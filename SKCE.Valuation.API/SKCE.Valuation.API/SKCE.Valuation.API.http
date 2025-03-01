@@ -1,6 +1,6 @@
-@SKCE.Valuation.API_HostAddress = http://localhost:5088
+@SKCE.Examination.API_HostAddress = http://localhost:5088
 
-GET {{SKCE.Valuation.API_HostAddress}}/weatherforecast/
+GET {{SKCE.Examination.API_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###

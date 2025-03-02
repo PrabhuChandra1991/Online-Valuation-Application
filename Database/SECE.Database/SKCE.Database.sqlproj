@@ -60,5 +60,15 @@
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\User.sql" />
+    <Build Include="Tables\Roles.sql" />
+    <Build Include="Tables\Designations.sql" />
+    <Build Include="Tables\Departments.sql" />
+    <Build Include="Tables\Institutions.sql" />
+    <Build Include="Tables\CourseDetails.sql" />
+    <Build Include="Tables\QPTags.sql" />
+    <Build Include="Tables\QPTemplate.sql" />
+    <Build Include="Tables\QPTemplateTagDetails.sql" />
+    <Build Include="Tables\QPTemplateTagByUserDetails.sql" />
+    <Build Include="Tables\DocumentDetails.sql" />
   </ItemGroup>
 </Project>

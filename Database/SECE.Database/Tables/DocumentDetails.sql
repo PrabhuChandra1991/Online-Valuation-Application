@@ -1,0 +1,12 @@
+﻿CREATE TABLE [dbo].[DocumentDetails]
+(
+	[DocumentId] INT NOT NULL PRIMARY KEY IDENTITY(1,1),
+	[DocumentName] NVARCHAR(255) NOT NULL,
+	[DocumentUrlPath] NVARCHAR(255) NOT NULL,
+	[DocumentType] NVARCHAR(50) NOT NULL,
+	[IsActive] BIT DEFAULT 1,
+	CreatedDate DATETIME DEFAULT GETDATE(),
+	CreatedBy NVARCHAR(255) NOT NULL,
+	ModifiedDate DATETIME DEFAULT GETDATE(),
+	ModifiedBy NVARCHAR(255) NOT NULL
+)

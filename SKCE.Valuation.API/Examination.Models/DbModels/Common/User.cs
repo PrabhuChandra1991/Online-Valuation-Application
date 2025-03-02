@@ -19,13 +19,13 @@ namespace Examination.Models.DbModels.Common
         [MaxLength(15)]
         public string? MobileNumber { get; set; }
 
-        public int RoleId { get; set; } // Foreign Key to Role
+        public int? RoleId { get; set; } 
 
-        public int Experience { get; set; }
+        public int? Experience { get; set; }
 
-        public int DepartmentId { get; set; } // Foreign Key to Department
+        public int? DepartmentId { get; set; } 
 
-        public int DesignationId { get; set; } // Foreign Key to Designation
+        public int? DesignationId { get; set; }
 
         public string? CollegeName { get; set; }
 
@@ -34,5 +34,6 @@ namespace Examination.Models.DbModels.Common
         public string? BankName { get; set; }
         public string? BankBranchName { get; set; }
         public string? BankIFSCCode { get; set; }
+        public bool IsEnabled { get; set; }
     }
 }

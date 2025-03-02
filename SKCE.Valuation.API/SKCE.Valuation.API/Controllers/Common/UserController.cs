@@ -10,7 +10,6 @@ namespace SKCE.Examination.API.Controllers.Common
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
-
         public UserController(IUserService  userService)
         {
             _userService = userService;

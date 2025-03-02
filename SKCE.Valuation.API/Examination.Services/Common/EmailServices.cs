@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Configuration;
 using System.Net.Mail;
 using System.Threading.Tasks;
 using MailKit.Net.Smtp;
 using MailKit.Security;
+using Microsoft.EntityFrameworkCore.Metadata;
 using MimeKit;
+using Org.BouncyCastle.Asn1.Ocsp;
 
 public class EmailService
 {
@@ -11,6 +14,7 @@ public class EmailService
     private const int SmtpPort = 587;
     private const string EmailSender = "venky27585@gmail.com"; // Replace with your Gmail
     private const string EmailPassword = "meru uhrk qcmm xhru"; // Replace with your App Password
+    private static readonly string hostUrl = ConfigurationManager.AppSettings["token"] ?? "https://localhost:5001"; // Fix CS1519 and CS1069
 
     public async Task<bool> SendEmailAsync(string recipientEmail, string subject, string body)
     {

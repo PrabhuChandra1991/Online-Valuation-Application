@@ -2,8 +2,10 @@
 using Examination.Models.DBModels.Common;
 using Examination.Services.ServiceContracts;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,11 +16,12 @@ namespace Examination.Services.Common
     {
         private readonly ExaminationDbContext _context;
         private readonly EmailService _emailService;
-
-        public UserService(ExaminationDbContext context,EmailService emailService)
+        private readonly IConfiguration _configuration;
+        public UserService(ExaminationDbContext context,EmailService emailService,IConfiguration configuration)
         {
             _context = context;
             _emailService = emailService;
+            _configuration = configuration;
         }
 
         public async Task<IEnumerable<User>> GetUsersAsync()
@@ -42,7 +45,8 @@ namespace Examination.Services.Common
             {
                 throw ex;
             }
-          _emailService.SendEmailAsync(user.Email, "Welcome to our SKCE Online Examination platform", $"Welcome {user.Email} to our SKCE Online Examination platform and please click here (Link here to login) to login for updating all profile details to proceed further.").Wait();
+          _emailService.SendEmailAsync(user.Email, "Welcome to our SKCE Online Examination platform",
+              $"Welcome {user.Email} to our SKCE Online Examination platform and please click (UI Host login Url) here to login for updating all profile details to proceed further.").Wait();
             return user;
         }
 

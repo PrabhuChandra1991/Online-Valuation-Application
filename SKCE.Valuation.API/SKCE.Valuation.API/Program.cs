@@ -11,6 +11,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ExaminationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Add CORS Policy
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("AllowSpecificOrigins", policy =>
+//    {
+//        policy.WithOrigins("http://localhost:5088")
+//              .AllowAnyMethod()
+//              .AllowAnyHeader();
+//    });
+//});
 // Register Services
 builder.Services.AddScoped<LoginServices>();
 builder.Services.AddScoped<EmailService>();
@@ -59,6 +69,8 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.UseRouting();
+// Enable CORS Middleware
+//app.UseCors("AllowSpecificOrigins");
 app.UseAuthorization();
 app.MapControllers();
 app.Run();

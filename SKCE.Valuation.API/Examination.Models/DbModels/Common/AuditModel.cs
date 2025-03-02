@@ -9,9 +9,9 @@ namespace Examination.Models.DbModels.Common
   public  class AuditModel
     {
         public bool IsActive { get; set; }
-        public int CreatedById { get; set; }
+        public string CreatedById { get; set; }
         public DateTime CreatedDate { get; set; }
-        public int? ModifiedById { get; set; }
+        public string? ModifiedById { get; set; }
         public DateTime? ModifiedDate { get; set; }
     }
 }

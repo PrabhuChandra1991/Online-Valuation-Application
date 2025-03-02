@@ -85,8 +85,8 @@ void SeedDefaultUser(ExaminationDbContext context)
             BankIFSCCode = "",
             CreatedDate = DateTime.Now,
             ModifiedDate = DateTime.Now,
-            CreatedById = 1,
-            ModifiedById = 1,
+            CreatedById = "1",
+            ModifiedById = "1",
             IsActive = true,
             IsEnabled= true
         };

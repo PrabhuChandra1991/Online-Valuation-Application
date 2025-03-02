@@ -31,7 +31,7 @@ namespace Examination.Services.Common
             string tempPassword = new Random().Next(100000, 999999).ToString();
             _tempPasswords[email] = (tempPassword, DateTime.UtcNow.AddMinutes(5));
 
-            _emailService.SendEmailAsync(email, "Your Temporary Password", $"Your temporary password is: {tempPassword} (valid for 5 minutes)").Wait();
+            _emailService.SendEmailAsync(email, "SKCE Online Examination Platform: Your Temporary Password", $"SKCE Online Examination Platform: Your temporary password is: {tempPassword} (valid for 5 minutes)").Wait();
 
             return tempPassword;
         }

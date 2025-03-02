@@ -32,7 +32,6 @@ namespace Examination.Services.Common
             _tempPasswords[email] = (tempPassword, DateTime.UtcNow.AddMinutes(5));
 
             _emailService.SendEmailAsync(email, "Your Temporary Password", $"Your temporary password is: {tempPassword} (valid for 5 minutes)").Wait();
-            //await SendEmailAsync(user.Email, tempPassword);
 
             return tempPassword;
         }

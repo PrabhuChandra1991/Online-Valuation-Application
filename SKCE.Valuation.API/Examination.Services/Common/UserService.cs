@@ -1,13 +1,9 @@
-﻿using Examination.Models.DbModels.Common;
-using Examination.Models.DBModels.Common;
-using Examination.Services.ServiceContracts;
+﻿using SKCE.Examination.Services.ServiceContracts;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Org.BouncyCastle.Asn1.Ocsp;
-using System.Net.Http;
+using SKCE.Examination.Models.DbModels.Common;
 
-namespace Examination.Services.Common
+namespace SKCE.Examination.Services.Common
 {
     public class UserService : IUserService
     {
@@ -43,8 +39,8 @@ namespace Examination.Services.Common
                 throw ex;
             }
             string hostUrl = $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/Login";
-            _emailService.SendEmailAsync(user.Email, "Welcome to our SKCE Online Examination Platform",
-              $"Welcome {user.Email} to our SKCE Online Examination Platform and please click {hostUrl} here to login for updating all your profile details to proceed further.").Wait();
+            _emailService.SendEmailAsync(user.Email, "Welcome to SKCE Online Examination Platform",
+              $"Welcome {user.Email} to our SKCE Online Examination Platform and please click {hostUrl} here to login for updating all your profile details to proceed further.\n\n Please contract SKCE Administrator if any challenges in login.\n\n Thanks\n SKCE Admin").Wait();
             return user;
         }
 

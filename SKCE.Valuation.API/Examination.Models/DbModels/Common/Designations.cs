@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SKCE.Examination.Models.DbModels.Common;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -8,8 +9,8 @@ using System.Threading.Tasks;
 
 namespace SKCE.Examination.Models.DbModels.Common
 {
-    [Table("Roles", Schema = "dbo")]
-    public class Roles: AuditModel
+    [Table("Designations", Schema ="dbo")]
+    public class Designations : AuditModel
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

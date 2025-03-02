@@ -1,6 +1,7 @@
-﻿using Examination.Models.ViewModels.Common;
-using Examination.Services.Common;
+﻿using SKCE.Examination.Services.Common;
 using Microsoft.AspNetCore.Mvc;
+using SKCE.Examination.Models.ViewModels.Common;
+using System.Threading.Tasks;
 
 namespace SKCE.Examination.API.Controllers.Common
 {
@@ -26,9 +27,9 @@ namespace SKCE.Examination.API.Controllers.Common
         }
 
         [HttpPost("validate-temp-password")]
-        public IActionResult ValidateTempPassword([FromBody] LoginVM request, [FromQuery] string tempPassword)
+        public async Task<IActionResult> ValidateTempPassword([FromBody] LoginVM request, [FromQuery] string tempPassword)
         {
-            var user = _loginManager.ValidateTempPassword(request.Email, tempPassword);
+            var user = await _loginManager.ValidateTempPassword(request.Email, tempPassword);
             if (user != null)
                 return Ok(user);
 

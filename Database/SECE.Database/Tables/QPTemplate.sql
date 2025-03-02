@@ -1,17 +1,17 @@
-﻿CREATE TABLE [dbo].[QPTemplate]
+﻿CREATE TABLE [dbo].[QPTemplates]
 (
-	[Id] INT NOT NULL PRIMARY KEY IDENTITY(1,1),
+	[Id] BIGINT NOT NULL PRIMARY KEY IDENTITY(1,1),
 	[Name] NVARCHAR(255) NOT NULL,
 	[Description] NVARCHAR(255) NOT NULL,
-	InstitutionId INT NOT NULL,
-	DepartmentId INT NOT NULL,
-	CourseId INT NOT NULL,
-	QPTemplateDocumentId INT NOT NULL,
-	QPTemplateAnswerDocumentId INT NOT NULL ,
-	QPTemplateSyalbusDocumentId INT NOT NULL ,
+	InstitutionId BIGINT NOT NULL,
+	DepartmentId BIGINT NOT NULL,
+	CourseId BIGINT NOT NULL,
+	QPTemplateDocumentId BIGINT NOT NULL,
+	QPTemplateAnswerDocumentId BIGINT NOT NULL ,
+	QPTemplateSyallbusDocumentId BIGINT NOT NULL ,
 	[IsActive] BIT DEFAULT 1,
 	CreatedDate DATETIME DEFAULT GETDATE(),
-	CreatedById NVARCHAR(255) NOT NULL,
+	CreatedById BIGINT NOT NULL,
 	ModifiedDate DATETIME DEFAULT GETDATE(),
-	ModifiedById NVARCHAR(255) NOT NULL
+	ModifiedById BIGINT NOT NULL
 )

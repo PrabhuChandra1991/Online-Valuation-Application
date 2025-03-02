@@ -1,11 +1,6 @@
-﻿using Examination.Models.DbModels.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using SKCE.Examination.Models.DbModels.Common;
 
-namespace Examination.Services.ServiceContracts
+namespace SKCE.Examination.Services.ServiceContracts
 {
     public interface IUserService
     {

@@ -1,6 +1,5 @@
-﻿using Examination.Models.DbModels.Common;
-using Examination.Services.ServiceContracts;
-using Microsoft.AspNetCore.Http;
+﻿using SKCE.Examination.Models.DbModels.Common;
+using SKCE.Examination.Services.ServiceContracts;
 using Microsoft.AspNetCore.Mvc;
 
 namespace SKCE.Examination.API.Controllers.Common

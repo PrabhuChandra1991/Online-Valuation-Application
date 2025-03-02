@@ -1,16 +1,16 @@
 ﻿CREATE TABLE Users (
-    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Id BIGINT IDENTITY(1,1) PRIMARY KEY,
     Name NVARCHAR(255) NULL,
     Email NVARCHAR(255) NOT NULL UNIQUE CHECK (Email LIKE '%@%'),
     MobileNumber NVARCHAR(15) NULL UNIQUE CHECK (MobileNumber LIKE '[0-9]%'),
-    RoleId INT NULL,
-    Experience INT CHECK (Experience >= 0),
+    RoleId BIGINT NULL,
+    Experience BIGINT CHECK (Experience >= 0),
     Mode AS (CASE 
                 WHEN Email LIKE '%@skcet.ac.in' THEN 'Internal' 
                 ELSE 'External' 
              END) PERSISTED,
-    DepartmentId INT ,
-    DesignationId INT  NULL,
+    DepartmentId BIGINT ,
+    DesignationId BIGINT  NULL,
     CollegeName NVARCHAR(255)  NULL,
     BankAccountName NVARCHAR(255)  NULL,
     BankAccountNumber NVARCHAR(50)  NULL,
@@ -20,7 +20,7 @@
     IsEnabled BIT DEFAULT 1,
     IsActive BIT DEFAULT 1,
     CreatedDate DATETIME DEFAULT GETDATE(),
-    CreatedById NVARCHAR(255)  NULL,
+    CreatedById BIGINT  NULL,
     ModifiedDate DATETIME DEFAULT GETDATE(),
-    ModifiedById NVARCHAR(255)  NULL
+    ModifiedById BIGINT  NULL
 );

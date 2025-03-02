@@ -5,13 +5,11 @@ VisualStudioVersion = 17.13.35806.99
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SKCE.Examination.API", "SKCE.Valuation.API\SKCE.Examination.API.csproj", "{4381B156-B409-4A59-952C-958773DFDB7A}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Database", "Database", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "SKCE.Examination.Database", "..\Database\SECE.Database\SKCE.Examination.Database.sqlproj", "{792E43CD-FAB5-4862-A1C2-62BC5799CCEE}"
 EndProject
-Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "SKCE.Database", "..\Database\SECE.Database\SKCE.Database.sqlproj", "{792E43CD-FAB5-4862-A1C2-62BC5799CCEE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SKCE.Examination.Services", "Examination.Services\SKCE.Examination.Services.csproj", "{55527136-906A-4A73-BF0A-DC863D9BE031}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Examination.Services", "Examination.Services\Examination.Services.csproj", "{55527136-906A-4A73-BF0A-DC863D9BE031}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Examination.Models", "Examination.Models\Examination.Models.csproj", "{1B71ADD5-6ED8-4BAF-85F7-E84163B59B2F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SKCE.Examination.Models", "Examination.Models\SKCE.Examination.Models.csproj", "{1B71ADD5-6ED8-4BAF-85F7-E84163B59B2F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -40,9 +38,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{792E43CD-FAB5-4862-A1C2-62BC5799CCEE} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {ED2BE15F-29C7-440A-9D65-F46DA01761E7}

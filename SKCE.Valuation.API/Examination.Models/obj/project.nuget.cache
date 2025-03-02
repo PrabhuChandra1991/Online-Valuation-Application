@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "wT0RTbu44pY=",
+  "dgSpecHash": "jQf2pAAYPaw=",
   "success": true,
-  "projectFilePath": "E:\\SKCE\\Workspace\\SKCE.Valuation.API\\Examination.Models\\Examination.Models.csproj",
+  "projectFilePath": "E:\\SKCE\\Workspace\\SKCE.Valuation.API\\Examination.Models\\SKCE.Examination.Models.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\HI\\.nuget\\packages\\microsoft.entityframeworkcore\\9.0.2\\microsoft.entityframeworkcore.9.0.2.nupkg.sha512",
     "C:\\Users\\HI\\.nuget\\packages\\microsoft.entityframeworkcore.abstractions\\9.0.2\\microsoft.entityframeworkcore.abstractions.9.0.2.nupkg.sha512",

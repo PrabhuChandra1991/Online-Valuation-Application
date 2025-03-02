@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Configuration;
 using System.Net.Mail;
-using System.Threading.Tasks;
-using MailKit.Net.Smtp;
+
 using MailKit.Security;
-using Microsoft.EntityFrameworkCore.Metadata;
 using MimeKit;
-using Org.BouncyCastle.Asn1.Ocsp;
 
 public class EmailService
 {
@@ -43,12 +40,3 @@ public class EmailService
     }
 }
 
-// Example usage
-class Program
-{
-    static async Task Main()
-    {
-        var emailService = new EmailService();
-        await emailService.SendEmailAsync("recipient@example.com", "Test Email", "Hello, this is a test email from Gmail SMTP.");
-    }
-}

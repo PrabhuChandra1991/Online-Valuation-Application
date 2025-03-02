@@ -1,14 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using SKCE.Examination.Models.DbModels.Common;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Examination.Models.DbModels.Common
+namespace SKCE.Examination.Models.DbModels.Common
 {
     [Table("Users", Schema = "dbo")]
     public class User: AuditModel
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         [MaxLength(255)]
         public string? Name { get; set; }
@@ -19,13 +20,13 @@ namespace Examination.Models.DbModels.Common
         [MaxLength(15)]
         public string? MobileNumber { get; set; }
 
-        public int? RoleId { get; set; } 
+        public long? RoleId { get; set; } 
 
-        public int? Experience { get; set; }
+        public long? Experience { get; set; }
 
-        public int? DepartmentId { get; set; } 
+        public long? DepartmentId { get; set; } 
 
-        public int? DesignationId { get; set; }
+        public long? DesignationId { get; set; }
 
         public string? CollegeName { get; set; }
 

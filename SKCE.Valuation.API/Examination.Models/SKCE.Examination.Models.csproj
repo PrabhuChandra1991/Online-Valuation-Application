@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <Folder Include="DbModels\Valuation\" />
-    <Folder Include="DbModels\QPSettings\" />
     <Folder Include="ViewModels\Valuation\" />
     <Folder Include="ViewModels\QPSettings\" />
   </ItemGroup>

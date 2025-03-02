@@ -8,12 +8,13 @@ using System.Threading.Tasks;
 
 namespace SKCE.Examination.Models.DbModels.Common
 {
-    [Table("Roles", Schema = "dbo")]
-    public class Roles: AuditModel
+    [Table("DocumentDetails", Schema = "dbo")]
+    public  class DocumentDetails:AuditModel
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long Id { get; set; }
-        public required string Name { get; set; }
+        public int DocumentId { get; set; }
+        public required string DocumentName { get; set; }
+        public required string DocumentUrl { get; set; }
     }
 }

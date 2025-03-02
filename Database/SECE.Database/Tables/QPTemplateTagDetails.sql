@@ -1,11 +1,11 @@
 ﻿CREATE TABLE [dbo].[QPTemplateTagDetails]
 (
-	[Id] INT NOT NULL PRIMARY KEY IDENTITY,
-	[QPTemplateId] INT NOT NULL FOREIGN KEY REFERENCES [dbo].[QPTemplate]([Id]),
-	[QPTagId] INT NOT NULL,
+	[Id] BIGINT NOT NULL PRIMARY KEY IDENTITY,
+	[QPTemplateId] BIGINT NOT NULL,
+	[QPTagId] BIGINT NOT NULL,
 	[IsActive] BIT DEFAULT 1,
-	[CreatedById] INT NOT NULL ,
+	[CreatedById] BIGINT NOT NULL ,
 	[CreatedDate] DATETIME NOT NULL,
-	[ModifiedById] INT ,
+	[ModifiedById] BIGINT ,
 	[ModifiedDate] DATETIME
 )

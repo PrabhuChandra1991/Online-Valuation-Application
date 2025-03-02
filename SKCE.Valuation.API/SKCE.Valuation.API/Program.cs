@@ -1,10 +1,9 @@
 
 using Microsoft.EntityFrameworkCore;
-using Examination.Services.Common;
-using Examination.Models.DBModels.Common;
-using Examination.Services.ServiceContracts;
-using System;
-using Examination.Models.DbModels.Common;
+using SKCE.Examination.Services.Common;
+using SKCE.Examination.Services.ServiceContracts;
+using SKCE.Examination.Models.DbModels.Common;
+using SKCE.Examination.Services.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +15,9 @@ builder.Services.AddDbContext<ExaminationDbContext>(options =>
 builder.Services.AddScoped<LoginServices>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<IUserService,UserService>();
+builder.Services.AddScoped<ExcelHelper>(); // Register helper
+builder.Services.AddScoped<S3Helper>(); // Register helper
+
 builder.Services.AddHttpContextAccessor();
 // Enable Controllers
 builder.Services.AddControllers();
@@ -83,13 +85,9 @@ void SeedDefaultUser(ExaminationDbContext context)
             BankName = "",
             BankBranchName = "",
             BankIFSCCode = "",
-            CreatedDate = DateTime.Now,
-            ModifiedDate = DateTime.Now,
-            CreatedById = "1",
-            ModifiedById = "1",
-            IsActive = true,
             IsEnabled= true
         };
+        AuditHelper.SetAuditPropertiesForInsert(defaultUser, 1);
 
         context.Users.Add(defaultUser);
         context.SaveChanges(); // Commit to Database

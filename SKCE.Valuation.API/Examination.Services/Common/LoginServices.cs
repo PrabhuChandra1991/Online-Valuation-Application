@@ -1,14 +1,10 @@
-﻿using Examination.Models.DbModels.Common;
-using Examination.Models.DBModels.Common;
-using System;
+﻿using SKCE.Examination.Models.DbModels.Common;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Mail;
+using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace Examination.Services.Common
+namespace SKCE.Examination.Services.Common
 {
     public class LoginServices
     {
@@ -22,7 +18,7 @@ namespace Examination.Services.Common
             _context = context;
         }
 
-        public async Task<string> GenerateTempPasswordAsync(string email)
+        public async Task<string?> GenerateTempPasswordAsync(string email)
         {
             var user = _context.Users.FirstOrDefault(u => u.Email == email);
             if (user == null)
@@ -31,20 +27,61 @@ namespace Examination.Services.Common
             string tempPassword = new Random().Next(100000, 999999).ToString();
             _tempPasswords[email] = (tempPassword, DateTime.UtcNow.AddMinutes(5));
 
-            _emailService.SendEmailAsync(email, "SKCE Online Examination Platform: Your Temporary Password", $"SKCE Online Examination Platform: Your temporary password is: {tempPassword} (valid for 5 minutes)").Wait();
+            var loginHistory = new UserLoginHistory
+            {
+                UserId = user.Id,
+                Email = email,
+                TempPassword = tempPassword, // Store hashed password
+                LoginDateTime = DateTime.UtcNow,
+                IsSuccessful = false
+            };
+            AuditHelper.SetAuditPropertiesForInsert(loginHistory, user.Id);
+            await _context.UserLoginHistories.AddAsync(loginHistory);
+            await _context.SaveChangesAsync();
+            _emailService.SendEmailAsync(email, "SKCE Online Examination Platform: Your Temporary Password", $"Hi {user.Email},\n\n Please use your Email Id and Temporary Password to login into SKCE Online Examination Platform. \n\n Your temporary password is: {tempPassword} (valid for 5 minutes) \n\n Thanks\n SKCE Admin").Wait();
 
             return tempPassword;
         }
 
-        public User ValidateTempPassword(string email, string password)
+        public async Task<User?> ValidateTempPassword(string email, string password)
         {
-            if (_tempPasswords.TryGetValue(email, out var data) &&
-                data.tempPassword == password && data.expiry < DateTime.UtcNow)
+            var loginRecord = await _context.UserLoginHistories
+            .Where(l => l.Email == email)
+            .OrderByDescending(l => l.LoginDateTime)
+            .FirstOrDefaultAsync();
+
+            if (loginRecord != null && _tempPasswords.TryGetValue(email, out var data) &&
+                (data.tempPassword == password && data.expiry >= DateTime.UtcNow))
             {
+                loginRecord.IsSuccessful = true;
+                AuditHelper.SetAuditPropertiesForUpdate(loginRecord, loginRecord.UserId);
+                _context.UserLoginHistories.Update(loginRecord);
+                await _context.SaveChangesAsync();
+
                 _tempPasswords.TryRemove(email, out _);
-                return null;
+                
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+                return user;
             }
-            return (_context.Users.FirstOrDefault(u => u.Email == email));
+            return null;
+        }
+
+        /// <summary>
+        /// Hash password using SHA256.
+        /// </summary>
+        private string HashPassword(string password)
+        {
+            using var sha256 = SHA256.Create();
+            var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+            return Convert.ToBase64String(bytes);
+        }
+
+        /// <summary>
+        /// Verify hashed password.
+        /// </summary>
+        private bool VerifyPassword(string inputPassword, string hashedPassword)
+        {
+            return HashPassword(inputPassword) == hashedPassword;
         }
 
     }

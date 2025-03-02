@@ -42,7 +42,7 @@ namespace Examination.Services.Common
             {
                 throw ex;
             }
-          _emailService.SendEmailAsync(user.Email, "Welcome to our SKCE Online Examination platform", $"Welcome {user.Name} to our SKCE Online Examination platform and use the link () to login and update all profile details.").Wait();
+          _emailService.SendEmailAsync(user.Email, "Welcome to our SKCE Online Examination platform", $"Welcome {user.Email} to our SKCE Online Examination platform and please click here (Link here to login) to login for updating all profile details to proceed further.").Wait();
             return user;
         }
 

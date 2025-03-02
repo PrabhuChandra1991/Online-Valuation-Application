@@ -1,4 +1,5 @@
 ﻿using Examination.Models.DbModels.Common;
+using Examination.Services.ServiceContracts;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,25 +9,25 @@ namespace SKCE.Examination.API.Controllers.Common
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IUserService _userService;
 
-        public UserController(IUserRepository userRepository)
+        public UserController(IUserService  userService)
         {
-            _userRepository = userRepository;
+            _userService = userService;
         }
 
         // GET: api/user
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
-            return Ok(await _userRepository.GetUsersAsync());
+            return Ok(await _userService.GetUsersAsync());
         }
 
         // GET: api/user/5
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUser(int id)
         {
-            var user = await _userRepository.GetUserByIdAsync(id);
+            var user = await _userService.GetUserByIdAsync(id);
             if (user == null) return NotFound();
             return Ok(user);
         }
@@ -35,7 +36,7 @@ namespace SKCE.Examination.API.Controllers.Common
         [HttpPost]
         public async Task<ActionResult<User>> AddUser(User user)
         {
-            var newUser = await _userRepository.AddUserAsync(user);
+            var newUser = await _userService.AddUserAsync(user);
             return CreatedAtAction(nameof(GetUser), new { id = newUser.Id }, newUser);
         }
 
@@ -45,7 +46,7 @@ namespace SKCE.Examination.API.Controllers.Common
         {
             if (id != user.Id) return BadRequest();
 
-            var updatedUser = await _userRepository.UpdateUserAsync(user);
+            var updatedUser = await _userService.UpdateUserAsync(user);
             return Ok(updatedUser);
         }
 
@@ -53,10 +54,9 @@ namespace SKCE.Examination.API.Controllers.Common
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
-            var deleted = await _userRepository.DeleteUserAsync(id);
+            var deleted = await _userService.DeleteUserAsync(id);
             if (!deleted) return NotFound();
             return NoContent();
         }
     }
-}
 }

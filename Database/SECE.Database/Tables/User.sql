@@ -1,26 +1,26 @@
 ﻿CREATE TABLE Users (
     Id INT IDENTITY(1,1) PRIMARY KEY,
-    Name NVARCHAR(255) NOT NULL,
+    Name NVARCHAR(255) NULL,
     Email NVARCHAR(255) NOT NULL UNIQUE CHECK (Email LIKE '%@%'),
-    MobileNumber NVARCHAR(15) NOT NULL UNIQUE CHECK (MobileNumber LIKE '[0-9]%'),
-    RoleId INT NOT NULL FOREIGN KEY REFERENCES Roles(Id),
+    MobileNumber NVARCHAR(15) NULL UNIQUE CHECK (MobileNumber LIKE '[0-9]%'),
+    RoleId INT NULL,
     Experience INT CHECK (Experience >= 0),
     Mode AS (CASE 
-                WHEN Email LIKE '%@yourdomain.com' THEN 'Internal' 
+                WHEN Email LIKE '%@skcet.ac.in' THEN 'Internal' 
                 ELSE 'External' 
              END) PERSISTED,
-    DepartmentId INT NOT NULL FOREIGN KEY REFERENCES Departments(Id),
-    DesignationId INT NOT NULL FOREIGN KEY REFERENCES Designations(Id),
-    CollegeName NVARCHAR(255) NOT NULL,
-    BankAccountName NVARCHAR(255) NOT NULL,
-    BankAccountNumber NVARCHAR(50) NOT NULL,
-    BankName NVARCHAR(255) NOT NULL,
-    BankBranchName NVARCHAR(255) NOT NULL,
-    BankIFSCCode NVARCHAR(20) NOT NULL,
+    DepartmentId INT ,
+    DesignationId INT  NULL,
+    CollegeName NVARCHAR(255)  NULL,
+    BankAccountName NVARCHAR(255)  NULL,
+    BankAccountNumber NVARCHAR(50)  NULL,
+    BankName NVARCHAR(255)  NULL,
+    BankBranchName NVARCHAR(255)  NULL,
+    BankIFSCCode NVARCHAR(20)  NULL,
     IsEnabled BIT DEFAULT 1,
     IsActive BIT DEFAULT 1,
     CreatedDate DATETIME DEFAULT GETDATE(),
-    CreatedBy NVARCHAR(255) NOT NULL,
+    CreatedById NVARCHAR(255)  NULL,
     ModifiedDate DATETIME DEFAULT GETDATE(),
-    ModifiedBy NVARCHAR(255) NOT NULL
+    ModifiedById NVARCHAR(255)  NULL
 );

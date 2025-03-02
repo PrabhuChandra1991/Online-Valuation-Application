@@ -7,7 +7,7 @@
 	[UserId] INT NOT NULL,
 	[IsActive] BIT NOT NULL,
 	[CreatedDate] DATETIME NOT NULL,
-	[CreatedBy] INT NOT NULL,
+	[CreatedById] INT NOT NULL,
 	[ModifiedDate] DATETIME NULL,
-	[ModifiedBy] INT NULL
+	[ModifiedById] INT NULL
 )

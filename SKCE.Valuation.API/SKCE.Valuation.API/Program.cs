@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Examination.Services.Common;
 using Examination.Models.DBModels.Common;
+using Examination.Services.ServiceContracts;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,7 @@ builder.Services.AddDbContext<ExaminationDbContext>(options =>
 // Register Services
 builder.Services.AddScoped<LoginServices>();
 builder.Services.AddScoped<EmailService>();
+builder.Services.AddScoped<IUserService,UserService>();
 
 // Enable Controllers
 builder.Services.AddControllers();

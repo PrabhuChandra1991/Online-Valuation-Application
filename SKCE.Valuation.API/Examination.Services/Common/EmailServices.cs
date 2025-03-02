@@ -14,7 +14,6 @@ public class EmailService
     private const int SmtpPort = 587;
     private const string EmailSender = "venky27585@gmail.com"; // Replace with your Gmail
     private const string EmailPassword = "meru uhrk qcmm xhru"; // Replace with your App Password
-    private static readonly string hostUrl = ConfigurationManager.AppSettings["token"] ?? "https://localhost:5001"; // Fix CS1519 and CS1069
 
     public async Task<bool> SendEmailAsync(string recipientEmail, string subject, string body)
     {

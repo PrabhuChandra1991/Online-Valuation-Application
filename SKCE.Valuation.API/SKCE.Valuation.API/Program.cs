@@ -16,7 +16,7 @@ builder.Services.AddDbContext<ExaminationDbContext>(options =>
 builder.Services.AddScoped<LoginServices>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<IUserService,UserService>();
-
+builder.Services.AddHttpContextAccessor();
 // Enable Controllers
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

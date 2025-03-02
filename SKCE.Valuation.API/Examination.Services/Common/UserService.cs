@@ -1,21 +1,24 @@
 ﻿using Examination.Models.DbModels.Common;
 using Examination.Models.DBModels.Common;
 using Examination.Services.ServiceContracts;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Org.BouncyCastle.Asn1.Ocsp;
+using System.Net.Http;
 
 namespace Examination.Services.Common
 {
     public class UserService : IUserService
     {
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ExaminationDbContext _context;
         private readonly EmailService _emailService;
-        private readonly IConfiguration _configuration;
-        public UserService(ExaminationDbContext context,EmailService emailService,IConfiguration configuration)
+        public UserService(IHttpContextAccessor  httpContextAccessor, ExaminationDbContext context, EmailService emailService)
         {
+            _httpContextAccessor = httpContextAccessor;
             _context = context;
             _emailService = emailService;
-            _configuration = configuration;
         }
 
         public async Task<IEnumerable<User>> GetUsersAsync()
@@ -39,8 +42,9 @@ namespace Examination.Services.Common
             {
                 throw ex;
             }
-          _emailService.SendEmailAsync(user.Email, "Welcome to our SKCE Online Examination platform",
-              $"Welcome {user.Email} to our SKCE Online Examination platform and please click (UI Host login Url) here to login for updating all profile details to proceed further.").Wait();
+            string hostUrl = $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/Login";
+            _emailService.SendEmailAsync(user.Email, "Welcome to our SKCE Online Examination Platform",
+              $"Welcome {user.Email} to our SKCE Online Examination Platform and please click {hostUrl} here to login for updating all your profile details to proceed further.").Wait();
             return user;
         }
 

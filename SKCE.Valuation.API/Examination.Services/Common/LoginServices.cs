@@ -40,7 +40,7 @@ namespace Examination.Services.Common
         public User ValidateTempPassword(string email, string password)
         {
             if (_tempPasswords.TryGetValue(email, out var data) &&
-                data.tempPassword == password && data.expiry > DateTime.UtcNow)
+                data.tempPassword == password && data.expiry < DateTime.UtcNow)
             {
                 _tempPasswords.TryRemove(email, out _);
                 return null;

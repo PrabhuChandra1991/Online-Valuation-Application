@@ -11,6 +11,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ExaminationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddCors();
+
 // Add CORS Policy
 //builder.Services.AddCors(options =>
 //{
@@ -21,10 +23,12 @@ builder.Services.AddDbContext<ExaminationDbContext>(options =>
 //              .AllowAnyHeader();
 //    });
 //});
+
+
 // Register Services
 builder.Services.AddScoped<LoginServices>();
 builder.Services.AddScoped<EmailService>();
-builder.Services.AddScoped<IUserService,UserService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ExcelHelper>(); // Register helper
 builder.Services.AddScoped<S3Helper>(); // Register helper
 
@@ -71,6 +75,12 @@ app.MapControllers();
 app.UseRouting();
 // Enable CORS Middleware
 //app.UseCors("AllowSpecificOrigins");
+app.UseCors(
+               options => options.SetIsOriginAllowed(x => _ = true)
+               .AllowAnyMethod()
+               .AllowAnyHeader()
+               .AllowCredentials()
+               );
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
@@ -97,7 +107,7 @@ void SeedDefaultUser(ExaminationDbContext context)
             BankName = "",
             BankBranchName = "",
             BankIFSCCode = "",
-            IsEnabled= true
+            IsEnabled = true
         };
         AuditHelper.SetAuditPropertiesForInsert(defaultUser, 1);
 

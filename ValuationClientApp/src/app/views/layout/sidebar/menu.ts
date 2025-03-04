@@ -3,12 +3,12 @@ import { MenuItem } from './menu.model';
 export const MENU: MenuItem[] = [
  
   {
-    label: 'User creation',
+    label: 'User Management',
     icon: 'home',
-    link: '/dashboard'
+    link: '/apps/user'
   },
   {
-    label: 'Template creation',
+    label: 'Template Management',
     icon: 'message-square',
     link: '/apps/chat',
   },

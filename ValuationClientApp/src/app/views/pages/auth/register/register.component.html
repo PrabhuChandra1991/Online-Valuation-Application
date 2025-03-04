@@ -5,38 +5,70 @@
         <div class="row">
           <div class="col-md-4 pe-md-0">
             <div class="auth-side-wrapper" [ngStyle]="{ 'background-image': 'url(https://placehold.co/250x650)' }">
-  
-            </div>
+              </div>
           </div>
           <div class="col-md-8 ps-md-0">
             <div class="auth-form-wrapper px-4 py-5">
-              <a routerLink="." class="nobleui-logo d-block mb-2">Noble<span>UI</span></a>
-              <h5 class="text-secondary fw-normal mb-4">Create a free account.</h5>
-              <form class="forms-sample">
+              <!-- <a routerLink="." class="nobleui-logo d-block mb-2">Noble<span>UI</span></a>
+              <h5 class="text-secondary fw-normal mb-4">Create a free account.</h5> -->
+              <form class="forms-sample" (ngSubmit)="onRegister()" #actorForm="ngForm">
                 <div class="mb-3">
-                  <label for="exampleInputUsername1" class="form-label">Username</label>
-                  <input type="text" class="form-control" id="exampleInputUsername1" autocomplete="Username" placeholder="Username">
+                  <label name="userName" class="form-label">Name <span class="text-danger">*</span></label>
+                  <input type="text" [(ngModel)]="userObj.name" name="name" required #uname="ngModel" class="form-control" id="userName" placeholder="User Name">
+                  <div class="text-danger">
+                    @if(uname.errors?.['required'] && uname.touched){
+                      <span>Name is required</span>
+                    }
+                    <!-- @if(userForm.controls['userEmail'].errors?.['pattern'] && userForm.controls['userEmail'].touched){
+                      <span>Email is not in valid format</span>
+                    } -->
+                  </div>
                 </div>
                 <div class="mb-3">
-                  <label for="exampleInputEmail1" class="form-label">Email address</label>
-                  <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email">
+                  <label name="userEmail" class="form-label">Email<span class="text-danger"> *</span></label>
+                  <input type="text" [(ngModel)]="userObj.email" name="email" pattern="^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$"  required #usrEmail="ngModel" class="form-control" id="userEmail" autocomplete="Useremail" placeholder="User Email">
+                  <div class="text-danger">
+                    <span *ngIf="usrEmail.errors?.['required'] && usrEmail.touched">Email is required</span>
+                    <span *ngIf="usrEmail.errors?.['pattern']">Email is not valid</span>
+                    <!-- @if(usrEmail.errors?.['required'] && usrEmail.touched){
+                      <span>Email is required</span>
+                    }
+                    @if(usrEmail.errors?.['pattern'] ){
+                      <span>Email is required</span>
+                    } -->
+                    <!-- @if(userForm.controls['userEmail'].errors?.['required'] && userForm.controls['userEmail'].touched){
+                      <span>This field is required</span>
+                    } -->
+                    <!-- @if(userForm.controls['userEmail'].errors?.['pattern'] && userForm.controls['userEmail'].touched){
+                      <span>Email is not in valid format</span>
+                    } -->
+                  </div>
                 </div>
                 <div class="mb-3">
-                  <label for="exampleInputPassword1" class="form-label">Password</label>
-                  <input type="password" class="form-control" id="exampleInputPassword1" autocomplete="current-password" placeholder="Password">
+                  <label name="userMobile" class="form-label">Mobile Number<span class="text-danger"> *</span></label>
+                  <input type="text" [(ngModel)]="userObj.mobileNumber" required name="mobileNumber" #usrMobile="ngModel" class="form-control" id="userMobile"  placeholder="Mobile Number">
+                  <div class="text-danger">
+                    <span *ngIf="usrMobile.errors?.['required'] && usrMobile.touched">Mobile Number is required</span>
+                    <!-- @if(userForm.controls['userEmail'].errors?.['required'] && userForm.controls['userEmail'].touched){
+                      <span>This field is required</span>
+                    } -->
+                    <!-- @if(userForm.controls['userEmail'].errors?.['pattern'] && userForm.controls['userEmail'].touched){
+                      <span>Email is not in valid format</span>
+                    } -->
+                  </div>
                 </div>
-                <div class="form-check mb-3">
+                <!-- <div class="form-check mb-3">
                   <input type="checkbox" class="form-check-input" id="authCheck">
                   <label class="form-check-label" for="authCheck">
                     Remember me
                   </label>
-                </div>
+                </div> -->
                 <div>
-                  <button type="submit" class="btn btn-primary me-2 mb-2 mb-md-0" (click)="onRegister($event)">Sign up</button>
-                  <button type="button" class="btn btn-outline-primary btn-icon-text mb-2 mb-md-0">
+                  <button type="submit" class="btn btn-primary me-2 mb-2 mb-md-0" >Sign up</button>
+                  <!-- <button type="button" class="btn btn-outline-primary btn-icon-text mb-2 mb-md-0">
                     <i class="feather icon-twitter btn-icon-prepend"></i>
                     Sign up with twitter
-                  </button>
+                  </button> -->
                 </div>
                 <a routerLink="/auth/login" class="d-block mt-3 text-secondary">Already a user? Sign in</a>
               </form>

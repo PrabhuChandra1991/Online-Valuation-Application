@@ -29,6 +29,9 @@
 /SKCE.Valuation.API/.vs/SKCE.Examination/FileContentIndex
 /SKCE.Valuation.API/.vs/ProjectEvaluation
 *.v2
+/SCET/.vscode
+/SCET.zip
+/SCET
 /Database/SECE.Database/bin/Debug
 /Database/SECE.Database/SKCE.Database.dbmdl
 /Database/SECE.Database/SKCE.Database.jfm

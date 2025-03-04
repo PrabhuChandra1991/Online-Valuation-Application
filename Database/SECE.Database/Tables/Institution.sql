@@ -1,6 +1,6 @@
-﻿CREATE TABLE [dbo].[Institutions]
+﻿CREATE TABLE [dbo].[Institution]
 (
-	[Id] BIGINT NOT NULL PRIMARY KEY IDENTITY(1,1),
+	[InstitutionId] BIGINT NOT NULL PRIMARY KEY IDENTITY(1,1),
 	[Name] NVARCHAR(255) NOT NULL,
 	[Email] NVARCHAR(255) NOT NULL,
 	[MobileNumber] NVARCHAR(15) NOT NULL,

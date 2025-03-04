@@ -1,8 +1,8 @@
-﻿CREATE TABLE [dbo].[DocumentDetails]
+﻿CREATE TABLE [dbo].[Document]
 (
 	[DocumentId] BIGINT NOT NULL PRIMARY KEY IDENTITY(1,1),
-	[DocumentName] NVARCHAR(255) NOT NULL,
-	[DocumentUrl] NVARCHAR(255) NOT NULL,
+	[Name] NVARCHAR(255) NOT NULL,
+	[Url] NVARCHAR(Max) NOT NULL,
 	[IsActive] BIT DEFAULT 1,
 	CreatedDate DATETIME DEFAULT GETDATE(),
 	CreatedById BIGINT NOT NULL,

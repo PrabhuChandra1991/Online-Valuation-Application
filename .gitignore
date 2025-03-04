@@ -22,7 +22,6 @@
 /SKCE.Valuation.API/Examination.Models/obj/Debug/net8.0
 /SKCE.Valuation.API/Examination.Services/obj/Debug/net8.0
 /SKCE.Valuation.API/Examination.Services/obj
-/Database/SECE.Database
 /SKCE.Valuation.API/.vs/ProjectEvaluation/skce.valuation.api.metadata.v9.bin
 /SKCE.Valuation.API/.vs/ProjectEvaluation/skce.valuation.api.projects.v9.bin
 /SKCE.Valuation.API/.vs/ProjectEvaluation/skce.valuation.api.strings.v9.bin
@@ -30,3 +29,7 @@
 /SKCE.Valuation.API/.vs/SKCE.Examination/FileContentIndex
 /SKCE.Valuation.API/.vs/ProjectEvaluation
 *.v2
+/Database/SECE.Database/bin/Debug
+/Database/SECE.Database/SKCE.Database.dbmdl
+/Database/SECE.Database/SKCE.Database.jfm
+/Database/SECE.Database/SKCE.Examination.Database.sqlproj.user

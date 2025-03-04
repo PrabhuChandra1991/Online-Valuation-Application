@@ -26,6 +26,10 @@ export default [
         loadComponent: () => import('./chat/chat.component').then(c => c.ChatComponent) 
     },
     {
+        path: 'user',
+        loadComponent: () => import('./user/user.component').then(c => c.UserComponent) 
+    },
+    {
         path: 'calendar',
         loadComponent: () => import('./calendar/calendar.component').then(c => c.CalendarComponent)
     }

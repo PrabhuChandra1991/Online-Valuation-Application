@@ -29,7 +29,7 @@ builder.Services.AddCors();
 builder.Services.AddScoped<LoginServices>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<ExcelHelper>(); // Register helper
+builder.Services.AddScoped<ExcelImportHelper>(); // Register helper
 builder.Services.AddScoped<S3Helper>(); // Register helper
 
 builder.Services.AddHttpContextAccessor();
@@ -50,6 +50,8 @@ using (var scope = app.Services.CreateScope())
         var context = services.GetRequiredService<ExaminationDbContext>();
         context.Database.Migrate(); // Apply pending migrations
         SeedDefaultUser(context);
+        SeedDefaultRoles(context);
+        SeedDefaultExamMonths(context);
     }
     catch (Exception ex)
     {
@@ -115,6 +117,53 @@ void SeedDefaultUser(ExaminationDbContext context)
         AuditHelper.SetAuditPropertiesForInsert(defaultUser, 1);
 
         context.Users.Add(defaultUser);
+        context.SaveChanges(); // Commit to Database
+    }
+}
+
+/// <summary>
+/// Seeds a default roles into the database if not exists.
+/// </summary>
+void SeedDefaultRoles(ExaminationDbContext context)
+{
+    if (!context.Roles.Any()) // Check if role table is empty
+    {
+        var roles = new List<Role>
+        {
+            new Role { Name = "Super Admin" },
+            new Role { Name = "Admin" },
+            new Role { Name = "Expert" }
+        };
+        foreach (var role in roles)
+            AuditHelper.SetAuditPropertiesForInsert(role, 1);
+
+        context.Roles.AddRange(roles);
+        context.SaveChanges(); // Commit to Database
+    }
+}
+
+/// <summary>
+/// Seeds a default roles into the database if not exists.
+/// </summary>
+void SeedDefaultExamMonths(ExaminationDbContext context)
+{
+    if (!context.ExamMonths.Any()) // Check if role table is empty
+    {
+        var examMonths = new List<ExamMonth>
+        {
+            new ExamMonth { Name = "NOV/DEC" ,Semester=1},
+            new ExamMonth { Name = "APRIL/MAY" ,Semester=2},
+            new ExamMonth { Name = "NOV/DEC" ,Semester=3},
+            new ExamMonth { Name = "APRIL/MAY" ,Semester=4},
+            new ExamMonth { Name = "NOV/DEC" ,Semester=5},
+            new ExamMonth { Name = "APRIL/MAY" ,Semester=6},
+            new ExamMonth { Name = "NOV/DEC" ,Semester=7},
+            new ExamMonth { Name = "APRIL/MAY" ,Semester=8},
+        };
+        foreach (var examMonth in examMonths)
+            AuditHelper.SetAuditPropertiesForInsert(examMonth, 1);
+
+        context.ExamMonths.AddRange(examMonths);
         context.SaveChanges(); // Commit to Database
     }
 }

@@ -1,6 +1,6 @@
 ﻿CREATE TABLE [dbo].[DegreeType]
 (
-	[DegreeTypeId] BIGINT NOT NULL PRIMARY KEY,
+	[DegreeTypeId] BIGINT IDENTITY(1,1) NOT NULL PRIMARY KEY,
     [Name] NVARCHAR(100) NOT NULL,
     [Code] NVARCHAR(100) NULL,
     IsActive BIT DEFAULT 1,

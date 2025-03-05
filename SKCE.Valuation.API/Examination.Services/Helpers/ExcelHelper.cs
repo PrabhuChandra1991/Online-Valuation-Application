@@ -1,54 +1,143 @@
-﻿using SKCE.Examination.Models.DbModels.Common;
-using OfficeOpenXml;
-namespace SKCE.Examination.Services.Helpers
-{
-    public class ExcelHelper
-    {
-        private readonly ExaminationDbContext _dbContext;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.EntityFrameworkCore;
+using SKCE.Examination.Models.DbModels.Common;
 
-        public ExcelHelper(ExaminationDbContext dbContext)
+public class ExcelImportHelper
+{
+    private readonly ExaminationDbContext _dbContext;
+
+    public ExcelImportHelper(ExaminationDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+
+    public async Task<string> ImportDataFromExcel(Stream excelStream)
+    {
+        using var spreadsheet = SpreadsheetDocument.Open(excelStream, false);
+        var workbookPart = spreadsheet.WorkbookPart;
+        var sheet = workbookPart.Workbook.Sheets.GetFirstChild<Sheet>();
+        var worksheetPart = (WorksheetPart)workbookPart.GetPartById(sheet.Id);
+        var rows = worksheetPart.Worksheet.Descendants<Row>().Skip(1); // Skip header
+
+        var degreeTypes = new HashSet<string>();
+        var departments = new HashSet<Department>();
+        var courses = new List<Course>();
+
+        foreach (var row in rows)
         {
-            _dbContext = dbContext;
+            var cells = row.Elements<Cell>().ToList();
+            string degreeTypeName = GetCellValue(workbookPart, cells[2]).Trim();
+
+            if (!string.IsNullOrEmpty(degreeTypeName))
+                degreeTypes.Add(degreeTypeName);
         }
 
-        /// <summary>
-        /// Reads an Excel file and imports data into the database.
-        /// </summary>
-        public async Task<List<User>> ImportCourseDetailsBySyllabusFromExcelAsync(Stream fileStream)
+        // Insert unique DegreeTypes
+        var existingDegreeTypes = _dbContext.DegreeTypes.ToList();
+        var newDegreeTypes = new HashSet<DegreeType>();
+        foreach (var dt in degreeTypes)
         {
-            ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial; // Required for EPPlus
-
-            var users = new List<User>();
-
-            using (var package = new ExcelPackage(fileStream))
+            if (!existingDegreeTypes.Any(x => x.Name == dt))
             {
-                var worksheet = package.Workbook.Worksheets[0]; // Read first sheet
-                int rowCount = worksheet.Dimension.Rows;
+                var newDegreeType = new DegreeType { Name = dt, Code = dt };
+                AuditHelper.SetAuditPropertiesForInsert(newDegreeType, 1);
+                newDegreeTypes.Add(newDegreeType);
+            }
+        }
+        await _dbContext.DegreeTypes.AddRangeAsync(newDegreeTypes);
+        await _dbContext.SaveChangesAsync(); 
+        var updatedDegreeTypes = await _dbContext.DegreeTypes.ToListAsync();
+        var updatedDepartments = await _dbContext.Departments.ToListAsync();
+        foreach (var row in rows)
+        {
+            var cells = row.Elements<Cell>().ToList();
+            string degreeTypeName = GetCellValue(workbookPart, cells[2]).Trim();
+            string departmentName = GetCellValue(workbookPart, cells[3]).Trim();
 
-                for (int row = 2; row <= rowCount; row++) // Start from row 2 (skip headers)
+            var degreeType = updatedDegreeTypes.FirstOrDefault(d => d.Name == degreeTypeName);
+
+            if (degreeType == null)
+            {
+                return $"Error: Invalid DegreeType or Department at row {rows.ToList().IndexOf(row) + 2}";
+            }
+            if (!updatedDepartments.Any(x => x.Name == departmentName))
+            {
+                var department = new Department
                 {
-                    var user = new User
-                    {
-                        Name = worksheet.Cells[row, 1].Text,
-                        Email = worksheet.Cells[row, 2].Text,
-                        MobileNumber = worksheet.Cells[row, 3].Text,
-                        //RoleId = worksheet.Cells[row, 4].Text,
-                        WorkExperience = int.TryParse(worksheet.Cells[row, 5].Text, out int exp) ? exp : 0,
-                        //Department = worksheet.Cells[row, 6].Text,
-                        //Designation = worksheet.Cells[row, 7].Text,
-                        CollegeName = worksheet.Cells[row, 8].Text
-                    };
+                    Name = departmentName,
+                    ShortName = departmentName,
+                    DegreeTypeId = degreeType.DegreeTypeId
+                };
+                AuditHelper.SetAuditPropertiesForInsert(department, 1);
+                departments.Add(department);
+
+            }
+        }
+        await _dbContext.Departments.AddRangeAsync(departments);
+        await _dbContext.SaveChangesAsync(); // Commit Master Data
 
 
-                    users.Add(user);
-                }
+        var examMonths = await _dbContext.ExamMonths.ToListAsync();
+        // Process Courses with Foreign Keys
+        foreach (var row in rows)
+        {
+            var cells = row.Elements<Cell>().ToList();
+            string regulation = GetCellValue(workbookPart, cells[0]).Trim();
+            string batch = GetCellValue(workbookPart, cells[1]).Trim();
+            string degreeTypeName = GetCellValue(workbookPart, cells[2]).Trim();
+            string departmentName = GetCellValue(workbookPart, cells[3]).Trim();
+            string semester = GetCellValue(workbookPart, cells[4]).Trim();
+            string courseCode = GetCellValue(workbookPart, cells[5]).Trim();
+            string courseName = GetCellValue(workbookPart, cells[6]).Trim();
+            string studentCount = GetCellValue(workbookPart, cells[7]).Trim();
 
-                // Save to the database
-                await _dbContext.Users.AddRangeAsync(users);
-                await _dbContext.SaveChangesAsync();
+
+            var degreeType = updatedDegreeTypes.FirstOrDefault(d => d.Name == degreeTypeName);
+            var department = updatedDepartments.FirstOrDefault(d => d.Name == departmentName);
+
+            if (degreeType == null || department == null)
+            {
+                return $"Error: Invalid DegreeType or Department at row {rows.ToList().IndexOf(row) + 2}";
             }
 
-            return users;
+            courses.Add(new Course
+            {
+                Name = courseName,
+                Code = courseCode,
+                RegulationYear = regulation,
+                BatchYear = batch,
+                Semester = string.IsNullOrEmpty(semester) ? (long?)null : long.Parse(semester),
+                StudentCount = string.IsNullOrEmpty(studentCount) ? (long?)null : long.Parse(studentCount),
+                DegreeTypeId = degreeType.DegreeTypeId,
+                DepartmentId = department.DepartmentId,
+                CreatedById = 1,
+                CreatedDate = DateTime.UtcNow,
+                ModifiedById = 1,
+                ModifiedDate = DateTime.UtcNow,
+                IsActive = true,
+                ExamMonthId = (examMonths != null)? (long)(examMonths.FirstOrDefault(x => x.Semester == long.Parse(semester))?.ExamMonthId):1
+            });
         }
+
+        await _dbContext.Courses.AddRangeAsync(courses);
+        await _dbContext.SaveChangesAsync();
+
+        return "Courses imported successfully! Imported Count is  "+ courses.Count;
+    }
+
+    private static string GetCellValue(WorkbookPart workbookPart, Cell cell)
+    {
+        if (cell.CellValue == null) return string.Empty;
+
+        var value = cell.CellValue.InnerText;
+        return cell.DataType != null && cell.DataType.Value == CellValues.SharedString
+            ? workbookPart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(int.Parse(value)).InnerText
+            : value;
     }
 }

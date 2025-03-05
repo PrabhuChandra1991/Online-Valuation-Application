@@ -7,9 +7,9 @@ namespace SKCE.Examination.API.Controllers.QPSettings
     [ApiController]
     public class ExcelController : ControllerBase
     {
-        private readonly ExcelHelper _excelHelper;
+        private readonly ExcelImportHelper _excelHelper;
 
-        public ExcelController(ExcelHelper excelHelper)
+        public ExcelController(ExcelImportHelper excelHelper)
         {
             _excelHelper = excelHelper;
         }
@@ -24,9 +24,9 @@ namespace SKCE.Examination.API.Controllers.QPSettings
                 return BadRequest("No file uploaded.");
 
             using var stream = file.OpenReadStream();
-            var users = await _excelHelper.ImportCourseDetailsBySyllabusFromExcelAsync(stream);
+            var importedInfo = await _excelHelper.ImportDataFromExcel(stream);
 
-            return Ok(new { Message = "Users imported successfully", Count = users.Count });
+            return Ok(new { Message = importedInfo });
         }
     }
 }

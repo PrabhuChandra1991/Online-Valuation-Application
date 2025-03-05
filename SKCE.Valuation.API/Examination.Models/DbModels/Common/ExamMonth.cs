@@ -11,7 +11,8 @@ namespace SKCE.Examination.Models.DbModels.Common
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long ExamMonthId { get; set; }
-        public required string Code { get; set; }
+        public required string Name { get; set; }
+        public long Semester { get; set; }
     }
 }
 

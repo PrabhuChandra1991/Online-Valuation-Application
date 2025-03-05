@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <PackageReference Include="AWSSDK.S3" Version="3.7.415.9" />
+    <PackageReference Include="DocumentFormat.OpenXml" Version="3.2.0" />
     <PackageReference Include="EPPlus" Version="7.6.0" />
     <PackageReference Include="MailKit" Version="4.10.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />

@@ -1,5 +1,5 @@
 ﻿CREATE TABLE [User] (
-    Id BIGINT IDENTITY(1,1) PRIMARY KEY,
+    UserId BIGINT IDENTITY(1,1) PRIMARY KEY,
     [Name] NVARCHAR(255) NULL,
     Email NVARCHAR(255) NOT NULL UNIQUE CHECK (Email LIKE '%@%'),
     MobileNumber NVARCHAR(15) NULL UNIQUE CHECK (MobileNumber LIKE '[0-9]%'),
@@ -10,8 +10,8 @@
                 WHEN Email LIKE '%@skcet.ac.in' THEN 'Internal' 
                 ELSE 'External' 
              END) PERSISTED,
-    DepartmentId BIGINT ,
-    DesignationId BIGINT  NULL,
+    DepartmentId BIGINT NOT NULL ,
+    DesignationId BIGINT NOT NULL,
     CollegeName NVARCHAR(255)  NULL,
     [AreaOfSpecialization] NVARCHAR(255)  NULL,
     [CourseId] BIGINT NOT NULL,

@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 
 namespace SKCE.Examination.Models.DbModels.Common
 {
-    [Table("Designations", Schema ="dbo")]
-    public class Designations : AuditModel
+    [Table("Designation", Schema ="dbo")]
+    public class Designation : AuditModel
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long Id { get; set; }
+        public long DesignationId { get; set; }
         public required string Name { get; set; }
     }
 }

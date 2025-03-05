@@ -11,7 +11,7 @@ namespace SKCE.Examination.Models.DbModels.Common;
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public long Id { get; set; }
+    public long UserLoginHistoryId { get; set; }
     [Required]
     public long UserId { get; set; }
 

@@ -41,10 +41,10 @@ namespace SKCE.Examination.Services.Helpers
                 await fileTransferUtility.UploadAsync(uploadRequest);
 
                 // Save file metadata in the database
-                var document = new DocumentDetails
+                var document = new Document
                 {
-                    DocumentName = key,
-                    DocumentUrl = $"https://{_bucketName}.s3.amazonaws.com/{key}"
+                    Name = key,
+                    Url = $"https://{_bucketName}.s3.amazonaws.com/{key}"
                 };
 
                 _context.DocumentDetails.Add(document);
@@ -73,7 +73,7 @@ namespace SKCE.Examination.Services.Helpers
                 var request = new GetObjectRequest
                 {
                     BucketName = _bucketName,
-                    Key = document.DocumentName
+                    Key = document.Name
                 };
 
                 using var response = await _s3Client.GetObjectAsync(request);
@@ -81,7 +81,7 @@ namespace SKCE.Examination.Services.Helpers
                 await response.ResponseStream.CopyToAsync(memoryStream);
                 memoryStream.Position = 0; // Reset stream position
 
-                return (memoryStream, document.DocumentName);
+                return (memoryStream, document.Name);
             }
             catch (AmazonS3Exception ex)
             {

@@ -60,7 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\User.sql" />
-    <Build Include="Tables\Roles.sql" />
+    <Build Include="Tables\Role.sql" />
     <Build Include="Tables\Designation.sql" />
     <Build Include="Tables\Department.sql" />
     <Build Include="Tables\Institution.sql" />

@@ -9,17 +9,20 @@ namespace SKCE.Examination.Models.DbModels.Common
 
         public DbSet<User> Users { get; set; }
         public DbSet<UserLoginHistory> UserLoginHistories { get; set; }
-        public DbSet<Roles> Roles { get; set; }
-        public DbSet<Departments> Departments { get; set; }
-        public DbSet<Designations> Designations { get; set; }
-        public DbSet<Institutions> Institutions { get; set; }
-        public DbSet<CourseDetails> CourseDetails { get; set; }
-        public DbSet<QPTags> QPTags { get; set; }
-        public DbSet<QPTemplates> QPTemplates { get; set; }
-        public DbSet<QPTemplateTagDetails> QPTemplateTagDetails { get; set; }
-        public DbSet<QPTemplateTagByUserDetails> QPTemplateTagByUserDetails { get; set; }
-        public DbSet<DocumentDetails> DocumentDetails { get; set; }
-        
+        public DbSet<Role> Roles { get; set; }
+        public DbSet<Department> Departments { get; set; }
+        public DbSet<Designation> Designations { get; set; }
+        public DbSet<Institution> Institutions { get; set; }
+        public DbSet<Course> CourseDetails { get; set; }
+        public DbSet<QPTag> QPTags { get; set; }
+        public DbSet<QPTemplate> QPTemplates { get; set; }
+        public DbSet<QPTemplateTag> QPTemplateTagDetails { get; set; }
+        public DbSet<UserQPTemplate> QPTemplateTagByUserDetails { get; set; }
+        public DbSet<UserQPTemplateTag> UserQPTemplateTags { get; set; }
+        public DbSet<QPTemplateStatusType> QPTemplateStatusTypes { get; set; }
+        public DbSet<Document> DocumentDetails { get; set; }
+        public DbSet<DegreeType> DegreeTypes { get; set; }
+        public DbSet<ExamMonth> ExamMonths { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
         }

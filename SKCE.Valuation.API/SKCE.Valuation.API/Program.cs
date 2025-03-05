@@ -98,7 +98,7 @@ void SeedDefaultUser(ExaminationDbContext context)
             Email = "superadmin@skcet.ac.in",
             MobileNumber = "8300034477",
             RoleId = 1,
-            Experience = 1,
+            WorkExperience = 1,
             DepartmentId = 1,
             DesignationId = 1,
             CollegeName = "SRI KRISHNA COLLEGE OF ENGINEERING TECHNOLOGY",
@@ -107,7 +107,10 @@ void SeedDefaultUser(ExaminationDbContext context)
             BankName = "",
             BankBranchName = "",
             BankIFSCCode = "",
-            IsEnabled = true
+            IsEnabled = true,
+            CourseId = 1,
+            Qualification = "M.E",
+            AreaOfSpecialization = "Computer Science and Engineering"
         };
         AuditHelper.SetAuditPropertiesForInsert(defaultUser, 1);
 

@@ -9,13 +9,17 @@ using System.Threading.Tasks;
 
 namespace SKCE.Examination.Models.DbModels.QPSettings
 {
-    [Table("QPTemplateTagDetails", Schema = "dbo")]
-    public class QPTemplateTagDetails: AuditModel
+    [Table("QPTag", Schema = "dbo")]
+    public class QPTag: AuditModel
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long Id { get; set; }
-        public long QPTemplateId { get; set; }
         public long QPTagId { get; set; }
+        public required string Name { get; set; }
+        public string? Description { get; set; }
+        public required string Tag { get; set; }
+        public long TagDataTypeId { get; set; }
+        public bool IsQuestion { get; set; }
     }
+    
 }

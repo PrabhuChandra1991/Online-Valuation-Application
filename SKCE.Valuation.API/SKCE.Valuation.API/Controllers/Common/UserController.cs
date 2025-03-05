@@ -35,14 +35,14 @@ namespace SKCE.Examination.API.Controllers.Common
         public async Task<ActionResult<User>> AddUser(User user)
         {
             var newUser = await _userService.AddUserAsync(user);
-            return CreatedAtAction(nameof(GetUser), new { id = newUser.Id }, newUser);
+            return CreatedAtAction(nameof(GetUser), new { id = newUser.UserId }, newUser);
         }
 
         // PUT: api/user/5
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(int id, User user)
         {
-            if (id != user.Id) return BadRequest();
+            if (id != user.UserId) return BadRequest();
 
             var updatedUser = await _userService.UpdateUserAsync(user);
             return Ok(updatedUser);

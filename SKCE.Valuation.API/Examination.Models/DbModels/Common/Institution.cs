@@ -3,12 +3,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SKCE.Examination.Models.DbModels.Common;
 
-[Table("Institutions", Schema = "dbo")]
-public class Institutions: AuditModel
+[Table("Institution", Schema = "dbo")]
+public class Institution: AuditModel
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public long Id { get; set; }
+    public long InstitutionIdId { get; set; }
     public required string Name { get; set; }
     public required string Email { get; set; }
     public required string MobileNumber { get; set; }

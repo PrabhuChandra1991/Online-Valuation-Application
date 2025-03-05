@@ -7,7 +7,7 @@
 	[BatchYear] NVARCHAR(50) NOT NULL,
 	[DegreeTypeId] BIGINT NOT NULL,
 	[DepartmentId] BIGINT NOT NULL,
-	[ExamMonthId] NVARCHAR(50) NOT NULL,
+	[ExamMonthId] BIGINT NOT NULL,
 	[Semester] BIGINT NULL,
 	[StudentCount] BIGINT  NULL,
 	[IsActive] BIT DEFAULT 1,

@@ -5,12 +5,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SKCE.Examination.Models.DbModels.Common
 {
-    [Table("Departments", Schema ="dbo")]
-    public class Departments: AuditModel
+    [Table("ExamMonth", Schema = "dbo")]
+    public class ExamMonth : AuditModel
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long Id { get; set; }
-        public required string Name { get; set; }
-       }
+        public long ExamMonthId { get; set; }
+        public required string Code { get; set; }
+    }
 }
+

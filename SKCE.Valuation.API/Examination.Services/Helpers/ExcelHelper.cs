@@ -33,7 +33,7 @@ namespace SKCE.Examination.Services.Helpers
                         Email = worksheet.Cells[row, 2].Text,
                         MobileNumber = worksheet.Cells[row, 3].Text,
                         //RoleId = worksheet.Cells[row, 4].Text,
-                        Experience = int.TryParse(worksheet.Cells[row, 5].Text, out int exp) ? exp : 0,
+                        WorkExperience = int.TryParse(worksheet.Cells[row, 5].Text, out int exp) ? exp : 0,
                         //Department = worksheet.Cells[row, 6].Text,
                         //Designation = worksheet.Cells[row, 7].Text,
                         CollegeName = worksheet.Cells[row, 8].Text

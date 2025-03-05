@@ -1,7 +1,7 @@
 ﻿CREATE TABLE [dbo].[ExamMonth]
 (
 	[ExamMonthId] INT NOT NULL PRIMARY KEY,
-    [Code] NVARCHAR(100) NULL,
+    [Code] NVARCHAR(100) NOT NULL,
     IsActive BIT DEFAULT 1,
     CreatedDate DATETIME DEFAULT GETDATE(),
     CreatedById BIGINT NOT NULL,

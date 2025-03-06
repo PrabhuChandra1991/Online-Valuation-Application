@@ -22,12 +22,18 @@ namespace SKCE.Examination.Services.Common
 
         public async Task<IEnumerable<User>> GetUsersAsync()
         {
-            return await _context.Users.ToListAsync();
+            return await  _context.Users
+            .Include(u => u.UserCourses)
+            .Include(u => u.UserAreaOfSpecializations)
+            .ToListAsync();
         }
 
-        public async Task<User?> GetUserByIdAsync(int id)
+        public async Task<User?> GetUserByIdAsync(long id)
         {
-            return await _context.Users.FindAsync(id);
+            return await _context.Users
+            .Include(u => u.UserCourses)
+            .Include(u => u.UserAreaOfSpecializations)
+            .FirstOrDefaultAsync(u => u.UserId == id); ;
         }
 
         public async Task<User> AddUserAsync(User user)
@@ -57,7 +63,7 @@ namespace SKCE.Examination.Services.Common
             return user;
         }
 
-        public async Task<bool> DeleteUserAsync(int id)
+        public async Task<bool> DeleteUserAsync(long id)
         {
             var user = await _context.Users.FindAsync(id);
             if (user == null) return false;

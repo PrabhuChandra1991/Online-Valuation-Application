@@ -1,6 +1,6 @@
 ﻿CREATE TABLE [dbo].[QPTemplateStatusType]
 (
-	[QPTemplateStatusTypeId] INT NOT NULL PRIMARY KEY,
+	[QPTemplateStatusTypeId] INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
 	[Name] NVARCHAR(255) NOT NULL,
 	[Description] NVARCHAR(255) NOT NULL,
 	[IsActive] BIT DEFAULT 1,

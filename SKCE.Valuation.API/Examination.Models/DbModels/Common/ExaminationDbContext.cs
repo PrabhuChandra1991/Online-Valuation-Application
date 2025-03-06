@@ -9,6 +9,8 @@ namespace SKCE.Examination.Models.DbModels.Common
 
         public DbSet<User> Users { get; set; }
         public DbSet<UserLoginHistory> UserLoginHistories { get; set; }
+        public DbSet<UserCourse> UserCourses { get; set; }
+        public DbSet<UserAreaOfSpecialization> UserSpecializations { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<Department> Departments { get; set; }
         public DbSet<Designation> Designations { get; set; }
@@ -25,6 +27,15 @@ namespace SKCE.Examination.Models.DbModels.Common
         public DbSet<ExamMonth> ExamMonths { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<UserCourse>()
+            .HasOne(uc => uc.User)
+            .WithMany(u => u.UserCourses)
+            .HasForeignKey(uc => uc.UserId);
+
+            modelBuilder.Entity<UserAreaOfSpecialization>()
+                .HasOne(us => us.User)
+                .WithMany(u => u.UserAreaOfSpecializations)
+                .HasForeignKey(us => us.UserId);
         }
     }
 }

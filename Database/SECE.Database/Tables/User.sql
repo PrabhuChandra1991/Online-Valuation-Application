@@ -13,8 +13,6 @@
     DepartmentId BIGINT NOT NULL ,
     DesignationId BIGINT NOT NULL,
     CollegeName NVARCHAR(255)  NULL,
-    [AreaOfSpecialization] NVARCHAR(255)  NULL,
-    [CourseId] BIGINT NOT NULL,
     BankAccountName NVARCHAR(255)  NULL,
     BankAccountNumber NVARCHAR(50)  NULL,
     BankName NVARCHAR(255)  NULL,

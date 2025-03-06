@@ -5,9 +5,9 @@ namespace SKCE.Examination.Services.ServiceContracts
     public interface IUserService
     {
         Task<IEnumerable<User>> GetUsersAsync();
-        Task<User> GetUserByIdAsync(int id);
+        Task<User> GetUserByIdAsync(long id);
         Task<User> AddUserAsync(User user);
         Task<User> UpdateUserAsync(User user);
-        Task<bool> DeleteUserAsync(int id);
+        Task<bool> DeleteUserAsync(long id);
     }
 }

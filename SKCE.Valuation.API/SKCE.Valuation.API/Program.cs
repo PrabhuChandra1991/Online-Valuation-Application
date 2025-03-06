@@ -4,6 +4,7 @@ using SKCE.Examination.Services.Common;
 using SKCE.Examination.Services.ServiceContracts;
 using SKCE.Examination.Models.DbModels.Common;
 using SKCE.Examination.Services.Helpers;
+using SKCE.Examination.Models.DbModels.QPSettings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,8 +51,11 @@ using (var scope = app.Services.CreateScope())
         var context = services.GetRequiredService<ExaminationDbContext>();
         context.Database.Migrate(); // Apply pending migrations
         SeedDefaultUser(context);
-        SeedDefaultRoles(context);
-        SeedDefaultExamMonths(context);
+        SeedRoles(context);
+        SeedExamMonths(context);
+        SeedQPTags(context);
+        SeedQPTemplateStatusType(context);
+        SeedDesignations(context);
     }
     catch (Exception ex)
     {
@@ -110,9 +114,7 @@ void SeedDefaultUser(ExaminationDbContext context)
             BankBranchName = "",
             BankIFSCCode = "",
             IsEnabled = true,
-            CourseId = 1,
             Qualification = "M.E",
-            AreaOfSpecialization = "Computer Science and Engineering"
         };
         AuditHelper.SetAuditPropertiesForInsert(defaultUser, 1);
 
@@ -124,7 +126,7 @@ void SeedDefaultUser(ExaminationDbContext context)
 /// <summary>
 /// Seeds a default roles into the database if not exists.
 /// </summary>
-void SeedDefaultRoles(ExaminationDbContext context)
+void SeedRoles(ExaminationDbContext context)
 {
     if (!context.Roles.Any()) // Check if role table is empty
     {
@@ -143,9 +145,9 @@ void SeedDefaultRoles(ExaminationDbContext context)
 }
 
 /// <summary>
-/// Seeds a default roles into the database if not exists.
+/// Seeds a default ExamMonth into the database if not exists.
 /// </summary>
-void SeedDefaultExamMonths(ExaminationDbContext context)
+void SeedExamMonths(ExaminationDbContext context)
 {
     if (!context.ExamMonths.Any()) // Check if role table is empty
     {
@@ -164,6 +166,81 @@ void SeedDefaultExamMonths(ExaminationDbContext context)
             AuditHelper.SetAuditPropertiesForInsert(examMonth, 1);
 
         context.ExamMonths.AddRange(examMonths);
+        context.SaveChanges(); // Commit to Database
+    }
+}
+
+/// <summary>
+/// Seeds a default QP Tags into the database if not exists.
+/// </summary>
+void SeedQPTags(ExaminationDbContext context)
+{
+    if (!context.QPTags.Any()) 
+    {
+        //TagDataTypeId -1 for Rich text box, 2 for TextBox, 3 for Numeric Text box
+        var qptags = new List<QPTag>
+        {
+            new QPTag { Name = "Question 1",Tag="<Question 1>",TagDataTypeId=1,IsQuestion=true,Description="Question 1 text"},
+            new QPTag { Name = "Question 1 Answer",Tag="<Question 1 Answer>",TagDataTypeId=1,IsQuestion=false,Description="Question 1 Answer text"},
+            new QPTag { Name = "Question 1 BT",Tag="<Question 1 BT>",TagDataTypeId=1,IsQuestion=true,Description="Question 1 BT text"},
+            new QPTag { Name = "Question 1 CO",Tag="<Question 1 CO>",TagDataTypeId=1,IsQuestion=true,Description="Question 1 CO text"},
+            new QPTag { Name = "Question 1 Marks",Tag="<Question 1 Marks>",TagDataTypeId=1,IsQuestion=true,Description="Question 1 Marks text"},
+        };
+
+        foreach (var qptag in qptags)
+            AuditHelper.SetAuditPropertiesForInsert(qptag, 1);
+
+        context.QPTags.AddRange(qptags);
+        context.SaveChanges(); // Commit to Database
+    }
+}
+
+/// <summary>
+/// Seeds a default QP Template Status Type into the database if not exists.
+/// </summary>
+void SeedQPTemplateStatusType(ExaminationDbContext context)
+{
+    if (!context.QPTemplateStatusTypes.Any())
+    {
+        var qpTemplateStatusTypes = new List<QPTemplateStatusType>
+        {
+            new QPTemplateStatusType { Name = "QP Not Assigned",Description = "QP Not Assigned"},
+            new QPTemplateStatusType { Name = "QP Allocated",Description = "QP Allocated" },
+            new QPTemplateStatusType { Name = "QP Scrutiny" ,Description = "QP Scrutiny" },
+            new QPTemplateStatusType { Name = "QP Selection",Description = "QP Selection"},
+            new QPTemplateStatusType { Name = "QP Printed" ,Description = "QP Printed" },
+            new QPTemplateStatusType { Name = "QP Allocated" ,Description = "QP Allocated"},
+            new QPTemplateStatusType { Name = "QP Initiated" ,Description = "QP Initiated"},
+            new QPTemplateStatusType { Name = "QP InProgress",Description = "QP InProgress" },
+            new QPTemplateStatusType { Name = "QP Submitted" ,Description ="QP Submitted"}
+        };
+
+        foreach (var qpemplateStatusTypes in qpTemplateStatusTypes)
+            AuditHelper.SetAuditPropertiesForInsert(qpemplateStatusTypes, 1);
+
+        context.QPTemplateStatusTypes.AddRange(qpTemplateStatusTypes);
+        context.SaveChanges(); // Commit to Database
+    }
+}
+
+/// <summary>
+/// Seeds a default Designations into the database if not exists.
+/// </summary>
+void SeedDesignations(ExaminationDbContext context)
+{
+    if (!context.Designations.Any())
+    {
+        var designations = new List<Designation>
+        {
+           new Designation { Name = "Professor" },
+           new Designation { Name = "Assistant Professor" },
+           new Designation { Name = "Associate Professor" },
+        };
+
+        foreach (var designation in designations)
+            AuditHelper.SetAuditPropertiesForInsert(designation, 1);
+
+        context.Designations.AddRange(designations);
         context.SaveChanges(); // Commit to Database
     }
 }

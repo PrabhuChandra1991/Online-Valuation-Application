@@ -26,13 +26,15 @@ namespace SKCE.Examination.Models.DbModels.Common
         public long? DepartmentId { get; set; } 
         public long? DesignationId { get; set; }
         public string? CollegeName { get; set; }
-        public  string? AreaOfSpecialization { get; set; }
-        public long CourseId { get; set; }
         public string? BankAccountName { get; set; }
         public string? BankAccountNumber { get; set; }
         public string? BankName { get; set; }
         public string? BankBranchName { get; set; }
         public string? BankIFSCCode { get; set; }
         public bool IsEnabled { get; set; }
+
+        public virtual ICollection<UserCourse> UserCourses { get; set; } = new List<UserCourse>();
+
+        public virtual ICollection<UserAreaOfSpecialization> UserAreaOfSpecializations { get; set; } = new List<UserAreaOfSpecialization>();
     }
 }

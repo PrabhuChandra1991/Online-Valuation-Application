@@ -75,6 +75,8 @@
     <Build Include="Tables\ExamMonth.sql" />
     <Build Include="Tables\UserQPTemplateTag.sql" />
     <Build Include="Tables\QPTemplateStatusType.sql" />
+    <Build Include="Tables\UserCourse.sql" />
+    <Build Include="Tables\UserAreaOfSpecialization.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="SKCE.Examination.Database.sqlproj.user" />

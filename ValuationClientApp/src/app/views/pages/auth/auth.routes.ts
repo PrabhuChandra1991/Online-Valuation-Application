@@ -10,4 +10,5 @@ export default [
     path: 'register',
     loadComponent: () => import('./register/register.component').then(c => c.RegisterComponent)
   }
+ 
 ] as Routes;

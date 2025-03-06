@@ -21,9 +21,9 @@ namespace SKCE.Examination.API.Controllers.Common
         {
             var tempPassword = await _loginManager.GenerateTempPasswordAsync(request.Email);
             if (tempPassword == null)
-                return BadRequest("Invalid email ID.");
+                return BadRequest();
 
-            return Ok("Temporary password sent to your email.");
+            return Ok();
         }
 
         [HttpPost("validate-temp-password")]

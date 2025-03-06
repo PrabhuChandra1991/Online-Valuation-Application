@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SKCE.Examination.Models.DbModels.Common
 {
-    [Table("Users", Schema = "dbo")]
+    [Table("User", Schema = "dbo")]
     public class User: AuditModel
     {
         [Key]
@@ -22,7 +22,7 @@ namespace SKCE.Examination.Models.DbModels.Common
 
         public long? RoleId { get; set; } 
 
-        public long? Experience { get; set; }
+        public long? WorkExperience { get; set; }
 
         public long? DepartmentId { get; set; } 
 
@@ -34,7 +34,15 @@ namespace SKCE.Examination.Models.DbModels.Common
         public string? BankAccountNumber { get; set; }
         public string? BankName { get; set; }
         public string? BankBranchName { get; set; }
-        public string? BankIFSCCode { get; set; }
         public bool IsEnabled { get; set; }
+
+        public string? Qualification { get; set; }
+
+        public string? AreaOfSpecialization { get; set; }
+
+        public long CourseId { get; set; }
+
+        public string? BankIfsccode { get; set; }
+
     }
 }

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component,OnInit } from '@angular/core';
 import { NgbDropdownModule, NgbNavModule, NgbTooltip, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 
@@ -7,10 +7,17 @@ import { NgScrollbarModule } from 'ngx-scrollbar';
   imports: [ NgbNavModule,
           NgbDropdownModule,
           NgScrollbarModule,
-          NgbTooltip],
+          NgbTooltip
+        ],
   templateUrl: './user.component.html',
   styleUrl: './user.component.scss'
 })
-export class UserComponent {
+export class UserComponent implements OnInit{
+  
+  ngOnInit(): void {
+    
+    // Get the return URL from the route parameters, or default to '/'
+    //this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+  }
 
 }

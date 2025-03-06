@@ -22,6 +22,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideToastr(), 
+    
     provideHttpClient(),
     provideRouter(routes, withInMemoryScrolling({ scrollPositionRestoration: 'top' })), 
     provideAnimationsAsync(),

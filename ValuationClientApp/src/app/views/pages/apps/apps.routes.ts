@@ -32,5 +32,13 @@ export default [
     {
         path: 'calendar',
         loadComponent: () => import('./calendar/calendar.component').then(c => c.CalendarComponent)
-    }
+    },
+    {
+        path: 'qptemplate',
+        loadComponent: () => import('./qp-template/template-list/template-list.component').then(c => c.TemplateListComponent) 
+    },
+    {
+        path: 'assigntemplate',
+        loadComponent: () => import('./qp-template/template-assignment/template-assignment.component').then(c => c.TemplateAssignmentComponent) 
+    },
 ] as Routes;

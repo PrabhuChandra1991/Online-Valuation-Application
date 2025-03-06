@@ -56,5 +56,6 @@ export const routes: Routes = [
     path: 'error/:type',
     loadComponent: () => import('./views/pages/error/error.component').then(c => c.ErrorComponent)
   },
+  
   { path: '**', redirectTo: 'error/404', pathMatch: 'full' }
 ];

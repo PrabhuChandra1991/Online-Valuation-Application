@@ -37,6 +37,8 @@ export class RegisterComponent {
   userObj: any = {
     "name":this.userName,
     "email": this.userEmail,
+    "departmentId":0,
+    "designationId":0,
     "mobileNumber":this.userMobileNumber,
     "createdDate":new Date().toJSON()
 }
@@ -47,16 +49,17 @@ export class RegisterComponent {
     debugger;
     //
     this.http.post("http://localhost:5088/api/User",this.userObj).subscribe((result:any)=>{
-      if(result['id'] > 0)
-      {
+      debugger;
+      // if(result['id'] > 0)
+      // {
         this.toastr.success('User created!');
         
         this.userObj.name='';
         this.userObj.email='';
         this.userObj.mobileNumber='';
         
-        this.router.navigate(['/auth/login']);
-      }
+        this.router.navigate(['/apps/user']);
+      //}
 
     });
 

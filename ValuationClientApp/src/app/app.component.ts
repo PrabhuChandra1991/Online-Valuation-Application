@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ThemeModeService } from './core/services/theme-mode.service';
 
@@ -9,7 +9,7 @@ import { ThemeModeService } from './core/services/theme-mode.service';
     styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  title = 'demo1';
+  title = 'Student Valuation App';
 
   constructor(private themeModeService: ThemeModeService) {}
 

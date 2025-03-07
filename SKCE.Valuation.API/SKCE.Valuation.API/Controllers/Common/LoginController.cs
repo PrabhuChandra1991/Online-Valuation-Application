@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SKCE.Examination.Models.ViewModels.Common;
 using System.Threading.Tasks;
+using SKCE.Examination.API.Controllers.Model;
 
 namespace SKCE.Examination.API.Controllers.Common
 {
@@ -20,10 +21,12 @@ namespace SKCE.Examination.API.Controllers.Common
         public async Task<IActionResult> RequestTempPassword([FromBody] LoginVM request)
         {
             var tempPassword = await _loginManager.GenerateTempPasswordAsync(request.Email);
-            if (tempPassword == null)
-                return BadRequest("Invalid email ID.");
 
-            return Ok("Temporary password sent to your email.");
+
+            if (tempPassword == null)
+                return BadRequest(new ResultModel { Message = "Invalid email ID." });
+
+            return Ok(new ResultModel { Message= "Temporary password sent to your email." });
         }
 
         [HttpPost("validate-temp-password")]
@@ -33,7 +36,7 @@ namespace SKCE.Examination.API.Controllers.Common
             if (user != null)
                 return Ok(user);
 
-            return BadRequest("Invalid or expired password.");
+            return BadRequest(new ResultModel { Message = "Invalid or expired password." });
         }
     }
 }

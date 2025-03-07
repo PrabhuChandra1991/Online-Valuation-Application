@@ -1,0 +1,17 @@
+﻿CREATE TABLE [dbo].[CourseDepartment]
+(
+	[CourseDepartmentId] BIGINT NOT NULL PRIMARY KEY IDENTITY(1,1),
+	[CourseId] NVARCHAR(255) NOT NULL,
+	[DepartmentId] BIGINT NOT NULL,
+	[RegulationYear] NVARCHAR(50) NOT NULL,
+	[BatchYear] NVARCHAR(50) NOT NULL,
+	[DegreeTypeId] BIGINT NOT NULL,
+	[ExamMonthId] BIGINT NOT NULL,
+	[Semester] BIGINT NULL,
+	[StudentCount] BIGINT  NULL,
+	[IsActive] BIT DEFAULT 1,
+	CreatedDate DATETIME DEFAULT GETDATE(),
+	CreatedById BIGINT NOT NULL,
+	ModifiedDate DATETIME DEFAULT GETDATE(),
+	ModifiedById BIGINT NOT NULL
+)

@@ -42,17 +42,17 @@ namespace SKCE.Examination.Services.Common
             {
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
+                _emailService.SendEmailAsync(user.Email, "Profile Update for Question Paper Setter Role – Sri Krishna Institutions, Coimbatore",
+                  $"Dear {user.Name}," +
+                  $"\n\nGreetings from Sri Krishna Institutions, Coimbatore! " +
+                  $"\n\nFurther to our previous communication, we are pleased to share the link {_configuration["LoginUrl"]} and Login Credentials to the form for updating your profile on our online platform. Kindly ensure that you complete this at your earliest convenience. You will also receive a notification via email regarding the appointment for the role of Question Paper Setter." +
+                  $"\n\nPlease note that the provided link allows only a one-time entry using your registered email address or username. If you encounter any issues or require any changes after submission, please feel free to contact us, and we will be happy to assist you." +
+                  $"\n\nThank you for your cooperation. We look forward to your valuable contribution to our institution \n\nWarm regards,\n[Your Name]\n[Your Position]\nSri Krishna Institutions, Coimbatore").Wait();
             }
             catch (Exception ex)
             {
                 throw ex;
             }
-            _emailService.SendEmailAsync(user.Email, "Profile Update for Question Paper Setter Role – Sri Krishna Institutions, Coimbatore",
-              $"Dear {user.Name}," +
-              $"\n\nGreetings from Sri Krishna Institutions, Coimbatore! " +
-              $"\n\nFurther to our previous communication, we are pleased to share the link {_configuration["LoginUrl"]} and Login Credentials to the form for updating your profile on our online platform. Kindly ensure that you complete this at your earliest convenience. You will also receive a notification via email regarding the appointment for the role of Question Paper Setter." +
-              $"\n\nPlease note that the provided link allows only a one-time entry using your registered email address or username. If you encounter any issues or require any changes after submission, please feel free to contact us, and we will be happy to assist you." +
-              $"\n\nThank you for your cooperation. We look forward to your valuable contribution to our institution \n\nWarm regards,\n[Your Name]\n[Your Position]\nSri Krishna Institutions, Coimbatore").Wait();
             return user;
         }
 

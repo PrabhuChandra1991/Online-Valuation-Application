@@ -1,6 +1,7 @@
 ﻿using SKCE.Examination.Models.DbModels.Common;
 using SKCE.Examination.Services.ServiceContracts;
 using Microsoft.AspNetCore.Mvc;
+using SKCE.Examination.API.Controllers.Model;
 
 namespace SKCE.Examination.API.Controllers.Common
 {
@@ -34,8 +35,16 @@ namespace SKCE.Examination.API.Controllers.Common
         [HttpPost]
         public async Task<ActionResult<User>> AddUser(User user)
         {
-            var newUser = await _userService.AddUserAsync(user);
-            return CreatedAtAction(nameof(GetUser), new { id = newUser.UserId }, newUser);
+            try
+            {
+                var newUser = await _userService.AddUserAsync(user);
+                return CreatedAtAction(nameof(GetUser), new { id = newUser.UserId }, newUser);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResultModel() { Message = "User is already exists." });
+            }
+           
         }
 
         // PUT: api/user/5

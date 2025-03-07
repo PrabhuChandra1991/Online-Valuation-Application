@@ -52,6 +52,8 @@ public class ExcelImportHelper
         }
         await _dbContext.DegreeTypes.AddRangeAsync(newDegreeTypes);
         await _dbContext.SaveChangesAsync(); 
+
+
         var updatedDegreeTypes = await _dbContext.DegreeTypes.ToListAsync();
         var updatedDepartments = await _dbContext.Departments.ToListAsync();
         foreach (var row in rows)
@@ -59,6 +61,7 @@ public class ExcelImportHelper
             var cells = row.Elements<Cell>().ToList();
             string degreeTypeName = GetCellValue(workbookPart, cells[2]).Trim();
             string departmentName = GetCellValue(workbookPart, cells[3]).Trim();
+            string departmentShortName = GetCellValue(workbookPart, cells[3]).Trim();
 
             var degreeType = updatedDegreeTypes.FirstOrDefault(d => d.Name == degreeTypeName);
 
@@ -71,7 +74,7 @@ public class ExcelImportHelper
                 var department = new Department
                 {
                     Name = departmentName,
-                    ShortName = departmentName,
+                    ShortName = departmentShortName,
                     DegreeTypeId = degreeType.DegreeTypeId
                 };
                 AuditHelper.SetAuditPropertiesForInsert(department, 1);

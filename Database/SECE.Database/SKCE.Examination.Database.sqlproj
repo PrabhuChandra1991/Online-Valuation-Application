@@ -77,6 +77,7 @@
     <Build Include="Tables\QPTemplateStatusType.sql" />
     <Build Include="Tables\UserCourse.sql" />
     <Build Include="Tables\UserAreaOfSpecialization.sql" />
+    <Build Include="Tables\CourseDepartment.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="SKCE.Examination.Database.sqlproj.user" />

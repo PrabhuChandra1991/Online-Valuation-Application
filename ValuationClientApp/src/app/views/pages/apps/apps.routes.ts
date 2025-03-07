@@ -1,4 +1,5 @@
 import { Routes } from "@angular/router";
+import { authGuard } from "../services/auth.guard";
 
 export default [
     { path: '', redirectTo: 'calendar', pathMatch: 'full' },
@@ -27,10 +28,26 @@ export default [
     },
     {
         path: 'user',
-        loadComponent: () => import('./user/user.component').then(c => c.UserComponent) 
+        loadComponent: () => import('./user/user.component').then(c => c.UserComponent),
+        canActivate:[authGuard]
+    },
+    {
+        path: 'register',
+        loadComponent: () => import('../auth/register/register.component').then(c => c.RegisterComponent),
+        canActivate:[authGuard]
     },
     {
         path: 'calendar',
         loadComponent: () => import('./calendar/calendar.component').then(c => c.CalendarComponent)
-    }
+    },
+    {
+        path: 'qptemplate',
+        loadComponent: () => import('./qp-template/template-list/template-list.component').then(c => c.TemplateListComponent),
+        canActivate:[authGuard]
+    },
+    {
+        path: 'assigntemplate',
+        loadComponent: () => import('./qp-template/template-assignment/template-assignment.component').then(c => c.TemplateAssignmentComponent),
+        canActivate:[authGuard]
+    },
 ] as Routes;

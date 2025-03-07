@@ -25,3 +25,6 @@
 
 // NobleUI styles for RTL layout. Replace the above style with this CSS file to enable RTL styles
 // @import "./styles/rtl-css/styles.rtl.css";
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

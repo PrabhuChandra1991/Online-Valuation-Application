@@ -1,16 +1,24 @@
 <div class="container">
-  <div class="row w-100 mx-0 auth-page">
+  <div class="row w-100 mx-0 h-100 auth-page">
     <div class="col-md-8 col-xl-6 mx-auto">
       <div class="card">
         <div class="row">
-          <div class="col-md-4 pe-md-0">
-            <div class="auth-side-wrapper" [ngStyle]="{ 'background-image': 'url(https://placehold.co/250x650)' }">
+          <!--<div class="col-md-12 pe-md-0">
+            <div class="auth-side-wrapper px-7 py-5" [ngStyle]="{ 'background-image': 'url(https://placehold.co/250x650)' }">
               </div>
-          </div>
-          <div class="col-md-8 ps-md-0">
-            <div class="auth-form-wrapper px-4 py-5">
+          </div>-->
+          <div class="col-md-12 ps-md-0">
+            <div class="auth-form-wrapper px-7 py-5">
               <!-- <a routerLink="." class="nobleui-logo d-block mb-2">Noble<span>UI</span></a>
               <h5 class="text-secondary fw-normal mb-4">Create a free account.</h5> -->
+              <div
+              class="d-flex justify-content-center align-items-center flex-column">
+              <div class="w-100px overflow-hidden">
+                <img class src="https://skcet.ac.in/wp-content/uploads/2024/08/skcet-logo.png" alt="logo">
+              </div>
+              <!-- <a routerLink="." class="nobleui-logo d-block mb-2">SKCET</a> -->
+              <h5 class="text-secondary fw-normal mb-4 mt-2">Sign up now and get started!</h5>
+            </div>
               <form class="forms-sample" (ngSubmit)="onRegister()" #actorForm="ngForm">
                 <div class="mb-3">
                   <label name="userName" class="form-label">Name <span class="text-danger">*</span></label>
@@ -70,7 +78,7 @@
                     Sign up with twitter
                   </button> -->
                 </div>
-                <a routerLink="/auth/login" class="d-block mt-3 text-secondary">Already a user? Sign in</a>
+                <a routerLink="/auth/login" class="d-block mt-3 text-secondary">Already a user? <span class="text-primary">Sign in</span></a>
               </form>
             </div>
           </div>

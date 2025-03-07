@@ -9,9 +9,19 @@ export const MENU: MenuItem[] = [
   },
   {
     label: 'Template Management',
-    icon: 'message-square',
-    link: '/apps/chat',
+    icon: 'clipboard',
+    link: '/apps/qptemplate',
   },
+{
+    label: 'Template Assignment',
+    icon: 'check-square',
+    link: '/apps/assigntemplate',
+  },
+  {
+    label: 'Master Data',
+    icon: 'list',
+    link: '/apps/assigntemplate',
+  }  
   // {
   //   label: 'Calendar',
   //   icon: 'calendar',

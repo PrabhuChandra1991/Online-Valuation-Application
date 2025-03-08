@@ -16,9 +16,28 @@ export class NavbarComponent implements OnInit {
 
   currentTheme: string;
 
+  userObj: any = {
+    "email": '',
+    "username":''
+    // "createdDate":new Date().toJSON()
+  }
+  
   constructor(private router: Router, private themeModeService: ThemeModeService) {}
 
   ngOnInit(): void {
+
+    debugger;
+   
+    const loggedData = localStorage.getItem('userData');
+
+    if(loggedData)
+    {
+      const userData = JSON.parse(loggedData);
+
+      this.userObj.email = userData.email;
+      this.userObj.username = userData.name;
+    }
+
     this.themeModeService.currentTheme.subscribe( (theme) => {
       this.currentTheme = theme;
       this.showActiveTheme(this.currentTheme);
@@ -71,7 +90,9 @@ export class NavbarComponent implements OnInit {
     e.preventDefault();
 
     localStorage.setItem('isLoggedin', 'false');
+
     if (localStorage.getItem('isLoggedin') === 'false') {
+      localStorage.clear();
       this.router.navigate(['/auth/login']);
     }
   }

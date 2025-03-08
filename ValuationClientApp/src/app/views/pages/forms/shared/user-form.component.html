@@ -1,0 +1,52 @@
+<form [formGroup]="userForm">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label class="form-label">Name</label>
+            <input type="text" class="form-control" formControlName="name" placeholder="Enter name">
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" formControlName="email" placeholder="Enter email">
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label class="form-label">Mobile Number</label>
+            <input type="number" class="form-control" formControlName="mobileNumber" placeholder="Enter mobile number">
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label class="form-label">Qualification</label>
+            <input type="text" class="form-control" formControlName="qualification" placeholder="Enter qualification">
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label class="form-label">Work Experience</label>
+            <input type="text" class="form-control" formControlName="workExperience" placeholder="Enter work experience">
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label class="form-label">College Name</label>
+            <input type="text" class="form-control" formControlName="collegeName" placeholder="Enter college name">
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="close()">Cancel</button>
+      <button type="button" class="btn btn-primary" (click)="save()">Save</button>
+    </div>
+  </form>
+  

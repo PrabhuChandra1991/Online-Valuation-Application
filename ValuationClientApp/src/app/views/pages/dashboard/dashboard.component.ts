@@ -13,6 +13,7 @@ import { ThemeCssVariableService, ThemeCssVariablesType } from '../../../core/se
         NgbDatepickerModule,
         NgApexchartsModule,
         FeatherIconDirective
+        
     ],
     templateUrl: './dashboard.component.html',
     styleUrl: './dashboard.component.scss'
@@ -36,6 +37,12 @@ export class DashboardComponent implements OnInit {
 
   themeCssVariables = inject(ThemeCssVariableService).getThemeCssVariables();
 
+  userObj: any = {
+    "email": '',
+    "name":'',
+    'mobilenumber':''
+    // "createdDate":new Date().toJSON()
+  }
   constructor() {}
 
   ngOnInit(): void {
@@ -45,6 +52,17 @@ export class DashboardComponent implements OnInit {
     this.revenueChartOptions = this.getRevenueChartOptions(this.themeCssVariables);
     this.monthlySalesChartOptions = this.getMonthlySalesChartOptions(this.themeCssVariables);
     this.cloudStorageChartOptions = this.getCloudStorageChartOptions(this.themeCssVariables);
+
+    const loggedData = localStorage.getItem('userData');
+    debugger;
+    if(loggedData)
+    {
+      const userData = JSON.parse(loggedData);
+
+      this.userObj.email = userData.email;
+      this.userObj.name = userData.name;
+      this.userObj.mobilenumber = userData.mobileNumber;
+    }
   }
 
 

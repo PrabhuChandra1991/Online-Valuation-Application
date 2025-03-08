@@ -11,6 +11,8 @@ namespace SKCE.Examination.Models.DbModels.Common
         public DbSet<UserLoginHistory> UserLoginHistories { get; set; }
         public DbSet<UserCourse> UserCourses { get; set; }
         public DbSet<UserAreaOfSpecialization> UserSpecializations { get; set; }
+        public DbSet<UserDesignation> UserDesignations { get; set; }
+        public DbSet<UserQualification> UserQualifications { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<Department> Departments { get; set; }
         public DbSet<Designation> Designations { get; set; }

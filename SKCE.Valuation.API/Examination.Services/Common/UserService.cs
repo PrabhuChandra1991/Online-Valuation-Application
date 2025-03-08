@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using SKCE.Examination.Models.DbModels.Common;
 using Microsoft.Extensions.Configuration;
+using SKCE.Examination.Models.DbModels.QPSettings;
 
 namespace SKCE.Examination.Services.Common
 {
@@ -25,6 +26,8 @@ namespace SKCE.Examination.Services.Common
             return await  _context.Users
             .Include(u => u.UserCourses)
             .Include(u => u.UserAreaOfSpecializations)
+            .Include(u => u.UserQualifications)
+            .Include(u => u.UserDesignations)
             .ToListAsync();
         }
 
@@ -33,6 +36,8 @@ namespace SKCE.Examination.Services.Common
             return await _context.Users
             .Include(u => u.UserCourses)
             .Include(u => u.UserAreaOfSpecializations)
+            .Include(u => u.UserQualifications)
+            .Include(u => u.UserDesignations)
             .FirstOrDefaultAsync(u => u.UserId == id); ;
         }
 
@@ -40,14 +45,35 @@ namespace SKCE.Examination.Services.Common
         {
             try
             {
+                //seed default qualifications
+                foreach (var degreeType in _context.DegreeTypes.OrderBy(d=>d.DegreeTypeId))
+                {
+                    var degreeTypeName = string.Format("{0}{1}:",degreeType.DegreeTypeId == 2?"*":"", degreeType.Name);
+                    var userQualification = new UserQualification { UserId = user.UserId, Title = degreeTypeName + ":", Specialization = "", Name = "", IsCompleted = false };
+                    AuditHelper.SetAuditPropertiesForInsert(userQualification, 1);
+                    user.UserQualifications.Add(userQualification);
+                }
+
+                //seed current designation
+                var currentDesignation = new UserDesignation() {UserId=user.UserId,DesignationId=0,Experience=0,IsCurrent=true };
+                AuditHelper.SetAuditPropertiesForInsert(currentDesignation, 1);
+                user.UserDesignations.Add(currentDesignation);
+
+                //seed one previou designation
+                var previousDesignation = new UserDesignation() { UserId = user.UserId, DesignationId = 0, Experience = 0, IsCurrent = false };
+                AuditHelper.SetAuditPropertiesForInsert(previousDesignation, 1);
+                user.UserDesignations.Add(previousDesignation);
+
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
-                _emailService.SendEmailAsync(user.Email, "Profile Update for Question Paper Setter Role – Sri Krishna Institutions, Coimbatore",
+
+                //send email
+                _emailService.SendEmailAsync(user.Email, "Profile Update - Question Paper Setter/Evaluator – Sri Krishna Institutions, Coimbatore",
                   $"Dear {user.Name}," +
-                  $"\n\nGreetings from Sri Krishna Institutions, Coimbatore! " +
-                  $"\n\nFurther to our previous communication, we are pleased to share the link {_configuration["LoginUrl"]} and Login Credentials to the form for updating your profile on our online platform. Kindly ensure that you complete this at your earliest convenience. You will also receive a notification via email regarding the appointment for the role of Question Paper Setter." +
-                  $"\n\nPlease note that the provided link allows only a one-time entry using your registered email address or username. If you encounter any issues or require any changes after submission, please feel free to contact us, and we will be happy to assist you." +
-                  $"\n\nThank you for your cooperation. We look forward to your valuable contribution to our institution \n\nWarm regards,\n[Your Name]\n[Your Position]\nSri Krishna Institutions, Coimbatore").Wait();
+                  $"\n\nGreetings from Sri Krishna Institutions, Coimbatore!" +
+                  $"\n\nFurther to our previous communication, we are pleased to share with you the link {_configuration["LoginUrl"]} for updating your profile on our online platform. We request you to complete the update at your earliest convenience. Additionally, you will receive a separate notification via email regarding your appointment for the role of Question Paper Setter/Evaluator."+
+                  $"\n\nIf you require any further clarification, please do not hesitate to contact us. We will be happy to assist you." +
+                  $"\n\nContact Details:\nName:\nContact Number:\n\nThank you for your cooperation. We look forward to your valuable contribution to our institution.\n\nWarm regards,\nSri Krishna College of Engineering and Technology").Wait();
             }
             catch (Exception ex)
             {

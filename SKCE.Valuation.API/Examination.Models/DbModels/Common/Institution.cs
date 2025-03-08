@@ -10,6 +10,8 @@ public class Institution: AuditModel
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public long InstitutionIdId { get; set; }
     public required string Name { get; set; }
+    public required string Code { get; set; }
+    public string Address { get; set; }
     public required string Email { get; set; }
     public required string MobileNumber { get; set; }
 }

@@ -5,6 +5,8 @@ using SKCE.Examination.Services.ServiceContracts;
 using SKCE.Examination.Models.DbModels.Common;
 using SKCE.Examination.Services.Helpers;
 using SKCE.Examination.Models.DbModels.QPSettings;
+using DocumentFormat.OpenXml.InkML;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,6 +52,7 @@ using (var scope = app.Services.CreateScope())
     {
         var context = services.GetRequiredService<ExaminationDbContext>();
         context.Database.Migrate(); // Apply pending migrations
+        SeedDegreeTypes(context);
         SeedDefaultUser(context);
         SeedRoles(context);
         SeedExamMonths(context);
@@ -104,18 +107,34 @@ void SeedDefaultUser(ExaminationDbContext context)
             Email = "superadmin@skcet.ac.in",
             MobileNumber = "8300034477",
             RoleId = 1,
-            WorkExperience = 1,
-            DepartmentId = 1,
-            DesignationId = 1,
             CollegeName = "SRI KRISHNA COLLEGE OF ENGINEERING TECHNOLOGY",
+            DepartmentId = 1,
+            TotalExperience = 1,
             BankAccountName = "",
             BankAccountNumber = "",
             BankName = "",
             BankBranchName = "",
             BankIFSCCode = "",
             IsEnabled = true,
-            Qualification = "M.E",
         };
+        //seed default qualifications
+        foreach (var degreeType in context.DegreeTypes.OrderBy(d => d.DegreeTypeId))
+        {
+            var degreeTypeName = string.Format("{0}{1}:", degreeType.DegreeTypeId == 2 ? "*" : "", degreeType.Name);
+            var userQualification = new UserQualification { UserId = defaultUser.UserId, Title = degreeTypeName + ":", Specialization = "", Name = "", IsCompleted = false };
+            AuditHelper.SetAuditPropertiesForInsert(userQualification, 1);
+            defaultUser.UserQualifications.Add(userQualification);
+        }
+
+        //seed current designation
+        var currentDesignation = new UserDesignation() { UserId = defaultUser.UserId, DesignationId = 0, Experience = 0, IsCurrent = true };
+        AuditHelper.SetAuditPropertiesForInsert(currentDesignation, 1);
+        defaultUser.UserDesignations.Add(currentDesignation);
+
+        //seed one previou designation
+        var previousDesignation = new UserDesignation() { UserId = defaultUser.UserId, DesignationId = 0, Experience = 0, IsCurrent = false };
+        AuditHelper.SetAuditPropertiesForInsert(previousDesignation, 1);
+        defaultUser.UserDesignations.Add(previousDesignation);
         AuditHelper.SetAuditPropertiesForInsert(defaultUser, 1);
 
         context.Users.Add(defaultUser);
@@ -241,6 +260,28 @@ void SeedDesignations(ExaminationDbContext context)
             AuditHelper.SetAuditPropertiesForInsert(designation, 1);
 
         context.Designations.AddRange(designations);
+        context.SaveChanges(); // Commit to Database
+    }
+}
+
+/// <summary>
+/// Seeds a default Degree Types into the database if not exists.
+/// </summary>
+void SeedDegreeTypes(ExaminationDbContext context)
+{
+    if (!context.DegreeTypes.Any())
+    {
+        var degreeTypes = new List<DegreeType>
+        {
+           new DegreeType { Name = "UG",Code="UG" },
+           new DegreeType { Name = "PG" ,Code="PG"},
+           new DegreeType { Name = "Ph.D",Code="Ph.D"},
+        };
+
+        foreach (var degreeType in degreeTypes)
+            AuditHelper.SetAuditPropertiesForInsert(degreeType, 1);
+
+        context.DegreeTypes.AddRange(degreeTypes);
         context.SaveChanges(); // Commit to Database
     }
 }

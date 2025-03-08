@@ -21,10 +21,8 @@ namespace SKCE.Examination.Models.DbModels.Common
         [MaxLength(15)]
         public required string MobileNumber { get; set; }
         public long? RoleId { get; set; }
-        public  string? Qualification { get; set; }
-        public long? WorkExperience { get; set; }
+        public long? TotalExperience { get; set; }
         public long? DepartmentId { get; set; } 
-        public long? DesignationId { get; set; }
         public string? CollegeName { get; set; }
         public string? BankAccountName { get; set; }
         public string? BankAccountNumber { get; set; }
@@ -36,5 +34,9 @@ namespace SKCE.Examination.Models.DbModels.Common
         public virtual ICollection<UserCourse> UserCourses { get; set; } = new List<UserCourse>();
 
         public virtual ICollection<UserAreaOfSpecialization> UserAreaOfSpecializations { get; set; } = new List<UserAreaOfSpecialization>();
+
+        public virtual ICollection<UserQualification> UserQualifications { get; set; } = new List<UserQualification>();
+
+        public virtual ICollection<UserDesignation> UserDesignations { get; set; } = new List<UserDesignation>();
     }
 }

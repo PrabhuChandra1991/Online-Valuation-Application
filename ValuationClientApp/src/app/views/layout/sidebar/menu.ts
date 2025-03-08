@@ -5,23 +5,35 @@ export const MENU: MenuItem[] = [
   {
     label: 'User Management',
     icon: 'home',
-    link: '/apps/user'
+
+    link: '/apps/user',
+    role: [1]
   },
   {
     label: 'Template Management',
     icon: 'clipboard',
     link: '/apps/qptemplate',
+    role: [1]
   },
 {
     label: 'Template Assignment',
     icon: 'check-square',
     link: '/apps/assigntemplate',
+    role: [1]
   },
   {
     label: 'Master Data',
     icon: 'list',
     link: '/apps/assigntemplate',
+    role: [1]
+  },
+  {
+    label: 'Assigned Template',
+    icon: 'list',
+    link: '/apps/assigntemplate',
+    role: [2]
   }  
+
   // {
   //   label: 'Calendar',
   //   icon: 'calendar',

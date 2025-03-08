@@ -4,6 +4,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ToastrModule,ToastrService  } from 'ngx-toastr';
+import { SpinnerService } from '../../services/spinner.service';
 
 @Component({
     selector: 'app-login',
@@ -25,7 +26,8 @@ export class LoginComponent implements OnInit {
   userEmail:string='';
   userOtp :number=0;
 
-  constructor(private router: Router, private route: ActivatedRoute, private http: HttpClient,private toastr: ToastrService) {}
+  constructor(private router: Router, private route: ActivatedRoute, private http: HttpClient,
+    private toastr: ToastrService,private spinnerService: SpinnerService) {}
 
   userObj: any = {
     "email": this.userEmail,
@@ -48,33 +50,36 @@ export class LoginComponent implements OnInit {
 
   requestPassword() {
     //e.preventDefault();
+    this.spinnerService.toggleSpinnerState(true);
      //
     this.http.post("http://localhost:5088/api/Login/request-temp-password",this.userObj).subscribe((result:any)=>{
      console.log(result);
       this.toastr.success(result['message']);
       this.isOTPRequested = true;
-      
+      this.spinnerService.toggleSpinnerState(false);
     });
 
   }
 
   login() {
-    //e.preventDefault();
     
     debugger;
     //
+    this.spinnerService.toggleSpinnerState(true);
     this.http.post("http://localhost:5088/api/Login/validate-temp-password?tempPassword="+this.userObj.tempPassword,this.userObj).subscribe((result:any)=>{
       debugger;
       localStorage.setItem('isLoggedin', 'true');
+      localStorage.setItem('userData',JSON.stringify(result));
+
       this.isOTPRequested = false;
       
       if (localStorage.getItem('isLoggedin') === 'true') {
         if(result.roleId == 1)
-        this.router.navigate(['/apps/user']);
+          this.router.navigate(['/apps/user']);
         else 
           this.router.navigate(['/dashboard']);
          }
-      
+         this.spinnerService.toggleSpinnerState(false);
     });
 
   }

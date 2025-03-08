@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { BaseComponent } from './views/layout/base/base.component';
 import { authGuard } from './core/guards/auth.guard';
+import { NgModule } from '@angular/core';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
@@ -10,7 +11,7 @@ export const routes: Routes = [
     component: BaseComponent,
     canActivateChild: [authGuard],
     children: [
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: '', redirectTo: 'login', pathMatch: 'full' },
       {
         path: 'dashboard',
         loadChildren: () => import('./views/pages/dashboard/dashboard.routes')

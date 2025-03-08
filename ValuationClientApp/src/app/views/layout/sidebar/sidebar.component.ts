@@ -10,6 +10,7 @@ import { MenuItem } from './menu.model';
 
 import { FeatherIconDirective } from '../../../core/feather-icon/feather-icon.directive';
 
+
 @Component({
     selector: 'app-sidebar',
     imports: [
@@ -17,7 +18,8 @@ import { FeatherIconDirective } from '../../../core/feather-icon/feather-icon.di
         RouterLinkActive,
         NgScrollbar,
         NgClass,
-        FeatherIconDirective,
+        FeatherIconDirective
+        
     ],
     templateUrl: './sidebar.component.html',
     styleUrl: './sidebar.component.scss'
@@ -27,7 +29,11 @@ export class SidebarComponent implements OnInit, AfterViewInit {
   @ViewChild('sidebarToggler') sidebarToggler: ElementRef;
 
   menuItems: MenuItem[] = [];
+
+  masterMenu : MenuItem[] = [];
+
   @ViewChild('sidebarMenu') sidebarMenu: ElementRef;
+
 
   constructor(@Inject(DOCUMENT) private document: Document, private renderer: Renderer2, router: Router) { 
     router.events.forEach((event) => {
@@ -50,8 +56,17 @@ export class SidebarComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.menuItems = MENU;
+    debugger;
+      this.masterMenu = MENU;
 
+    const loggedData = localStorage.getItem('userData');
+
+    if(loggedData)
+    {
+      const userData = JSON.parse(loggedData);
+
+      this.menuItems = this.masterMenu.filter(x=>x.role.includes(userData.roleId));
+    }
     /**
      * Sidebar-folded on desktop (min-width:992px and max-width: 1199px)
      */

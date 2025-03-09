@@ -83,6 +83,10 @@ export class NavbarComponent implements OnInit {
     document.querySelector('.sidebar .sidebar-toggler')?.classList.add('active');
   }
 
+  editProfile(){
+    debugger;
+    //this.router.navigate(['/dashboard']);
+  }
   /**
    * Logout
    */

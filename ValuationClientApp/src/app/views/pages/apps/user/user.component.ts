@@ -11,6 +11,7 @@ import { MatInputModule } from '@angular/material/input';
 import { UserFormComponent } from '../../forms/shared/user-form.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'; 
 import { User  } from '../../models/user.model';
+import { ToastrService } from 'ngx-toastr';
 import {MatButtonModule} from '@angular/material/button';
 
 @Component({
@@ -35,9 +36,10 @@ import {MatButtonModule} from '@angular/material/button';
 export class UserComponent implements OnInit{
 
   users: any[] = [];
-  selectedUser: any;
+  selectedUser: User | null ;
   modalRef!: NgbModalRef;
   isEditMode:boolean;
+  isSubmitting: boolean = false; // Track API call status
 
   @ViewChild('userModal') userModal: any;
 
@@ -47,7 +49,7 @@ export class UserComponent implements OnInit{
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  constructor(private userService: UserService,private modalService: NgbModal) {}
+  constructor(private userService: UserService,private modalService: NgbModal, private toastr: ToastrService) {}
 
   ngOnInit() {
     this.loadUsers();
@@ -80,73 +82,100 @@ export class UserComponent implements OnInit{
 
 
   openCreateUserDialog() {
-    this.selectedUser = null; // Ensure it's empty for new user
+  // Ensure it's empty for new user
+  this.isEditMode = false;
+    this.selectedUser = null;
     this.modalRef = this.modalService.open(this.userModal, { size: 'lg', backdrop: 'static' });
   }
 
   openEditUserDialog(user: any) {
     this.selectedUser = { ...user }; // Load selected user data
+    this.isEditMode = true;
     this.modalRef = this.modalService.open(this.userModal, { size: 'lg', backdrop: 'static' });
   }
 
   handleFormSubmit(userData: any) {
-    if (this.selectedUser) {
+    if (this.isEditMode) {
       // Update logic
-      this.updateUser(userData);
-      console.log('Updating User:', userData);
+      // Merge only changed values into selectedUser
+     const updatedUser = { ...this.selectedUser, ...userData };
+      this.updateUser(updatedUser);
+      console.log('Updating User:', updatedUser);
     } else {
       // Create logic
-      this.selectedUser = {
-        id: 0,
-        name:  userData.name,
-        email: userData.email,
-        mobileNumber: userData.mobileNumber,
-        roleId: null,
-        workExperience: null,
-        departmentId: null,
-        designationId: null,
-        collegeName: userData.collegeName,
-        bankAccountName: null,
-        bankAccountNumber: null,
-        bankName: null,
-        bankBranchName: null,
-        isEnabled: false,
-        qualification: userData.qualification,
-        areaOfSpecialization: null,
-        courseId: 0,
-        bankIfsccode: null,
-        isActive: false,
-        createdById: 0,
-        createdDate: new Date().toISOString(),
-        modifiedById: 0,
-        modifiedDate: null
-      };
-    
-    this.addUser();
-      console.log('Creating User:', this.selectedUser);
-      this.modalRef.close();
+      this.createUser(userData);
     }
    
   }
 
-  // Add a new user
-  addUser() {
-    this.userService.addUser(this.selectedUser).subscribe(() => {
-   
-      this.modalService.dismissAll(); // Close modal after adding
-      this.loadUsers(); // Refresh user list
+  createUser(userData: any) {
+
+    this.isSubmitting = true;
+    const newUser: User = {
+      isActive: true,
+      createdById: 0,
+      createdDate: new Date().toISOString(),
+      modifiedById: 0,
+      modifiedDate: new Date().toISOString(),
+      id: 0,
+      name: userData.name,
+      email: userData.email,
+      mobileNumber: userData.mobileNumber.toString(),
+      roleId: 0,
+      workExperience: userData.workExperience,
+      departmentId: 0,
+      designationId: 0,
+      collegeName: userData.collegeName,
+      bankAccountName: "",
+      bankAccountNumber: "",
+      bankName: "",
+      bankBranchName: "",
+      isEnabled: true,
+      qualification: "",
+      areaOfSpecialization: "",
+      courseId: 0,
+      bankIfscCode: ""
+    };
+
+    this.userService.addUser(newUser).subscribe({
+      next: () => {
+        this.toastr.success('User added successfully!');
+        this.loadUsers();
+        this.modalRef.close();
+      },
+      error: () => {
+        this.toastr.error('Failed to add user. Please try again.');
+      },
+      complete: () => {
+        this.isSubmitting = false;
+      }
     });
   }
 
   updateUser(userData:any) {
-    this.userService.updateUser(this.selectedUser.id, this.selectedUser).subscribe(() => {
-      this.modalService.dismissAll(); // Close modal after updating
-      this.loadUsers(); // Refresh user list
+    if (!this.selectedUser) return;
+
+    this.isSubmitting = true;
+
+    this.userService.updateUser(userData.id.toString(), userData).subscribe({
+      next: () => {
+        this.toastr.success('User updated successfully!');
+        this.loadUsers();
+        this.modalRef.close();
+      },
+      error: () => {
+        this.toastr.error('Failed to update user. Please try again.');
+      },
+      complete: () => {
+        this.isSubmitting = false;
+      }
     });
   }
 
   closeModal() {
-    this.modalRef.close();
+    if (this.modalRef) {
+      this.modalRef.close();
+    }
   }
 
 }

@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
 import { BaseComponent } from './views/layout/base/base.component';
 import { authGuard } from './core/guards/auth.guard';
-import { NgModule } from '@angular/core';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
@@ -60,3 +59,5 @@ export const routes: Routes = [
   },
   { path: '**', redirectTo: 'error/404', pathMatch: 'full' }
 ];
+
+export class AppRoutingModule { }

@@ -25,6 +25,11 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(),
     provideRouter(routes, withInMemoryScrolling({ scrollPositionRestoration: 'top' })), 
     provideAnimationsAsync(),
+    provideToastr({
+      timeOut: 5000,
+      positionClass: 'toast-top-center',
+      preventDuplicates: true,
+    }), // Toastr providers
     importProvidersFrom([SweetAlert2Module.forRoot()]), // ngx-sweetalert2: https://github.com/sweetalert2/ngx-sweetalert2
     provideHighlightOptions(highlightOptions), provideAnimationsAsync(), provideAnimationsAsync(), // ngx-highlightjs: https://github.com/murhafsousli/ngx-highlightjs
   ],

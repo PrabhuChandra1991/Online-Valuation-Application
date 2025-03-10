@@ -56,17 +56,43 @@ export class UserComponent implements OnInit{
   }
 
   loadUsers() {
-    this.userService.getUsers().subscribe(
-      (data: any[]) => {
-        console.log("API Data:", data);  // Debugging step 
-        this.dataSource = new MatTableDataSource(data);
-        this.dataSource.paginator = this.paginator;
-        this.dataSource.sort = this.sort;
-      },
-      (error) => {
-        console.error("Error fetching users:", error);
+    // this.userService.getUsers().subscribe(
+    //   (data: any[]) => {
+    //     console.log("API Data:", data);  // Debugging step 
+    //     this.dataSource = new MatTableDataSource(data);
+    //     this.dataSource.paginator = this.paginator;
+    //     this.dataSource.sort = this.sort;
+    //   },
+    //   (error) => {
+    //     console.error("Error fetching users:", error);
+    //   }
+    // );
+
+    this.userService.getUsers().subscribe(response => {
+      if (response && response.$values) {
+        this.dataSource.data = response.$values;  // ✅ Extract $values array and assign it to dataSource
+      } else {
+        this.dataSource.data = [];  // ✅ Handle empty response case
       }
-    );
+    }, error => {
+      console.error('Error fetching users:', error);
+    });
+  
+
+    // this.userService.getUsers().subscribe(
+    //   (data: User[]) => {
+    //     console.log('API Data:', data);
+    //     this.users = data;
+    //     this.dataSource.data = this.users; // Avoid reassigning MatTableDataSource
+    //     this.dataSource.paginator = this.paginator;
+    //     this.dataSource.sort = this.sort;
+    //   },
+    //   (error) => {
+    //     console.error('Error fetching users:', error);
+    //     this.toastr.error('Failed to load users.');
+    //   }
+    // );
+
   }
 
   editUser(user: any) {
@@ -122,19 +148,19 @@ export class UserComponent implements OnInit{
       email: userData.email,
       mobileNumber: userData.mobileNumber.toString(),
       roleId: 0,
-      workExperience: userData.workExperience,
+      totalExperience: userData.totalExperience,
       departmentId: 0,
-      designationId: 0,
+      userDesignations: [],
       collegeName: userData.collegeName,
       bankAccountName: "",
       bankAccountNumber: "",
       bankName: "",
       bankBranchName: "",
       isEnabled: true,
-      qualification: "",
-      areaOfSpecialization: "",
-      courseId: 0,
-      bankIfscCode: ""
+      userQualifications: [],
+      userAreaOfSpecializations: [],
+      userCourses: [],
+      bankIFSCCode: ""
     };
 
     this.userService.addUser(newUser).subscribe({

@@ -54,8 +54,7 @@ onFileChange(event:any) {
        
     this.http.post('http://localhost:5088/api/S3/upload', formData)
       .subscribe(res => {
-        console.log(res);
-        alert('Uploaded Successfully.');
+        this.toastr.success('Data imported successfully!');
       })
   }
 }

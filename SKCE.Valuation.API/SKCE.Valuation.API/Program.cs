@@ -5,15 +5,16 @@ using SKCE.Examination.Services.ServiceContracts;
 using SKCE.Examination.Models.DbModels.Common;
 using SKCE.Examination.Services.Helpers;
 using SKCE.Examination.Models.DbModels.QPSettings;
-using DocumentFormat.OpenXml.InkML;
-using DocumentFormat.OpenXml.Spreadsheet;
+using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Database Connection
 builder.Services.AddDbContext<ExaminationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
+builder.WebHost.ConfigureKestrel(options => {
+    options.Listen(IPAddress.Any, 5088); // Listen on all interfaces, port 5000
+});
 builder.Services.AddCors();
 
 // Add CORS Policy

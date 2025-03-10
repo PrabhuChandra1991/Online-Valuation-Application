@@ -12,9 +12,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Database Connection
 builder.Services.AddDbContext<ExaminationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.WebHost.ConfigureKestrel(options => {
-    options.Listen(IPAddress.Any, 5088); // Listen on all interfaces, port 5000
-});
+//builder.WebHost.ConfigureKestrel(options => {
+//    options.Listen(IPAddress.Any, 5088); // Listen on all interfaces, port 5000
+//});
 builder.Services.AddCors();
 
 // Add CORS Policy

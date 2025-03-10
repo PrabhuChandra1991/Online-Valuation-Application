@@ -50,4 +50,9 @@ export default [
         loadComponent: () => import('./qp-template/template-assignment/template-assignment.component').then(c => c.TemplateAssignmentComponent),
         canActivate:[authGuard]
     },
+    {
+        path: 'master',
+        loadComponent: () => import('./master/master.component').then(c => c.MasterComponent),
+        canActivate:[authGuard]
+    },
 ] as Routes;

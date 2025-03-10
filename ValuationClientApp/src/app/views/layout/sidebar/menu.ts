@@ -24,7 +24,7 @@ export const MENU: MenuItem[] = [
   {
     label: 'Master Data',
     icon: 'list',
-    link: '/apps/assigntemplate',
+    link: '/apps/master',
     role: [1]
   },
   {

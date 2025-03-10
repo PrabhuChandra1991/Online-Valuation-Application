@@ -12,9 +12,7 @@ namespace SKCE.Examination.Models.DbModels.Common
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long DepartmentId { get; set; }
         public required string Name { get; set; }
-
         public required string ShortName { get; set; }
 
-        public long DegreeTypeId { get; set; }
     }
 }

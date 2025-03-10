@@ -25,110 +25,135 @@ public class ExcelImportHelper
         var worksheetPart = (WorksheetPart)workbookPart.GetPartById(sheet.Id);
         var rows = worksheetPart.Worksheet.Descendants<Row>().Skip(1); // Skip header
 
-        var degreeTypes = new HashSet<string>();
+        // read and update Institutions
+        var institutionCodes = new HashSet<string>();
+        foreach (var row in rows)
+        {
+            var cells = row.Elements<Cell>().ToList();
+            string institutionCode = GetCellValue(workbookPart, cells[0]).Trim();
+
+            if (!string.IsNullOrEmpty(institutionCode) && !institutionCodes.Any(ic => ic == institutionCode))
+                institutionCodes.Add(institutionCode);
+        }
+        // Insert unique Institutions
+        var existingInstitutions = _dbContext.Institutions.ToList();
+        var newInstitutions = new HashSet<Institution>();
+        foreach (var institutionCode in institutionCodes)
+        {
+            if (!existingInstitutions.Any(x => x.Code == institutionCode))
+            {
+                var newInstitution = new Institution { Name = institutionCode, Code = institutionCode,Email="",MobileNumber=""};
+                AuditHelper.SetAuditPropertiesForInsert(newInstitution, 1);
+                newInstitutions.Add(newInstitution);
+            }
+        }
+        await _dbContext.Institutions.AddRangeAsync(newInstitutions);
+
+
+        // read and update departments
         var departments = new HashSet<Department>();
-        var courses = new List<Course>();
-
         foreach (var row in rows)
         {
             var cells = row.Elements<Cell>().ToList();
-            string degreeTypeName = GetCellValue(workbookPart, cells[2]).Trim();
+            string departmentName = GetCellValue(workbookPart, cells[4]).Trim();
+            string departmentShortName = GetCellValue(workbookPart, cells[5]).Trim();
 
-            if (!string.IsNullOrEmpty(degreeTypeName))
-                degreeTypes.Add(degreeTypeName);
-        }
-
-        // Insert unique DegreeTypes
-        var existingDegreeTypes = _dbContext.DegreeTypes.ToList();
-        var newDegreeTypes = new HashSet<DegreeType>();
-        foreach (var dt in degreeTypes)
-        {
-            if (!existingDegreeTypes.Any(x => x.Name == dt))
+            if (!string.IsNullOrEmpty(departmentName) && !departments.Any(d => d.Name == departmentName))
             {
-                var newDegreeType = new DegreeType { Name = dt, Code = dt };
-                AuditHelper.SetAuditPropertiesForInsert(newDegreeType, 1);
-                newDegreeTypes.Add(newDegreeType);
+                departments.Add(new Department() { Name=departmentName,ShortName= departmentShortName });
+
             }
         }
-        await _dbContext.DegreeTypes.AddRangeAsync(newDegreeTypes);
-        await _dbContext.SaveChangesAsync(); 
-
-
-        var updatedDegreeTypes = await _dbContext.DegreeTypes.ToListAsync();
-        var updatedDepartments = await _dbContext.Departments.ToListAsync();
-        foreach (var row in rows)
+        // Insert unique departments
+        var existingDepartments = _dbContext.Departments.ToList();
+        var newDepartments = new HashSet<Department>();
+        foreach (var department in departments)
         {
-            var cells = row.Elements<Cell>().ToList();
-            string degreeTypeName = GetCellValue(workbookPart, cells[2]).Trim();
-            string departmentName = GetCellValue(workbookPart, cells[3]).Trim();
-            string departmentShortName = GetCellValue(workbookPart, cells[3]).Trim();
-
-            var degreeType = updatedDegreeTypes.FirstOrDefault(d => d.Name == degreeTypeName);
-
-            if (degreeType == null)
+            if (!existingDepartments.Any(x => x.Name == department.Name))
             {
-                return $"Error: Invalid DegreeType or Department at row {rows.ToList().IndexOf(row) + 2}";
-            }
-            if (!updatedDepartments.Any(x => x.Name == departmentName))
-            {
-                var department = new Department
-                {
-                    Name = departmentName,
-                    ShortName = departmentShortName,
-                    DegreeTypeId = degreeType.DegreeTypeId
-                };
                 AuditHelper.SetAuditPropertiesForInsert(department, 1);
-                departments.Add(department);
-
+                newDepartments.Add(department);
             }
         }
-        await _dbContext.Departments.AddRangeAsync(departments);
-        await _dbContext.SaveChangesAsync(); // Commit Master Data
+        await _dbContext.Departments.AddRangeAsync(newDepartments);
 
-
-        var examMonths = await _dbContext.ExamMonths.ToListAsync();
-        // Process Courses with Foreign Keys
+        // read and update departments
+        var courses = new HashSet<Course>();
         foreach (var row in rows)
         {
             var cells = row.Elements<Cell>().ToList();
-            string regulation = GetCellValue(workbookPart, cells[0]).Trim();
-            string batch = GetCellValue(workbookPart, cells[1]).Trim();
-            string degreeTypeName = GetCellValue(workbookPart, cells[2]).Trim();
-            string departmentName = GetCellValue(workbookPart, cells[3]).Trim();
-            string semester = GetCellValue(workbookPart, cells[4]).Trim();
-            string courseCode = GetCellValue(workbookPart, cells[5]).Trim();
-            string courseName = GetCellValue(workbookPart, cells[6]).Trim();
-            string studentCount = GetCellValue(workbookPart, cells[7]).Trim();
+            string courseCode = GetCellValue(workbookPart, cells[8]).Trim();
+            string courseName = GetCellValue(workbookPart, cells[9]).Trim();
 
-
-            var degreeType = updatedDegreeTypes.FirstOrDefault(d => d.Name == degreeTypeName);
-            var department = updatedDepartments.FirstOrDefault(d => d.Name == departmentName);
-
-            if (degreeType == null || department == null)
+            if (!string.IsNullOrEmpty(courseCode) && !courses.Any(d => d.Code == courseCode))
             {
-                return $"Error: Invalid DegreeType or Department at row {rows.ToList().IndexOf(row) + 2}";
+                courses.Add(new Course() { Name = courseName, Code = courseCode });
+
             }
-
-            courses.Add(new Course
+        }
+        // Insert unique departments
+        var existingCourses = _dbContext.Courses.ToList();
+        var newCourses = new HashSet<Course>();
+        foreach (var course in courses)
+        {
+            if (!existingCourses.Any(x => x.Code == course.Code))
             {
-                Name = courseName,
-                Code = courseCode,
+                AuditHelper.SetAuditPropertiesForInsert(course, 1);
+                newCourses.Add(course);
+            }
+        }
+        await _dbContext.Courses.AddRangeAsync(newCourses);
+        await _dbContext.SaveChangesAsync();
+
+        var updatedInstitutions = _dbContext.Institutions.ToList();
+        var updatedDepartments = _dbContext.Departments.ToList();
+        var updatedCourses = _dbContext.Courses.ToList();
+        var degreeTypes = _dbContext.DegreeTypes.ToList();
+        var examMonths = _dbContext.ExamMonths.ToList();
+        var courseDepartMents = new HashSet<CourseDepartment>();
+        // Process Institution, Course, Department, StudentCount, DegreeType, Semester, Batch, Regulation, ExamMonth
+        foreach (var row in rows)
+        {
+            var cells = row.Elements<Cell>().ToList();
+            string institutionCode = GetCellValue(workbookPart, cells[0]).Trim();
+            string regulation = GetCellValue(workbookPart, cells[1]).Trim();
+            string batch = GetCellValue(workbookPart, cells[2]).Trim();
+            string degreeTypeName = GetCellValue(workbookPart, cells[3]).Trim();
+            string departmentName = GetCellValue(workbookPart, cells[4]).Trim();
+            string examType = GetCellValue(workbookPart, cells[6]).Trim();
+            string semester = GetCellValue(workbookPart, cells[7]).Trim();
+            string courseCode = GetCellValue(workbookPart, cells[8]).Trim();
+            string studentCount = GetCellValue(workbookPart, cells[10]).Trim();
+
+
+            var institution = updatedInstitutions.FirstOrDefault(d => d.Code == institutionCode);
+            var course = updatedCourses.FirstOrDefault(d => d.Code == courseCode);
+            var department = updatedDepartments.FirstOrDefault(d => d.Name == departmentName);
+            var degreeType = degreeTypes.FirstOrDefault(d => d.Name == degreeTypeName);
+            var examMonth = examMonths.FirstOrDefault(d => d.Semester == long.Parse(semester));
+
+
+            courseDepartMents.Add(new CourseDepartment()
+            {
+                InstitutionId = (institution != null) ?institution.InstitutionId:1,
                 RegulationYear = regulation,
                 BatchYear = batch,
-                Semester = string.IsNullOrEmpty(semester) ? (long?)null : long.Parse(semester),
-                StudentCount = string.IsNullOrEmpty(studentCount) ? (long?)null : long.Parse(studentCount),
-                DegreeTypeId = degreeType.DegreeTypeId,
-                DepartmentId = department.DepartmentId,
+                DegreeTypeId = (degreeType != null) ? degreeType.DegreeTypeId : 1,
+                DepartmentId = (department != null) ? department.DepartmentId : 1,
+                ExamType = examType,
+                Semester = string.IsNullOrEmpty(semester) ? 0 : long.Parse(semester),
+                ExamMonthId = (examMonth != null) ? examMonth.ExamMonthId : 1,
+                CourseId = (course != null) ? course.CourseId : 1,
+                StudentCount = string.IsNullOrEmpty(studentCount) ? 0 : long.Parse(studentCount),
                 CreatedById = 1,
                 CreatedDate = DateTime.UtcNow,
                 ModifiedById = 1,
                 ModifiedDate = DateTime.UtcNow,
                 IsActive = true,
-                ExamMonthId = (examMonths != null)? (long)(examMonths.FirstOrDefault(x => x.Semester == long.Parse(semester))?.ExamMonthId):1
             });
         }
 
-        await _dbContext.Courses.AddRangeAsync(courses);
+        await _dbContext.CourseDepartments.AddRangeAsync(courseDepartMents);
         await _dbContext.SaveChangesAsync();
 
         return "Courses imported successfully! Imported Count is  "+ courses.Count;

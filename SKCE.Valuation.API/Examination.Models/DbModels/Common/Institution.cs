@@ -8,7 +8,7 @@ public class Institution: AuditModel
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public long InstitutionIdId { get; set; }
+    public long InstitutionId { get; set; }
     public required string Name { get; set; }
     public required string Code { get; set; }
     public string Address { get; set; }

@@ -85,7 +85,15 @@ export class NavbarComponent implements OnInit {
 
   editProfile(){
     debugger;
-    //this.router.navigate(['/dashboard']);
+    let loggedDataJson = localStorage.getItem('userData');
+    if(loggedDataJson)
+    {
+      let loggedDataObject = JSON.parse(loggedDataJson);
+      localStorage.setItem('isLoggedin', 'true');
+      this.router.navigate(['/dashboard/edit', loggedDataObject.userId]); // Redirect to Edit
+    }
+     return;
+    
   }
   /**
    * Logout

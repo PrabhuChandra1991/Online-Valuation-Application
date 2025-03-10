@@ -1,4 +1,4 @@
-﻿namespace SKCE.Examination.API.Controllers.Model
+﻿namespace SKCE.Examination.API.Model
 {
     public class ResultModel
     {

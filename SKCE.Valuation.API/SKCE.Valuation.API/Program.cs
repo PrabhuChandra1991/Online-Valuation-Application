@@ -35,6 +35,9 @@ builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ExcelImportHelper>(); // Register helper
 builder.Services.AddScoped<S3Helper>(); // Register helper
+builder.Services.AddScoped<CourseService>();
+builder.Services.AddScoped<DepartmentService>();
+
 
 builder.Services.AddHttpContextAccessor();
 // Enable Controllers

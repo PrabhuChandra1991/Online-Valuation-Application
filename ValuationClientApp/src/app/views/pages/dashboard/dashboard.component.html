@@ -1,245 +1,207 @@
-<div class="container">
+<div class="container"> 
   <div class="row mt-5">
     <div class="col-md-1"></div>
     <div class="col-md-10 col-sm-12 stretch-card">
       <div class="card">
         <div class="card-body">
           <h6 class="card-title">Edit User Profile</h6>
-          <form>
-            <div class="row">
+          <form [formGroup]="userForm">
+            <div class="row mb-4">
               <div class="col-sm-4">
-                <div class="mb-3">
-                  <label class="form-label">Name</label>
-                  <input type="text" class="form-control"
-                    placeholder="Enter name" [(ngModel)]="this.userObj.name" name="name" disabled/>
-                </div>
-              </div><!-- Col -->
+                <label class="form-label">Name</label>
+                <input type="text" class="form-control" formControlName="name" [attr.disabled]="true" />
+              </div>
               <div class="col-sm-4">
-                <div class="mb-3">
-                  <label class="form-label">Email address </label>
-                  <input type="email" class="form-control"
-                    placeholder="Enter email" [(ngModel)]="this.userObj.email" name="email" disabled>
-                </div>
-              </div><!-- Col -->
+                <label class="form-label">Email Address</label>
+                <input type="email" class="form-control" formControlName="email" [attr.disabled]="true" />
+              </div>
               <div class="col-sm-4">
-                <div class="mb-3">
-                  <label class="form-label">Mobile number</label>
-                  <input type="number" class="form-control" name="mobilenumber"
-                    placeholder="Enter mobile number " [(ngModel)]="this.userObj.mobilenumber" >
-                </div>
-              </div><!-- Col -->
-            </div><!-- Row -->
-            <div class="row">
-              <div class="col-sm-4">
-                <div class="mb-3">
-                  <label for="exampleFormControlSelect1" class="form-label">Qualification
-                    </label>
-                    <input type="text" class="form-control"
-                    placeholder="Enter qualification ">
-                  
-                </div>
-              </div><!-- Col -->
-              <div class="col-sm-4">
-                <div class="mb-3">
-                  <label for="exampleFormControlSelect1"
-                    class="form-label">Work Experience</label>
-                    <input type="text" class="form-control"
-                    placeholder="Enter work experience">
-                  
-                </div>
-              </div><!-- Col -->
-              <div class="col-sm-4">
-                <div class="mb-3">
-                  <label for="exampleFormControlSelect1"
-                    class="form-label">Department</label>
-                    <select class="form-select" id="exampleFormControlSelect1">
-                      <option selected disabled>Select</option>
-                      <option>Computer Science</option>
-                      <option>Mechanical</option>
-                      <option>Electrical</option>
-                      <option>Civil</option>
-                      <option>Electronics</option>
-                    </select>
-                  
-                </div><!-- Col -->
-                
+                <label class="form-label">Mobile Number</label>
+                <input type="number" class="form-control" formControlName="mobileNumber" />
               </div>
             </div>
-            <div class="row"><!-- Row Start -->
+
+            <div class="row mb-4">
               <div class="col-sm-4">
-                <div class="mb-3">
-                  <label for="exampleFormControlSelect1"
-                    class="form-label">Designation</label>
-                    
-                    <select class="form-select" id="exampleFormControlSelect1">
-                      <option selected disabled>Select</option>
-                      <option>Professor</option>
-                      <option>Associate Professor</option>
-                      <option>Assistant Professor</option>
-                      </select> 
-                </div>
-              </div><!-- Col -->
+                <label class="form-label">Department</label>
+                <select class="form-select" formControlName="departmentId">
+                  <option selected disabled>Select Department</option>
+                  <option *ngFor="let dept of departments" [value]="dept.id">{{ dept.name }}</option>
+                </select>
+              </div>
               <div class="col-sm-4">
-                <div class="mb-3">
-                  <label for="exampleFormControlSelect1"
-                    class="form-label">College Name</label>
-                    <input type="text" class="form-control"
-                    placeholder="Enter current college name">
-                  </div>
-              </div><!-- Col -->
-              <!-- Col -->
-            </div><!--Row end-->
-            <div class="row"><!--Row start-->
+                <label class="form-label">Designation</label>
+                <select class="form-select" formControlName="designationId">
+                  <option selected disabled>Select Designation</option>
+                  <option *ngFor="let desig of designations" [value]="desig.id">{{ desig.name }}</option>
+                </select>
+              </div>
               <div class="col-sm-4">
-                <div class="mb-3">
-                  <label for="exampleFormControlSelect1" class="form-label">Area of specialization
-                    </label>
-                    <input type="number" class="form-control"
-                    placeholder="Enter area of specialization">
-                  </div>
-              </div><!-- Col -->
-              <div class="col-sm-4">
-                <div class="mb-3">
-                  <label for="exampleFormControlSelect1"
-                    class="form-label"></label>
-                    <button class="btn btn-primary mt-4" alt="add" >+</button>
-                  
-                </div>
-            </div>
-            </div>  
-            <div class="row"><!--Row start-->
-              <div class="col-6">
-                <div class="mb-3">
-                  <table class="table table-striped">
-                    <thead>
-                    <tr>
-                      <th>
-                      Area of specialization
-                      </th>
-                      
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>AI</td>
-                                     
-                    </tr>
-                    <tr>
-                      <td>Data Science</td>
-                                    
-                    </tr>
-                    </tbody>
-                  </table>
-                  </div>
+                <label class="form-label">College Name</label>
+                <input type="text" class="form-control" formControlName="collegeName" />
+                <!-- <select class="form-select" formControlName="collegeName">
+                  <option selected disabled>Select College</option>
+                  <option *ngFor="let college of colleges" [value]="college.name">{{ college.name }}</option>
+                </select> -->
               </div>
             </div>
-            <div class="row"><!--Row start-->
+            <div class="row mb-4">
               <div class="col-sm-4">
-                <div class="mb-3">
-                  <label for="exampleFormControlSelect1" class="form-label">Course
-                    </label>
-                    <input type="text" class="form-control"
-                    placeholder="Enter course name">
-                  </div>
-              </div><!-- Col -->
+                <label class="form-label">UG</label>
+                <input type="text" class="form-control" formControlName="ug" />
+              </div>
               <div class="col-sm-4">
-                <div class="mb-3">
-                  <label for="exampleFormControlSelect1"
-                    class="form-label">Course Experience</label>
-                    <input type="number" class="form-control"
-                    placeholder="Enter course experience">
-                  
-                </div>
-              </div><!-- Col -->
-              <div class="col-sm-4">
-                <div class="mb-3">
-                 <input type="checkbox" class="form-check-input"
-                      id="authCheck">
-                      <label class="form-check-label" for="authCheck">
-                        Handled in last two semesters
-                      </label>
-                      <button class="btn btn-primary mt-2" alt="add" >+</button>
-                    </div><!-- Col -->
-                  
-                </div>
+                <label class="form-label">PG</label>
+                <input type="text" class="form-control" formControlName="pg" />
+              </div>
+              
+              <div class="col-sm-4 mt-4" >
+        
+                <mat-checkbox formControlName="hasPhd">Have you completed a PhD?</mat-checkbox>
+                <!-- <input type="text" class="form-control" formControlName="hasPhd" /> -->
+               </div>
             </div>
-            <div class="row"><!--Row start-->
-              <div class="col-6">
-                <div class="mb-3">
-                  <table class="table table-striped">
-                    <thead>
-                    <tr>
-                      <th>
-                        Course
-                      </th>
-                      <th>
-                        Course Experience
-                      </th>
-                      <th>
-                        Handled in last two semesters
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>AI</td>
-                      <td>4</td>
-                      <td>Yes</td>                      
-                    </tr>
-                    <tr>
-                      <td>Data Science</td>
-                      <td>4</td>
-                      <td>No</td>                      
-                    </tr>
-                    </tbody>
-                  </table>
-                  </div>
+
+            <div class="row mb-4">
+              <div class="col-sm-4">
+                <label class="form-label">Bank Account Name</label>
+                <input type="text" class="form-control" formControlName="bankAccountName" />
+              </div>
+              <div class="col-sm-4">
+                <label class="form-label">Bank Account Number</label>
+                <input type="text" class="form-control" formControlName="bankAccountNumber" />
               </div>
             </div>
-            
-            <div class="row"><!-- Row Start -->
+
+            <div class="row mb-4">
               <div class="col-sm-4">
-                <div class="mb-3">
-                  <label for="exampleFormControlSelect1"
-                    class="form-label">Bank Account Name</label>
-                    
-                    <input type="text" class="form-control"
-                    placeholder="Enter bank account name">
-                </div>
-              </div><!-- Col -->
+                <label class="form-label">Bank Branch Name</label>
+                <input type="text" class="form-control" formControlName="bankBranchName" />
+              </div>
               <div class="col-sm-4">
-                <div class="mb-3">
-                  <label for="exampleFormControlSelect1"
-                    class="form-label">Bank Account Number</label>
-                    <input type="text" class="form-control"
-                    placeholder="Enter account number">
-                  </div>
+                <label class="form-label">Bank IFSC Code</label>
+                <input type="text" class="form-control" formControlName="bankIfscCode" />
               </div>
-              </div>
-              <div class="row"><!-- Row Start -->
-                <div class="col-sm-4">
-                  <div class="mb-3">
-                    <label for="exampleFormControlSelect1"
-                      class="form-label">Bank Branch Name</label>
-                      
-                      <input type="text" class="form-control"
-                      placeholder="Enter branch name">
-                  </div>
-                </div><!-- Col -->
-                <div class="col-sm-4">
-                  <div class="mb-3">
-                    <label for="exampleFormControlSelect1"
-                      class="form-label">Bank IFSC Code</label>
-                      <input type="text" class="form-control"
-                      placeholder="Enter ifsc code">
-                    </div>
-                </div>
-                </div>                
+            </div>
+
+            <!-- Area of Specialization Section -->
+            <h6 class="mt-4">Area of Specialization
+              <button type="button" class="btn btn-link float-end" (click)="openSpecializationModal()">
+                Add Specialization
+              </button>
+            </h6>
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Course</th>
+                  <!-- <th>Experience</th>
+                  <th>Handled Last Two Semesters</th> -->
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let specialization of specializations; let i = index">
+                  <td>{{ specialization.course }}</td>
+                  <!-- <td>{{ specialization.experience }}</td>
+                  <td>{{ specialization.handledLastTwoSemesters ? 'Yes' : 'No' }}</td> -->
+                  <td>
+                    <button (click)="editSpecialization(i)" mat-icon-button color="primary"><mat-icon>edit</mat-icon></button>
+                    <button (click)="deleteSpecialization(i)" mat-icon-button color="danger"><mat-icon>delete</mat-icon></button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- Qualification Section -->
+            <h6 class="mt-4">Designation Experience </h6>
+            <button type="button" class="btn btn-link float-end" (click)="openDesignationModal()">
+              Add Designation
+            </button>
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Designation</th>
+                  <th>Experience</th>
+                  <th>Is Current</th>
+                 <!--  <th>Actions</th> -->
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let exp of designation; let i = index">
+                  <td>{{ exp.designation }}</td>
+                  <td>{{ exp.experience }}</td>
+                  <td>{{ exp.isCurrent }}</td>
+                  <!-- <td>{{ qualification.specialization }}</td> -->
+                  <!-- <td>
+                    <button (click)="editQualification(i)" mat-icon-button color="primary"><mat-icon>edit</mat-icon></button>
+                    <button (click)="deleteQualification(i)" mat-icon-button color="danger"><mat-icon>delete</mat-icon></button>
+                  </td> -->
+                </tr>
+              </tbody>
+            </table>
+            <button type="button" (click)="onSubmit()" class="btn btn-primary" style="float: right;">Submit</button>
           </form>
-          <button type="button" class="btn btn-primary submit">Submit</button>
         </div>
       </div>
     </div>
     <div class="col-md-1"></div>
   </div>
 </div>
+
+<!-- NgbModal for Editing Specialization -->
+<ng-template #editSpecializationModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Edit Specialization</h5>
+    <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="specializationForm">
+      <div class="mb-3">
+        <label>Course</label>
+        <input type="text" class="form-control" formControlName="course" />
+      </div>
+      <!-- <div class="mb-3">
+        <label>Experience</label>
+        <input type="number" class="form-control" formControlName="experience" />
+      </div>
+      <div class="mb-3">
+        <input type="checkbox" formControlName="handledLastTwoSemesters" />
+        <label>Handled Last Two Semesters</label>
+      </div> -->
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-danger" (click)="modal.dismiss()" >Cancel</button>
+    <button class="btn btn-primary" (click)="saveSpecialization()">Save</button>
+  </div>
+</ng-template>
+
+<!-- NgbModal for Editing Qualification -->
+<ng-template #editDesignationModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Edit Designation</h5>
+    <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="designationForm">
+      <div class="mb-3">
+        <label>Designation</label>
+        <select class="form-select" formControlName="expDesignation">
+          <option selected disabled>Select Designation</option>
+          <option *ngFor="let desig of designations" [value]="desig.id">{{ desig.name }}</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label>Experience</label>
+        <input type="text" class="form-control" formControlName="experience" />
+      </div>
+      <div class="mb-3">
+        <mat-checkbox formControlName="isCurrent">Is Current Position?</mat-checkbox>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-danger" (click)="modal.dismiss()" >Cancel</button>
+    <button class="btn btn-primary" (click)="saveExperience()">Save</button>
+  </div>
+</ng-template>

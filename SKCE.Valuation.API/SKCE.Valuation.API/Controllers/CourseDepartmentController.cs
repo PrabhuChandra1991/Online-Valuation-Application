@@ -15,8 +15,7 @@ namespace SKCE.Examination.API.Controllers
             _service = service;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<CourseDepartmentViewModel>>> GetAll() => Ok(await _service.GetAllCourseDepartmentsAsync());
+        //[HttpGet]
+        //public async Task<ActionResult<IEnumerable<CourseDepartmentViewModel>>> GetAll() => Ok(await _service.GetAllCourseDepartmentsAsync());
     }
-}
 }

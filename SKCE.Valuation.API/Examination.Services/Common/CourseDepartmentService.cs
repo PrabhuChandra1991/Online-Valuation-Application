@@ -12,24 +12,24 @@ namespace SKCE.Examination.Services.Common
             _context = context;
         }
 
-        public async Task<IEnumerable<CourseDepartmentViewModel>> GetAllCourseDepartmentsAsync()
-        {
-            return await _context.CourseDepartments
-                .Include(cd => cd.Course)
-                .Include(cd => cd.Department)
-                .Select(cd => new CourseDepartmentViewModel
-                {
+        //public async Task<IEnumerable<CourseDepartmentViewModel>> GetAllCourseDepartmentsAsync()
+        //{
+        //    //return await _context.CourseDepartments
+        //    //    .Include(cd => cd.Course)
+        //    //    .Include(cd => cd.Department)
+        //    //    .Select(cd => new CourseDepartmentViewModel
+        //    //    {
                     
-                    CourseId = cd.Course.Id,
-                    CourseTitle = cd.Course.Title,
-                    CourseDescription = cd.Course.Description,
-                    CourseDuration = cd.Course.Duration,
-                    DepartmentId = cd.Department.Id,
-                    DepartmentName = cd.Department.Name,
-                    DepartmentLocation = cd.Department.Location
-                })
-                .ToListAsync();
-        }
+        //    //        CourseId = cd.Course.Id,
+        //    //        CourseTitle = cd.Course.Title,
+        //    //        CourseDescription = cd.Course.Description,
+        //    //        CourseDuration = cd.Course.Duration,
+        //    //        DepartmentId = cd.Department.Id,
+        //    //        DepartmentName = cd.Department.Name,
+        //    //        DepartmentLocation = cd.Department.Location
+        //    //    })
+        //    //    .ToListAsync();
+        //}
 
     }
 }

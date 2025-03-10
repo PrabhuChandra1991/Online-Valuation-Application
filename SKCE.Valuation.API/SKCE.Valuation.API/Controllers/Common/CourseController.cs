@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SKCE.Examination.API.Controllers.Model;
+using SKCE.Examination.API.Model;
 using SKCE.Examination.Models.DbModels.Common;
 using SKCE.Examination.Services.Common;
 

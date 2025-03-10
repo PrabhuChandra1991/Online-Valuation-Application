@@ -45,6 +45,7 @@ export class DashboardComponent implements OnInit {
   // Local storage of Specialization & Qualification
   specializations: any[] = [];
   designation: any[] = [];
+  qualification: any[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -84,9 +85,11 @@ export class DashboardComponent implements OnInit {
       designation: this.fb.array([]),
       ug: ['', [Validators.required]],
       pg: ['' , [Validators.required]],
-      hasPhd: [false]  // Checkbox for PhD completion
+      hasPhd: [false],  // Checkbox for PhD completion
+      qualification: this.fb.array([]),
     });
 
+  
     // Example specializations to show in the table initially
     this.specializations = [
       {
@@ -146,7 +149,8 @@ export class DashboardComponent implements OnInit {
         collegeName: userData.collegeName,
         bankAccountName: userData.bankAccountName,
         bankAccountNumber: userData.bankAccountNumber,
-        bankBranchName: userData.bankBranchName
+        bankBranchName: userData.bankBranchName,
+        qualification: userData.userQualifications
       });
     }
   }

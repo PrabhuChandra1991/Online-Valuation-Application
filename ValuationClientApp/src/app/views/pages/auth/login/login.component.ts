@@ -24,7 +24,7 @@ export class LoginComponent implements OnInit {
 
   isOTPRequested: boolean = false;
   userEmail:string='';
-  userOtp :number=0;
+  userOtp ?:number;
 
   constructor(private router: Router, private route: ActivatedRoute, private http: HttpClient,
     private toastr: ToastrService,private spinnerService: SpinnerService) {}
@@ -77,7 +77,7 @@ export class LoginComponent implements OnInit {
         if(result.roleId == 1)
           this.router.navigate(['/apps/user']);
         else 
-          this.router.navigate(['/dashboard']);
+          this.router.navigate(['/apps/assigntemplate']);
          }
          this.spinnerService.toggleSpinnerState(false);
     });

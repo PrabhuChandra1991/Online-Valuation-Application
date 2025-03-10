@@ -11,7 +11,7 @@ public class Institution: AuditModel
     public long InstitutionId { get; set; }
     public required string Name { get; set; }
     public required string Code { get; set; }
-    public string Address { get; set; }
+    public string? Address { get; set; }
     public required string Email { get; set; }
     public required string MobileNumber { get; set; }
 }

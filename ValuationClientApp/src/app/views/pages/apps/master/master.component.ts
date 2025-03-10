@@ -52,9 +52,11 @@ onFileChange(event:any) {
         formData.append('file', fileSourceValue);
     }
        
-    this.http.post('http://localhost:5088/api/S3/upload', formData)
+    this.http.post('http://localhost:5088/api/Excel/importCourseDetailsBySyllabus', formData)
       .subscribe(res => {
-        this.toastr.success('Data imported successfully!');
+        this.masterForm.reset();
+        this.toastr.success((res as any)?.message?.toString());
+        //this.toastr.success('Data imported successfully!');
       })
   }
 }

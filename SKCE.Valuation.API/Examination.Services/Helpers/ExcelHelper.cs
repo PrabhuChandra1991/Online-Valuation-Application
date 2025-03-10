@@ -156,7 +156,7 @@ public class ExcelImportHelper
         await _dbContext.CourseDepartments.AddRangeAsync(courseDepartMents);
         await _dbContext.SaveChangesAsync();
 
-        return "Courses imported successfully! Imported Count is  "+ courses.Count;
+        return ($"Imported successfully! \n Course Count is " + newCourses.Count + " \n Departmets Count is " + newDepartments.Count);
     }
 
     private static string GetCellValue(WorkbookPart workbookPart, Cell cell)

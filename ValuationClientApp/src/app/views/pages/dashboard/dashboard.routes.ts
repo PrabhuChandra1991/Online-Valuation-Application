@@ -5,6 +5,11 @@ export default [
     {
         path: '',
         loadComponent: () => import('./dashboard.component').then(c => c.DashboardComponent),
-        canActivate:[authGuard]
+        canActivate: [authGuard]
+    },
+    {
+        path: 'edit/:id',
+        loadComponent: () => import('./dashboard.component').then(c => c.DashboardComponent),
+        canActivate: [authGuard]
     }
 ] as Routes;

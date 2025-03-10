@@ -9,6 +9,10 @@ import { UserService } from '../services/user.service';
 import { MatIcon } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import {MatButtonModule} from '@angular/material/button';
+import { ActivatedRoute } from '@angular/router';
+import { DashboardService } from '../services/dashboard.service';
+import { UserAreaOfSpecialization  } from '../models/userAreaOfSpecialization.model';
+import { UserDesignation } from '../models/userDesignation.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -34,25 +38,29 @@ export class DashboardComponent implements OnInit {
   specializationForm!: FormGroup;
   selectedDesignationIndex: number | null = null;
   selectedSpecializationIndex: number | null = null;
+  selectedUserId:any;
 
 
   @ViewChild('editSpecializationModal') editSpecializationModal!: TemplateRef<any>;
   @ViewChild('editDesignationModal') editDesignationModal!: TemplateRef<any>;
 
+  //this should be load from dashboard service 
   departments = [{ id: 1, name: "Computer Science" }, { id: 2, name: "Mechanical" }, { id: 3, name: "Electrical" }, { id: 4, name: "Civil" }, { id: 5, name: "Electronics" }];
   designations = [{ id: 1, name: "Professor" }, { id: 2, name: "Associate Professor" }, { id: 3, name: "Assistant Professor" }];
 
   // Local storage of Specialization & Qualification
   specializations: any[] = [];
   designation: any[] = [];
-  qualification: any[] = [];
+  //qualification: any[] = [];
 
   constructor(
     private fb: FormBuilder,
     private modalService: NgbModal,
     private calendar: NgbCalendar,
     private userService: UserService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private route: ActivatedRoute,
+    private dashboardService: DashboardService
   ) {
     // Initialize the form with default values
     this.specializationForm = new FormGroup({
@@ -70,6 +78,16 @@ export class DashboardComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
+    this.route.paramMap.subscribe(params => {
+      const userId = params.get('id'); // Get user ID from route
+      if (userId) {
+        this.selectedUserId = userId;
+        this.getUser(userId); // Load user data for editing
+      }
+    });
+
+
     this.userForm = this.fb.group({
       name: [{ value: '', disabled: true }, Validators.required],
       email: [{ value: '', disabled: true }, [Validators.required, Validators.email]],
@@ -85,8 +103,7 @@ export class DashboardComponent implements OnInit {
       designation: this.fb.array([]),
       ug: ['', [Validators.required]],
       pg: ['' , [Validators.required]],
-      hasPhd: [false],  // Checkbox for PhD completion
-      qualification: this.fb.array([]),
+      hasPhd: [false]  // Checkbox for PhD completion
     });
 
   
@@ -149,10 +166,39 @@ export class DashboardComponent implements OnInit {
         collegeName: userData.collegeName,
         bankAccountName: userData.bankAccountName,
         bankAccountNumber: userData.bankAccountNumber,
-        bankBranchName: userData.bankBranchName,
-        qualification: userData.userQualifications
+        bankBranchName: userData.bankBranchName
       });
     }
+  }
+
+  getUser(userId:any)
+  {
+    this.userService.getUser(userId).subscribe({
+      next: (data) => {
+       let selectedUser = data;
+       if(selectedUser)
+       {
+        this.userForm.patchValue({
+          name: selectedUser.name,
+          email: selectedUser.email,
+          mobileNumber: selectedUser.mobileNumber,
+          collegeName: selectedUser.collegeName,
+          bankAccountName: selectedUser.bankAccountName,
+          bankAccountNumber: selectedUser.bankAccountNumber,
+          bankBranchName: selectedUser.bankBranchName
+        });
+
+        //assign child elements dynamically
+        this.designation = selectedUser.userDesignations;
+        this.specializations = selectedUser.userAreaOfSpecializations;
+
+       }
+        console.log('User Details:', selectedUser);
+      },
+      error: (err) => {
+        console.error('Error fetching user:', err);
+      }
+    });
   }
 /****************************Specilization *************************************************************************/
   // Open Specialization Modal
@@ -171,7 +217,18 @@ export class DashboardComponent implements OnInit {
       this.specializations[this.selectedSpecializationIndex] = this.specializationForm.value;
     } else {
       // If no specialization is selected, add a new one
-      this.specializations.push(this.specializationForm.value);
+      let newSpecialization: UserAreaOfSpecialization = {
+        userAreaOfSpecializationId: 0,
+        userId: this.selectedUserId,
+        areaOfSpecializationName: this.specializationForm.value,
+        isActive: false,
+        createdDate: new Date().toISOString(),  // Current timestamp
+        createdById: 0,
+        modifiedDate: new Date().toISOString(),
+        modifiedById: 0
+      };
+      
+      this.specializations.push(newSpecialization);
     }
     
     this.modalService.dismissAll(); // Close the modal
@@ -211,7 +268,7 @@ export class DashboardComponent implements OnInit {
  /****************************Specilization section end**************************************************************/
 
 
-/****************************qualification *************************************************************************/
+/****************************Designation *************************************************************************/
 openDesignationModal() {
   const modalRef = this.modalService.open(this.editDesignationModal);
   modalRef.result.then((result) => {
@@ -223,11 +280,25 @@ openDesignationModal() {
 
 saveExperience() {
   if (this.selectedDesignationIndex !== null) {
+    debugger;
     // Update the existing Qualification
     this.designation[this.selectedDesignationIndex] = this.designationForm.value;
   } else {
     // If no Qualification is selected, add a new one
-    this.designation.push(this.designationForm.value);
+    let newDesignation: UserDesignation = {
+      userDesignationId: 0,
+      designationId: 0,
+      userId: this.selectedUserId,
+      experience: this.designationForm.value.experience,
+      isCurrent: this.designationForm.value.isCurrent,
+      isActive: false,
+      createdById: 0,
+      createdDate: new Date().toISOString(), // Current date in ISO format
+      modifiedById: 0,
+      modifiedDate: new Date().toISOString()
+    };
+    
+    this.designation.push(newDesignation);
   }
   
   this.modalService.dismissAll(); // Close the modal

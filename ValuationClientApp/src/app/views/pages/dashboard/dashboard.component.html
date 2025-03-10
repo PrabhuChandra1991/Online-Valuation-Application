@@ -56,7 +56,8 @@
               </div>
               
               <div class="col-sm-4 mt-4" >
-               <mat-checkbox formControlName="hasPhd">Have you completed a PhD?</mat-checkbox>
+        
+                <mat-checkbox formControlName="hasPhd">Have you completed a PhD?</mat-checkbox>
                 <!-- <input type="text" class="form-control" formControlName="hasPhd" /> -->
                </div>
             </div>
@@ -100,7 +101,7 @@
               </thead>
               <tbody>
                 <tr *ngFor="let specialization of specializations; let i = index">
-                  <td>{{ specialization.course }}</td>
+                  <td>{{ specialization.AreaOfSpecializationName }}</td>
                   <!-- <td>{{ specialization.experience }}</td>
                   <td>{{ specialization.handledLastTwoSemesters ? 'Yes' : 'No' }}</td> -->
                   <td>
@@ -127,7 +128,7 @@
               </thead>
               <tbody>
                 <tr *ngFor="let exp of designation; let i = index">
-                  <td>{{ exp.designation }}</td>
+                  <td>{{ exp.Name }}</td>
                   <td>{{ exp.experience }}</td>
                   <td>{{ exp.isCurrent }}</td>
                   <!-- <td>{{ qualification.specialization }}</td> -->

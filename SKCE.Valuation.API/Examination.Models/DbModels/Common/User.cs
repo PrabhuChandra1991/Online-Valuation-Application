@@ -18,6 +18,10 @@ namespace SKCE.Examination.Models.DbModels.Common
         [Required, EmailAddress]
         public required string Email { get; set; }
 
+        public string Gender { get; set; }
+
+        public string? Salutation { get; set; }
+
         [MaxLength(15)]
         public required string MobileNumber { get; set; }
         public long? RoleId { get; set; }

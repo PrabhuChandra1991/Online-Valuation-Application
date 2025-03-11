@@ -20,6 +20,8 @@ namespace SKCE.Examination.Models.DbModels.Common
 
         public required string CourseName { get; set; }
 
+        [ForeignKey("DegreeType")]
+        public long DegreeTypeId { get; set; }
         public long NumberOfYearsHandled { get; set; }
 
         public bool IsHandledInLast2Semester { get; set; }

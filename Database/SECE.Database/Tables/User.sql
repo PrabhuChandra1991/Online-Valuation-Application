@@ -3,6 +3,8 @@
     [Name] NVARCHAR(255) NULL,
     Email NVARCHAR(255) NOT NULL UNIQUE CHECK (Email LIKE '%@%'),
     MobileNumber NVARCHAR(15) NULL UNIQUE CHECK (MobileNumber LIKE '[0-9]%'),
+    [Gender] NVARCHAR(50)  NULL,
+    [Salutation] NVARCHAR(50)  NULL,
     RoleId BIGINT NULL,
     [TotalExperience] BIGINT CHECK (TotalExperience >= 0),
     Mode AS (CASE 

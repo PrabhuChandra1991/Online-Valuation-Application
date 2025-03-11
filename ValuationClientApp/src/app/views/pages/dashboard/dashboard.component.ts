@@ -59,8 +59,8 @@ export class DashboardComponent implements OnInit {
     private calendar: NgbCalendar,
     private userService: UserService,
     private toastr: ToastrService,
-    private route: ActivatedRoute,
-    private dashboardService: DashboardService
+    private route: ActivatedRoute
+    //,private dashboardService: DashboardService
   ) {
     // Initialize the form with default values
     this.specializationForm = new FormGroup({

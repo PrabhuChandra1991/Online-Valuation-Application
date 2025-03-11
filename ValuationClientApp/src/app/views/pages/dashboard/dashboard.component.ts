@@ -14,6 +14,7 @@ import { DashboardService } from '../services/dashboard.service';
 import { UserAreaOfSpecialization  } from '../models/userAreaOfSpecialization.model';
 import { UserDesignation } from '../models/userDesignation.model';
 
+
 @Component({
   selector: 'app-dashboard',
   imports: [
@@ -39,7 +40,7 @@ export class DashboardComponent implements OnInit {
   selectedDesignationIndex: number | null = null;
   selectedSpecializationIndex: number | null = null;
   selectedUserId:any;
-
+  userQualifications: any[] = [];
 
   @ViewChild('editSpecializationModal') editSpecializationModal!: TemplateRef<any>;
   @ViewChild('editDesignationModal') editDesignationModal!: TemplateRef<any>;
@@ -51,7 +52,6 @@ export class DashboardComponent implements OnInit {
   // Local storage of Specialization & Qualification
   specializations: any[] = [];
   designation: any[] = [];
-  //qualification: any[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -59,12 +59,12 @@ export class DashboardComponent implements OnInit {
     private calendar: NgbCalendar,
     private userService: UserService,
     private toastr: ToastrService,
-    private route: ActivatedRoute
-    //,private dashboardService: DashboardService
+    private route: ActivatedRoute,
+    private dashboardService: DashboardService
   ) {
     // Initialize the form with default values
     this.specializationForm = new FormGroup({
-      course: new FormControl(''),
+      areaOfSpecializationName: new FormControl(''),
       // experience: new FormControl(''),
       // handledLastTwoSemesters: new FormControl(false),
     }),
@@ -106,7 +106,6 @@ export class DashboardComponent implements OnInit {
       hasPhd: [false]  // Checkbox for PhD completion
     });
 
-  
     // Example specializations to show in the table initially
     this.specializations = [
       {
@@ -153,6 +152,7 @@ export class DashboardComponent implements OnInit {
 
     this.loadUserData();
   }
+  
 
   // Load User Data from Local Storage
   loadUserData() {
@@ -189,8 +189,10 @@ export class DashboardComponent implements OnInit {
         });
 
         //assign child elements dynamically
+        selectedUser.userDesignations = [];
         this.designation = selectedUser.userDesignations;
         this.specializations = selectedUser.userAreaOfSpecializations;
+        this.userQualifications = selectedUser.userQualifications;
 
        }
         console.log('User Details:', selectedUser);
@@ -214,13 +216,14 @@ export class DashboardComponent implements OnInit {
   saveSpecialization() {
     if (this.selectedSpecializationIndex !== null) {
       // Update the existing specialization
-      this.specializations[this.selectedSpecializationIndex] = this.specializationForm.value;
+      this.specializations[this.selectedSpecializationIndex].areaOfSpecializationName = this.specializationForm.value.areaOfSpecializationName;      
+    this.selectedSpecializationIndex = 0; // Clear the selection
     } else {
       // If no specialization is selected, add a new one
       let newSpecialization: UserAreaOfSpecialization = {
         userAreaOfSpecializationId: 0,
         userId: this.selectedUserId,
-        areaOfSpecializationName: this.specializationForm.value,
+        areaOfSpecializationName: this.specializationForm.value.areaOfSpecializationName,
         isActive: false,
         createdDate: new Date().toISOString(),  // Current timestamp
         createdById: 0,
@@ -233,7 +236,6 @@ export class DashboardComponent implements OnInit {
     
     this.modalService.dismissAll(); // Close the modal
     this.specializationForm.reset(); // Reset the form
-    this.selectedSpecializationIndex = null; // Clear the selection
   }
 
   // Open Specialization Modal for editing
@@ -243,7 +245,7 @@ export class DashboardComponent implements OnInit {
 
     // Set the form values to the clicked specialization data
     this.specializationForm.patchValue({
-      course: specialization.course
+      areaOfSpecializationName: specialization.areaOfSpecializationName
       // experience: specialization.experience,
       // handledLastTwoSemesters: specialization.handledLastTwoSemesters
     });
@@ -254,7 +256,7 @@ export class DashboardComponent implements OnInit {
       if (result) {
         if (this.selectedSpecializationIndex !== null) {
           // Update the specialization with the edited values
-          this.specializations[this.selectedSpecializationIndex] = this.specializationForm.value;
+          this.specializations[this.selectedSpecializationIndex] = this.specializationForm.value.areaOfSpecializationName;
         }
       }
     }).catch(() => {});
@@ -289,6 +291,7 @@ saveExperience() {
       userDesignationId: 0,
       designationId: 0,
       userId: this.selectedUserId,
+      name: this.designationForm.value.expDesignation,
       experience: this.designationForm.value.experience,
       isCurrent: this.designationForm.value.isCurrent,
       isActive: false,

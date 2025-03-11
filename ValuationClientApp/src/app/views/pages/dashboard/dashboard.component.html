@@ -23,27 +23,17 @@
 
             <div class="row mb-4">
               <div class="col-sm-4">
+                <label class="form-label">College Name</label>
+                <input type="text" class="form-control" formControlName="collegeName" />
+              </div>
+              <div class="col-sm-4">
                 <label class="form-label">Department</label>
                 <select class="form-select" formControlName="departmentId">
                   <option selected disabled>Select Department</option>
                   <option *ngFor="let dept of departments" [value]="dept.id">{{ dept.name }}</option>
                 </select>
               </div>
-              <div class="col-sm-4">
-                <label class="form-label">Designation</label>
-                <select class="form-select" formControlName="designationId">
-                  <option selected disabled>Select Designation</option>
-                  <option *ngFor="let desig of designations" [value]="desig.id">{{ desig.name }}</option>
-                </select>
-              </div>
-              <div class="col-sm-4">
-                <label class="form-label">College Name</label>
-                <input type="text" class="form-control" formControlName="collegeName" />
-                <!-- <select class="form-select" formControlName="collegeName">
-                  <option selected disabled>Select College</option>
-                  <option *ngFor="let college of colleges" [value]="college.name">{{ college.name }}</option>
-                </select> -->
-              </div>
+             
             </div>
             <div class="row mb-4">
               <div class="col-sm-4">
@@ -62,27 +52,7 @@
                </div>
             </div>
 
-            <div class="row mb-4">
-              <div class="col-sm-4">
-                <label class="form-label">Bank Account Name</label>
-                <input type="text" class="form-control" formControlName="bankAccountName" />
-              </div>
-              <div class="col-sm-4">
-                <label class="form-label">Bank Account Number</label>
-                <input type="text" class="form-control" formControlName="bankAccountNumber" />
-              </div>
-            </div>
-
-            <div class="row mb-4">
-              <div class="col-sm-4">
-                <label class="form-label">Bank Branch Name</label>
-                <input type="text" class="form-control" formControlName="bankBranchName" />
-              </div>
-              <div class="col-sm-4">
-                <label class="form-label">Bank IFSC Code</label>
-                <input type="text" class="form-control" formControlName="bankIfscCode" />
-              </div>
-            </div>
+            
 
             <!-- Area of Specialization Section -->
             <h6 class="mt-4">Area of Specialization
@@ -93,15 +63,13 @@
             <table class="table table-striped">
               <thead>
                 <tr>
-                  <th>Course</th>
-                  <!-- <th>Experience</th>
-                  <th>Handled Last Two Semesters</th> -->
+                  <th>Area of Specialization</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 <tr *ngFor="let specialization of specializations; let i = index">
-                  <td>{{ specialization.AreaOfSpecializationName }}</td>
+                  <td>{{ specialization.areaOfSpecializationName }}</td>
                   <!-- <td>{{ specialization.experience }}</td>
                   <td>{{ specialization.handledLastTwoSemesters ? 'Yes' : 'No' }}</td> -->
                   <td>
@@ -128,7 +96,7 @@
               </thead>
               <tbody>
                 <tr *ngFor="let exp of designation; let i = index">
-                  <td>{{ exp.Name }}</td>
+                  <td>{{ exp.name }}</td>
                   <td>{{ exp.experience }}</td>
                   <td>{{ exp.isCurrent }}</td>
                   <!-- <td>{{ qualification.specialization }}</td> -->
@@ -139,6 +107,28 @@
                 </tr>
               </tbody>
             </table>
+            <div mt-1>
+            <div class="row mb-4 mt-5">
+              <div class="col-sm-4">
+                <label class="form-label">Bank Account Name</label>
+                <input type="text" class="form-control" formControlName="bankAccountName" />
+              </div>
+              <div class="col-sm-4">
+                <label class="form-label">Bank Account Number</label>
+                <input type="text" class="form-control" formControlName="bankAccountNumber" />
+              </div>
+            </div>
+          </div>
+            <div class="row mb-4">
+              <div class="col-sm-4">
+                <label class="form-label">Bank Branch Name</label>
+                <input type="text" class="form-control" formControlName="bankBranchName" />
+              </div>
+              <div class="col-sm-4">
+                <label class="form-label">Bank IFSC Code</label>
+                <input type="text" class="form-control" formControlName="bankIfscCode" />
+              </div>
+            </div>
             <button type="button" (click)="onSubmit()" class="btn btn-primary" style="float: right;">Submit</button>
           </form>
         </div>
@@ -157,8 +147,8 @@
   <div class="modal-body">
     <form [formGroup]="specializationForm">
       <div class="mb-3">
-        <label>Course</label>
-        <input type="text" class="form-control" formControlName="course" />
+        <label>Area of Specialization</label>
+        <input type="text" class="form-control" formControlName="areaOfSpecializationName" />
       </div>
       <!-- <div class="mb-3">
         <label>Experience</label>
@@ -188,12 +178,12 @@
         <label>Designation</label>
         <select class="form-select" formControlName="expDesignation">
           <option selected disabled>Select Designation</option>
-          <option *ngFor="let desig of designations" [value]="desig.id">{{ desig.name }}</option>
+          <option *ngFor="let desig of designations" [value]="desig.name">{{ desig.name }}</option>
         </select>
       </div>
       <div class="mb-3">
         <label>Experience</label>
-        <input type="text" class="form-control" formControlName="experience" />
+        <input type="number" class="form-control" formControlName="experience" />
       </div>
       <div class="mb-3">
         <mat-checkbox formControlName="isCurrent">Is Current Position?</mat-checkbox>

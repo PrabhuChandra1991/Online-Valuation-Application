@@ -3,21 +3,32 @@ using System.Configuration;
 using System.Net.Mail;
 
 using MailKit.Security;
+using Microsoft.Extensions.Configuration;
 using MimeKit;
+using SKCE.Examination.Models.DbModels.Common;
 
 public class EmailService
 {
-    private const string SmtpServer = "smtp.gmail.com";
-    private const int SmtpPort = 587;
-    private const string EmailSender = "venky27585@gmail.com"; // Replace with your Gmail
-    private const string EmailPassword = "meru uhrk qcmm xhru"; // Replace with your App Password
+    private readonly string SmtpServer = "smtp.gmail.com";
+    private readonly int SmtpPort = 587;
+    private readonly string EmailSender = "swt@srikrishnaitech.com"; // Replace with your Gmail
+    private readonly string EmailPassword = "hdwl cfbw unsd hfir"; // Replace with your App Password
+    private readonly string FromAddress = "swt@srikrishnaitech.com"; // Replace with your Gmail
 
+    public EmailService(IConfiguration configuration)
+    {
+        SmtpServer = configuration["Email:SmtpHost"];
+        SmtpPort = int.Parse(configuration["Email:SmtpPort"]); // Convert string to int
+        EmailSender = configuration["Email:Username"];
+        EmailPassword = configuration["Email:Password"];
+        FromAddress = configuration["Email:FromAddress"];
+    }
     public async Task<bool> SendEmailAsync(string recipientEmail, string subject, string body)
     {
         try
         {
             var message = new MimeMessage();
-            message.From.Add(new MailboxAddress("venky27585@gmail.com", EmailSender));
+            message.From.Add(new MailboxAddress(FromAddress, EmailSender));
             message.To.Add(new MailboxAddress("", recipientEmail));
             message.Subject = subject;
 

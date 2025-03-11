@@ -25,7 +25,7 @@ namespace SKCE.Examination.Services.Common
                 return null;
 
             string tempPassword = new Random().Next(100000, 999999).ToString();
-            _tempPasswords[email] = (tempPassword, DateTime.UtcNow.AddMinutes(5));
+            _tempPasswords[email] = (tempPassword, DateTime.UtcNow.AddMinutes(20));
 
             var loginHistory = new UserLoginHistory
             {
@@ -38,7 +38,7 @@ namespace SKCE.Examination.Services.Common
             AuditHelper.SetAuditPropertiesForInsert(loginHistory, user.UserId);
             await _context.UserLoginHistories.AddAsync(loginHistory);
             await _context.SaveChangesAsync();
-            _emailService.SendEmailAsync(email, "SKCE Online Examination Platform: Your Temporary Password", $"Hi {user.Name},\n\n Please use your Email Id and Temporary Password to login into SKCE Online Examination Platform. \n\n Your temporary password is: {tempPassword} (valid for 20 minutes) \n\n Thanks\n SKCE Admin").Wait();
+            _emailService.SendEmailAsync(email, "SKCE Online Examination Platform: Your Temporary Password", $"Hi {user.Name},\n\nPlease use your Email Id and Temporary Password to login into SKCE Online Examination Platform. \n\nYour temporary password is: {tempPassword} (valid for 20 minutes) \n\nThanks\nSKCE Admin").Wait();
 
             return tempPassword;
         }

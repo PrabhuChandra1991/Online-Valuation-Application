@@ -38,7 +38,7 @@ namespace SKCE.Examination.Services.Common
             AuditHelper.SetAuditPropertiesForInsert(loginHistory, user.UserId);
             await _context.UserLoginHistories.AddAsync(loginHistory);
             await _context.SaveChangesAsync();
-            _emailService.SendEmailAsync(email, "SKCE Online Examination Platform: Your Temporary Password", $"Hi {user.Email},\n\n Please use your Email Id and Temporary Password to login into SKCE Online Examination Platform. \n\n Your temporary password is: {tempPassword} (valid for 5 minutes) \n\n Thanks\n SKCE Admin").Wait();
+            _emailService.SendEmailAsync(email, "SKCE Online Examination Platform: Your Temporary Password", $"Hi {user.Name},\n\n Please use your Email Id and Temporary Password to login into SKCE Online Examination Platform. \n\n Your temporary password is: {tempPassword} (valid for 5 minutes) \n\n Thanks\n SKCE Admin").Wait();
 
             return tempPassword;
         }

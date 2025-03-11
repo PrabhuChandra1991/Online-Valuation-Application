@@ -22,7 +22,7 @@ namespace SKCE.Examination.Models.DbModels.Common
         public required string MobileNumber { get; set; }
         public long? RoleId { get; set; }
         public long? TotalExperience { get; set; }
-        public long? DepartmentId { get; set; } 
+        public string DepartmentName { get; set; } 
         public string? CollegeName { get; set; }
         public string? BankAccountName { get; set; }
         public string? BankAccountNumber { get; set; }

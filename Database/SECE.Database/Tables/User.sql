@@ -9,7 +9,7 @@
                 WHEN Email LIKE '%@skcet.ac.in' THEN 'Internal' 
                 ELSE 'External' 
              END) PERSISTED,
-    DepartmentId BIGINT NOT NULL ,
+    DepartmentName NVARCHAR(255)  NULL ,
     CollegeName NVARCHAR(255)  NULL,
     BankAccountName NVARCHAR(255)  NULL,
     BankAccountNumber NVARCHAR(50)  NULL,

@@ -49,21 +49,10 @@ namespace SKCE.Examination.Services.Common
                 foreach (var degreeType in _context.DegreeTypes.OrderBy(d=>d.DegreeTypeId))
                 {
                     var degreeTypeName = string.Format("{0}{1}:",degreeType.DegreeTypeId == 2?"*":"", degreeType.Name);
-                    var userQualification = new UserQualification { UserId = user.UserId, Title = degreeTypeName + ":", Specialization = "", Name = "", IsCompleted = false };
+                    var userQualification = new UserQualification { UserId = user.UserId, Title = degreeTypeName, Specialization = "", Name = "", IsCompleted = false };
                     AuditHelper.SetAuditPropertiesForInsert(userQualification, 1);
                     user.UserQualifications.Add(userQualification);
                 }
-
-                //seed current designation
-                var currentDesignation = new UserDesignation() {UserId=user.UserId,DesignationId=0,Experience=0,IsCurrent=true };
-                AuditHelper.SetAuditPropertiesForInsert(currentDesignation, 1);
-                user.UserDesignations.Add(currentDesignation);
-
-                //seed one previou designation
-                var previousDesignation = new UserDesignation() { UserId = user.UserId, DesignationId = 0, Experience = 0, IsCurrent = false };
-                AuditHelper.SetAuditPropertiesForInsert(previousDesignation, 1);
-                user.UserDesignations.Add(previousDesignation);
-
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
 

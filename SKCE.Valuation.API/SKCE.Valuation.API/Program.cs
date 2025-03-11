@@ -119,7 +119,7 @@ void SeedDefaultUser(ExaminationDbContext context)
             MobileNumber = "8300034477",
             RoleId = 1,
             CollegeName = "SRI KRISHNA COLLEGE OF ENGINEERING TECHNOLOGY",
-            DepartmentId = 1,
+            DepartmentName ="",
             TotalExperience = 1,
             BankAccountName = "",
             BankAccountNumber = "",

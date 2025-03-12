@@ -22,8 +22,8 @@ namespace SKCE.Examination.Models.DbModels.Common
         public required long DegreeTypeId { get; set; }
         public required string ExamType { get; set; }
         public required long Semester { get; set; }
-        public required long ExamMonthId { get; set; }
+        public required string ExamMonth { get; set; }
+        public required string ExamYear { get; set; }
         public required long StudentCount { get; set; }
-
     }
 }

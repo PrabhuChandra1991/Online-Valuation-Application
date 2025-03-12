@@ -68,30 +68,30 @@ export class UserComponent implements OnInit{
     //   }
     // );
 
-    this.userService.getUsers().subscribe(response => {
-      if (response && response.$values) {
-        this.dataSource.data = response.$values;  // ✅ Extract $values array and assign it to dataSource
-      } else {
-        this.dataSource.data = [];  // ✅ Handle empty response case
-      }
-    }, error => {
-      console.error('Error fetching users:', error);
-    });
+    // this.userService.getUsers().subscribe(response => {
+    //   if (response && response.$values) {
+    //     this.dataSource.data = response.$values;  // ✅ Extract $values array and assign it to dataSource
+    //   } else {
+    //     this.dataSource.data = [];  // ✅ Handle empty response case
+    //   }
+    // }, error => {
+    //   console.error('Error fetching users:', error);
+    // });
   
 
-    // this.userService.getUsers().subscribe(
-    //   (data: User[]) => {
-    //     console.log('API Data:', data);
-    //     this.users = data;
-    //     this.dataSource.data = this.users; // Avoid reassigning MatTableDataSource
-    //     this.dataSource.paginator = this.paginator;
-    //     this.dataSource.sort = this.sort;
-    //   },
-    //   (error) => {
-    //     console.error('Error fetching users:', error);
-    //     this.toastr.error('Failed to load users.');
-    //   }
-    // );
+    this.userService.getUsers().subscribe(
+      (data: any[]) => {
+        console.log('API Data:', data);
+        this.users = data;
+        this.dataSource.data = this.users; // Avoid reassigning MatTableDataSource
+        this.dataSource.paginator = this.paginator;
+        this.dataSource.sort = this.sort;
+      },
+      (error) => {
+        console.error('Error fetching users:', error);
+        this.toastr.error('Failed to load users.');
+      }
+    );
 
   }
 

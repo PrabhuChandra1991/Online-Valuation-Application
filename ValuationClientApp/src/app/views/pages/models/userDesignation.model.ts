@@ -3,7 +3,7 @@ export interface UserDesignation {
     designationId: number;
     userId: number;
     experience: number;
-    name:any;
+    Name:any;
     isCurrent: boolean;
     isActive: boolean;
     createdById: number;

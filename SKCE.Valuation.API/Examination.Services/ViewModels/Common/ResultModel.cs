@@ -1,4 +1,4 @@
-﻿namespace SKCE.Examination.API.Model
+﻿namespace SKCE.Examination.Services.ViewModels.Common
 {
     public class ResultModel
     {

@@ -1,8 +1,7 @@
 ﻿using SKCE.Examination.Services.Common;
 using Microsoft.AspNetCore.Mvc;
 using SKCE.Examination.Models.ViewModels.Common;
-using System.Threading.Tasks;
-using SKCE.Examination.API.Model;
+using SKCE.Examination.Services.ViewModels.Common;
 
 namespace SKCE.Examination.API.Controllers.Common
 {

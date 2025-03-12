@@ -1,10 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DocumentFormat.OpenXml.Bibliography;
+using Microsoft.EntityFrameworkCore;
 using SKCE.Examination.Models.DbModels.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SKCE.Examination.Services.ViewModels.Common;
+using static SKCE.Examination.Services.ViewModels.Common.CourseVM;
 
 namespace SKCE.Examination.Services.Common
 {
@@ -22,9 +20,62 @@ namespace SKCE.Examination.Services.Common
             return await _context.Courses.ToListAsync();
         }
 
-        public async Task<Course?> GetCourseByIdAsync(int id)
+        public async Task<CourseVM?> GetCourseByIdAsync(long id)
         {
-            return await _context.Courses.FindAsync(id);
+            var course = await _context.Courses.Where(cd => cd.CourseId == id)
+                .Select(c => new CourseVM
+                {
+                    CourseId = c.CourseId,
+                    CourseCode = c.Code,
+                    CourseName = c.Name,
+                    Institutions = new List<InstitutionDepartmentVM>()
+                }).FirstOrDefaultAsync();
+
+            if (course == null) return null;
+
+            var courseDepartments = _context.CourseDepartments.Where(cd => cd.CourseId == id).ToList();
+            if (courseDepartments.Any())
+            {
+                course.RegulationYear = courseDepartments.First().RegulationYear;
+                course.BatchYear = courseDepartments.First().BatchYear;
+                course.ExamYear = courseDepartments.First().ExamYear;
+                course.ExamMonth = courseDepartments.First().ExamMonth;
+                course.ExamType = courseDepartments.First().ExamType;
+                course.Semester = courseDepartments.First().Semester;
+                course.TotalStudentCount = courseDepartments.Sum(cd => cd.StudentCount);
+            }
+
+            List<long> institutionIds = courseDepartments.Select(cd => cd.InstitutionId).Distinct().ToList();
+            var institutions = _context.Institutions.ToList();
+            var departments = _context.Departments.ToList();
+
+            foreach (var institutionId in institutionIds)
+            {
+                var institution = institutions.FirstOrDefault(i => i.InstitutionId == institutionId);
+                if (institution != null)
+                {
+                    var institutionVM = new InstitutionDepartmentVM
+                    {
+                        InstitutionId = institution.InstitutionId,
+                        InstitutionName = institution.Name,
+                        InstitutionCode = institution.Code,
+                        TotalStudentCount = courseDepartments.Where(i => i.InstitutionId == institution.InstitutionId).Sum(ci => ci.StudentCount),
+                        Departments = new List<DepartmentVM>()
+                    };
+                    var departmentVMs = courseDepartments.Join(departments, cd => cd.DepartmentId, d => d.DepartmentId, (cd, d) => new { cd, d })
+                        .Where(cd => cd.cd.InstitutionId == institution.InstitutionId)
+                        .Select(cd => new DepartmentVM
+                        {
+                            DepartmentId = cd.d.DepartmentId,
+                            DepartmentName = cd.d.Name,
+                            DepartmentShortName = cd.d.ShortName,
+                            StudentCount = cd.cd.StudentCount
+                        }).ToList();
+                    institutionVM.Departments = departmentVMs;
+                    course.Institutions.Add(institutionVM);
+                }
+            }
+            return course;
         }
 
         public async Task<Course?> AddCourseAsync(Course course)

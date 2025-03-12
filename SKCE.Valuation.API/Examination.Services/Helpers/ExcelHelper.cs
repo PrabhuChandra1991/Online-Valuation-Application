@@ -124,13 +124,13 @@ public class ExcelImportHelper
             string semester = GetCellValue(workbookPart, cells[7]).Trim();
             string courseCode = GetCellValue(workbookPart, cells[8]).Trim();
             string studentCount = GetCellValue(workbookPart, cells[10]).Trim();
-
+            string examMonth = GetCellValue(workbookPart, cells[11]).Trim();
+            string examYear = GetCellValue(workbookPart, cells[12]).Trim();
 
             var institution = updatedInstitutions.FirstOrDefault(d => d.Code == institutionCode);
             var course = updatedCourses.FirstOrDefault(d => d.Code == courseCode);
             var department = updatedDepartments.FirstOrDefault(d => d.Name == departmentName);
             var degreeType = degreeTypes.FirstOrDefault(d => d.Name == degreeTypeName);
-            var examMonth = examMonths.FirstOrDefault(d => d.Semester == long.Parse(semester));
 
 
             courseDepartMents.Add(new CourseDepartment()
@@ -142,7 +142,8 @@ public class ExcelImportHelper
                 DepartmentId = (department != null) ? department.DepartmentId : 1,
                 ExamType = examType,
                 Semester = string.IsNullOrEmpty(semester) ? 0 : long.Parse(semester),
-                ExamMonthId = (examMonth != null) ? examMonth.ExamMonthId : 1,
+                ExamMonth = examMonth,
+                ExamYear= examYear,
                 CourseId = (course != null) ? course.CourseId : 1,
                 StudentCount = string.IsNullOrEmpty(studentCount) ? 0 : long.Parse(studentCount),
                 CreatedById = 1,

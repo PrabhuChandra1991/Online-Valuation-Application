@@ -13,6 +13,7 @@ import { ActivatedRoute } from '@angular/router';
 import { DashboardService } from '../services/dashboard.service';
 import { UserAreaOfSpecialization  } from '../models/userAreaOfSpecialization.model';
 import { UserDesignation } from '../models/userDesignation.model';
+import { delay, Observable } from 'rxjs';
 
 const currentDate = new Date().toISOString();
 
@@ -48,7 +49,6 @@ export class DashboardComponent implements OnInit {
   selectedUserId:any;
   userQualifications: any[] = [];
   userCourses :any [] = [];
-
   @ViewChild('editSpecializationModal') editSpecializationModal!: TemplateRef<any>;
   @ViewChild('editDesignationModal') editDesignationModal!: TemplateRef<any>;
   @ViewChild('editUserCourseModal') editUserCourseModal!: TemplateRef<any>;
@@ -61,11 +61,12 @@ export class DashboardComponent implements OnInit {
     { id: 'dr', name: 'Dr.' },
     { id: 'prof', name: 'Prof.' }
   ];
+    
 
   genders = [
-    { id: '1', name: 'Male' },
-    { id: '2', name: 'Female' },
-    { id: '3', name: 'Other' }
+    { id: 'Male', name: 'Male' },
+    { id: 'Female', name: 'Female' },
+    { id: 'Other', name: 'Other' }
   ];
 
   degreeTypes = [
@@ -128,20 +129,53 @@ export class DashboardComponent implements OnInit {
     private route: ActivatedRoute,
     private dashboardService: DashboardService
   ) {
+
+     // Initialize the form with validation
+     this.userCourseForm = this.fb.group({
+      courseName: ['', Validators.required],
+      degreeTypeId: ['', Validators.required],
+      numberOfYearsHandled: ['', [Validators.required, Validators.min(1)]],
+      isHandledInLast2Semester: [false]
+    });
+
     // Initialize the form with default values
-    this.specializationForm = new FormGroup({
-      areaOfSpecializationName: new FormControl(''),
+    this.specializationForm = this.fb.group({
+      areaOfSpecializationName: ['', Validators.required],
       // experience: new FormControl(''),
       // handledLastTwoSemesters: new FormControl(false),
     }),
 
-    this.designationForm = new FormGroup({
-      expDesignation: new FormControl('', Validators.required),
-      experience: new FormControl('', Validators.required),
-      isCurrent: new FormControl(false),
-          
+    this.designationForm = this.fb.group({
+      expDesignation: ['', Validators.required],
+      experience: ['', Validators.required],
+      isCurrent: [false]
+    });
+
+    this.userForm = this.fb.group({
+      genderId: ['', Validators.required],
+      name: [{ value: '', disabled: true }, Validators.required],
+      email: [{ value: '', disabled: true }, [Validators.required, Validators.email]],
+      mobileNumber: [{ value: '', disabled: true }, [Validators.required, Validators.pattern('^[0-9]{10}$')]],
+      departmentName: ['', Validators.required],
+      designationId: ['', Validators.required],
+      collegeName: ['', Validators.required],
+      bankAccountName: [''],
+      bankAccountNumber: ['', Validators.pattern('^[0-9]+$')],
+      bankBranchName: [''],
+      bankIfscCode: [''],
+      specializations: this.fb.array([]),
+      designations: this.fb.array([]),
+      ugName: ['', [Validators.required]],
+      ugSpecialization: ['', [Validators.required]],
+      pgName: ['', [Validators.required]],
+      pgSpecialization: ['', [Validators.required]],
+      phdSpecialization: ['', [Validators.required]],
+      hasPhd: [false], // Checkbox for PhD completion,
+      salutationId:['', Validators.required]
     });
   }
+
+  selectedUserObject: Observable<any>
 
   ngOnInit(): void {
 
@@ -151,26 +185,9 @@ export class DashboardComponent implements OnInit {
         this.selectedUserId = userId;
         this.getUser(userId); // Load user data for editing
       }
-    });
-
-
-    this.userForm = this.fb.group({
-      name: [{ value: '', disabled: true }, Validators.required],
-      email: [{ value: '', disabled: true }, [Validators.required, Validators.email]],
-      mobileNumber: [{ value: '', disabled: true }, [Validators.required, Validators.pattern('^[0-9]{10}$')]],
-      departmentId: ['', Validators.required],
-      designationId: ['', Validators.required],
-      collegeName: ['', Validators.required],
-      bankAccountName: [''],
-      bankAccountNumber: ['', Validators.pattern('^[0-9]+$')],
-      bankBranchName: [''],
-      bankIfscCode: [''],
-      specializations: this.fb.array([]),
-      designations: this.fb.array([]),
-      ug: ['', [Validators.required]],
-      pg: ['' , [Validators.required]],
-      hasPhd: [false], // Checkbox for PhD completion,
-      salutationId:['', Validators.required]
+      else{
+        this.loadUserData();
+      }
     });
 
     // Example specializations to show in the table initially
@@ -216,19 +233,10 @@ export class DashboardComponent implements OnInit {
       }
     ];
   
-
-    // Initialize the form with validation
-    this.userCourseForm = this.fb.group({
-      courseName: ['', Validators.required],
-      degreeTypeId: ['', Validators.required],
-      numberOfYearsHandled: ['', [Validators.required, Validators.min(1)]],
-      isHandledInLast2Semester: [false]
-    });
-
     //getting master data
     this.degreeTypes = this.getDegreeTypes();
     this.designations = this.getdesignations();
-    this.loadUserData();
+    
   }
   
   getDegreeTypes() {
@@ -248,15 +256,15 @@ export class DashboardComponent implements OnInit {
     const loggedData = localStorage.getItem('userData');
     if (loggedData) {
       const userData = JSON.parse(loggedData);
-      this.userForm.patchValue({
-        name: userData.name,
-        email: userData.email,
-        mobileNumber: userData.mobileNumber,
-        collegeName: userData.collegeName,
-        bankAccountName: userData.bankAccountName,
-        bankAccountNumber: userData.bankAccountNumber,
-        bankBranchName: userData.bankBranchName
-      });
+      // this.userForm.patchValue({
+      //   name: userData.name,
+      //   email: userData.email,
+      //   mobileNumber: userData.mobileNumber,
+      //   collegeName: userData.collegeName,
+      //   bankAccountName: userData.bankAccountName,
+      //   bankAccountNumber: userData.bankAccountNumber,
+      //   bankBranchName: userData.bankBranchName
+      // });
     }
   }
 
@@ -267,22 +275,51 @@ export class DashboardComponent implements OnInit {
        let selectedUser = data;
        if(selectedUser)
        {
-        this.userForm.patchValue({
-          name: selectedUser.name,
-          email: selectedUser.email,
-          mobileNumber: selectedUser.mobileNumber,
-          collegeName: selectedUser.collegeName,
-          bankAccountName: selectedUser.bankAccountName,
-          bankAccountNumber: selectedUser.bankAccountNumber,
-          bankBranchName: selectedUser.bankBranchName
-        });
+        this.selectedUserObject = selectedUser;
 
         //assign child elements dynamically
-        selectedUser.userDesignations = [];
         this.designations = selectedUser.userDesignations;
         this.specializations = selectedUser.userAreaOfSpecializations;
         this.userQualifications = selectedUser.userQualifications;
         this.userCourses = selectedUser.userCourses; 
+        
+        //this.selectedUserObject = selectedUser;
+        //filter data for qualification section 
+        let ugQualification = selectedUser.userQualifications.find((f: { title: string }) => f.title.includes('UG'));
+        let pgQualification = selectedUser.userQualifications.find((f: { title: string }) => f.title.includes('PG'));
+        let phdQualification = selectedUser.userQualifications.find((f: { title: string }) => f.title.includes('Ph'));
+
+        let salutation = this.salutations.find(f => f.name == selectedUser.salutation);
+        let gender = this.genders.find(f => f.name == selectedUser.gender);
+        console.log('gender',gender);
+        console.log("salutation",salutation);
+          console.log("user",selectedUser);
+          console.log("ug",ugQualification);
+          console.log("pg",pgQualification);
+          console.log("phd",phdQualification);
+          console.log("before patch",this.userForm.value);
+          this.userForm.updateValueAndValidity();
+          this.userForm.patchValue({
+          
+          salutationId:salutation?.id,
+          genderId: gender?.id,
+          name: selectedUser.name,
+          email: selectedUser.email,
+          mobileNumber: Number(selectedUser.mobileNumber),
+          collegeName: selectedUser.collegeName,
+          ugName: ugQualification.name,
+          departmentName:selectedUser.departmentName,
+          ugSpecialization: ugQualification.specialization,
+          pgName:pgQualification.name,
+          pgSpecialization: pgQualification.specialization,
+          bankAccountName: selectedUser.bankAccountName,
+          bankAccountNumber: selectedUser.bankAccountNumber,
+          bankBranchName: selectedUser.bankBranchName,
+          hasPhd : phdQualification.isCompleted,
+          phdSpecialization:phdQualification.specialization
+        });
+
+        console.log("after patch",this.userForm.value);
         
 
        }
@@ -503,25 +540,31 @@ getDeginationName(Id: number) {
  getDegreeTypeName(degreeTypeId: number) {
    const degree = this.degreeTypes.find(d => d.DegreeTypeId == degreeTypeId);
    return degree ? degree.Name : 'Unknown';
- }
+  }
+
+  OnPhDCheck() {
+    let data = this.userQualifications.find(f => f.title.includes('Ph.D'));
+    if(data)
+      data.isCompleted = !data.isCompleted;
+  }
  
  //#endregion
 
 
 // Submit Form including Specialization & Qualification
   onSubmit() {
-    if (this.userForm.valid) {
+    // if (this.userForm.valid) {
       const formData = {
         ...this.userForm.value,
         specializations: this.specializations,
-        designations: this.designations
+        designations: this.designations,
       };
 
       this.updateUser(formData);
       console.log('Submitted Data:', formData);
-    } else {
-      console.log('Form is invalid');
-    }
+    // } else {
+    //   console.log('Form is invalid');
+    // }
   }
 
   updateUser(userData: any) {

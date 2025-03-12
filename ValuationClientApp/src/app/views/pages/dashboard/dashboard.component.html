@@ -5,7 +5,8 @@
       <div class="card">
         <div class="card-body">
           <h6 class="card-title">Edit User Profile</h6>
-          <form [formGroup]="userForm">
+          <div>
+          <form  [formGroup]="userForm">
             <div class="row mb-4">
               <!-- Salutation -->
               <div class="col-sm-4">
@@ -19,7 +20,7 @@
               <!-- Gender -->
               <div class="col-sm-4">
                 <label class="form-label">Gender</label>
-                <select formcontrolname="genderId" class="form-select ng-pristine ng-invalid ng-touched" ng-reflect-name="genderId">
+                <select class="form-select" formcontrolname="genderId" >
                   <option selected disabled>Select Gender</option>
                   <option *ngFor="let gender of genders" [value]="gender.id">{{ gender.name }}</option>
                 </select>
@@ -54,32 +55,34 @@
             <div class="row mb-4">
               <div class="col-sm-6">
                 <label class="form-label">Department</label>
-                <input type="text" formcontrolname="departmentName" class="form-control" ng-reflect-name="departmentName" />
+                <input type="text"  class="form-control" formcontrolname="departmentName"  />
               </div>
             </div>
             
             <div *ngFor="let qualification of userQualifications" class="row mb-4">
               <div *ngIf="qualification.title.includes('UG')">
-                <div class="col-sm-4">
-                  <label class="form-label">{{qualification.title}}</label>
-                  <input type="text" formcontrolname="ugName" class="form-control" />
-                </div>
+                <div class="row mb-4">
+                  <div class="col-sm-4">
+                    <label class="form-label">{{qualification.title}}</label>
+                    <input type="text" formcontrolname="ugName" [value]="qualification.name" class="form-control" />
+                  </div>
             
-                <div class="col-sm-4">
-                  <label class="form-label">Specialization</label>
-                  <input type="text" formcontrolname="ugSpecialization" class="form-control" />
+                  <div class="col-sm-4">
+                    <label class="form-label">Specialization</label>
+                    <input type="text" formcontrolname="ugSpecialization" [value]="qualification.specialization" class="form-control" />
+                  </div>
                 </div>
               </div>
               <div *ngIf="qualification.title.includes('PG')">
                 <div class="row mb-4">
                   <div class="col-sm-4">
-                    <label class="form-label">PG</label>
-                    <input type="text" formcontrolname="pgName" class="form-control" />
+                    <label class="form-label">{{qualification.title}}</label>
+                    <input type="text" formcontrolname="pgName" [value]="qualification.name" class="form-control" />
                   </div>
               
                   <div class="col-sm-4">
                     <label class="form-label">Specialization</label>
-                    <input type="text" formcontrolname="pgSpecialization" class="form-control" />
+                    <input type="text" formcontrolname="pgSpecialization" [value]="qualification.specialization" class="form-control" />
                   </div>
                 </div>
               </div>
@@ -87,11 +90,11 @@
                 <!-- PhD Checkbox -->
                 <div class="row mb-4">
                   <div class="col-sm-4 mt-4">
-                    <mat-checkbox formControlName="hasPhd">Have you completed a PhD?</mat-checkbox>
+                    <mat-checkbox formControlName="hasPhd" (click)="OnPhDCheck()">Have you completed a PhD?</mat-checkbox>
                   </div>
-                  <div class="col-sm-4">
+                  <div class="col-sm-4"  *ngIf="qualification.isCompleted">
                     <label class="form-label">Specialization</label>
-                    <input type="text" formcontrolname="phdSpecialization" class="form-control" />
+                    <input type="text" formcontrolname="phdSpecialization" [value]="qualification.specialization" class="form-control" />
                   </div>
                 </div>
               </div>
@@ -208,6 +211,7 @@
             </div>
             <button type="button" (click)="onSubmit()" class="btn btn-primary" style="float: right;">Submit</button>
           </form>
+        </div>
         </div>
       </div>
     </div>

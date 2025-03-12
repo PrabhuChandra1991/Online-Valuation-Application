@@ -25,7 +25,7 @@ namespace SKCE.Examination.Services.Helpers
         /// <summary>
         /// Uploads a file to S3 bucket.
         /// </summary>
-        public async Task<int?> UploadFileAsync(string key, Stream fileStream, string contentType)
+        public async Task<long?> UploadFileAsync(string key, Stream fileStream, string contentType)
         {
             try
             {

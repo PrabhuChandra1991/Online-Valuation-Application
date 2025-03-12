@@ -24,7 +24,7 @@ namespace SKCE.Examination.API.Controllers.Common
                 return BadRequest("No file uploaded.");
 
             using var stream = file.OpenReadStream();
-            int? documentId = await _s3Helper.UploadFileAsync(file.FileName, stream, file.ContentType);
+            long? documentId = await _s3Helper.UploadFileAsync(file.FileName, stream, file.ContentType);
 
             if (documentId == -1 || documentId == null)
                 return StatusCode(500, "File upload failed.");

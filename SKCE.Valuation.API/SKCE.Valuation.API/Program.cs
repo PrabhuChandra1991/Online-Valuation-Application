@@ -23,6 +23,8 @@ builder.Services.AddScoped<ExcelImportHelper>(); // Register helper
 builder.Services.AddScoped<S3Helper>(); // Register helper
 builder.Services.AddScoped<CourseService>();
 //builder.Services.AddAutoMapper(typeof(UserProfile));
+// Add services to the container
+builder.Services.AddScoped<AzureBlobStorageHelper>();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers()

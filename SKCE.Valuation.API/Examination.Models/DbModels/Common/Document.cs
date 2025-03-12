@@ -13,7 +13,7 @@ namespace SKCE.Examination.Models.DbModels.Common
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int DocumentId { get; set; }
+        public long DocumentId { get; set; }
         public required string Name { get; set; }
         public required string Url { get; set; }
     }

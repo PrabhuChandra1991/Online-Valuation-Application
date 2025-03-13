@@ -23,7 +23,7 @@ namespace SKCE.Examination.API.Controllers.Common
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<CourseVM>> GetCourse(long id)
+        public async Task<ActionResult<Course>> GetCourse(long id)
         {
             var course = await _courseService.GetCourseByIdAsync(id);
             if (course == null) return NotFound();
@@ -54,6 +54,12 @@ namespace SKCE.Examination.API.Controllers.Common
                 return NotFound();
 
             return NoContent();
+        }
+        public async Task<ActionResult<QPTemplateVM>> GetQPTemplateByCourseId(long courseId)
+        {
+            var qpTemplate = await _courseService.GetQPTemplateByCourseId(courseId);
+            if (qpTemplate == null) return NotFound();
+            return Ok(qpTemplate);
         }
     }
 }

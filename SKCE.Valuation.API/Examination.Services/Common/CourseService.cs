@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using SKCE.Examination.Models.DbModels.Common;
 using SKCE.Examination.Services.ViewModels.Common;
-using static SKCE.Examination.Services.ViewModels.Common.CourseVM;
 
 namespace SKCE.Examination.Services.Common
 {
@@ -19,11 +18,14 @@ namespace SKCE.Examination.Services.Common
         {
             return await _context.Courses.ToListAsync();
         }
-
-        public async Task<CourseVM?> GetCourseByIdAsync(long id)
+        public async Task<Course?> GetCourseByIdAsync(long id)
         {
-            var course = await _context.Courses.Where(cd => cd.CourseId == id)
-                .Select(c => new CourseVM
+            return await _context.Courses.FindAsync(id);
+        }
+        public async Task<QPTemplateVM?> GetQPTemplateByCourseId(long courseId)
+        {
+            var course = await _context.Courses.Where(cd => cd.CourseId == courseId)
+                .Select(c => new QPTemplateVM
                 {
                     CourseId = c.CourseId,
                     CourseCode = c.Code,
@@ -33,7 +35,7 @@ namespace SKCE.Examination.Services.Common
 
             if (course == null) return null;
 
-            var courseDepartments = _context.CourseDepartments.Where(cd => cd.CourseId == id).ToList();
+            var courseDepartments = _context.CourseDepartments.Where(cd => cd.CourseId == courseId).ToList();
             if (courseDepartments.Any())
             {
                 course.RegulationYear = courseDepartments.First().RegulationYear;

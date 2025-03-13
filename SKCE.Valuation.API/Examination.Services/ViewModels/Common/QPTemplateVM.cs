@@ -1,7 +1,14 @@
 ﻿namespace SKCE.Examination.Services.ViewModels.Common
 {
-    public class CourseVM
+    public class QPTemplateVM
     {
+        public long QPTemplateId { get; set; }
+        public string QPTemplateName { get; set; }
+        public string QPTemplateDescription { get; set; }
+        public string QPCode { get; set; }
+        public long QPTemplateStatusTypeId { get; set; }
+        public string QPTemplateStatusTypeName { get; set; }
+        public long  UserId { get; set; }
         public long CourseId { get; set; }
         public string CourseCode { get; set; }
         public string CourseName { get; set; }
@@ -12,6 +19,11 @@
         public string ExamType { get; set; }
         public long Semester { get; set; }
         public long TotalStudentCount { get; set; }
+        public long QPTemplateSyallbusDocumentId { get; set; }
+        public long QPDocumentId { get; set; }
+        public long QPAnswerDocumentId { get; set; }
+        public long QPUserDocumentId { get; set; }
+        public long QPUserUpdatedDocumentId { get; set; }
         public List<InstitutionDepartmentVM> Institutions { get; set; }
     }
     public class InstitutionDepartmentVM
@@ -20,6 +32,8 @@
         public string InstitutionName { get; set; }
         public string InstitutionCode { get; set; }
         public long TotalStudentCount { get; set; }
+        public long QPPrintDocumentId { get; set; }
+        public long QPAnswerPrintDocumentId { get; set; }
         public List<DepartmentVM> Departments { get; set; }
     }
     public class DepartmentVM

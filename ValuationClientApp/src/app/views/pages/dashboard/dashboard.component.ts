@@ -699,12 +699,14 @@ onGenderChange(event: Event) {
     this.userService.updateUser(userData.userId, userData).subscribe({
       next: () => {
         this.toastr.success('User updated successfully!');
-        this.spinnerService.toggleSpinnerState(false);
+        
       },
       error: () => {
         this.toastr.error('Failed to update user. Please try again.');
+        this.spinnerService.toggleSpinnerState(false);
       },
       complete: () => {
+        this.spinnerService.toggleSpinnerState(false);
        }
     });
   }

@@ -179,7 +179,6 @@ export class DashboardComponent implements OnInit {
       phdSpecialization: ['', [Validators.required]],
       hasPhd: [false], // Checkbox for PhD completion,
       salutationId:['', Validators.required],
-      genderId:['', Validators.required],
       department:['', Validators.required],
     });
   }
@@ -324,10 +323,11 @@ export class DashboardComponent implements OnInit {
           bankAccountName: selectedUser.bankAccountName,
           bankAccountNumber: selectedUser.bankAccountNumber,
           bankBranchName: selectedUser.bankBranchName,
-          salutationId:selectedUser.salutation,
-          genderId:selectedUser.gender,
-          department:selectedUser.departmentName
-
+          // salutationId:selectedUser.salutation,
+          // genderId:selectedUser.gender,
+          department:selectedUser.departmentName,
+          hasPhd : phdQualification.isCompleted,
+          phdSpecialization:phdQualification.specialization
           
         });
 

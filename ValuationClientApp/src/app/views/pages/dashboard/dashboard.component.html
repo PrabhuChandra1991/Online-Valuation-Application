@@ -11,17 +11,17 @@
               <!-- Salutation -->
               <div class="col-sm-4">
                 <label class="form-label">Salutation</label>
-                <select class="form-select" formControlName="salutationId">
-                  <option selected disabled>Select Salutation</option>
-                  <option *ngFor="let salutation of salutations" [value]="salutation.id">{{ salutation.name }}</option>
+                <select class="form-select" formcontrolname="salutationId" ng-reflect-name="salutationId">
+                  <option [ngValue]="null" disabled>Select Salutation</option>
+                  <option *ngFor="let salutation of salutations" [ngValue]="salutation.id">{{ salutation.name }}</option>
                 </select>
               </div>
             
               <!-- Gender -->
               <div class="col-sm-4">
                 <label class="form-label">Gender</label>
-                <select class="form-select" formcontrolname="genderId" >
-                  <option selected disabled>Select Gender</option>
+                <select formcontrolname="genderId" class="form-select ng-pristine ng-invalid ng-touched" ng-reflect-name="genderId">
+                  <option [ngValue]="null" disabled>Select Gender</option>
                   <option *ngFor="let gender of genders" [ngValue]="gender.id">{{ gender.name }}</option>
                 </select>
               </div>
@@ -29,7 +29,7 @@
               <!-- Name -->
               <div class="col-sm-4">
                 <label class="form-label">Name</label>
-                <input type="text" class="form-control" formControlName="name" />
+                <input type="text" class="form-control"  formControlName="name" />
               </div>
             </div>
             
@@ -47,7 +47,7 @@
             
               <div class="col-sm-4">
                 <label class="form-label">Mobile Number</label>
-                <input type="number" formcontrolname="mobileNumber" class="form-control" />
+                <input type="text"  formControlName="mobileNumber" class="form-control" />
               </div>
             </div>
             
@@ -55,17 +55,16 @@
             <div class="row mb-4">
               <div class="col-sm-6">
                 <label class="form-label">Department</label>
-                <input type="text"  class="form-control" formcontrolname="departmentName"  />
+                <input type="text" formControlName="department" class="form-control"  />
               </div>
             </div>
             
             <div *ngFor="let qualification of userQualifications" class="row mb-4">
               <div *ngIf="qualification.title.includes('UG')">
-                <div class="row mb-4">
-                  <div class="col-sm-4">
-                    <label class="form-label">{{qualification.title}}</label>
-                    <input type="text" formcontrolname="ugName" [value]="qualification.name" class="form-control" />
-                  </div>
+                <div class="col-sm-4">
+                  <label class="form-label">{{qualification.title}}</label>
+                  <input type="text" formControlname="ugName" class="form-control" />
+                </div>
             
                   <div class="col-sm-4">
                     <label class="form-label">Specialization</label>
@@ -100,10 +99,6 @@
               </div>
               </div>
             
-           
-            
-           
-
             <!-- User Courses Table -->
           <h6 class="mt-4">User Courses
             <button type="button" class="btn btn-link float-end" (click)="openUserCourseModal()">
@@ -125,7 +120,11 @@
                 <td>{{ course.courseName }}</td>
                 <td>{{ getDegreeTypeName(course.degreeTypeId) }}</td>
                 <td>{{ course.numberOfYearsHandled }}</td>
-                <td>{{ course.isHandledInLast2Semester ? 'Yes' : 'No' }}</td>
+                <!-- <td>{{ course.isHandledInLast2Semester ? 'Yes' : 'No' }} -->
+
+                <td><mat-icon [style.color]="course.isHandledInLast2Semester ? 'green' : 'red'">
+                  {{ course.isHandledInLast2Semester ? 'check_circle' : 'cancel' }}
+                </mat-icon></td>
                 <td>
                   <button (click)="editUserCourse(i)" mat-icon-button color="primary"><mat-icon>edit</mat-icon></button>
                   <button (click)="deleteUserCourse(i)" mat-icon-button color="danger"><mat-icon>delete</mat-icon></button>
@@ -133,7 +132,6 @@
               </tr>
             </tbody>
           </table>
-
 
             <!-- Area of Specialization Section -->
             <h6 class="mt-4">Area of Specialization

@@ -52,6 +52,8 @@ export class DashboardComponent implements OnInit {
   userQualifications: any[] = [];
   userCourses :any [] = [];
   qualification : UserQualification;
+  Salutation:any;
+
   @ViewChild('editSpecializationModal') editSpecializationModal!: TemplateRef<any>;
   @ViewChild('editDesignationModal') editDesignationModal!: TemplateRef<any>;
   @ViewChild('editUserCourseModal') editUserCourseModal!: TemplateRef<any>;
@@ -176,7 +178,8 @@ export class DashboardComponent implements OnInit {
       pgSpecialization: ['', [Validators.required]],
       phdSpecialization: ['', [Validators.required]],
       hasPhd: [false], // Checkbox for PhD completion,
-      salutationId:['', Validators.required]
+      salutationId:['', Validators.required],
+      department:['', Validators.required],
     });
   }
 
@@ -320,8 +323,12 @@ export class DashboardComponent implements OnInit {
           bankAccountName: selectedUser.bankAccountName,
           bankAccountNumber: selectedUser.bankAccountNumber,
           bankBranchName: selectedUser.bankBranchName,
+          // salutationId:selectedUser.salutation,
+          // genderId:selectedUser.gender,
+          department:selectedUser.departmentName,
           hasPhd : phdQualification.isCompleted,
           phdSpecialization:phdQualification.specialization
+          
         });
 
         console.log("after patch",this.userForm.value);

@@ -119,8 +119,7 @@ export class DashboardComponent implements OnInit {
     designationId: designation.DesignationId,
     userId: 0,
     experience: 0,
-    isCurrent: true,
-    Name: designation.Name
+    isCurrent: true
   }));
 
  
@@ -160,16 +159,16 @@ export class DashboardComponent implements OnInit {
 
     this.userForm = this.fb.group({
       genderId: ['', Validators.required],
-      name: [{ value: '', disabled: true }, Validators.required],
-      email: [{ value: '', disabled: true }, [Validators.required, Validators.email]],
-      mobileNumber: [{ value: '', disabled: true }, [Validators.required, Validators.pattern('^[0-9]{10}$')]],
+      name: [{ value: '', disabled: false }, Validators.required],
+      email: [{ value: '', disabled: false }, [Validators.required, Validators.email]],
+      mobileNumber: [{ value: '', disabled: false }, [Validators.required, Validators.pattern('^[0-9]{10}$')]],
       departmentName: ['', Validators.required],
       designationId: ['', Validators.required],
       collegeName: ['', Validators.required],
-      bankAccountName: [''],
+      bankAccountName: ['', Validators.required],
       bankAccountNumber: ['', Validators.pattern('^[0-9]+$')],
-      bankBranchName: [''],
-      bankIfscCode: [''],
+      bankBranchName: ['', Validators.required],
+      bankIfscCode: ['', Validators.required],
       specializations: this.fb.array([]),
       designations: this.fb.array([]),
       ugName: ['', [Validators.required]],
@@ -306,7 +305,7 @@ export class DashboardComponent implements OnInit {
           console.log("pg",pgQualification);
           console.log("phd",phdQualification);
           console.log("before patch",this.userForm.value);
-          this.userForm.updateValueAndValidity();
+         debugger;
           this.userForm.patchValue({
           
           salutationId:salutation?.id,
@@ -331,6 +330,8 @@ export class DashboardComponent implements OnInit {
           
         });
 
+        this.userForm.updateValueAndValidity();
+        
         console.log("after patch",this.userForm.value);
         
 
@@ -432,7 +433,7 @@ saveExperience() {
       userDesignationId: 0,
       designationId: 0,
       userId: this.selectedUserId,
-      Name: this.designationForm.value.expName,
+      name: this.designationForm.value.expName,
       experience: this.designationForm.value.experience,
       isCurrent: this.designationForm.value.isCurrent,
       isActive: false,
@@ -480,7 +481,7 @@ deleteExperience(index: number) {
 }
 
 // Helper function to get the name of a degree type from the degreeTypes array
-getDeginationName(Id: number) {
+getDesignationName(Id: number) {
   const designation = this.designationTypes.find(d => d.DesignationId == Id);
   return designation ? designation.Name : 'Unknown';
 }
@@ -576,7 +577,7 @@ getDeginationName(Id: number) {
     //map formdata to user object
      let userData =  this.mapFormDataToUserObject (formData);
       this.updateUser(userData);
-      console.log('Submitted Data:', formData);
+      console.log('Final Object:', JSON.stringify(userData));
     // } else {
     //   console.log('Form is invalid');
     // }
@@ -659,7 +660,7 @@ getDeginationName(Id: number) {
   }
 
   updateUser(userData: any) {
-    this.userService.updateUser("3", userData).subscribe({
+    this.userService.updateUser(userData.userId, userData).subscribe({
       next: () => {
         this.toastr.success('User updated successfully!');
       },

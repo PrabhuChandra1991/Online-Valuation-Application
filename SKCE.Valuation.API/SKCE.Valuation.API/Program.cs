@@ -7,6 +7,7 @@ using SKCE.Examination.Services.Helpers;
 using SKCE.Examination.Models.DbModels.QPSettings;
 using SKCE.Examination.Services.AutoMapperProfiles;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Azure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,6 +34,12 @@ builder.Services.AddControllers()
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddAzureClients(clientBuilder =>
+{
+    clientBuilder.AddBlobServiceClient(builder.Configuration["StorageConnection:blobServiceUri"]!).WithName("StorageConnection");
+    clientBuilder.AddQueueServiceClient(builder.Configuration["StorageConnection:queueServiceUri"]!).WithName("StorageConnection");
+    clientBuilder.AddTableServiceClient(builder.Configuration["StorageConnection:tableServiceUri"]!).WithName("StorageConnection");
+});
 
 var app = builder.Build();
 
@@ -58,16 +65,18 @@ using (var scope = app.Services.CreateScope())
     }
 }
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-else
-{
-    app.UseExceptionHandler("/Error");
-    app.UseHsts();
-}
+//if (app.Environment.IsDevelopment())
+//{
+//    app.UseSwagger();
+//    app.UseSwaggerUI();
+//}
+//else
+//{
+//    app.UseExceptionHandler("/Error");
+//    app.UseHsts();
+//}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseAuthorization();
 
@@ -98,7 +107,7 @@ void SeedDefaultUser(ExaminationDbContext context)
             Salutation="Mr.",
             Gender="Male",
             Name = "Super Admin",
-            Email = "superadmin@skcet.ac.in",
+            Email = "superadmin@skitech.ai",
             MobileNumber = "8300034477",
             RoleId = 1,
             CollegeName = "SRI KRISHNA COLLEGE OF ENGINEERING TECHNOLOGY",

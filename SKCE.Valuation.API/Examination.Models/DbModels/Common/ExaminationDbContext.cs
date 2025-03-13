@@ -30,15 +30,6 @@ namespace SKCE.Examination.Models.DbModels.Common
         public DbSet<ExamMonth> ExamMonths { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<UserCourse>()
-            .HasOne(uc => uc.User)
-            .WithMany(u => u.UserCourses)
-            .HasForeignKey(uc => uc.UserId);
-
-            modelBuilder.Entity<UserAreaOfSpecialization>()
-                .HasOne(us => us.User)
-                .WithMany(u => u.UserAreaOfSpecializations)
-                .HasForeignKey(us => us.UserId);
         }
     }
 }

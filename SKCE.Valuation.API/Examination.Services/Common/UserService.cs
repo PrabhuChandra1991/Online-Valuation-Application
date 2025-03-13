@@ -73,6 +73,23 @@ namespace SKCE.Examination.Services.Common
 
         public async Task<User> UpdateUserAsync(User user)
         {
+            AuditHelper.SetAuditPropertiesForUpdate(user, 1);
+            foreach (var userCourse in user.UserCourses)
+            {
+                AuditHelper.SetAuditPropertiesForUpdate(userCourse, 1);
+            }
+            foreach (var userAreaOfSpecialization in user.UserAreaOfSpecializations)
+            {
+                AuditHelper.SetAuditPropertiesForUpdate(userAreaOfSpecialization, 1);
+            }
+            foreach (var userDesignation in user.UserDesignations)
+            {
+                AuditHelper.SetAuditPropertiesForUpdate(userDesignation, 1);
+            }
+            foreach (var userQualification in user.UserQualifications)
+            {
+                AuditHelper.SetAuditPropertiesForUpdate(userQualification, 1);
+            }
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
             return user;

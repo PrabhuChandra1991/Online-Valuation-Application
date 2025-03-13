@@ -20,7 +20,5 @@ namespace SKCE.Examination.Models.DbModels.Common
 
         public required string AreaOfSpecializationName { get; set; }
 
-        public required virtual User User { get; set; }
-
     }
 }

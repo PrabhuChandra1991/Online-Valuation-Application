@@ -26,7 +26,6 @@ namespace SKCE.Examination.Models.DbModels.Common
 
         public bool IsHandledInLast2Semester { get; set; }
 
-        public required virtual User User { get; set; }
 
     }
 }

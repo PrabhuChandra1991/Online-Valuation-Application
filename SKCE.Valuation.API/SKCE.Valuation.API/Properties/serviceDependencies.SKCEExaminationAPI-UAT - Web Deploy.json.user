@@ -1,0 +1,39 @@
+{
+  "dependencies": {
+    "apis1": {
+      "restored": true,
+      "restoreTime": "2025-03-13T06:05:23.4492551Z"
+    },
+    "mssql1": {
+      "restored": true,
+      "restoreTime": "2025-03-13T06:28:05.5488287Z"
+    }
+  },
+  "parameters": {
+    "mssql1.subscriptionId": {
+      "Name": "mssql1.subscriptionId",
+      "Type": "subscription",
+      "Value": "68a1bb44-6cbc-44ca-aa2f-afd87b354ac3"
+    },
+    "mssql1.resourceGroupName": {
+      "Name": "mssql1.resourceGroupName",
+      "Type": "resourceGroup",
+      "Value": "SKCEExaminationAPI20250311191221ResourceGroup"
+    },
+    "apis1.resourceGroupName": {
+      "Name": "apis1.resourceGroupName",
+      "Type": "resourceGroup",
+      "Value": "SKCEExaminationAPI20250311191221ResourceGroup"
+    },
+    "apis1.subscriptionId": {
+      "Name": "apis1.subscriptionId",
+      "Type": "subscription",
+      "Value": "68a1bb44-6cbc-44ca-aa2f-afd87b354ac3"
+    },
+    "mssql1.serviceConnectorResourceGroupName": {
+      "Name": "mssql1.serviceConnectorResourceGroupName",
+      "Type": "resourceGroup",
+      "Value": "SKCEExaminationAPI20250311191221ResourceGroup"
+    }
+  }
+}

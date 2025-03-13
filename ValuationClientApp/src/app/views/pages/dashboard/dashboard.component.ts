@@ -48,6 +48,7 @@ export class DashboardComponent implements OnInit {
   selectedUserId:any;
   userQualifications: any[] = [];
   userCourses :any [] = [];
+  Salutation:any;
 
   @ViewChild('editSpecializationModal') editSpecializationModal!: TemplateRef<any>;
   @ViewChild('editDesignationModal') editDesignationModal!: TemplateRef<any>;
@@ -170,7 +171,9 @@ export class DashboardComponent implements OnInit {
       ug: ['', [Validators.required]],
       pg: ['' , [Validators.required]],
       hasPhd: [false], // Checkbox for PhD completion,
-      salutationId:['', Validators.required]
+      salutationId:['', Validators.required],
+      genderId:['', Validators.required],
+      department:['', Validators.required],
     });
 
     // Example specializations to show in the table initially
@@ -255,7 +258,10 @@ export class DashboardComponent implements OnInit {
         collegeName: userData.collegeName,
         bankAccountName: userData.bankAccountName,
         bankAccountNumber: userData.bankAccountNumber,
-        bankBranchName: userData.bankBranchName
+        bankBranchName: userData.bankBranchName,
+        salutationId:userData.salutationId,
+        genderId:userData.gender,
+        department:userData.departmentName
       });
     }
   }
@@ -274,9 +280,15 @@ export class DashboardComponent implements OnInit {
           collegeName: selectedUser.collegeName,
           bankAccountName: selectedUser.bankAccountName,
           bankAccountNumber: selectedUser.bankAccountNumber,
-          bankBranchName: selectedUser.bankBranchName
+          bankBranchName: selectedUser.bankBranchName,
+          salutationId:selectedUser.salutation,
+          genderId:selectedUser.gender,
+          department:selectedUser.departmentName
+
+          
         });
 
+        
         //assign child elements dynamically
         selectedUser.userDesignations = [];
         this.designations = selectedUser.userDesignations;

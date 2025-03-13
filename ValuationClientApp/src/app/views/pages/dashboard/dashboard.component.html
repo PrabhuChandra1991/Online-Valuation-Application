@@ -22,7 +22,7 @@
                 <label class="form-label">Gender</label>
                 <select class="form-select" formcontrolname="genderId" >
                   <option selected disabled>Select Gender</option>
-                  <option *ngFor="let gender of genders" [value]="gender.id">{{ gender.name }}</option>
+                  <option *ngFor="let gender of genders" [ngValue]="gender.id">{{ gender.name }}</option>
                 </select>
               </div>
             
@@ -249,7 +249,7 @@
     <form [formGroup]="designationForm">
       <div class="mb-3">
         <label>Designation</label>
-        <select class="form-select" formControlName="expDesignation">
+        <select class="form-select" formControlName="expName">
           <option selected disabled>Select Designation</option>
           <option *ngFor="let desig of designations" [value]="desig.designationId">{{ desig.Name }}</option>
         </select>

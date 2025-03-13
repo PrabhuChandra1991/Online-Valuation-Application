@@ -14,6 +14,8 @@ import { DashboardService } from '../services/dashboard.service';
 import { UserAreaOfSpecialization  } from '../models/userAreaOfSpecialization.model';
 import { UserDesignation } from '../models/userDesignation.model';
 import { delay, Observable } from 'rxjs';
+import {UserProfile} from '../models/userProfile.model';
+import { UserQualification } from '../models/userQualification';
 
 const currentDate = new Date().toISOString();
 
@@ -49,6 +51,7 @@ export class DashboardComponent implements OnInit {
   selectedUserId:any;
   userQualifications: any[] = [];
   userCourses :any [] = [];
+  qualification : UserQualification;
   @ViewChild('editSpecializationModal') editSpecializationModal!: TemplateRef<any>;
   @ViewChild('editDesignationModal') editDesignationModal!: TemplateRef<any>;
   @ViewChild('editUserCourseModal') editUserCourseModal!: TemplateRef<any>;
@@ -117,6 +120,8 @@ export class DashboardComponent implements OnInit {
     isCurrent: true,
     Name: designation.Name
   }));
+
+ 
   // Local storage of Specialization & Qualification
   specializations: any[] = [];
 
@@ -146,7 +151,7 @@ export class DashboardComponent implements OnInit {
     }),
 
     this.designationForm = this.fb.group({
-      expDesignation: ['', Validators.required],
+      expName: ['', Validators.required],
       experience: ['', Validators.required],
       isCurrent: [false]
     });
@@ -178,7 +183,7 @@ export class DashboardComponent implements OnInit {
   selectedUserObject: Observable<any>
 
   ngOnInit(): void {
-
+    console.log('des',this.designations);
     this.route.paramMap.subscribe(params => {
       const userId = params.get('id'); // Get user ID from route
       if (userId) {
@@ -302,7 +307,7 @@ export class DashboardComponent implements OnInit {
           this.userForm.patchValue({
           
           salutationId:salutation?.id,
-          genderId: gender?.id,
+          genderId:selectedUser.gender,
           name: selectedUser.name,
           email: selectedUser.email,
           mobileNumber: Number(selectedUser.mobileNumber),
@@ -420,7 +425,7 @@ saveExperience() {
       userDesignationId: 0,
       designationId: 0,
       userId: this.selectedUserId,
-      Name: this.designationForm.value.expDesignation,
+      Name: this.designationForm.value.expName,
       experience: this.designationForm.value.experience,
       isCurrent: this.designationForm.value.isCurrent,
       isActive: false,
@@ -445,7 +450,7 @@ editExperience(index: number) {
 
   // Set the form values to the clicked Experience data
   this.designationForm.patchValue({
-    expDesignationId: Designation.designationId,
+    expName: Designation.designationId,
     experience: Designation.experience,
     isCurrent: Designation.isCurrent
   });
@@ -558,13 +563,92 @@ getDeginationName(Id: number) {
         ...this.userForm.value,
         specializations: this.specializations,
         designations: this.designations,
+        courses: this.userCourses
       };
 
-      this.updateUser(formData);
+    //map formdata to user object
+     let userData =  this.mapFormDataToUserObject (formData);
+      this.updateUser(userData);
       console.log('Submitted Data:', formData);
     // } else {
     //   console.log('Form is invalid');
     // }
+  }
+
+   mapFormDataToUserObject(formData: any) {
+
+    //map course details
+
+     let ugCourse = this.userQualifications.find(f => f.title.includes('UG'));
+     let pgCourse = this.userQualifications.find(f => f.title.includes('PG'));
+     let phdSCourse = this.userQualifications.find(f => f.title.includes('Ph.D'));
+
+     if (ugCourse) {
+       ugCourse.name = formData.ugName;
+       ugCourse.specialization = formData.ugSpecialization;
+     }
+
+     if (ugCourse) {
+       pgCourse.name = formData.pgName;
+       pgCourse.specialization = formData.pgSpecialization;
+     }
+
+     if (phdSCourse) {
+      phdSCourse.specialization = formData.phdSpecialization;
+    }
+     
+    const userObj: UserProfile = {
+
+      userId: this.selectedUserId || 0,
+      name: formData.name || '',
+      email: formData.email || '',
+      gender: formData.genderId || '',
+      salutation: formData.salutationId || '',
+      mobileNumber: formData.mobileNumber || '',
+      roleId: formData.roleId || 0,
+      totalExperience: formData.totalExperience || 0,
+      departmentName: formData.departmentName || '',
+      collegeName: formData.collegeName || '',
+      bankAccountName: formData.bankAccountName || '',
+      bankName : formData.bankName || '',
+      bankAccountNumber: formData.bankAccountNumber || '',
+      bankBranchName: formData.bankBranchName || '',
+      bankIFSCCode: formData.bankIfscCode || '',
+      isEnabled: formData.isEnabled || false,
+      userCourses: formData.courses || [],
+      userAreaOfSpecializations: formData.specializations || [],
+      userQualifications: formData.qualifications || [],
+      userDesignations: formData.designations || [],
+      isActive: formData.isActive || false,
+      createdById: formData.createdById || 0,
+      createdDate: formData.createdDate || '',
+      modifiedById: formData.modifiedById || 0,
+      modifiedDate: formData.modifiedDate || ''
+    };
+    
+    return userObj;
+  }
+
+  getQualification(formData: any): UserQualification {
+   
+    const userQualification: UserQualification = {
+
+      userQualificationId: formData.userQualificationId,
+      userId: formData.userId,
+      title: formData.title,
+      name: formData.name,
+      specialization: formData.specialization,
+      isCompleted: formData.isCompleted,
+      isActive: formData.isActive,
+      createdById: formData.createdById,
+      createdDate: formData.createdDate,
+      modifiedById: formData.modifiedById,
+      modifiedDate: formData.modifiedDate
+    };
+
+    
+
+    return userQualification;
   }
 
   updateUser(userData: any) {
@@ -579,4 +663,8 @@ getDeginationName(Id: number) {
     });
   }
 }
+
+
+
+
 

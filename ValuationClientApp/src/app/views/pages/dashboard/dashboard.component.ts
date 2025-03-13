@@ -16,6 +16,10 @@ import { UserDesignation } from '../models/userDesignation.model';
 import { delay, Observable } from 'rxjs';
 import {UserProfile} from '../models/userProfile.model';
 import { UserQualification } from '../models/userQualification';
+import { User } from '../models/user.model';
+import { UserCourse } from '../models/userCourse.model';
+import { SpinnerService } from '../services/spinner.service';
+
 
 const currentDate = new Date().toISOString();
 
@@ -53,18 +57,18 @@ export class DashboardComponent implements OnInit {
   userCourses :any [] = [];
   qualification : UserQualification;
   Salutation:any;
-
+  selectedUser:User;
   @ViewChild('editSpecializationModal') editSpecializationModal!: TemplateRef<any>;
   @ViewChild('editDesignationModal') editDesignationModal!: TemplateRef<any>;
   @ViewChild('editUserCourseModal') editUserCourseModal!: TemplateRef<any>;
 
   //this should be load from dashboard service 
   salutations = [
-    { id: 'mr', name: 'Mr.' },
-    { id: 'ms', name: 'Ms.' },
-    { id: 'mrs', name: 'Mrs.' },
-    { id: 'dr', name: 'Dr.' },
-    { id: 'prof', name: 'Prof.' }
+    { id: 'Mr.', name: 'Mr.' },
+    { id: 'Ms.', name: 'Ms.' },
+    { id: 'Mrs.', name: 'Mrs.' },
+    { id: 'Dr.', name: 'Dr.' },
+    { id: 'Prof.', name: 'Prof.' }
   ];
     
 
@@ -80,9 +84,9 @@ export class DashboardComponent implements OnInit {
       Name: 'UG',
       Code: 'UG',
       IsActive: 1,
-      CreatedDate: '2025-03-11 18:08:23.823',
+      CreatedDate: currentDate,
       CreatedById: 1,
-      ModifiedDate: '2025-03-11 18:08:23.823',
+      ModifiedDate: currentDate,
       ModifiedById: 1
     },
     {
@@ -90,9 +94,9 @@ export class DashboardComponent implements OnInit {
       Name: 'PG',
       Code: 'PG',
       IsActive: 1,
-      CreatedDate: '2025-03-11 18:08:23.823',
+      CreatedDate: currentDate,
       CreatedById: 1,
-      ModifiedDate: '2025-03-11 18:08:23.823',
+      ModifiedDate: currentDate,
       ModifiedById: 1
     },
     {
@@ -100,9 +104,9 @@ export class DashboardComponent implements OnInit {
       Name: 'Ph.D',
       Code: 'Ph.D',
       IsActive: 1,
-      CreatedDate: '2025-03-11 18:08:23.823',
+      CreatedDate: currentDate,
       CreatedById: 1,
-      ModifiedDate: '2025-03-11 18:08:23.823',
+      ModifiedDate: currentDate,
       ModifiedById: 1
     }
   ];
@@ -117,7 +121,7 @@ export class DashboardComponent implements OnInit {
     modifiedDate: currentDate,
     userDesignationId: 0,
     designationId: designation.DesignationId,
-    userId: 0,
+    userId: this.selectedUserId,
     experience: 0,
     isCurrent: true
   }));
@@ -133,7 +137,8 @@ export class DashboardComponent implements OnInit {
     private userService: UserService,
     private toastr: ToastrService,
     private route: ActivatedRoute,
-    private dashboardService: DashboardService
+    private dashboardService: DashboardService,
+    private spinnerService: SpinnerService
   ) {
 
      // Initialize the form with validation
@@ -159,16 +164,17 @@ export class DashboardComponent implements OnInit {
 
     this.userForm = this.fb.group({
       genderId: ['', Validators.required],
-      name: [{ value: '', disabled: false }, Validators.required],
-      email: [{ value: '', disabled: false }, [Validators.required, Validators.email]],
-      mobileNumber: [{ value: '', disabled: false }, [Validators.required, Validators.pattern('^[0-9]{10}$')]],
+      name:  ['', [Validators.required]],
+      email: ['', [Validators.required, Validators.email]],
+      mobileNumber: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
       departmentName: ['', Validators.required],
       designationId: ['', Validators.required],
       collegeName: ['', Validators.required],
       bankAccountName: ['', Validators.required],
       bankAccountNumber: ['', Validators.pattern('^[0-9]+$')],
       bankBranchName: ['', Validators.required],
-      bankIfscCode: ['', Validators.required],
+      bankName:['', Validators.required],
+      bankIFSCCode: ['', Validators.required],
       specializations: this.fb.array([]),
       designations: this.fb.array([]),
       ugName: ['', [Validators.required]],
@@ -198,47 +204,47 @@ export class DashboardComponent implements OnInit {
     });
 
     // Example specializations to show in the table initially
-    this.specializations = [
-      {
-        isActive: true,
-        createdById: 0,
-        createdDate: new Date().toISOString(),
-        modifiedById: 0,
-        modifiedDate: new Date().toISOString(),
-        userAreaOfSpecializationId: 1,
-        userId: 4,
-        areaOfSpecializationName: "Computer Science",
-        experience: 5,
-        handledLastTwoSemesters: true,
-        user: ""
-      },
-      {
-        isActive: true,
-        createdById: 0,
-        createdDate: new Date().toISOString(),
-        modifiedById: 0,
-        modifiedDate: new Date().toISOString(),
-        userAreaOfSpecializationId: 2,
-        userId: 4,
-        areaOfSpecializationName: "Mathematics",
-        experience: 3,
-        handledLastTwoSemesters: true,
-        user: ""
-      },
-      {
-        isActive: true,
-        createdById: 0,
-        createdDate: new Date().toISOString(),
-        modifiedById: 0,
-        modifiedDate: new Date().toISOString(),
-        userAreaOfSpecializationId: 3,
-        userId: 4,
-        areaOfSpecializationName: "Physics",
-        experience: 1,
-        handledLastTwoSemesters: true,
-        user: ""
-      }
-    ];
+    // this.specializations = [
+    //   {
+    //     isActive: true,
+    //     createdById: 0,
+    //     createdDate: new Date().toISOString(),
+    //     modifiedById: 0,
+    //     modifiedDate: new Date().toISOString(),
+    //     userAreaOfSpecializationId: 1,
+    //     userId: this.selectedUserId,
+    //     areaOfSpecializationName: "Computer Science",
+    //     experience: 5,
+    //     handledLastTwoSemesters: true,
+    //     user: ""
+    //   },
+    //   {
+    //     isActive: true,
+    //     createdById: 0,
+    //     createdDate: new Date().toISOString(),
+    //     modifiedById: 0,
+    //     modifiedDate: new Date().toISOString(),
+    //     userAreaOfSpecializationId: 2,
+    //     userId: 4,
+    //     areaOfSpecializationName: "Mathematics",
+    //     experience: 3,
+    //     handledLastTwoSemesters: true,
+    //     user: ""
+    //   },
+    //   {
+    //     isActive: true,
+    //     createdById: 0,
+    //     createdDate: new Date().toISOString(),
+    //     modifiedById: 0,
+    //     modifiedDate: new Date().toISOString(),
+    //     userAreaOfSpecializationId: 3,
+    //     userId: 4,
+    //     areaOfSpecializationName: "Physics",
+    //     experience: 1,
+    //     handledLastTwoSemesters: true,
+    //     user: ""
+    //   }
+    // ];
   
     //getting master data
     this.degreeTypes = this.getDegreeTypes();
@@ -283,7 +289,7 @@ export class DashboardComponent implements OnInit {
        if(selectedUser)
        {
         this.selectedUserObject = selectedUser;
-
+        this.selectedUser = selectedUser;
         //assign child elements dynamically
         this.designations = selectedUser.userDesignations;
         this.specializations = selectedUser.userAreaOfSpecializations;
@@ -322,11 +328,12 @@ export class DashboardComponent implements OnInit {
           bankAccountName: selectedUser.bankAccountName,
           bankAccountNumber: selectedUser.bankAccountNumber,
           bankBranchName: selectedUser.bankBranchName,
-          // salutationId:selectedUser.salutation,
-          // genderId:selectedUser.gender,
+          bankName:selectedUser.bankName,
+          bankIFSCCode: selectedUser.bankIFSCCode,
           department:selectedUser.departmentName,
           hasPhd : phdQualification.isCompleted,
-          phdSpecialization:phdQualification.specialization
+          phdSpecialization:phdQualification.specialization,
+          userId:selectedUser.userId
           
         });
 
@@ -366,11 +373,11 @@ export class DashboardComponent implements OnInit {
         userAreaOfSpecializationId: 0,
         userId: this.selectedUserId,
         areaOfSpecializationName: this.specializationForm.value.areaOfSpecializationName,
-        isActive: false,
-        createdDate: new Date().toISOString(),  // Current timestamp
-        createdById: 0,
-        modifiedDate: new Date().toISOString(),
-        modifiedById: 0
+        isActive: true,
+        createdDate: currentDate, 
+        createdById: this.selectedUserId,
+        modifiedDate: currentDate,
+        modifiedById: this.selectedUserId
       };
       
       this.specializations.push(newSpecialization);
@@ -426,21 +433,22 @@ saveExperience() {
   if (this.selectedDesignationIndex !== null) {
     debugger;
     // Update the existing Qualification
-    this.designations[this.selectedDesignationIndex] = this.designationForm.value;
+    this.designations[this.selectedDesignationIndex].designationId = this.designationForm.value.expName;
+    this.designations[this.selectedDesignationIndex].experience = this.designationForm.value.experience;
+    this.designations[this.selectedDesignationIndex].isCurrent = this.designationForm.value.isCurrent;
   } else {
     // If no Qualification is selected, add a new one
     let newDesignation: UserDesignation = {
-      userDesignationId: 0,
-      designationId: 0,
+      userDesignationId:0,
+      designationId: this.designationForm.value.expName,
       userId: this.selectedUserId,
-      name: this.designationForm.value.expName,
       experience: this.designationForm.value.experience,
       isCurrent: this.designationForm.value.isCurrent,
-      isActive: false,
-      createdById: 0,
-      createdDate: new Date().toISOString(), // Current date in ISO format
-      modifiedById: 0,
-      modifiedDate: new Date().toISOString(),
+      isActive: true,
+      createdById: this.selectedUserId,
+      createdDate: currentDate,
+      modifiedById: this.selectedUserId,
+      modifiedDate: currentDate
     };
     
     this.designations.push(newDesignation);
@@ -513,10 +521,26 @@ getDesignationName(Id: number) {
      const newCourse = this.userCourseForm.value;
      if (this.selectedUserCourseIndex !== null) {
        // Edit existing course
-       this.userCourses[this.selectedUserCourseIndex] = newCourse;
+       this.userCourses[this.selectedUserCourseIndex].courseName = newCourse.courseName;
+       this.userCourses[this.selectedUserCourseIndex].degreeTypeId = newCourse.degreeTypeId;
+       this.userCourses[this.selectedUserCourseIndex].numberOfYearsHandled = newCourse.numberOfYearsHandled;
+       this.userCourses[this.selectedUserCourseIndex].isHandledInLast2Semester = newCourse.isHandledInLast2Semester;
      } else {
        // Add new course
-       this.userCourses.push(newCourse);
+       let newCourseObj: UserCourse = {
+         userCourseId: 0,
+         userId: this.selectedUserId,
+         courseName: newCourse.courseName,
+         degreeTypeId: newCourse.degreeTypeId,
+         numberOfYearsHandled: newCourse.numberOfYearsHandled,
+         isHandledInLast2Semester: newCourse.isHandledInLast2Semester,
+         isActive: true,
+         createdById: this.selectedUserId,
+         createdDate: currentDate,
+         modifiedById: this.selectedUserId,
+         modifiedDate: currentDate
+       }
+       this.userCourses.push(newCourseObj);
      }
 
      this.modalService.dismissAll(); // Close the modal
@@ -563,15 +587,27 @@ getDesignationName(Id: number) {
  
  //#endregion
 
+ onSalutationChange(event: Event) {
+  const selectedValue = (event.target as HTMLSelectElement).value;
+  this.userForm.patchValue({ salutationId: selectedValue });
+}
+
+onGenderChange(event: Event) {
+  const selectedValue = (event.target as HTMLSelectElement).value;
+  this.userForm.patchValue({ genderId: selectedValue });
+}
+
 
 // Submit Form including Specialization & Qualification
   onSubmit() {
     // if (this.userForm.valid) {
+      this.spinnerService.toggleSpinnerState(true);
       const formData = {
         ...this.userForm.value,
         specializations: this.specializations,
         designations: this.designations,
-        courses: this.userCourses
+        courses: this.userCourses,
+        userQualifications :this.userQualifications
       };
 
     //map formdata to user object
@@ -621,17 +657,17 @@ getDesignationName(Id: number) {
       bankName : formData.bankName || '',
       bankAccountNumber: formData.bankAccountNumber || '',
       bankBranchName: formData.bankBranchName || '',
-      bankIFSCCode: formData.bankIfscCode || '',
+      bankIFSCCode: formData.bankIFSCCode || '',
       isEnabled: formData.isEnabled || false,
       userCourses: formData.courses || [],
       userAreaOfSpecializations: formData.specializations || [],
-      userQualifications: formData.qualifications || [],
+      userQualifications: this.userQualifications || [],
       userDesignations: formData.designations || [],
-      isActive: formData.isActive || false,
-      createdById: formData.createdById || 0,
-      createdDate: formData.createdDate || '',
-      modifiedById: formData.modifiedById || 0,
-      modifiedDate: formData.modifiedDate || ''
+      isActive: formData.isActive || true,
+      createdById: this.selectedUser.createdById || 0,
+      createdDate: this.selectedUser.createdDate || '',
+      modifiedById: this.selectedUserId || 0,
+      modifiedDate: currentDate || ''
     };
     
     return userObj;
@@ -650,7 +686,7 @@ getDesignationName(Id: number) {
       isActive: formData.isActive,
       createdById: formData.createdById,
       createdDate: formData.createdDate,
-      modifiedById: formData.modifiedById,
+      modifiedById: formData.userId,
       modifiedDate: formData.modifiedDate
     };
 
@@ -663,11 +699,15 @@ getDesignationName(Id: number) {
     this.userService.updateUser(userData.userId, userData).subscribe({
       next: () => {
         this.toastr.success('User updated successfully!');
+        
       },
       error: () => {
         this.toastr.error('Failed to update user. Please try again.');
+        this.spinnerService.toggleSpinnerState(false);
       },
-      complete: () => { }
+      complete: () => {
+        this.spinnerService.toggleSpinnerState(false);
+       }
     });
   }
 }

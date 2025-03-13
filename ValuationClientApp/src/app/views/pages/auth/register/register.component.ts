@@ -4,6 +4,8 @@ import { Component, Inject } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { ToastrModule,ToastrService  } from 'ngx-toastr';
+import { RegisterService } from '../../services/register.service';
+
 
 @Component({
     selector: 'app-register',
@@ -28,7 +30,7 @@ export class RegisterComponent {
 
   
 
-  constructor(private router: Router,private http: HttpClient,private toastr: ToastrService) {}
+  constructor(private router: Router,private RegisterService: RegisterService,private toastr: ToastrService) {}
 
   userEmail:string='';
   userName:string='';
@@ -48,7 +50,7 @@ export class RegisterComponent {
     
     debugger;
     //
-    this.http.post("http://localhost:5088/api/User",this.userObj).subscribe((result:any)=>{
+    this.RegisterService.createUser(this.userObj).subscribe((result:any)=>{
       debugger;
       // if(result['id'] > 0)
       // {

@@ -13,6 +13,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { User  } from '../../models/user.model';
 import { ToastrService } from 'ngx-toastr';
 import {MatButtonModule} from '@angular/material/button';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-user',
@@ -49,7 +50,7 @@ export class UserComponent implements OnInit{
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  constructor(private userService: UserService,private modalService: NgbModal, private toastr: ToastrService) {}
+  constructor(private userService: UserService,private modalService: NgbModal, private toastr: ToastrService,private router: Router) {}
 
   ngOnInit() {
     this.loadUsers();
@@ -95,9 +96,9 @@ export class UserComponent implements OnInit{
 
   }
 
-  editUser(user: any) {
-    this.selectedUser = { ...user }; // Store selected user details
+  editUser(userId: any) {
     this.isEditMode = true; // Set edit mode
+    this.router.navigate(['/dashboard/edit', userId]); 
   }
   
 

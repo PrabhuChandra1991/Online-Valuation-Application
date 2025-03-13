@@ -5,6 +5,8 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build-dev":"ng build --configuration=development",
+    "build-uat":"ng build --configuration=uat",
     "watch": "ng build --watch --configuration development",
     "rtl": "webpack --config rtl.config.js",
     "test": "ng test"

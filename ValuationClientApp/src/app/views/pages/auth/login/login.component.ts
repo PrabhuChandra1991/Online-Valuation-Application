@@ -1,10 +1,10 @@
 import { NgIf, NgStyle } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ToastrModule,ToastrService  } from 'ngx-toastr';
 import { SpinnerService } from '../../services/spinner.service';
+import { LoginService } from '../../services/login.service';
 
 @Component({
     selector: 'app-login',
@@ -13,7 +13,8 @@ import { SpinnerService } from '../../services/spinner.service';
         RouterLink,
         NgIf,
         FormsModule,
-        ToastrModule
+        ToastrModule,
+
     ],
     templateUrl: './login.component.html',
     styleUrl: './login.component.scss'
@@ -26,8 +27,9 @@ export class LoginComponent implements OnInit {
   userEmail:string='';
   userOtp ?:number;
 
-  constructor(private router: Router, private route: ActivatedRoute, private http: HttpClient,
-    private toastr: ToastrService,private spinnerService: SpinnerService) {}
+  constructor(private router: Router, private route: ActivatedRoute, 
+    private toastr: ToastrService,private spinnerService: SpinnerService,
+  private LoginService: LoginService) {}
 
   userObj: any = {
     "email": this.userEmail,
@@ -52,7 +54,7 @@ export class LoginComponent implements OnInit {
     //e.preventDefault();
     this.spinnerService.toggleSpinnerState(true);
      //
-    this.http.post("http://localhost:5088/api/Login/request-temp-password",this.userObj).subscribe((result:any)=>{
+    this.LoginService.requestPassword(this.userObj).subscribe((result:any)=>{
      console.log(result);
       this.toastr.success(result['message']);
       this.isOTPRequested = true;
@@ -66,7 +68,7 @@ export class LoginComponent implements OnInit {
     debugger;
     //
     this.spinnerService.toggleSpinnerState(true);
-    this.http.post("http://localhost:5088/api/Login/validate-temp-password?tempPassword="+this.userObj.tempPassword,this.userObj).subscribe((result:any)=>{
+    this.LoginService.login(this.userObj).subscribe((result:any)=>{
       debugger;
       localStorage.setItem('isLoggedin', 'true');
       localStorage.setItem('userData',JSON.stringify(result));

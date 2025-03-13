@@ -13,6 +13,9 @@ import { ActivatedRoute } from '@angular/router';
 import { DashboardService } from '../services/dashboard.service';
 import { UserAreaOfSpecialization  } from '../models/userAreaOfSpecialization.model';
 import { UserDesignation } from '../models/userDesignation.model';
+import { delay, Observable } from 'rxjs';
+import {UserProfile} from '../models/userProfile.model';
+import { UserQualification } from '../models/userQualification';
 
 const currentDate = new Date().toISOString();
 
@@ -48,6 +51,7 @@ export class DashboardComponent implements OnInit {
   selectedUserId:any;
   userQualifications: any[] = [];
   userCourses :any [] = [];
+  qualification : UserQualification;
   Salutation:any;
 
   @ViewChild('editSpecializationModal') editSpecializationModal!: TemplateRef<any>;
@@ -62,11 +66,12 @@ export class DashboardComponent implements OnInit {
     { id: 'dr', name: 'Dr.' },
     { id: 'prof', name: 'Prof.' }
   ];
+    
 
   genders = [
-    { id: '1', name: 'Male' },
-    { id: '2', name: 'Female' },
-    { id: '3', name: 'Other' }
+    { id: 'Male', name: 'Male' },
+    { id: 'Female', name: 'Female' },
+    { id: 'Other', name: 'Other' }
   ];
 
   degreeTypes = [
@@ -117,6 +122,8 @@ export class DashboardComponent implements OnInit {
     isCurrent: true,
     Name: designation.Name
   }));
+
+ 
   // Local storage of Specialization & Qualification
   specializations: any[] = [];
 
@@ -129,37 +136,34 @@ export class DashboardComponent implements OnInit {
     private route: ActivatedRoute,
     private dashboardService: DashboardService
   ) {
+
+     // Initialize the form with validation
+     this.userCourseForm = this.fb.group({
+      courseName: ['', Validators.required],
+      degreeTypeId: ['', Validators.required],
+      numberOfYearsHandled: ['', [Validators.required, Validators.min(1)]],
+      isHandledInLast2Semester: [false]
+    });
+
     // Initialize the form with default values
-    this.specializationForm = new FormGroup({
-      areaOfSpecializationName: new FormControl(''),
+    this.specializationForm = this.fb.group({
+      areaOfSpecializationName: ['', Validators.required],
       // experience: new FormControl(''),
       // handledLastTwoSemesters: new FormControl(false),
     }),
 
-    this.designationForm = new FormGroup({
-      expDesignation: new FormControl('', Validators.required),
-      experience: new FormControl('', Validators.required),
-      isCurrent: new FormControl(false),
-          
+    this.designationForm = this.fb.group({
+      expName: ['', Validators.required],
+      experience: ['', Validators.required],
+      isCurrent: [false]
     });
-  }
-
-  ngOnInit(): void {
-
-    this.route.paramMap.subscribe(params => {
-      const userId = params.get('id'); // Get user ID from route
-      if (userId) {
-        this.selectedUserId = userId;
-        this.getUser(userId); // Load user data for editing
-      }
-    });
-
 
     this.userForm = this.fb.group({
+      genderId: ['', Validators.required],
       name: [{ value: '', disabled: true }, Validators.required],
       email: [{ value: '', disabled: true }, [Validators.required, Validators.email]],
       mobileNumber: [{ value: '', disabled: true }, [Validators.required, Validators.pattern('^[0-9]{10}$')]],
-      departmentId: ['', Validators.required],
+      departmentName: ['', Validators.required],
       designationId: ['', Validators.required],
       collegeName: ['', Validators.required],
       bankAccountName: [''],
@@ -168,12 +172,31 @@ export class DashboardComponent implements OnInit {
       bankIfscCode: [''],
       specializations: this.fb.array([]),
       designations: this.fb.array([]),
-      ug: ['', [Validators.required]],
-      pg: ['' , [Validators.required]],
+      ugName: ['', [Validators.required]],
+      ugSpecialization: ['', [Validators.required]],
+      pgName: ['', [Validators.required]],
+      pgSpecialization: ['', [Validators.required]],
+      phdSpecialization: ['', [Validators.required]],
       hasPhd: [false], // Checkbox for PhD completion,
       salutationId:['', Validators.required],
       genderId:['', Validators.required],
       department:['', Validators.required],
+    });
+  }
+
+  selectedUserObject: Observable<any>
+
+  ngOnInit(): void {
+    console.log('des',this.designations);
+    this.route.paramMap.subscribe(params => {
+      const userId = params.get('id'); // Get user ID from route
+      if (userId) {
+        this.selectedUserId = userId;
+        this.getUser(userId); // Load user data for editing
+      }
+      else{
+        this.loadUserData();
+      }
     });
 
     // Example specializations to show in the table initially
@@ -219,19 +242,10 @@ export class DashboardComponent implements OnInit {
       }
     ];
   
-
-    // Initialize the form with validation
-    this.userCourseForm = this.fb.group({
-      courseName: ['', Validators.required],
-      degreeTypeId: ['', Validators.required],
-      numberOfYearsHandled: ['', [Validators.required, Validators.min(1)]],
-      isHandledInLast2Semester: [false]
-    });
-
     //getting master data
     this.degreeTypes = this.getDegreeTypes();
     this.designations = this.getdesignations();
-    this.loadUserData();
+    
   }
   
   getDegreeTypes() {
@@ -251,18 +265,15 @@ export class DashboardComponent implements OnInit {
     const loggedData = localStorage.getItem('userData');
     if (loggedData) {
       const userData = JSON.parse(loggedData);
-      this.userForm.patchValue({
-        name: userData.name,
-        email: userData.email,
-        mobileNumber: userData.mobileNumber,
-        collegeName: userData.collegeName,
-        bankAccountName: userData.bankAccountName,
-        bankAccountNumber: userData.bankAccountNumber,
-        bankBranchName: userData.bankBranchName,
-        salutationId:userData.salutationId,
-        genderId:userData.gender,
-        department:userData.departmentName
-      });
+      // this.userForm.patchValue({
+      //   name: userData.name,
+      //   email: userData.email,
+      //   mobileNumber: userData.mobileNumber,
+      //   collegeName: userData.collegeName,
+      //   bankAccountName: userData.bankAccountName,
+      //   bankAccountNumber: userData.bankAccountNumber,
+      //   bankBranchName: userData.bankBranchName
+      // });
     }
   }
 
@@ -273,11 +284,43 @@ export class DashboardComponent implements OnInit {
        let selectedUser = data;
        if(selectedUser)
        {
-        this.userForm.patchValue({
+        this.selectedUserObject = selectedUser;
+
+        //assign child elements dynamically
+        this.designations = selectedUser.userDesignations;
+        this.specializations = selectedUser.userAreaOfSpecializations;
+        this.userQualifications = selectedUser.userQualifications;
+        this.userCourses = selectedUser.userCourses; 
+        
+        //this.selectedUserObject = selectedUser;
+        //filter data for qualification section 
+        let ugQualification = selectedUser.userQualifications.find((f: { title: string }) => f.title.includes('UG'));
+        let pgQualification = selectedUser.userQualifications.find((f: { title: string }) => f.title.includes('PG'));
+        let phdQualification = selectedUser.userQualifications.find((f: { title: string }) => f.title.includes('Ph'));
+
+        let salutation = this.salutations.find(f => f.name == selectedUser.salutation);
+        let gender = this.genders.find(f => f.name == selectedUser.gender);
+        console.log('gender',gender);
+        console.log("salutation",salutation);
+          console.log("user",selectedUser);
+          console.log("ug",ugQualification);
+          console.log("pg",pgQualification);
+          console.log("phd",phdQualification);
+          console.log("before patch",this.userForm.value);
+          this.userForm.updateValueAndValidity();
+          this.userForm.patchValue({
+          
+          salutationId:salutation?.id,
+          genderId:selectedUser.gender,
           name: selectedUser.name,
           email: selectedUser.email,
-          mobileNumber: selectedUser.mobileNumber,
+          mobileNumber: Number(selectedUser.mobileNumber),
           collegeName: selectedUser.collegeName,
+          ugName: ugQualification.name,
+          departmentName:selectedUser.departmentName,
+          ugSpecialization: ugQualification.specialization,
+          pgName:pgQualification.name,
+          pgSpecialization: pgQualification.specialization,
           bankAccountName: selectedUser.bankAccountName,
           bankAccountNumber: selectedUser.bankAccountNumber,
           bankBranchName: selectedUser.bankBranchName,
@@ -288,13 +331,7 @@ export class DashboardComponent implements OnInit {
           
         });
 
-        
-        //assign child elements dynamically
-        selectedUser.userDesignations = [];
-        this.designations = selectedUser.userDesignations;
-        this.specializations = selectedUser.userAreaOfSpecializations;
-        this.userQualifications = selectedUser.userQualifications;
-        this.userCourses = selectedUser.userCourses; 
+        console.log("after patch",this.userForm.value);
         
 
        }
@@ -395,7 +432,7 @@ saveExperience() {
       userDesignationId: 0,
       designationId: 0,
       userId: this.selectedUserId,
-      Name: this.designationForm.value.expDesignation,
+      Name: this.designationForm.value.expName,
       experience: this.designationForm.value.experience,
       isCurrent: this.designationForm.value.isCurrent,
       isActive: false,
@@ -420,7 +457,7 @@ editExperience(index: number) {
 
   // Set the form values to the clicked Experience data
   this.designationForm.patchValue({
-    expDesignationId: Designation.designationId,
+    expName: Designation.designationId,
     experience: Designation.experience,
     isCurrent: Designation.isCurrent
   });
@@ -515,25 +552,110 @@ getDeginationName(Id: number) {
  getDegreeTypeName(degreeTypeId: number) {
    const degree = this.degreeTypes.find(d => d.DegreeTypeId == degreeTypeId);
    return degree ? degree.Name : 'Unknown';
- }
+  }
+
+  OnPhDCheck() {
+    let data = this.userQualifications.find(f => f.title.includes('Ph.D'));
+    if(data)
+      data.isCompleted = !data.isCompleted;
+  }
  
  //#endregion
 
 
 // Submit Form including Specialization & Qualification
   onSubmit() {
-    if (this.userForm.valid) {
+    // if (this.userForm.valid) {
       const formData = {
         ...this.userForm.value,
         specializations: this.specializations,
-        designations: this.designations
+        designations: this.designations,
+        courses: this.userCourses
       };
 
-      this.updateUser(formData);
+    //map formdata to user object
+     let userData =  this.mapFormDataToUserObject (formData);
+      this.updateUser(userData);
       console.log('Submitted Data:', formData);
-    } else {
-      console.log('Form is invalid');
+    // } else {
+    //   console.log('Form is invalid');
+    // }
+  }
+
+   mapFormDataToUserObject(formData: any) {
+
+    //map course details
+
+     let ugCourse = this.userQualifications.find(f => f.title.includes('UG'));
+     let pgCourse = this.userQualifications.find(f => f.title.includes('PG'));
+     let phdSCourse = this.userQualifications.find(f => f.title.includes('Ph.D'));
+
+     if (ugCourse) {
+       ugCourse.name = formData.ugName;
+       ugCourse.specialization = formData.ugSpecialization;
+     }
+
+     if (ugCourse) {
+       pgCourse.name = formData.pgName;
+       pgCourse.specialization = formData.pgSpecialization;
+     }
+
+     if (phdSCourse) {
+      phdSCourse.specialization = formData.phdSpecialization;
     }
+     
+    const userObj: UserProfile = {
+
+      userId: this.selectedUserId || 0,
+      name: formData.name || '',
+      email: formData.email || '',
+      gender: formData.genderId || '',
+      salutation: formData.salutationId || '',
+      mobileNumber: formData.mobileNumber || '',
+      roleId: formData.roleId || 0,
+      totalExperience: formData.totalExperience || 0,
+      departmentName: formData.departmentName || '',
+      collegeName: formData.collegeName || '',
+      bankAccountName: formData.bankAccountName || '',
+      bankName : formData.bankName || '',
+      bankAccountNumber: formData.bankAccountNumber || '',
+      bankBranchName: formData.bankBranchName || '',
+      bankIFSCCode: formData.bankIfscCode || '',
+      isEnabled: formData.isEnabled || false,
+      userCourses: formData.courses || [],
+      userAreaOfSpecializations: formData.specializations || [],
+      userQualifications: formData.qualifications || [],
+      userDesignations: formData.designations || [],
+      isActive: formData.isActive || false,
+      createdById: formData.createdById || 0,
+      createdDate: formData.createdDate || '',
+      modifiedById: formData.modifiedById || 0,
+      modifiedDate: formData.modifiedDate || ''
+    };
+    
+    return userObj;
+  }
+
+  getQualification(formData: any): UserQualification {
+   
+    const userQualification: UserQualification = {
+
+      userQualificationId: formData.userQualificationId,
+      userId: formData.userId,
+      title: formData.title,
+      name: formData.name,
+      specialization: formData.specialization,
+      isCompleted: formData.isCompleted,
+      isActive: formData.isActive,
+      createdById: formData.createdById,
+      createdDate: formData.createdDate,
+      modifiedById: formData.modifiedById,
+      modifiedDate: formData.modifiedDate
+    };
+
+    
+
+    return userQualification;
   }
 
   updateUser(userData: any) {
@@ -548,4 +670,8 @@ getDeginationName(Id: number) {
     });
   }
 }
+
+
+
+
 

@@ -5,7 +5,8 @@
       <div class="card">
         <div class="card-body">
           <h6 class="card-title">Edit User Profile</h6>
-          <form [formGroup]="userForm">
+          <div>
+          <form  [formGroup]="userForm">
             <div class="row mb-4">
               <!-- Salutation -->
               <div class="col-sm-4">
@@ -65,21 +66,22 @@
                   <input type="text" formControlname="ugName" class="form-control" />
                 </div>
             
-                <div class="col-sm-4">
-                  <label class="form-label">Specialization</label>
-                  <input type="text" formcontrolname="ugSpecialization" class="form-control" />
+                  <div class="col-sm-4">
+                    <label class="form-label">Specialization</label>
+                    <input type="text" formcontrolname="ugSpecialization" [value]="qualification.specialization" class="form-control" />
+                  </div>
                 </div>
               </div>
               <div *ngIf="qualification.title.includes('PG')">
                 <div class="row mb-4">
                   <div class="col-sm-4">
-                    <label class="form-label">PG</label>
-                    <input type="text" formcontrolname="pgName" class="form-control" />
+                    <label class="form-label">{{qualification.title}}</label>
+                    <input type="text" formcontrolname="pgName" [value]="qualification.name" class="form-control" />
                   </div>
               
                   <div class="col-sm-4">
                     <label class="form-label">Specialization</label>
-                    <input type="text" formcontrolname="pgSpecialization" class="form-control" />
+                    <input type="text" formcontrolname="pgSpecialization" [value]="qualification.specialization" class="form-control" />
                   </div>
                 </div>
               </div>
@@ -87,11 +89,11 @@
                 <!-- PhD Checkbox -->
                 <div class="row mb-4">
                   <div class="col-sm-4 mt-4">
-                    <mat-checkbox formControlName="hasPhd">Have you completed a PhD?</mat-checkbox>
+                    <mat-checkbox formControlName="hasPhd" (click)="OnPhDCheck()">Have you completed a PhD?</mat-checkbox>
                   </div>
-                  <div class="col-sm-4">
+                  <div class="col-sm-4"  *ngIf="qualification.isCompleted">
                     <label class="form-label">Specialization</label>
-                    <input type="text" formcontrolname="phdSpecialization" class="form-control" />
+                    <input type="text" formcontrolname="phdSpecialization" [value]="qualification.specialization" class="form-control" />
                   </div>
                 </div>
               </div>
@@ -208,6 +210,7 @@
             <button type="button" (click)="onSubmit()" class="btn btn-primary" style="float: right;">Submit</button>
           </form>
         </div>
+        </div>
       </div>
     </div>
     <div class="col-md-1"></div>
@@ -244,7 +247,7 @@
     <form [formGroup]="designationForm">
       <div class="mb-3">
         <label>Designation</label>
-        <select class="form-select" formControlName="expDesignation">
+        <select class="form-select" formControlName="expName">
           <option selected disabled>Select Designation</option>
           <option *ngFor="let desig of designations" [value]="desig.designationId">{{ desig.Name }}</option>
         </select>

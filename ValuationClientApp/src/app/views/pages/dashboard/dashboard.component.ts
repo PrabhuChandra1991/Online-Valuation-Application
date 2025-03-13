@@ -18,6 +18,8 @@ import {UserProfile} from '../models/userProfile.model';
 import { UserQualification } from '../models/userQualification';
 import { User } from '../models/user.model';
 import { UserCourse } from '../models/userCourse.model';
+import { SpinnerService } from '../services/spinner.service';
+
 
 const currentDate = new Date().toISOString();
 
@@ -135,7 +137,8 @@ export class DashboardComponent implements OnInit {
     private userService: UserService,
     private toastr: ToastrService,
     private route: ActivatedRoute,
-    private dashboardService: DashboardService
+    private dashboardService: DashboardService,
+    private spinnerService: SpinnerService
   ) {
 
      // Initialize the form with validation
@@ -518,7 +521,10 @@ getDesignationName(Id: number) {
      const newCourse = this.userCourseForm.value;
      if (this.selectedUserCourseIndex !== null) {
        // Edit existing course
-       this.userCourses[this.selectedUserCourseIndex] = newCourse;
+       this.userCourses[this.selectedUserCourseIndex].courseName = newCourse.courseName;
+       this.userCourses[this.selectedUserCourseIndex].degreeTypeId = newCourse.degreeTypeId;
+       this.userCourses[this.selectedUserCourseIndex].numberOfYearsHandled = newCourse.numberOfYearsHandled;
+       this.userCourses[this.selectedUserCourseIndex].isHandledInLast2Semester = newCourse.isHandledInLast2Semester;
      } else {
        // Add new course
        let newCourseObj: UserCourse = {
@@ -581,10 +587,21 @@ getDesignationName(Id: number) {
  
  //#endregion
 
+ onSalutationChange(event: Event) {
+  const selectedValue = (event.target as HTMLSelectElement).value;
+  this.userForm.patchValue({ salutationId: selectedValue });
+}
+
+onGenderChange(event: Event) {
+  const selectedValue = (event.target as HTMLSelectElement).value;
+  this.userForm.patchValue({ genderId: selectedValue });
+}
+
 
 // Submit Form including Specialization & Qualification
   onSubmit() {
     // if (this.userForm.valid) {
+      this.spinnerService.toggleSpinnerState(true);
       const formData = {
         ...this.userForm.value,
         specializations: this.specializations,
@@ -682,11 +699,13 @@ getDesignationName(Id: number) {
     this.userService.updateUser(userData.userId, userData).subscribe({
       next: () => {
         this.toastr.success('User updated successfully!');
+        this.spinnerService.toggleSpinnerState(false);
       },
       error: () => {
         this.toastr.error('Failed to update user. Please try again.');
       },
-      complete: () => { }
+      complete: () => {
+       }
     });
   }
 }

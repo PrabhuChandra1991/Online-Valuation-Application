@@ -55,6 +55,7 @@ namespace SKCE.Examination.API.Controllers.Common
 
             return NoContent();
         }
+        [HttpGet("GetQPTemplateByCourseId/{courseId}")]
         public async Task<ActionResult<QPTemplateVM>> GetQPTemplateByCourseId(long courseId)
         {
             var qpTemplate = await _courseService.GetQPTemplateByCourseId(courseId);

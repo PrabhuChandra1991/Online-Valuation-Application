@@ -17,6 +17,7 @@ import { delay, Observable } from 'rxjs';
 import {UserProfile} from '../models/userProfile.model';
 import { UserQualification } from '../models/userQualification';
 import { User } from '../models/user.model';
+import { UserCourse } from '../models/userCourse.model';
 
 const currentDate = new Date().toISOString();
 
@@ -369,11 +370,11 @@ export class DashboardComponent implements OnInit {
         userAreaOfSpecializationId: 0,
         userId: this.selectedUserId,
         areaOfSpecializationName: this.specializationForm.value.areaOfSpecializationName,
-        isActive: false,
-        createdDate: new Date().toISOString(),  // Current timestamp
-        createdById: 0,
-        modifiedDate: new Date().toISOString(),
-        modifiedById: 0
+        isActive: true,
+        createdDate: currentDate, 
+        createdById: this.selectedUserId,
+        modifiedDate: currentDate,
+        modifiedById: this.selectedUserId
       };
       
       this.specializations.push(newSpecialization);
@@ -429,21 +430,22 @@ saveExperience() {
   if (this.selectedDesignationIndex !== null) {
     debugger;
     // Update the existing Qualification
-    this.designations[this.selectedDesignationIndex] = this.designationForm.value;
+    this.designations[this.selectedDesignationIndex].designationId = this.designationForm.value.expName;
+    this.designations[this.selectedDesignationIndex].experience = this.designationForm.value.experience;
+    this.designations[this.selectedDesignationIndex].isCurrent = this.designationForm.value.isCurrent;
   } else {
     // If no Qualification is selected, add a new one
     let newDesignation: UserDesignation = {
-      userDesignationId: 0,
-      designationId: 0,
+      userDesignationId:0,
+      designationId: this.designationForm.value.expName,
       userId: this.selectedUserId,
-      name: this.designationForm.value.expName,
       experience: this.designationForm.value.experience,
       isCurrent: this.designationForm.value.isCurrent,
-      isActive: false,
-      createdById: 0,
-      createdDate: new Date().toISOString(), // Current date in ISO format
-      modifiedById: 0,
-      modifiedDate: new Date().toISOString(),
+      isActive: true,
+      createdById: this.selectedUserId,
+      createdDate: currentDate,
+      modifiedById: this.selectedUserId,
+      modifiedDate: currentDate
     };
     
     this.designations.push(newDesignation);
@@ -519,7 +521,20 @@ getDesignationName(Id: number) {
        this.userCourses[this.selectedUserCourseIndex] = newCourse;
      } else {
        // Add new course
-       this.userCourses.push(newCourse);
+       let newCourseObj: UserCourse = {
+         userCourseId: 0,
+         userId: this.selectedUserId,
+         courseName: newCourse.courseName,
+         degreeTypeId: newCourse.degreeTypeId,
+         numberOfYearsHandled: newCourse.numberOfYearsHandled,
+         isHandledInLast2Semester: newCourse.isHandledInLast2Semester,
+         isActive: true,
+         createdById: this.selectedUserId,
+         createdDate: currentDate,
+         modifiedById: this.selectedUserId,
+         modifiedDate: currentDate
+       }
+       this.userCourses.push(newCourseObj);
      }
 
      this.modalService.dismissAll(); // Close the modal

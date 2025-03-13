@@ -1,6 +1,8 @@
-﻿namespace SKCE.Examination.Services.ViewModels.Common
+﻿using SKCE.Examination.Models.DbModels.Common;
+
+namespace SKCE.Examination.Services.ViewModels.Common
 {
-    public class QPTemplateVM
+    public class QPTemplateVM:AuditModel
     {
         public long QPTemplateId { get; set; }
         public string QPTemplateName { get; set; }
@@ -20,13 +22,14 @@
         public long Semester { get; set; }
         public long TotalStudentCount { get; set; }
         public long QPTemplateSyallbusDocumentId { get; set; }
+        public List<QPDocumentVM> qpDocumentVMs { get; set; }
         public long QPDocumentId { get; set; }
         public long QPAnswerDocumentId { get; set; }
         public long QPUserDocumentId { get; set; }
         public long QPUserUpdatedDocumentId { get; set; }
         public List<InstitutionDepartmentVM> Institutions { get; set; }
     }
-    public class InstitutionDepartmentVM
+    public class InstitutionDepartmentVM: AuditModel
     {
         public long InstitutionId { get; set; }
         public string InstitutionName { get; set; }
@@ -35,8 +38,9 @@
         public long QPPrintDocumentId { get; set; }
         public long QPAnswerPrintDocumentId { get; set; }
         public List<DepartmentVM> Departments { get; set; }
+        public List<QPDocumentVM> qpDocumentVMs { get; set; }
     }
-    public class DepartmentVM
+    public class DepartmentVM: AuditModel
     {
         public long DepartmentId { get; set; }
         public string DepartmentName { get; set; }
@@ -44,4 +48,14 @@
         public long StudentCount { get; set; }
     }
 
+    public class QPDocumentVM: AuditModel
+    { 
+        public long QPDocumentId { get; set; }
+        public long QPTemplateId { get; set; }
+        public string QPDocumentName { get;set; }
+        public int QPDocumentTypeId { get; set; }
+        public string QPDocumentTypeName { get; set; }
+        public long DocumentId { get; set; }
+
+    }
 }

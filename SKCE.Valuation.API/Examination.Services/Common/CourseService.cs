@@ -46,7 +46,21 @@ namespace SKCE.Examination.Services.Common
                 course.Semester = courseDepartments.First().Semester;
                 course.TotalStudentCount = courseDepartments.Sum(cd => cd.StudentCount);
             }
+            AuditHelper.SetAuditPropertiesForInsert(course, 1);
+            course.qpDocumentVMs = new List<QPDocumentVM>() { 
+            // add QP Template document for Course Syllabus document
+           new QPDocumentVM() { QPDocumentId = 0, DocumentId = 0, QPDocumentName = "", QPDocumentTypeId = 1, QPDocumentTypeName = "Course Syllabus document", QPTemplateId = course.QPTemplateId },
 
+            // add QP Template document for Expert Preview with QP and Answer Generation with  bookmark
+            new QPDocumentVM() { QPDocumentId=0,DocumentId=0,QPDocumentName="",QPDocumentTypeId=2,QPDocumentTypeName="Expert preview document",QPTemplateId=course.QPTemplateId},
+
+            // add QP Template document for Expert use for QP and Answer Generation with  bookmark
+            new QPDocumentVM() { QPDocumentId = 0, DocumentId = 0, QPDocumentName = "", QPDocumentTypeId = 3, QPDocumentTypeName = "Expert QP generation", QPTemplateId = course.QPTemplateId }
+            };
+            foreach (var qpDocumentVM in course.qpDocumentVMs)
+            {
+                AuditHelper.SetAuditPropertiesForInsert(qpDocumentVM, 1);
+            }
             List<long> institutionIds = courseDepartments.Select(cd => cd.InstitutionId).Distinct().ToList();
             var institutions = _context.Institutions.ToList();
             var departments = _context.Departments.ToList();
@@ -74,6 +88,18 @@ namespace SKCE.Examination.Services.Common
                             StudentCount = cd.cd.StudentCount
                         }).ToList();
                     institutionVM.Departments = departmentVMs;
+
+                    institutionVM.qpDocumentVMs = new List<QPDocumentVM>() { 
+                    // add QP Template document for Print with QP With  Tags
+                    new QPDocumentVM() { QPDocumentId = 0, DocumentId = 0, QPDocumentName = "", QPDocumentTypeId = 4, QPDocumentTypeName = "Print preview QP document", QPTemplateId = course.QPTemplateId },
+
+                    // add QP Template document for Print with QP and Answer With Tags
+                    new QPDocumentVM() { QPDocumentId = 0, DocumentId = 0, QPDocumentName = "", QPDocumentTypeId = 5, QPDocumentTypeName = "Print preview QP Answer document", QPTemplateId = course.QPTemplateId }
+                    };
+                    foreach (var qpDocumentVM in institutionVM.qpDocumentVMs)
+                    {
+                        AuditHelper.SetAuditPropertiesForInsert(qpDocumentVM, 1);
+                    }
                     course.Institutions.Add(institutionVM);
                 }
             }

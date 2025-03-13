@@ -1,8 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using SKCE.Examination.API.Model;
+﻿using Microsoft.AspNetCore.Mvc;
 using SKCE.Examination.Models.DbModels.Common;
 using SKCE.Examination.Services.Common;
+using SKCE.Examination.Services.ViewModels.Common;
 
 namespace SKCE.Examination.API.Controllers.Common
 {
@@ -24,7 +23,7 @@ namespace SKCE.Examination.API.Controllers.Common
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Course>> GetCourse(int id)
+        public async Task<ActionResult<CourseVM>> GetCourse(long id)
         {
             var course = await _courseService.GetCourseByIdAsync(id);
             if (course == null) return NotFound();

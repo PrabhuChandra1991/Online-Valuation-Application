@@ -24,7 +24,7 @@ namespace SKCE.Examination.API.Controllers.QPSettings
                 return BadRequest("No file uploaded.");
 
             using var stream = file.OpenReadStream();
-            var importedInfo = await _excelHelper.ImportDataFromExcel(stream);
+            var importedInfo = await _excelHelper.ImportDataFromExcel(stream, file);
 
             return Ok(new { Message = importedInfo });
         }

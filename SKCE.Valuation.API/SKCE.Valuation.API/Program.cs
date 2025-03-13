@@ -5,9 +5,8 @@ using SKCE.Examination.Services.ServiceContracts;
 using SKCE.Examination.Models.DbModels.Common;
 using SKCE.Examination.Services.Helpers;
 using SKCE.Examination.Models.DbModels.QPSettings;
-using System.Net;
-using System.Text.Json.Serialization;
-using static Org.BouncyCastle.Math.EC.ECCurve;
+using SKCE.Examination.Services.AutoMapperProfiles;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,18 +15,6 @@ builder.Services.AddDbContext<ExaminationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddCors();
 
-// Add CORS Policy
-//builder.Services.AddCors(options =>
-//{
-//    options.AddPolicy("AllowSpecificOrigins", policy =>
-//    {
-//        policy.WithOrigins("http://localhost:5088")
-//              .AllowAnyMethod()
-//              .AllowAnyHeader();
-//    });
-//});
-
-
 // Register Services
 builder.Services.AddScoped<LoginServices>();
 builder.Services.AddScoped<EmailService>();
@@ -35,14 +22,11 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ExcelImportHelper>(); // Register helper
 builder.Services.AddScoped<S3Helper>(); // Register helper
 builder.Services.AddScoped<CourseService>();
-builder.Services.AddScoped<DepartmentService>();
-
+//builder.Services.AddAutoMapper(typeof(UserProfile));
+// Add services to the container
+builder.Services.AddScoped<AzureBlobStorageHelper>();
 
 builder.Services.AddHttpContextAccessor();
-// Enable Controllers
-//builder.Services.AddControllers().AddJsonOptions(x =>
-//   x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
-
 builder.Services.AddControllers()
     .AddNewtonsoftJson();
 

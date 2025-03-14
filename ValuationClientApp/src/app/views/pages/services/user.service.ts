@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({
     providedIn: 'root'
@@ -8,7 +9,7 @@ import { Observable } from 'rxjs';
 
 export class UserService {
 
-    private apiUrl = 'http://localhost:5088'; // Update this with your actual API URL
+    private apiUrl = environment.apiURL; // Update this with your actual API URL
 
     private httpOptions = {
         headers: new HttpHeaders({

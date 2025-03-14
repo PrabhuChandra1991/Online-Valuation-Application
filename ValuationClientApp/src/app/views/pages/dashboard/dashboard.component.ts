@@ -1,4 +1,4 @@
-import { Component, OnInit, TemplateRef, viewChild, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, TemplateRef, viewChild, ViewChild } from '@angular/core';
 import { NgbCalendar, NgbDatepickerModule, NgbDateStruct, NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormBuilder, FormGroup, FormArray, Validators, FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { NgApexchartsModule } from 'ng-apexcharts';
@@ -43,7 +43,15 @@ const currentDate = new Date().toISOString();
 
 
 
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit   {
+
+
+  @ViewChild('ugNameInput') ugNameInput!: ElementRef;
+  @ViewChild('ugSpecializationInput') ugSpecializationInput!: ElementRef;
+  @ViewChild('pgNameInput') pgNameInput!: ElementRef;
+  @ViewChild('pgSpecializationInput') pgSpecializationInput!: ElementRef;
+  @ViewChild('phdSpecializationInput') phdSpecializationInput!: ElementRef;
+  @ViewChild('hasPhdInput') hasPhdInput!: ElementRef;
 
   userForm!: FormGroup;
   designationForm!: FormGroup;
@@ -628,18 +636,21 @@ onGenderChange(event: Event) {
      let phdSCourse = this.userQualifications.find(f => f.title.includes('Ph.D'));
 
      if (ugCourse) {
-       ugCourse.name = formData.ugName;
-       ugCourse.specialization = formData.ugSpecialization;
+       ugCourse.name =  this.ugNameInput.nativeElement.value;
+       ugCourse.specialization = this.ugSpecializationInput.nativeElement.value;
      }
 
      if (ugCourse) {
-       pgCourse.name = formData.pgName;
-       pgCourse.specialization = formData.pgSpecialization;
+       pgCourse.name =this.pgNameInput.nativeElement.value;;
+       pgCourse.specialization = this.pgSpecializationInput.nativeElement.value;
      }
 
      if (phdSCourse) {
-      phdSCourse.specialization = formData.phdSpecialization;
+      if(this.phdSpecializationInput?.nativeElement?.value)
+        phdSCourse.specialization = this.phdSpecializationInput.nativeElement.value;
     }
+
+
      
     const userObj: UserProfile = {
 

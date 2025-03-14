@@ -66,13 +66,12 @@
                 <div class="row mb-4">
                 <div class="col-sm-4">
                   <label class="form-label">{{qualification.title}}</label>
-                  <input type="text" formControlname="ugName" [value]="qualification.name" class="form-control" />
+                  <input type="text" id="ugName"  #ugNameInput formControlname="ugName" [value]="qualification.name" class="form-control" />
                   </div>
-              
             
                   <div class="col-sm-4">
                     <label class="form-label">Specialization</label>
-                    <input type="text" formcontrolname="ugSpecialization" [value]="qualification.specialization" class="form-control" />
+                    <input type="text"  #ugSpecializationInput formcontrolname="ugSpecialization" [value]="qualification.specialization" class="form-control" />
                   </div>
                 </div>
                 </div>
@@ -81,12 +80,12 @@
                 <div class="row mb-4">
                   <div class="col-sm-4">
                     <label class="form-label">{{qualification.title}}</label>
-                    <input type="text" formcontrolname="pgName" [value]="qualification.name" class="form-control" />
+                    <input type="text" #pgNameInput formcontrolname="pgName" [value]="qualification.name" class="form-control" />
                   </div>
               
                   <div class="col-sm-4">
                     <label class="form-label">Specialization</label>
-                    <input type="text" formcontrolname="pgSpecialization" [value]="qualification.specialization" class="form-control" />
+                    <input type="text" #pgSpecializationInput formcontrolname="pgSpecialization" [value]="qualification.specialization" class="form-control" />
                   </div>
                 </div>
               </div>
@@ -94,11 +93,11 @@
                 <!-- PhD Checkbox -->
                 <div class="row mb-4">
                   <div class="col-sm-4 mt-4">
-                    <mat-checkbox formControlName="hasPhd" (click)="OnPhDCheck()">Have you completed a PhD?</mat-checkbox>
+                    <mat-checkbox #hasPhdInput formControlName="hasPhd" (click)="OnPhDCheck()">Have you completed a PhD?</mat-checkbox>
                   </div>
                   <div class="col-sm-4"  *ngIf="qualification.isCompleted">
                     <label class="form-label">Specialization</label>
-                    <input type="text" formcontrolname="phdSpecialization" [value]="qualification.specialization" class="form-control" />
+                    <input type="text" #phdSpecializationInput formcontrolname="phdSpecialization" [value]="qualification.specialization" class="form-control" />
                   </div>
                 </div>
               </div>

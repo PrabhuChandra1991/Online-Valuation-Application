@@ -153,7 +153,7 @@ export class UserComponent implements OnInit{
           gender:  '',
           salutation: '',
           mobileNumber:userData.mobileNumber.toString() || '',
-          roleId: 0,
+          roleId: 3,
           totalExperience: 0,
           departmentName: '',
           collegeName: '',
@@ -168,9 +168,9 @@ export class UserComponent implements OnInit{
           userQualifications: [],
           userDesignations:[],
           isActive: true,
-          createdById:  0,
+          createdById:  1,
           createdDate: new Date().toISOString(),
-          modifiedById: 0,
+          modifiedById: 1,
           modifiedDate:''
         };
   

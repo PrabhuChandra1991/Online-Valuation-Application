@@ -2,6 +2,7 @@
 using SKCE.Examination.Models.DbModels.Common;
 using SKCE.Examination.Services.Common;
 using SKCE.Examination.Services.ViewModels.Common;
+using SKCE.Examination.Services.ViewModels.QPSettings;
 
 namespace SKCE.Examination.API.Controllers.Common
 {
@@ -55,12 +56,6 @@ namespace SKCE.Examination.API.Controllers.Common
 
             return NoContent();
         }
-        [HttpGet("GetQPTemplateByCourseId/{courseId}")]
-        public async Task<ActionResult<QPTemplateVM>> GetQPTemplateByCourseId(long courseId)
-        {
-            var qpTemplate = await _courseService.GetQPTemplateByCourseId(courseId);
-            if (qpTemplate == null) return NotFound();
-            return Ok(qpTemplate);
-        }
+        
     }
 }

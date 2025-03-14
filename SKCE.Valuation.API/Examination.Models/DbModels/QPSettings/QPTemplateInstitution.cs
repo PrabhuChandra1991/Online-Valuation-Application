@@ -15,8 +15,12 @@ namespace SKCE.Examination.Models.DbModels.QPSettings
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long QPTemplateInstitutionId { get; set; }
+        
+        [ForeignKey("QPTemplate")]
         public long QPTemplateId { get; set; }
         public long InstitutionId { get; set; }
         public long StudentCount { get; set; }
+        public virtual ICollection<QPTemplateInstitutionDocument> QPTemplateInstitutionDocuments { get; set; } = new List<QPTemplateInstitutionDocument>();
+        public virtual ICollection<QPTemplateInstitutionDepartment> QPTemplateInstitutionDepartments { get; set; } = new List<QPTemplateInstitutionDepartment>();
     }
 }

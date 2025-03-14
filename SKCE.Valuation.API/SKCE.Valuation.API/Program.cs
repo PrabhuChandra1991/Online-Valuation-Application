@@ -216,15 +216,15 @@ void SeedQPTemplateStatusType(ExaminationDbContext context)
     {
         var qpTemplateStatusTypes = new List<QPTemplateStatusType>
         {
-            new QPTemplateStatusType { Name = "QP Not Assigned",Description = "QP Not Assigned"},
-            new QPTemplateStatusType { Name = "QP Allocated",Description = "QP Allocated" },
-            new QPTemplateStatusType { Name = "QP Scrutiny" ,Description = "QP Scrutiny" },
-            new QPTemplateStatusType { Name = "QP Selection",Description = "QP Selection"},
-            new QPTemplateStatusType { Name = "QP Printed" ,Description = "QP Printed" },
-            new QPTemplateStatusType { Name = "QP Allocated" ,Description = "QP Allocated"},
-            new QPTemplateStatusType { Name = "QP Initiated" ,Description = "QP Initiated"},
-            new QPTemplateStatusType { Name = "QP InProgress",Description = "QP InProgress" },
-            new QPTemplateStatusType { Name = "QP Submitted" ,Description ="QP Submitted"}
+            new QPTemplateStatusType { Name = "QP Pending for Allocation"},
+            new QPTemplateStatusType { Name = "QP Allocated" },
+            new QPTemplateStatusType { Name = "QP Pending for Scrutiny" },
+            new QPTemplateStatusType { Name = "QP Scrutinized" },
+            new QPTemplateStatusType { Name = "QP Pending for Selection"},
+            new QPTemplateStatusType { Name = "QP Selected" },
+            new QPTemplateStatusType { Name = "QP Printed" },
+            new QPTemplateStatusType { Name = "QP InProgress" },
+            new QPTemplateStatusType { Name = "QP Submitted"}
         };
 
         foreach (var qpemplateStatusTypes in qpTemplateStatusTypes)

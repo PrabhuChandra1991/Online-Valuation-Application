@@ -1,6 +1,6 @@
 ﻿using SKCE.Examination.Models.DbModels.Common;
 
-namespace SKCE.Examination.Services.ViewModels.Common
+namespace SKCE.Examination.Services.ViewModels.QPSettings
 {
     public class QPTemplateVM:AuditModel
     {

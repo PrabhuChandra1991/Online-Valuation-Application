@@ -49,13 +49,22 @@ namespace SKCE.Examination.Services.Common
             AuditHelper.SetAuditPropertiesForInsert(course, 1);
             course.qpDocumentVMs = new List<QPDocumentVM>() { 
             // add QP Template document for Course Syllabus document
-           new QPDocumentVM() { QPDocumentId = 0, DocumentId = 0, QPDocumentName = "", QPDocumentTypeId = 1, QPDocumentTypeName = "Course Syllabus document", QPTemplateId = course.QPTemplateId },
+           new QPDocumentVM() { QPDocumentId = 0, DocumentId = 0, QPDocumentTypeId = 1, QPDocumentTypeName = "Course Syllabus document", QPTemplateId = course.QPTemplateId ,DocumentUrl=""},
 
             // add QP Template document for Expert Preview with QP and Answer Generation with  bookmark
-            new QPDocumentVM() { QPDocumentId=0,DocumentId=0,QPDocumentName="",QPDocumentTypeId=2,QPDocumentTypeName="Expert preview document",QPTemplateId=course.QPTemplateId},
+            new QPDocumentVM() { QPDocumentId=0,DocumentId=0, QPDocumentTypeId=2,QPDocumentTypeName="Expert preview document",QPTemplateId=course.QPTemplateId,DocumentUrl=""},
 
             // add QP Template document for Expert use for QP and Answer Generation with  bookmark
-            new QPDocumentVM() { QPDocumentId = 0, DocumentId = 0, QPDocumentName = "", QPDocumentTypeId = 3, QPDocumentTypeName = "Expert QP generation", QPTemplateId = course.QPTemplateId }
+            new QPDocumentVM() { QPDocumentId = 0, DocumentId = 0, QPDocumentTypeId = 3, QPDocumentTypeName = "Expert QP generation", QPTemplateId = course.QPTemplateId,DocumentUrl="" },
+            };
+            course.qpUserDocumentVMs = new List<QPDocumentVM>()
+            {
+                //// add QP Template document for download  for Expert for QP and Answer Generation with  bookmark
+                new QPDocumentVM() { QPDocumentId = 0, DocumentId = 0, QPDocumentTypeId = 6, QPDocumentTypeName = "For download for Expert for QP Generation", QPTemplateId = course.QPTemplateId,DocumentUrl="" },
+
+                //// add QP Template document uploaded by Expert for QP and Answer Generation with  bookmark
+                new QPDocumentVM() { QPDocumentId = 0, DocumentId = 0, QPDocumentTypeId = 7, QPDocumentTypeName = "Expert QP uploaded", QPTemplateId = course.QPTemplateId,DocumentUrl="" }
+
             };
             foreach (var qpDocumentVM in course.qpDocumentVMs)
             {
@@ -91,10 +100,10 @@ namespace SKCE.Examination.Services.Common
 
                     institutionVM.qpDocumentVMs = new List<QPDocumentVM>() { 
                     // add QP Template document for Print with QP With  Tags
-                    new QPDocumentVM() { QPDocumentId = 0, DocumentId = 0, QPDocumentName = "", QPDocumentTypeId = 4, QPDocumentTypeName = "Print preview QP document", QPTemplateId = course.QPTemplateId },
+                    new QPDocumentVM() { QPDocumentId = 0, DocumentId = 0,DocumentUrl="", QPDocumentTypeId = 4, QPDocumentTypeName = "Print preview QP document", QPTemplateId = course.QPTemplateId },
 
                     // add QP Template document for Print with QP and Answer With Tags
-                    new QPDocumentVM() { QPDocumentId = 0, DocumentId = 0, QPDocumentName = "", QPDocumentTypeId = 5, QPDocumentTypeName = "Print preview QP Answer document", QPTemplateId = course.QPTemplateId }
+                    new QPDocumentVM() { QPDocumentId = 0, DocumentId = 0,DocumentUrl="", QPDocumentTypeId = 5, QPDocumentTypeName = "Print preview QP Answer document", QPTemplateId = course.QPTemplateId }
                     };
                     foreach (var qpDocumentVM in institutionVM.qpDocumentVMs)
                     {

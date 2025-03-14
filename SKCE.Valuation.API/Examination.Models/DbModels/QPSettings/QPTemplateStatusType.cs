@@ -17,6 +17,5 @@ namespace SKCE.Examination.Models.DbModels.QPSettings
             [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
             public int QPTemplateStatusTypeId { get; set; }
             public required string Name { get; set; }
-            public string? Description { get; set; }
         }
 }

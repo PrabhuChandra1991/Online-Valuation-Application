@@ -9,14 +9,14 @@ using System.Threading.Tasks;
 
 namespace SKCE.Examination.Models.DbModels.QPSettings
 {
-    [Table("UserQPTemplate", Schema = "dbo")]
-    public class UserQPTemplate : AuditModel
+    [Table("QPTemplateInstitution", Schema = "dbo")]
+    public class QPTemplateInstitution:AuditModel
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long UserQPTemplateId { get; set; }
-        public long UserId { get; set; }
+        public long QPTemplateInstitutionId { get; set; }
         public long QPTemplateId { get; set; }
-        public long QPTemplateStatusTypeId { get; set; }
+        public long InstitutionId { get; set; }
+        public long StudentCount { get; set; }
     }
 }

@@ -80,6 +80,11 @@
     <Build Include="Tables\CourseDepartment.sql" />
     <Build Include="Tables\UserQualification.sql" />
     <Build Include="Tables\UserDesignation.sql" />
+    <Build Include="Tables\QPTemplateDocument.sql" />
+    <Build Include="Tables\QPTemplateInstitution.sql" />
+    <Build Include="Tables\QPTemplateInstitutionDocument.sql" />
+    <Build Include="Tables\UserQPTemplateDocument.sql" />
+    <Build Include="Tables\QPTemplateInstitutionDepartment.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="SKCE.Examination.Database.sqlproj.user" />

@@ -4,8 +4,6 @@
 	[UserId] BIGINT NOT NULL,
 	[QPTemplateId] BIGINT NOT NULL,
 	[QPTemplateStatusTypeId] BIGINT NOT NULL,
-	[UserQPDocumentId] BIGINT NOT NULL,
-	[UserQPAnswerDocumentId] BIGINT NOT NULL ,
 	[IsActive] BIGINT NOT NULL,
 	[CreatedDate] DATETIME NOT NULL,
 	[CreatedById] BIGINT NOT NULL,

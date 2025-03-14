@@ -51,7 +51,9 @@ export class DashboardComponent implements OnInit   {
   @ViewChild('pgNameInput') pgNameInput!: ElementRef;
   @ViewChild('pgSpecializationInput') pgSpecializationInput!: ElementRef;
   @ViewChild('phdSpecializationInput') phdSpecializationInput!: ElementRef;
-  @ViewChild('hasPhdInput') hasPhdInput!: ElementRef;
+  @ViewChild('salutation') salutationInput!: ElementRef;
+  @ViewChild('gender') genderInput!: ElementRef;
+  
 
   userForm!: FormGroup;
   designationForm!: FormGroup;
@@ -66,10 +68,12 @@ export class DashboardComponent implements OnInit   {
   qualification : UserQualification;
   Salutation:any;
   selectedUser:User;
+  selectedSalutation:any;
+  selectedGender:any;
   @ViewChild('editSpecializationModal') editSpecializationModal!: TemplateRef<any>;
   @ViewChild('editDesignationModal') editDesignationModal!: TemplateRef<any>;
   @ViewChild('editUserCourseModal') editUserCourseModal!: TemplateRef<any>;
-
+  
   //this should be load from dashboard service 
   salutations = [
     { id: 'Mr.', name: 'Mr.' },
@@ -131,7 +135,7 @@ export class DashboardComponent implements OnInit   {
     designationId: designation.DesignationId,
     userId: this.selectedUserId,
     experience: 0,
-    isCurrent: true
+    isCurrent: false
   }));
 
  
@@ -312,6 +316,10 @@ export class DashboardComponent implements OnInit   {
 
         let salutation = this.salutations.find(f => f.name == selectedUser.salutation);
         let gender = this.genders.find(f => f.name == selectedUser.gender);
+      
+        this.salutationInput.nativeElement.value = salutation?.id;
+        this.genderInput.nativeElement.value = gender?.id;
+        
         console.log('gender',gender);
         console.log("salutation",salutation);
           console.log("user",selectedUser);
@@ -322,8 +330,8 @@ export class DashboardComponent implements OnInit   {
          debugger;
           this.userForm.patchValue({
           
-          salutationId:salutation?.id,
-          genderId:selectedUser.gender,
+          salutationId: salutation?.id,
+          genderId: gender?.id,
           name: selectedUser.name,
           email: selectedUser.email,
           mobileNumber: Number(selectedUser.mobileNumber),
@@ -451,7 +459,7 @@ saveExperience() {
       designationId: this.designationForm.value.expName,
       userId: this.selectedUserId,
       experience: this.designationForm.value.experience,
-      isCurrent: this.designationForm.value.isCurrent,
+      isCurrent: this.designationForm?.value?.isCurrent?this.designationForm?.value?.isCurrent: false,
       isActive: true,
       createdById: this.selectedUserId,
       createdDate: currentDate,

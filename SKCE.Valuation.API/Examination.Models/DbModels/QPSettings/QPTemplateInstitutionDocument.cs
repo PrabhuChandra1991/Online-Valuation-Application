@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SKCE.Examination.Models.DbModels.QPSettings
 {
-    [Table("QPTemplateDocument", Schema = "dbo")]
+    [Table("QPTemplateInstitutionDocument", Schema = "dbo")]
     public class QPTemplateInstitutionDocument:AuditModel
     {
         [Key]

@@ -8,6 +8,8 @@ using SKCE.Examination.Models.DbModels.QPSettings;
 using SKCE.Examination.Services.AutoMapperProfiles;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Azure;
+using SKCE.Examination.Services.MappingProfiles;
+using SKCE.Examination.Services.QPSettings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,10 +22,10 @@ builder.Services.AddCors();
 builder.Services.AddScoped<LoginServices>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<ExcelImportHelper>(); // Register helper
-builder.Services.AddScoped<S3Helper>(); // Register helper
+builder.Services.AddScoped<IQpTemplateService, QpTemplateService>();
+builder.Services.AddScoped<QPDataImportHelper>(); // Register helper
 builder.Services.AddScoped<CourseService>();
-//builder.Services.AddAutoMapper(typeof(UserProfile));
+builder.Services.AddAutoMapper(typeof(QPTemplateMappingProfile));
 // Add services to the container
 builder.Services.AddScoped<AzureBlobStorageHelper>();
 

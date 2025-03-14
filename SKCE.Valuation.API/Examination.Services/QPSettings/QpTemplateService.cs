@@ -57,28 +57,32 @@ namespace SKCE.Examination.Services.QPSettings
             course.DegreeTypeName = _context.DegreeTypes.FirstOrDefault(dt => dt.DegreeTypeId == course.DegreeTypeId)?.Name ?? string.Empty;
 
             AuditHelper.SetAuditPropertiesForInsert(course, 1);
-            course.qpDocumentVMs = new List<QPDocumentVM>() { 
+            course.Documents = new List<QPDocumentVM>() { 
             // add QP Template document for Course Syllabus document
-           new QPDocumentVM() { QPDocumentId = 0, DocumentId = 0, QPDocumentTypeId = 1, QPDocumentTypeName = "Course Syllabus document", QPTemplateId = course.QPTemplateId ,DocumentUrl=""},
+           new QPDocumentVM() { QPDocumentId = 0, DocumentId = 0, DocumentName="", QPDocumentTypeId = 1, QPDocumentTypeName = "Course Syllabus document", QPTemplateId = course.QPTemplateId ,DocumentUrl=""},
 
             // add QP Template document for Expert Preview with QP and Answer Generation with  bookmark
-            new QPDocumentVM() { QPDocumentId=0,DocumentId=0, QPDocumentTypeId=2,QPDocumentTypeName="Expert preview document",QPTemplateId=course.QPTemplateId,DocumentUrl=""},
+            new QPDocumentVM() { QPDocumentId=0,DocumentId=0, DocumentName="", QPDocumentTypeId=2,QPDocumentTypeName="Expert preview document",QPTemplateId=course.QPTemplateId,DocumentUrl=""},
 
             // add QP Template document for Expert use for QP and Answer Generation with  bookmark
-            new QPDocumentVM() { QPDocumentId = 0, DocumentId = 0, QPDocumentTypeId = 3, QPDocumentTypeName = "Expert QP generation", QPTemplateId = course.QPTemplateId,DocumentUrl="" },
+            new QPDocumentVM() { QPDocumentId = 0, DocumentId = 0, DocumentName="", QPDocumentTypeId = 3, QPDocumentTypeName = "Expert QP generation", QPTemplateId = course.QPTemplateId,DocumentUrl="" },
             };
-            course.qpUserDocumentVMs = new List<QPDocumentVM>()
+            course.UserDocuments = new List<QPDocumentVM>()
             {
                 //// add QP Template document for download  for Expert for QP and Answer Generation with  bookmark
-                new QPDocumentVM() { QPDocumentId = 0, DocumentId = 0, QPDocumentTypeId = 6, QPDocumentTypeName = "For download for Expert for QP Generation", QPTemplateId = course.QPTemplateId,DocumentUrl="" },
+                new QPDocumentVM() { QPDocumentId = 0, DocumentId = 0, DocumentName="", QPDocumentTypeId = 6, QPDocumentTypeName = "For download for Expert for QP Generation", QPTemplateId = course.QPTemplateId,DocumentUrl="" },
 
                 //// add QP Template document uploaded by Expert for QP and Answer Generation with  bookmark
-                new QPDocumentVM() { QPDocumentId = 0, DocumentId = 0, QPDocumentTypeId = 7, QPDocumentTypeName = "Expert QP uploaded", QPTemplateId = course.QPTemplateId,DocumentUrl="" }
+                new QPDocumentVM() { QPDocumentId = 0, DocumentId = 0, DocumentName="", QPDocumentTypeId = 7, QPDocumentTypeName = "Expert QP uploaded", QPTemplateId = course.QPTemplateId,DocumentUrl="" }
 
             };
-            foreach (var qpDocumentVM in course.qpDocumentVMs)
+            foreach (var document in course.Documents)
             {
-                AuditHelper.SetAuditPropertiesForInsert(qpDocumentVM, 1);
+                AuditHelper.SetAuditPropertiesForInsert(document, 1);
+            }
+            foreach (var userDocument in course.UserDocuments)
+            {
+                AuditHelper.SetAuditPropertiesForInsert(userDocument, 1);
             }
             List<long> institutionIds = courseDepartments.Select(cd => cd.InstitutionId).Distinct().ToList();
             var institutions = _context.Institutions.ToList();
@@ -106,28 +110,89 @@ namespace SKCE.Examination.Services.QPSettings
                             DepartmentShortName = cd.d.ShortName,
                             StudentCount = cd.cd.StudentCount
                         }).ToList();
+                    
                     institutionVM.Departments = departmentVMs;
+                    foreach (var department in institutionVM.Departments)
+                    {
+                        AuditHelper.SetAuditPropertiesForInsert(department, 1);
+                    }
 
-                    institutionVM.qpDocumentVMs = new List<QPDocumentVM>() { 
+                    institutionVM.Documents = new List<QPDocumentVM>() { 
                     // add QP Template document for Print with QP With  Tags
-                    new QPDocumentVM() { QPDocumentId = 0, DocumentId = 0,DocumentUrl="", QPDocumentTypeId = 4, QPDocumentTypeName = "Print preview QP document", QPTemplateId = course.QPTemplateId },
+                    new QPDocumentVM() { QPDocumentId = 0, DocumentId = 0, DocumentName="",DocumentUrl="", QPDocumentTypeId = 4, QPDocumentTypeName = "Print preview QP document", QPTemplateId = course.QPTemplateId },
 
                     // add QP Template document for Print with QP and Answer With Tags
-                    new QPDocumentVM() { QPDocumentId = 0, DocumentId = 0,DocumentUrl="", QPDocumentTypeId = 5, QPDocumentTypeName = "Print preview QP Answer document", QPTemplateId = course.QPTemplateId }
+                    new QPDocumentVM() { QPDocumentId = 0, DocumentId = 0, DocumentName="",DocumentUrl="", QPDocumentTypeId = 5, QPDocumentTypeName = "Print preview QP Answer document", QPTemplateId = course.QPTemplateId }
                     };
-                    foreach (var qpDocumentVM in institutionVM.qpDocumentVMs)
+                    foreach (var qPDocument in institutionVM.Documents)
                     {
-                        AuditHelper.SetAuditPropertiesForInsert(qpDocumentVM, 1);
+                        AuditHelper.SetAuditPropertiesForInsert(qPDocument, 1);
                     }
+                    AuditHelper.SetAuditPropertiesForInsert(institutionVM, 1);
                     course.Institutions.Add(institutionVM);
                 }
             }
+
             return course;
         }
 
-        public async Task<QPTemplate> CreateQpTemplateAsync(QPTemplateVM viewModel)
+        public async Task<QPTemplate> CreateQpTemplateAsync(QPTemplateVM qPTemplateVM)
         {
-            var qPTemplate = _mapper.Map<QPTemplate>(viewModel);
+            //var qPTemplate = _mapper.Map<QPTemplate>(qPTemplateVM);
+            var qPTemplate = new QPTemplate
+            {
+                QPTemplateName = qPTemplateVM.QPTemplateName,
+                QPCode = qPTemplateVM.QPCode,
+                QPTemplateStatusTypeId = qPTemplateVM.QPTemplateStatusTypeId,
+                CourseId = qPTemplateVM.CourseId,
+                RegulationYear = qPTemplateVM.RegulationYear,
+                BatchYear = qPTemplateVM.BatchYear,
+                DegreeTypeId = qPTemplateVM.DegreeTypeId,
+                ExamYear = qPTemplateVM.ExamYear,
+                ExamMonth = qPTemplateVM.ExamMonth,
+                ExamType = qPTemplateVM.ExamType,
+                Semester = qPTemplateVM.Semester,
+                StudentCount = qPTemplateVM.StudentCount
+            };
+            AuditHelper.SetAuditPropertiesForInsert(qPTemplate, 1);
+            qPTemplateVM.Documents.ForEach(d => qPTemplate.Documents.Add(new QPTemplateDocument
+            {
+                QPDocumentTypeId = d.QPDocumentTypeId,
+                DocumentId = d.DocumentId,
+            }));
+            foreach (var document in qPTemplate.Documents)
+            {
+                AuditHelper.SetAuditPropertiesForInsert(document, 1);
+            }
+
+            qPTemplateVM.Institutions.ForEach(i =>
+            {
+                var institution = new QPTemplateInstitution
+                {
+                    InstitutionId = i.InstitutionId,
+                    StudentCount = i.StudentCount
+                };
+                i.Departments.ForEach(d => institution.Departments.Add(new QPTemplateInstitutionDepartment
+                {
+                    DepartmentId = d.DepartmentId,
+                    StudentCount = d.StudentCount
+                }));
+                i.Documents.ForEach(d => institution.Documents.Add(new QPTemplateInstitutionDocument
+                {
+                    QPDocumentTypeId = d.QPDocumentTypeId,
+                    DocumentId = d.DocumentId
+                }));
+                foreach (var document in institution.Departments)
+                {
+                    AuditHelper.SetAuditPropertiesForInsert(document, 1);
+                }
+                foreach (var document in institution.Documents)
+                {
+                    AuditHelper.SetAuditPropertiesForInsert(document, 1);
+                }
+                AuditHelper.SetAuditPropertiesForInsert(institution, 1);
+                qPTemplate.Institutions.Add(institution);
+            });
             _context.QPTemplates.Add(qPTemplate);
             await _context.SaveChangesAsync();
             return qPTemplate;

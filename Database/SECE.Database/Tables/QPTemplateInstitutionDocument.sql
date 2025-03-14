@@ -1,7 +1,7 @@
 ﻿CREATE TABLE [dbo].[QPTemplateInstitutionDocument]
 (
-	[QPTemplateInstitutionDocumentId] INT NOT NULL PRIMARY KEY IDENTITY(1,1),
-	[QPTemplateInstitutionId] INT NOT NULL,
+	[QPTemplateInstitutionDocumentId] BIGINT NOT NULL PRIMARY KEY IDENTITY(1,1),
+	[QPTemplateInstitutionId] BIGINT NOT NULL FOREIGN KEY (QPTemplateInstitutionId) REFERENCES [QPTemplateInstitution](QPTemplateInstitutionId),
 	[QPDocumentTypeId] BIGINT NOT NULL,
 	[DocumentId] BIGINT NOT NULL,
 	[IsActive] BIT DEFAULT 1,

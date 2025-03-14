@@ -21,10 +21,10 @@ namespace SKCE.Examination.Services.ViewModels.QPSettings
         public string ExamType { get; set; }
         public long Semester { get; set; }
         public long StudentCount { get; set; }
-        public List<QPDocumentVM> qpDocumentVMs { get; set; }
+        public List<QPDocumentVM> Documents { get; set; }
         public List<InstitutionDepartmentVM> Institutions { get; set; }
         public long UserId { get; set; }
-        public List<QPDocumentVM> qpUserDocumentVMs { get; set; }
+        public List<QPDocumentVM> UserDocuments { get; set; }
     }
     public class InstitutionDepartmentVM: AuditModel
     {
@@ -33,7 +33,7 @@ namespace SKCE.Examination.Services.ViewModels.QPSettings
         public string InstitutionCode { get; set; }
         public long StudentCount { get; set; }
         public List<DepartmentVM> Departments { get; set; }
-        public List<QPDocumentVM> qpDocumentVMs { get; set; }
+        public List<QPDocumentVM> Documents { get; set; }
     }
     public class DepartmentVM: AuditModel
     {

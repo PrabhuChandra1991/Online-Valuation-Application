@@ -15,7 +15,7 @@ namespace SKCE.Examination.Models.DbModels.QPSettings
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long QPTemplateId { get; set; }
-        public required string Name { get; set; }
+        public required string QPTemplateName { get; set; }
         public string QPCode { get; set; }
         public long QPTemplateStatusTypeId { get; set; }
         public long CourseId { get; set; }
@@ -28,9 +28,9 @@ namespace SKCE.Examination.Models.DbModels.QPSettings
         public required long Semester { get; set; }
         public required long StudentCount { get; set; }
 
-        public virtual ICollection<QPTemplateDocument> QPTemplateDocuments { get; set; } = new List<QPTemplateDocument>();
+        public virtual ICollection<QPTemplateDocument> Documents { get; set; } = new List<QPTemplateDocument>();
 
-        public virtual ICollection<QPTemplateInstitution> QPTemplateInstitutions { get; set; } = new List<QPTemplateInstitution>();
+        public virtual ICollection<QPTemplateInstitution> Institutions { get; set; } = new List<QPTemplateInstitution>();
 
     }
 }

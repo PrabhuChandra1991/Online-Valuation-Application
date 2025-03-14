@@ -10,17 +10,17 @@ using Microsoft.EntityFrameworkCore;
 using SKCE.Examination.Models.DbModels.Common;
 using SKCE.Examination.Services.Helpers;
 
-public class ExcelImportHelper
+public class QPDataImportHelper
 {
     private readonly ExaminationDbContext _dbContext;
     private readonly AzureBlobStorageHelper _azureBlobStorageHelper;
-    public ExcelImportHelper(ExaminationDbContext dbContext, AzureBlobStorageHelper azureBlobStorageHelper)
+    public QPDataImportHelper(ExaminationDbContext dbContext, AzureBlobStorageHelper azureBlobStorageHelper)
     {
         _dbContext = dbContext;
         _azureBlobStorageHelper = azureBlobStorageHelper;
     }
 
-    public async Task<string> ImportDataFromExcel(Stream excelStream, IFormFile file)
+    public async Task<string> ImportQPDataByExcel(Stream excelStream, IFormFile file)
     {
         try
         {

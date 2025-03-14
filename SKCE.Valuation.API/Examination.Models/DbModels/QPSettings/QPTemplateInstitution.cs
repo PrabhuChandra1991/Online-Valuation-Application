@@ -20,7 +20,7 @@ namespace SKCE.Examination.Models.DbModels.QPSettings
         public long QPTemplateId { get; set; }
         public long InstitutionId { get; set; }
         public long StudentCount { get; set; }
-        public virtual ICollection<QPTemplateInstitutionDocument> QPTemplateInstitutionDocuments { get; set; } = new List<QPTemplateInstitutionDocument>();
-        public virtual ICollection<QPTemplateInstitutionDepartment> QPTemplateInstitutionDepartments { get; set; } = new List<QPTemplateInstitutionDepartment>();
+        public virtual ICollection<QPTemplateInstitutionDocument> Documents { get; set; } = new List<QPTemplateInstitutionDocument>();
+        public virtual ICollection<QPTemplateInstitutionDepartment> Departments { get; set; } = new List<QPTemplateInstitutionDepartment>();
     }
 }

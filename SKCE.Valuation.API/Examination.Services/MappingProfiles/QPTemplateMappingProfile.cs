@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Aspose.Words.Saving;
+using AutoMapper;
 using SKCE.Examination.Models.DbModels.QPSettings;
 using SKCE.Examination.Services.ViewModels.QPSettings;
 using System;
@@ -9,9 +10,9 @@ using System.Threading.Tasks;
 
 namespace SKCE.Examination.Services.MappingProfiles
 {
-    public class MappingProfile : Profile
+    public class QPTemplateMappingProfile : Profile
     {
-        public MappingProfile()
+        public QPTemplateMappingProfile()
         {
             CreateMap<QPTemplateVM, QPTemplate>()
                 .ForMember(dest => dest.QPTemplateId, opt => opt.Ignore()) // Ignore Id for entity auto-generation

@@ -52,7 +52,7 @@ onFileChange(event:any) {
         formData.append('file', fileSourceValue);
     }
        
-    this.http.post('http://localhost:5088/api/Excel/importCourseDetailsBySyllabus', formData)
+    this.http.post('http://localhost:5088/api/QPDataImport/importQPDataByExcel', formData)
       .subscribe(res => {
         this.masterForm.reset();
         this.toastr.success((res as any)?.message?.toString());

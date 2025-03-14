@@ -14,6 +14,8 @@ import { User  } from '../../models/user.model';
 import { ToastrService } from 'ngx-toastr';
 import {MatButtonModule} from '@angular/material/button';
 import { Router } from '@angular/router';
+import { UserProfile } from '../../models/userProfile.model';
+import { SpinnerService } from '../../services/spinner.service';
 
 @Component({
   selector: 'app-user',
@@ -50,7 +52,11 @@ export class UserComponent implements OnInit{
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  constructor(private userService: UserService,private modalService: NgbModal, private toastr: ToastrService,private router: Router) {}
+  constructor(private userService: UserService,
+    private modalService: NgbModal, 
+    private toastr: ToastrService,
+    private router: Router,
+    private spinnerService: SpinnerService) {}
 
   ngOnInit() {
     this.loadUsers();
@@ -137,38 +143,44 @@ export class UserComponent implements OnInit{
 
   createUser(userData: any) {
 
+    this.spinnerService.toggleSpinnerState(true);
     this.isSubmitting = true;
-    const newUser: User = {
-      isActive: true,
-      createdById: 0,
-      createdDate: new Date().toISOString(),
-      modifiedById: 0,
-      modifiedDate: new Date().toISOString(),
-      id: 0,
-      name: userData.name,
-      email: userData.email,
-      mobileNumber: userData.mobileNumber.toString(),
-      roleId: 0,
-      totalExperience: userData.totalExperience,
-      departmentId: 0,
-      userDesignations: [],
-      collegeName: userData.collegeName,
-      bankAccountName: "",
-      bankAccountNumber: "",
-      bankName: "",
-      bankBranchName: "",
-      isEnabled: true,
-      userQualifications: [],
-      userAreaOfSpecializations: [],
-      userCourses: [],
-      bankIFSCCode: ""
-    };
-
-    this.userService.addUser(newUser).subscribe({
+    const userObj: UserProfile = {
+    
+          userId: 0,
+          name: userData.name || '',
+          email: userData.email || '',
+          gender:  '',
+          salutation: '',
+          mobileNumber:userData.mobileNumber.toString() || '',
+          roleId: 0,
+          totalExperience: 0,
+          departmentName: '',
+          collegeName: '',
+          bankAccountName: '',
+          bankName : '',
+          bankAccountNumber: '',
+          bankBranchName: '',
+          bankIFSCCode: '',
+          isEnabled: true,
+          userCourses: [],
+          userAreaOfSpecializations: [],
+          userQualifications: [],
+          userDesignations:[],
+          isActive: true,
+          createdById:  0,
+          createdDate: new Date().toISOString(),
+          modifiedById: 0,
+          modifiedDate:''
+        };
+  
+        console.log('userObj', JSON.stringify(userObj));
+    this.userService.addUser(userObj).subscribe({
       next: () => {
         this.toastr.success('User added successfully!');
         this.loadUsers();
         this.modalRef.close();
+        this.spinnerService.toggleSpinnerState(false);
       },
       error: () => {
         this.toastr.error('Failed to add user. Please try again.');

@@ -47,7 +47,7 @@ namespace SKCE.Examination.Services.Helpers
                     Url = $"https://{_bucketName}.s3.amazonaws.com/{key}"
                 };
 
-                _context.DocumentDetails.Add(document);
+                _context.Documents.Add(document);
                 await _context.SaveChangesAsync();
 
                 return document.DocumentId; // Return the generated Document ID
@@ -66,7 +66,7 @@ namespace SKCE.Examination.Services.Helpers
         {
             try
             {
-                var document = await _context.DocumentDetails.FindAsync(documentId);
+                var document = await _context.Documents.FindAsync(documentId);
                 if (document == null)
                     return (null, null);
 

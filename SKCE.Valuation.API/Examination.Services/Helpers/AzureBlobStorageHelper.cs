@@ -41,7 +41,7 @@ namespace SKCE.Examination.Services.Helpers
                 Url = blobClient.Uri.ToString()
             };
             AuditHelper.SetAuditPropertiesForInsert(document,1);
-            _context.DocumentDetails.Add(document);
+            _context.Documents.Add(document);
             await _context.SaveChangesAsync();
 
             return document.DocumentId; // Return the generated Document ID
@@ -52,7 +52,7 @@ namespace SKCE.Examination.Services.Helpers
         /// </summary>
         public async Task<(Stream?, string?)> DownloadFileAsync(long documentId)
         {
-            var document = await _context.DocumentDetails.FindAsync(documentId);
+            var document = await _context.Documents.FindAsync(documentId);
             if (document == null)
                 return (null, null);
 

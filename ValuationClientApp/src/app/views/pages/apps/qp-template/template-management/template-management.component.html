@@ -110,12 +110,13 @@
         <div class="row">
           <div class="col-md-6">
             <div class="mb-3">
-              <label for="exampleFormControlSelect1"
+              <label for="course"
                 class="form-label">Course</label>
-              <select class="form-select" id="exampleFormControlSelect1">
+              <select class="form-select" id="course" (change)="onCourseChange($event)">
                 <option selected disabled>Select Course</option>
-                <option>23MA101 - MATHEMATICS I</option>
-                <option>23EE113 - FUNDAMENTALS OF ELECTRICAL AND ELECTRONICS ENGINEERING</option>
+                <option *ngFor="let course of courses" [value]="course.courseId">
+                  {{ course.name }}
+                </option>
               </select>
             </div>
           </div><!-- Col -->

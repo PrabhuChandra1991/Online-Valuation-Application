@@ -42,7 +42,7 @@ export default [
     },
     {
         path: 'qptemplate',
-        loadComponent: () => import('./qp-template/template-list/template-list.component').then(c => c.TemplateListComponent),
+        loadComponent: () => import('./qp-template/template-management/template-management.component').then(c => c.TemplateManagemenComponent),
         canActivate:[authGuard]
     },
     {

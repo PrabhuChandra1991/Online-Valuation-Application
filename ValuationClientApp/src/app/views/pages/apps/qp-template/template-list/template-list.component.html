@@ -3,109 +3,7 @@
       <div class="col-md-12">
         <!-- Button trigger lg modal -->
         <button class="btn btn-primary me-1" (click)="openLgModal(lgModal)">Create Template</button>
-        <!-- Lg Modal -->
-        <ng-template #lgModal let-modal>
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Create Template</h5>
-            <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <form>
-              <div class="row">
-                <div class="col-md-6">
-                  <div class="mb-3">
-                    <label for="exampleFormControlSelect1"
-                      class="form-label">Programme</label>
-                    <select class="form-select" id="exampleFormControlSelect1">
-                      <option selected disabled>Select Programme</option>
-                      <option>UG</option>
-                      <option>PG</option>
-                    </select>
-                  </div>
-                </div><!-- Col -->
-                <div class="col-sm-4">
-                  <div class="mb-3">
-                    <label for="exampleFormControlSelect1"
-                      class="form-label">Semester</label>
-                    <select class="form-select" id="exampleFormControlSelect1">
-                      <option selected disabled>Select Semester </option>
-                      <option>Semester 1</option>
-                      <option>Semester 2</option>
-                      <option>Semester 3</option>
-                      <option>Semester 4</option>
-                      <option>Semester 5</option>
-                      <option>Semester 6</option>
-                    </select>
-                  </div>
-                </div><!-- Col -->
-                <div class="col-sm-4">
-                  <div class="mb-3">
-                    <label for="exampleFormControlSelect1"
-                      class="form-label">Course Code</label>
-                    <select class="form-select" id="exampleFormControlSelect1">
-                      <option selected disabled>Select Course Code</option>
-                      <option>CS</option>
-                      <option>BCA</option>
-                      <option>Bsc IT</option>
-                    </select>
-                  </div>
-                </div><!-- Col -->
-              </div><!-- Row -->
-              <div class="row">
-                <div class="col-sm-4">
-                  <div class="mb-3">
-                    <label for="exampleFormControlSelect1"
-                      class="form-label">Course Title</label>
-                    <select class="form-select" id="exampleFormControlSelect1">
-                      <option selected disabled>Select Course Title </option>
-                      <option>Course Title 1</option>
-                      <option>Course Title 2</option>
-                      <option>Course Title 3</option>
-                      <option>Course Title 4</option>
-                      <option>Course Title 5</option>
-                    </select>
-                  </div>
-                </div><!-- Col -->
-                <div class="col-sm-4">
-                  <div class="mb-3">
-                    <label for="exampleInputPlaceholder" class="form-label">Month
-                    </label>
-                    <input type="month" class="form-control"
-                      id="exampleInputPlaceholder" placeholder="Enter Month">
-                  </div>
-                </div><!-- Col -->
-                <div class="col-sm-4">
-                  <div class="mb-3">
-                    <label for="exampleInputPlaceholder" class="form-label">Year
-                    </label>
-                    <input type="month" class="form-control"
-                      id="exampleInputPlaceholder" placeholder="Enter Month">
-                  </div><!-- Col -->
-                </div>
-              </div>
-  
-              <!-- Row -->
-              <div class="row">
-                <div class="col-sm-6">
-                  <div class="mb-3">
-                    <label class="form-label" for="formFile">QP Template </label>
-                    <input class="form-control" type="file" id="formFile">
-                  </div>
-                </div>
-                <div class="col-sm-6">
-                  <div class="mb-3">
-                    <label class="form-label" for="formFile">Answer QP</label>
-                    <input class="form-control" type="file" id="formFile">
-                  </div>
-                </div>
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" (click)="modal.close('by: close button')">Close</button>
-            <button type="button" class="btn btn-primary" (click)="modal.close('by: save button')">Save changes</button>
-          </div>
-        </ng-template>
+       
       </div>
     
       <div class="row mt-5">
@@ -113,10 +11,6 @@
           <div class="card">
             <div class="card-body">
               <h4 class="card-title">Templates</h4>
-  
-  
-  
-      
               <div class="table-responsive">
                 <table class="table table-striped">
                   <thead>
@@ -204,6 +98,222 @@
       </div>
     </div>
   </div>
-  
+
+   <!-- Lg Modal -->
+   <ng-template #lgModal let-modal>
+    <div class="modal-header">
+      <h5 class="modal-title" id="exampleModalLabel">Create Template</h5>
+      <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+      <form>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label for="exampleFormControlSelect1"
+                class="form-label">Course</label>
+              <select class="form-select" id="exampleFormControlSelect1">
+                <option selected disabled>Select Course</option>
+                <option>23MA101 - MATHEMATICS I</option>
+                <option>23EE113 - FUNDAMENTALS OF ELECTRICAL AND ELECTRONICS ENGINEERING</option>
+              </select>
+            </div>
+          </div><!-- Col -->
+          <div class="col-sm-6">
+            <div class="mb-4">
+              <label for="exampleFormControlSelect1"
+                class="form-label">Template Name</label>
+              <input type="text" class="form-control"/>
+            </div>
+          </div><!-- Col -->
+        
+        </div><!-- Row -->
+
+        <div class="row">
+          <div class="col-sm-4">
+            <div class="mb-3">
+              <label for="exampleFormControlSelect1"
+                class="form-label">Degree Type</label>
+                <input type="text" class="form-control" value="UG"/>
+            </div>
+          </div><!-- Col -->
+          <div class="col-sm-4">
+            <div class="mb-3">
+              <label for="exampleFormControlSelect1"
+                class="form-label">Requlation Year</label>
+                <input type="month" class="form-control"
+                id="exampleInputPlaceholder" placeholder="Enter Regulation Year">
+            </div>
+          </div><!-- Col -->
+          <div class="col-sm-4">
+            <div class="mb-3">
+              <label for="exampleInputPlaceholder" class="form-label">Batch Year
+              </label>
+              <input type="month" class="form-control"
+                id="exampleInputPlaceholder" placeholder="Enter Batch Year">
+            </div>
+          </div><!-- Col -->
+        </div><!-- Row -->
+        
+        <div class="row">
+          <div class="col-sm-4">
+            <div class="mb-3">
+              <label for="exampleFormControlSelect1"
+                class="form-label">Exam Year</label>
+                <input type="year" class="form-control" value="" readonly/>
+            </div>
+          </div><!-- Col -->
+          <div class="col-sm-4">
+            <div class="mb-3">
+              <label for="exampleFormControlSelect1"
+                class="form-label">Exam Month</label>
+                <input type="month" class="form-control"
+                id="exampleInputPlaceholder" placeholder="Enter Exam Month" readonly>
+            </div>
+          </div><!-- Col -->
+          <div class="col-sm-4">
+            <div class="mb-3">
+              <label for="exampleInputPlaceholder" class="form-label">Exam Type
+              </label>
+              <input type="text" class="form-control"
+                id="exampleInputPlaceholder" placeholder="" readonly>
+            </div>
+          </div><!-- Col -->
+        </div><!-- Row -->
+
+        <div class="row">
+          <div class="col-sm-4">
+            <div class="mb-3">
+              <label for="exampleFormControlSelect1"
+                class="form-label">Semester</label>
+                <input type="text" class="form-control" value="" readonly/>
+            </div>
+          </div><!-- Col -->
+          <div class="col-sm-4">
+            <div class="mb-3">
+              <label for="exampleFormControlSelect1"
+                class="form-label">Students Count</label>
+                <input type="text" class="form-control"
+                id="exampleInputPlaceholder" placeholder="" readonly>
+            </div>
+          </div><!-- Col -->          
+        </div><!-- Row -->
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="mb-3">
+              <label class="form-label" for="formFile">Course Syllabus document </label>
+              <input class="form-control" type="file" id="formFile">
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="mb-3">
+              <label class="form-label" for="formFile">Expert preview document</label>
+              <input class="form-control" type="file" id="formFile">
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="mb-3">
+              <label class="form-label" for="formFile">Expert QP generation </label>
+              <input class="form-control" type="file" id="formFile">
+            </div>
+          </div>
+          
+        </div>
+        <!-- <div class="row">
+          <div class="div col-sm-6">
+            <div class="div mb-4">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Document Type</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr >
+                    <td>Course Syllabus document</td>
+                    <td> Download</td>                                       
+                  </tr>
+                  <tr >
+                    <td>Expert preview document</td>
+                    <td> Download</td>                                       
+                  </tr>
+                  <tr >
+                    <td>Expert QP generation</td>
+                    <td>Download</td>                                       
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div> -->
+        <div class="row">
+          <div class="col-sm-4">
+            <div class="mb-3">
+              <label for="exampleFormControlSelect1"
+                class="form-label">Institution Name</label>
+                <input type="text" class="form-control" value="7278 - 7278" readonly/>
+            </div>
+          </div><!-- Col -->
+          <div class="col-sm-4">
+            <div class="mb-3">
+              <label for="exampleFormControlSelect1"
+                class="form-label">Students Count</label>
+                <input type="text" class="form-control"
+                id="exampleInputPlaceholder" placeholder="" value="1717" readonly>
+            </div>
+          </div><!-- Col -->          
+        </div><!-- Row -->
+        <div class="row">
+          <div class="div col-sm-6">
+            <div class="div mb-4">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Department Name</th>
+                    <th>Short Code</th>
+                    <th>Student Count</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr >
+                    <td>B.E- MECHANICAL ENGINEERING</td>
+                    <td> B.E- MECH</td>    
+                    <td> 138</td>                                    
+                  </tr>
+                  <tr >
+                    <td>B.E- ELECTRONICS AND COMMUNICATION ENGINEERING</td>
+                    <td> B.E- EC</td> 
+                    <td>248</td>
+                  </tr>
+                  
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="mb-3">
+              <label class="form-label" for="formFile">Print preview QP document </label>
+              <input class="form-control" type="file" id="formFile">
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="mb-3">
+              <label class="form-label" for="formFile">Print preview QP Answer document</label>
+              <input class="form-control" type="file" id="formFile">
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="modal.close('by: close button')">Close</button>
+      <button type="button" class="btn btn-primary" (click)="modal.close('by: save button')">Save changes</button>
+    </div>
+  </ng-template>
   
   

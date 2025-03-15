@@ -28,34 +28,54 @@
             
               <!-- Name -->
               <div class="col-sm-4">
-                <label class="form-label">Name</label>
+                <label class="form-label">Name <span class="text-danger">*</span></label>
                 <input type="text" class="form-control"  formControlName="name" />
+                <span class="text-danger"
+                    *ngIf="(userForm.controls.name.touched) && userForm.controls.name.errors?.required">
+                    Name is required
+                </span>
               </div>
             </div>
             
             <!-- College Info -->
             <div class="row mb-4">
               <div class="col-sm-4">
-                <label class="form-label">College Name</label>
+                <label class="form-label">College Name <span class="text-danger">*</span></label>
                 <input type="text" class="form-control" formControlName="collegeName" />
+                <span class="text-danger"
+                    *ngIf="(userForm.controls.collegeName.touched) && userForm.controls.collegeName.errors?.required">
+                    College Name is required
+                </span>
               </div>
             
               <div class="col-sm-4">
-                <label class="form-label">Email Address</label>
+                <label class="form-label">Email Address <span class="text-danger">*</span></label>
                 <input type="text" formControlName="email" class="form-control" />
+                <span class="text-danger"
+                    *ngIf="(userForm.controls.email.touched) && userForm.controls.email.errors?.required">
+                    Email is required
+                </span>
               </div>
             
               <div class="col-sm-4">
-                <label class="form-label">Mobile Number</label>
+                <label class="form-label">Mobile Number <span class="text-danger">*</span></label>
                 <input type="text"  formControlName="mobileNumber" class="form-control" />
+                <span class="text-danger"
+                    *ngIf="(userForm.controls.mobileNumber.touched) && userForm.controls.mobileNumber.errors?.required">
+                    Mobile Number is required
+                </span>
               </div>
             </div>
             
             <!-- Department and Academic Info -->
             <div class="row mb-4">
               <div class="col-sm-6">
-                <label class="form-label">Department</label>
-                <input type="text" formControlName="departmentName" class="form-control"  />
+                <label class="form-label">Department <span class="text-danger">*</span></label>
+                <input type="text" formControlName="department" class="form-control"  />
+                <span class="text-danger"
+                    *ngIf="(userForm.controls.department.touched) && userForm.controls.department.errors?.required">
+                    Department is required
+                </span>
               </div>
             </div>
             <h6 class="mt-4 mb-2">Qualification
@@ -194,29 +214,52 @@
               </tbody>
             </table>
             <div mt-1>
+              <h6 class="mt-4 mb-2">Bank Account Details
+                   
+              </h6>
             <div class="row mb-4 mt-5">
               <div class="col-sm-4">
-                <label class="form-label">Bank Account Name</label>
+                <label class="form-label">Bank Account Name <span class="text-danger">*</span></label>
                 <input type="text" class="form-control" formControlName="bankAccountName" />
+                <span class="text-danger"
+                    *ngIf="(userForm.controls.bankAccountName.touched) && userForm.controls.bankAccountName.errors?.required">
+                    Bank Account Name is required
+                </span>
               </div>
               <div class="col-sm-4">
-                <label class="form-label">Bank Account Number</label>
+                <label class="form-label">Bank Account Number <span class="text-danger">*</span></label>
                 <input type="text" class="form-control" formControlName="bankAccountNumber" />
+                <span class="text-danger"
+                    *ngIf="(userForm.controls.bankAccountNumber.touched) && userForm.controls.bankAccountNumber.errors?.required">
+                    Bank Account Number is required
+                </span>
               </div>
               <div class="col-sm-4">
-                <label class="form-label">Bank Name</label>
+                <label class="form-label">Bank Name <span class="text-danger">*</span></label>
                 <input type="text" class="form-control" formControlName="bankName" />
+                <span class="text-danger"
+                    *ngIf="(userForm.controls.bankName.touched) && userForm.controls.bankName.errors?.required">
+                    Bank Name is required
+                </span>
               </div>
             </div>
           </div>
             <div class="row mb-4">
               <div class="col-sm-4">
-                <label class="form-label">Bank Branch Name</label>
+                <label class="form-label">Bank Branch Name <span class="text-danger">*</span></label>
                 <input type="text" class="form-control" formControlName="bankBranchName" />
+                <span class="text-danger"
+                    *ngIf="(userForm.controls.bankBranchName.touched) && userForm.controls.bankBranchName.errors?.required">
+                    Bank Branch Name is required
+                </span>
               </div>
               <div class="col-sm-4">
-                <label class="form-label">Bank IFSC Code</label>
+                <label class="form-label">Bank IFSC Code <span class="text-danger">*</span></label>
                 <input type="text" class="form-control" formControlName="bankIFSCCode" />
+                <span class="text-danger"
+                    *ngIf="(userForm.controls.bankIFSCCode.touched) && userForm.controls.bankIFSCCode.errors?.required">
+                    Bank IFSC is required
+                </span>
               </div>
             </div>
             <button type="button" (click)="onSubmit()" class="btn btn-primary" style="float: right;">Submit</button>
@@ -238,7 +281,7 @@
   <div class="modal-body">
     <form [formGroup]="specializationForm">
       <div class="mb-3">
-        <label>Area of Specialization</label>
+        <label>Area of Specialization <span class="text-danger">*</span></label>
         <input type="text" class="form-control" formControlName="areaOfSpecializationName" />
       </div>
     </form>
@@ -260,12 +303,12 @@
       <div class="mb-3">
         <label>Designation</label>
         <select class="form-select" formControlName="expName">
-          <option selected disabled>Select Designation</option>
+          <option selected disabled>Select Designation <span class="text-danger">*</span></option>
           <option *ngFor="let desig of designationTypes" [value]="desig.DesignationId">{{ desig.Name }}</option>
         </select>
       </div>
       <div class="mb-3">
-        <label>Experience</label>
+        <label>Experience <span class="text-danger">*</span></label>
         <input type="number" class="form-control" formControlName="experience" />
       </div>
       <div class="mb-3">
@@ -288,17 +331,17 @@
   <div class="modal-body">
     <form [formGroup]="userCourseForm">
       <div class="mb-3">
-        <label>Course Name</label>
+        <label>Course Name <span class="text-danger">*</span></label>
         <input type="text" class="form-control" formControlName="courseName" />
       </div>
       <div class="mb-3">
-        <label>Degree Type</label>
+        <label>Degree Type <span class="text-danger">*</span></label>
         <select formControlName="degreeTypeId" class="form-select">
           <option *ngFor="let degree of degreeTypes" [value]="degree.DegreeTypeId">{{ degree.Name }}</option>
         </select>
       </div>
       <div class="mb-3">
-        <label>Years Handled</label>
+        <label>Years Handled <span class="text-danger">*</span></label>
         <input type="number" class="form-control" formControlName="numberOfYearsHandled" />
       </div>
       <div class="mb-3">

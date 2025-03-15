@@ -549,7 +549,7 @@ getDesignationName(Id: number) {
          courseName: newCourse.courseName,
          degreeTypeId: newCourse.degreeTypeId,
          numberOfYearsHandled: newCourse.numberOfYearsHandled,
-         isHandledInLast2Semester: newCourse.isHandledInLast2Semester,
+         isHandledInLast2Semester: newCourse.isHandledInLast2Semester?newCourse.isHandledInLast2Semester:false ,
          isActive: true,
          createdById: this.selectedUserId,
          createdDate: currentDate,

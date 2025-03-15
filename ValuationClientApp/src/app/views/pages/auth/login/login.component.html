@@ -56,7 +56,7 @@
                   </div>
                 </div> -->
                 <div>
-                  <button [disabled]="actorForm.invalid" (click)="requestPassword()" type="submit" *ngIf="!isOTPRequested"
+                  <button (click)="requestPassword()" type="submit" *ngIf="!isOTPRequested"
                     class="btn btn-primary me-2 mb-2 mb-md-0 mx-7"
                     >Request Password</button>
                     <button (click)="login()" type="submit" *ngIf="isOTPRequested"

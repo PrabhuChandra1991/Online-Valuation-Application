@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.Bibliography;
 using Microsoft.EntityFrameworkCore;
 using SKCE.Examination.Models.DbModels.Common;
 using SKCE.Examination.Models.DbModels.QPSettings;
@@ -159,6 +160,7 @@ namespace SKCE.Examination.Services.QPSettings
             {
                 QPDocumentTypeId = d.QPDocumentTypeId,
                 DocumentId = d.DocumentId,
+                QPTemplateId = qPTemplate.QPTemplateId
             }));
             foreach (var document in qPTemplate.Documents)
             {
@@ -170,17 +172,20 @@ namespace SKCE.Examination.Services.QPSettings
                 var institution = new QPTemplateInstitution
                 {
                     InstitutionId = i.InstitutionId,
-                    StudentCount = i.StudentCount
+                    StudentCount = i.StudentCount,
+                    QPTemplateId= qPTemplate.QPTemplateId
                 };
                 i.Departments.ForEach(d => institution.Departments.Add(new QPTemplateInstitutionDepartment
                 {
                     DepartmentId = d.DepartmentId,
-                    StudentCount = d.StudentCount
+                    StudentCount = d.StudentCount,
+                    QPTemplateInstitutionId= institution.QPTemplateInstitutionId
                 }));
                 i.Documents.ForEach(d => institution.Documents.Add(new QPTemplateInstitutionDocument
                 {
                     QPDocumentTypeId = d.QPDocumentTypeId,
-                    DocumentId = d.DocumentId
+                    DocumentId = d.DocumentId,
+                    QPTemplateInstitutionId = institution.QPTemplateInstitutionId
                 }));
                 foreach (var document in institution.Departments)
                 {
@@ -191,6 +196,7 @@ namespace SKCE.Examination.Services.QPSettings
                     AuditHelper.SetAuditPropertiesForInsert(document, 1);
                 }
                 AuditHelper.SetAuditPropertiesForInsert(institution, 1);
+
                 qPTemplate.Institutions.Add(institution);
             });
             _context.QPTemplates.Add(qPTemplate);

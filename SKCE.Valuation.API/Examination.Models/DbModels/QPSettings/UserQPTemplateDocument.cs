@@ -14,7 +14,7 @@ namespace SKCE.Examination.Models.DbModels.QPSettings
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int UserQPTemplateDocumentId { get; set; }
+        public long UserQPTemplateDocumentId { get; set; }
         [ForeignKey("UserQPTemplate")]
         public long UserQPTemplateId { get; set; }
         public long QPDocumentTypeId { get; set; }

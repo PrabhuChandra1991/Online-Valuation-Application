@@ -14,10 +14,10 @@ namespace SKCE.Examination.Models.DbModels.QPSettings
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int QPTemplateInstitutionDepartmentId { get; set; }
+        public long QPTemplateInstitutionDepartmentId { get; set; }
         
         [ForeignKey("QPTemplateInstitution")]
-        public int QPTemplateInstitutionId { get; set; }
+        public long QPTemplateInstitutionId { get; set; }
         public long DepartmentId { get; set; }
         public long StudentCount { get; set; }
     }

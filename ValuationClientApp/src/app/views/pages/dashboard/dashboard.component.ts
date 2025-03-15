@@ -677,7 +677,7 @@ onGenderChange(event: Event) {
       bankAccountNumber: formData.bankAccountNumber || '',
       bankBranchName: formData.bankBranchName || '',
       bankIFSCCode: formData.bankIFSCCode || '',
-      isEnabled: formData.isEnabled || false,
+      isEnabled: formData.isEnabled || true,
       userCourses: formData.courses || [],
       userAreaOfSpecializations: formData.specializations || [],
       userQualifications: this.userQualifications || [],

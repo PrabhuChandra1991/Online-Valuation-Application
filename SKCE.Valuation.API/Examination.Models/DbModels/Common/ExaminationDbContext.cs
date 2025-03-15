@@ -28,7 +28,7 @@ namespace SKCE.Examination.Models.DbModels.Common
         public DbSet<QPTemplateInstitutionDepartment> QPTemplateInstitutionDepartments { get; set; }
         public DbSet<UserQPTemplate> UserQPTemplates { get; set; }
         public DbSet<UserQPTemplateDocument> UserQPTemplateDocuments { get; set; }
-        public DbSet<Document> DocumentDetails { get; set; }
+        public DbSet<Document> Documents { get; set; }
         public DbSet<DegreeType> DegreeTypes { get; set; }
         public DbSet<ExamMonth> ExamMonths { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)

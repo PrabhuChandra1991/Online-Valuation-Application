@@ -21,37 +21,49 @@ namespace SKCE.Examination.Services.ViewModels.QPSettings
         public string ExamType { get; set; }
         public long Semester { get; set; }
         public long StudentCount { get; set; }
-        public List<QPDocumentVM> Documents { get; set; }
-        public List<InstitutionDepartmentVM> Institutions { get; set; }
+        public List<QPTemplateDocumentVM> Documents { get; set; }
+        public List<QPTemplateInstitutionVM> Institutions { get; set; }
         public long UserId { get; set; }
-        public List<QPDocumentVM> UserDocuments { get; set; }
+        public List<QPTemplateDocumentVM> UserDocuments { get; set; }
     }
-    public class InstitutionDepartmentVM: AuditModel
+    public class QPTemplateDocumentVM : AuditModel
     {
+        public long QPTemplateDocumentId { get; set; }
+        public long QPTemplateId { get; set; }
+        public long QPDocumentTypeId { get; set; }
+        public string QPDocumentTypeName { get; set; }
+        public long DocumentId { get; set; }
+        public string DocumentName { get; set; }
+        public string DocumentUrl { get; set; }
+    }
+    public class QPTemplateInstitutionVM : AuditModel
+    {
+        public long QPTemplateInstitutionId { get; set; }
+        public long QPTemplateId { get; set; }
         public long InstitutionId { get; set; }
         public string InstitutionName { get; set; }
         public string InstitutionCode { get; set; }
         public long StudentCount { get; set; }
-        public List<DepartmentVM> Departments { get; set; }
-        public List<QPDocumentVM> Documents { get; set; }
+        public List<QPTemplateInstitutionDepartmentVM> Departments { get; set; }
+        public List<QPTemplateInstitutionDocumentVM> Documents { get; set; }
     }
-    public class DepartmentVM: AuditModel
+    public class QPTemplateInstitutionDepartmentVM : AuditModel
     {
+        public long QPTemplateInstitutionDepartmentId { get; set; }
+        public long QPTemplateInstitutionId { get; set; }
         public long DepartmentId { get; set; }
         public string DepartmentName { get; set; }
         public string DepartmentShortName { get; set; }
         public long StudentCount { get; set; }
     }
-
-    public class QPDocumentVM: AuditModel
-    { 
-        public long QPDocumentId { get; set; }
-        public long QPTemplateId { get; set; }
-        public int QPDocumentTypeId { get; set; }
+    public class QPTemplateInstitutionDocumentVM : AuditModel
+    {
+        public long QPTemplateInstitutionDocumentId { get; set; }
+        public long QPTemplateInstitutionId { get; set; }
+        public long QPDocumentTypeId { get; set; }
         public string QPDocumentTypeName { get; set; }
         public long DocumentId { get; set; }
         public string DocumentName { get; set; }
         public string DocumentUrl { get; set; }
-
     }
 }

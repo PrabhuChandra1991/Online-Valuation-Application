@@ -215,49 +215,6 @@ export class DashboardComponent implements OnInit   {
       }
     });
 
-    // Example specializations to show in the table initially
-    // this.specializations = [
-    //   {
-    //     isActive: true,
-    //     createdById: 0,
-    //     createdDate: new Date().toISOString(),
-    //     modifiedById: 0,
-    //     modifiedDate: new Date().toISOString(),
-    //     userAreaOfSpecializationId: 1,
-    //     userId: this.selectedUserId,
-    //     areaOfSpecializationName: "Computer Science",
-    //     experience: 5,
-    //     handledLastTwoSemesters: true,
-    //     user: ""
-    //   },
-    //   {
-    //     isActive: true,
-    //     createdById: 0,
-    //     createdDate: new Date().toISOString(),
-    //     modifiedById: 0,
-    //     modifiedDate: new Date().toISOString(),
-    //     userAreaOfSpecializationId: 2,
-    //     userId: 4,
-    //     areaOfSpecializationName: "Mathematics",
-    //     experience: 3,
-    //     handledLastTwoSemesters: true,
-    //     user: ""
-    //   },
-    //   {
-    //     isActive: true,
-    //     createdById: 0,
-    //     createdDate: new Date().toISOString(),
-    //     modifiedById: 0,
-    //     modifiedDate: new Date().toISOString(),
-    //     userAreaOfSpecializationId: 3,
-    //     userId: 4,
-    //     areaOfSpecializationName: "Physics",
-    //     experience: 1,
-    //     handledLastTwoSemesters: true,
-    //     user: ""
-    //   }
-    // ];
-  
     //getting master data
     this.degreeTypes = this.getDegreeTypes();
     this.designations = this.getdesignations();
@@ -677,12 +634,12 @@ onGenderChange(event: Event) {
       bankAccountNumber: formData.bankAccountNumber || '',
       bankBranchName: formData.bankBranchName || '',
       bankIFSCCode: formData.bankIFSCCode || '',
-      isEnabled: formData.isEnabled || true,
+      isEnabled: true,
       userCourses: formData.courses || [],
       userAreaOfSpecializations: formData.specializations || [],
       userQualifications: this.userQualifications || [],
       userDesignations: formData.designations || [],
-      isActive: formData.isActive || true,
+      isActive: true,
       createdById: this.selectedUser.createdById || 0,
       createdDate: this.selectedUser.createdDate || '',
       modifiedById: this.selectedUserId || 0,
@@ -701,8 +658,8 @@ onGenderChange(event: Event) {
       title: formData.title,
       name: formData.name,
       specialization: formData.specialization,
-      isCompleted: formData.isCompleted,
-      isActive: formData.isActive,
+      isCompleted: formData?.isCompleted?formData.isCompleted:false,
+      isActive: true,
       createdById: formData.createdById,
       createdDate: formData.createdDate,
       modifiedById: formData.userId,

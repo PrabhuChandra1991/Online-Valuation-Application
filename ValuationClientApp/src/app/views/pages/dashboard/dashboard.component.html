@@ -175,7 +175,7 @@
                   <th>Designation</th>
                   <th>Experience</th>
                   <th>Is Current</th>
-                 <!--  <th>Actions</th> -->
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -268,7 +268,7 @@
         <label>Experience</label>
         <input type="number" class="form-control" formControlName="experience" />
       </div>
-      <div class="mb-3">
+      <div class="mb-3" *ngIf="showCurrentPostion">
         <mat-checkbox formControlName="isCurrent">Is Current Position?</mat-checkbox>
       </div>
     </form>

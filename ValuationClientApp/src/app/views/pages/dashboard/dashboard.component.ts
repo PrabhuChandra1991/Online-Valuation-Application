@@ -70,6 +70,7 @@ export class DashboardComponent implements OnInit   {
   selectedUser:User;
   selectedSalutation:any;
   selectedGender:any;
+  showCurrentPostion:boolean = true;
   @ViewChild('editSpecializationModal') editSpecializationModal!: TemplateRef<any>;
   @ViewChild('editDesignationModal') editDesignationModal!: TemplateRef<any>;
   @ViewChild('editUserCourseModal') editUserCourseModal!: TemplateRef<any>;
@@ -164,8 +165,6 @@ export class DashboardComponent implements OnInit   {
     // Initialize the form with default values
     this.specializationForm = this.fb.group({
       areaOfSpecializationName: ['', Validators.required],
-      // experience: new FormControl(''),
-      // handledLastTwoSemesters: new FormControl(false),
     }),
 
     this.designationForm = this.fb.group({
@@ -199,8 +198,6 @@ export class DashboardComponent implements OnInit   {
       department:['', Validators.required],
     });
   }
-
-  selectedUserObject: Observable<any>
 
   ngOnInit(): void {
     console.log('des',this.designations);
@@ -238,15 +235,7 @@ export class DashboardComponent implements OnInit   {
     const loggedData = localStorage.getItem('userData');
     if (loggedData) {
       const userData = JSON.parse(loggedData);
-      // this.userForm.patchValue({
-      //   name: userData.name,
-      //   email: userData.email,
-      //   mobileNumber: userData.mobileNumber,
-      //   collegeName: userData.collegeName,
-      //   bankAccountName: userData.bankAccountName,
-      //   bankAccountNumber: userData.bankAccountNumber,
-      //   bankBranchName: userData.bankBranchName
-      // });
+      console.log("localstoreUserData",userData);
     }
   }
 
@@ -257,15 +246,14 @@ export class DashboardComponent implements OnInit   {
        let selectedUser = data;
        if(selectedUser)
        {
-        this.selectedUserObject = selectedUser;
         this.selectedUser = selectedUser;
+
         //assign child elements dynamically
         this.designations = selectedUser.userDesignations;
         this.specializations = selectedUser.userAreaOfSpecializations;
         this.userQualifications = selectedUser.userQualifications;
         this.userCourses = selectedUser.userCourses; 
         
-        //this.selectedUserObject = selectedUser;
         //filter data for qualification section 
         let ugQualification = selectedUser.userQualifications.find((f: { title: string }) => f.title.includes('UG'));
         let pgQualification = selectedUser.userQualifications.find((f: { title: string }) => f.title.includes('PG'));
@@ -277,37 +265,37 @@ export class DashboardComponent implements OnInit   {
         this.salutationInput.nativeElement.value = salutation?.id;
         this.genderInput.nativeElement.value = gender?.id;
         
-        console.log('gender',gender);
-        console.log("salutation",salutation);
+          console.log('gender',gender);
+          console.log("salutation",salutation);
           console.log("user",selectedUser);
           console.log("ug",ugQualification);
           console.log("pg",pgQualification);
           console.log("phd",phdQualification);
           console.log("before patch",this.userForm.value);
-         debugger;
+
           this.userForm.patchValue({
-          
-          salutationId: salutation?.id,
-          genderId: gender?.id,
-          name: selectedUser.name,
-          email: selectedUser.email,
-          mobileNumber: Number(selectedUser.mobileNumber),
-          collegeName: selectedUser.collegeName,
-          ugName: ugQualification.name,
-          departmentName:selectedUser.departmentName,
-          ugSpecialization: ugQualification.specialization,
-          pgName:pgQualification.name,
-          pgSpecialization: pgQualification.specialization,
-          bankAccountName: selectedUser.bankAccountName,
-          bankAccountNumber: selectedUser.bankAccountNumber,
-          bankBranchName: selectedUser.bankBranchName,
-          bankName:selectedUser.bankName,
-          bankIFSCCode: selectedUser.bankIFSCCode,
-          department:selectedUser.departmentName,
-          hasPhd : phdQualification.isCompleted,
-          phdSpecialization:phdQualification.specialization,
-          userId:selectedUser.userId
-          
+
+            salutationId: salutation?.id,
+            genderId: gender?.id,
+            name: selectedUser.name,
+            email: selectedUser.email,
+            mobileNumber: Number(selectedUser.mobileNumber),
+            collegeName: selectedUser.collegeName,
+            ugName: ugQualification.name,
+            departmentName:selectedUser.departmentName,
+            ugSpecialization: ugQualification.specialization,
+            pgName:pgQualification.name,
+            pgSpecialization: pgQualification.specialization,
+            bankAccountName: selectedUser.bankAccountName,
+            bankAccountNumber: selectedUser.bankAccountNumber,
+            bankBranchName: selectedUser.bankBranchName,
+            bankName:selectedUser.bankName,
+            bankIFSCCode: selectedUser.bankIFSCCode,
+            department:selectedUser.departmentName,
+            hasPhd : phdQualification.isCompleted,
+            phdSpecialization:phdQualification.specialization,
+            userId:selectedUser.userId
+            
         });
 
         this.userForm.updateValueAndValidity();
@@ -316,7 +304,7 @@ export class DashboardComponent implements OnInit   {
         
 
        }
-        console.log('User Details:', selectedUser);
+        console.log('selectedUser Details:', selectedUser);
       },
       error: (err) => {
         console.error('Error fetching user:', err);
@@ -325,6 +313,7 @@ export class DashboardComponent implements OnInit   {
   }
 
 //#region Specilization grid Section
+
   // Open Specialization Modal
   openSpecializationModal() {
     const modalRef = this.modalService.open(this.editSpecializationModal);
@@ -368,8 +357,6 @@ export class DashboardComponent implements OnInit   {
     // Set the form values to the clicked specialization data
     this.specializationForm.patchValue({
       areaOfSpecializationName: specialization.areaOfSpecializationName
-      // experience: specialization.experience,
-      // handledLastTwoSemesters: specialization.handledLastTwoSemesters
     });
 
     // Open the modal
@@ -377,8 +364,10 @@ export class DashboardComponent implements OnInit   {
     modalRef.result.then((result) => {
       if (result) {
         if (this.selectedSpecializationIndex !== null) {
+
           // Update the specialization with the edited values
           this.specializations[this.selectedSpecializationIndex] = this.specializationForm.value.areaOfSpecializationName;
+
         }
       }
     }).catch(() => {});
@@ -394,6 +383,9 @@ export class DashboardComponent implements OnInit   {
 //#region Designation grid Section
 
 openDesignationModal() {
+  //set isCurrent
+  this.showCurrentPostion = !this.designations.some(f => f.isCurrent === true);
+
   const modalRef = this.modalService.open(this.editDesignationModal);
   modalRef.result.then((result) => {
     if (result) {
@@ -403,12 +395,14 @@ openDesignationModal() {
 }
 
 saveExperience() {
+
   if (this.selectedDesignationIndex !== null) {
-    debugger;
+
     // Update the existing Qualification
     this.designations[this.selectedDesignationIndex].designationId = this.designationForm.value.expName;
     this.designations[this.selectedDesignationIndex].experience = this.designationForm.value.experience;
     this.designations[this.selectedDesignationIndex].isCurrent = this.designationForm.value.isCurrent;
+
   } else {
     // If no Qualification is selected, add a new one
     let newDesignation: UserDesignation = {
@@ -437,6 +431,8 @@ editExperience(index: number) {
   this.selectedDesignationIndex = index;  // Store the index of the Experience being edited
   const Designation = this.designations[index];
 
+  this.showCurrentPostion = Designation.isCurrent || !this.designations.some(f => f.isCurrent === true);
+
   // Set the form values to the clicked Experience data
   this.designationForm.patchValue({
     expName: Designation.designationId,
@@ -449,6 +445,7 @@ editExperience(index: number) {
   modalRef.result.then((result) => {
     if (result) {
       if (this.selectedDesignationIndex !== null) {
+
         // Update the Qualification with the edited values
         this.designations[this.selectedDesignationIndex] = this.designationForm.value;
       }

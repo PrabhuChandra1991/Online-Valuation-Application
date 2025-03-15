@@ -1,4 +1,4 @@
-import { Component, OnInit, TemplateRef, viewChild, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, TemplateRef, viewChild, ViewChild } from '@angular/core';
 import { NgbCalendar, NgbDatepickerModule, NgbDateStruct, NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormBuilder, FormGroup, FormArray, Validators, FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { NgApexchartsModule } from 'ng-apexcharts';
@@ -43,7 +43,17 @@ const currentDate = new Date().toISOString();
 
 
 
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit   {
+
+
+  @ViewChild('ugNameInput') ugNameInput!: ElementRef;
+  @ViewChild('ugSpecializationInput') ugSpecializationInput!: ElementRef;
+  @ViewChild('pgNameInput') pgNameInput!: ElementRef;
+  @ViewChild('pgSpecializationInput') pgSpecializationInput!: ElementRef;
+  @ViewChild('phdSpecializationInput') phdSpecializationInput!: ElementRef;
+  @ViewChild('salutation') salutationInput!: ElementRef;
+  @ViewChild('gender') genderInput!: ElementRef;
+  
 
   userForm!: FormGroup;
   designationForm!: FormGroup;
@@ -58,10 +68,12 @@ export class DashboardComponent implements OnInit {
   qualification : UserQualification;
   Salutation:any;
   selectedUser:User;
+  selectedSalutation:any;
+  selectedGender:any;
   @ViewChild('editSpecializationModal') editSpecializationModal!: TemplateRef<any>;
   @ViewChild('editDesignationModal') editDesignationModal!: TemplateRef<any>;
   @ViewChild('editUserCourseModal') editUserCourseModal!: TemplateRef<any>;
-
+  
   //this should be load from dashboard service 
   salutations = [
     { id: 'Mr.', name: 'Mr.' },
@@ -123,7 +135,7 @@ export class DashboardComponent implements OnInit {
     designationId: designation.DesignationId,
     userId: this.selectedUserId,
     experience: 0,
-    isCurrent: true
+    isCurrent: false
   }));
 
  
@@ -304,6 +316,10 @@ export class DashboardComponent implements OnInit {
 
         let salutation = this.salutations.find(f => f.name == selectedUser.salutation);
         let gender = this.genders.find(f => f.name == selectedUser.gender);
+      
+        this.salutationInput.nativeElement.value = salutation?.id;
+        this.genderInput.nativeElement.value = gender?.id;
+        
         console.log('gender',gender);
         console.log("salutation",salutation);
           console.log("user",selectedUser);
@@ -314,8 +330,8 @@ export class DashboardComponent implements OnInit {
          debugger;
           this.userForm.patchValue({
           
-          salutationId:salutation?.id,
-          genderId:selectedUser.gender,
+          salutationId: salutation?.id,
+          genderId: gender?.id,
           name: selectedUser.name,
           email: selectedUser.email,
           mobileNumber: Number(selectedUser.mobileNumber),
@@ -443,7 +459,7 @@ saveExperience() {
       designationId: this.designationForm.value.expName,
       userId: this.selectedUserId,
       experience: this.designationForm.value.experience,
-      isCurrent: this.designationForm.value.isCurrent,
+      isCurrent: this.designationForm?.value?.isCurrent?this.designationForm?.value?.isCurrent: false,
       isActive: true,
       createdById: this.selectedUserId,
       createdDate: currentDate,
@@ -628,18 +644,21 @@ onGenderChange(event: Event) {
      let phdSCourse = this.userQualifications.find(f => f.title.includes('Ph.D'));
 
      if (ugCourse) {
-       ugCourse.name = formData.ugName;
-       ugCourse.specialization = formData.ugSpecialization;
+       ugCourse.name =  this.ugNameInput.nativeElement.value;
+       ugCourse.specialization = this.ugSpecializationInput.nativeElement.value;
      }
 
      if (ugCourse) {
-       pgCourse.name = formData.pgName;
-       pgCourse.specialization = formData.pgSpecialization;
+       pgCourse.name =this.pgNameInput.nativeElement.value;;
+       pgCourse.specialization = this.pgSpecializationInput.nativeElement.value;
      }
 
      if (phdSCourse) {
-      phdSCourse.specialization = formData.phdSpecialization;
+      if(this.phdSpecializationInput?.nativeElement?.value)
+        phdSCourse.specialization = this.phdSpecializationInput.nativeElement.value;
     }
+
+
      
     const userObj: UserProfile = {
 

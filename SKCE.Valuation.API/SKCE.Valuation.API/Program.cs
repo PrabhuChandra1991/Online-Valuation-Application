@@ -8,6 +8,8 @@ using SKCE.Examination.Models.DbModels.QPSettings;
 using SKCE.Examination.Services.AutoMapperProfiles;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Azure;
+using SKCE.Examination.Services.MappingProfiles;
+using SKCE.Examination.Services.QPSettings;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,10 +23,10 @@ builder.Services.AddCors();
 builder.Services.AddScoped<LoginServices>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<ExcelImportHelper>(); // Register helper
-builder.Services.AddScoped<S3Helper>(); // Register helper
+builder.Services.AddScoped<IQpTemplateService, QpTemplateService>();
+builder.Services.AddScoped<QPDataImportHelper>(); // Register helper
 builder.Services.AddScoped<CourseService>();
-//builder.Services.AddAutoMapper(typeof(UserProfile));
+builder.Services.AddAutoMapper(typeof(QPTemplateMappingProfile));
 // Add services to the container
 builder.Services.AddScoped<AzureBlobStorageHelper>();
 
@@ -68,17 +70,7 @@ using (var scope = app.Services.CreateScope())
         Console.WriteLine($"An error occurred while seeding the database: {ex.Message}");
     }
 }
-// Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
-//{
-//    app.UseSwagger();
-//    app.UseSwaggerUI();
-//}
-//else
-//{
-//    app.UseExceptionHandler("/Error");
-//    app.UseHsts();
-//}
+    app.UseExceptionHandler("/Error");
 app.UseSwagger();
 app.UseSwaggerUI();
 
@@ -230,15 +222,15 @@ void SeedQPTemplateStatusType(ExaminationDbContext context)
     {
         var qpTemplateStatusTypes = new List<QPTemplateStatusType>
         {
-            new QPTemplateStatusType { Name = "QP Not Assigned",Description = "QP Not Assigned"},
-            new QPTemplateStatusType { Name = "QP Allocated",Description = "QP Allocated" },
-            new QPTemplateStatusType { Name = "QP Scrutiny" ,Description = "QP Scrutiny" },
-            new QPTemplateStatusType { Name = "QP Selection",Description = "QP Selection"},
-            new QPTemplateStatusType { Name = "QP Printed" ,Description = "QP Printed" },
-            new QPTemplateStatusType { Name = "QP Allocated" ,Description = "QP Allocated"},
-            new QPTemplateStatusType { Name = "QP Initiated" ,Description = "QP Initiated"},
-            new QPTemplateStatusType { Name = "QP InProgress",Description = "QP InProgress" },
-            new QPTemplateStatusType { Name = "QP Submitted" ,Description ="QP Submitted"}
+            new QPTemplateStatusType { Name = "QP Pending for Allocation"},
+            new QPTemplateStatusType { Name = "QP Allocated" },
+            new QPTemplateStatusType { Name = "QP Pending for Scrutiny" },
+            new QPTemplateStatusType { Name = "QP Scrutinized" },
+            new QPTemplateStatusType { Name = "QP Pending for Selection"},
+            new QPTemplateStatusType { Name = "QP Selected" },
+            new QPTemplateStatusType { Name = "QP Printed" },
+            new QPTemplateStatusType { Name = "QP InProgress" },
+            new QPTemplateStatusType { Name = "QP Submitted"}
         };
 
         foreach (var qpemplateStatusTypes in qpTemplateStatusTypes)

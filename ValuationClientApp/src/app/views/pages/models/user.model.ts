@@ -5,7 +5,9 @@ export interface User {
   mobileNumber: string;
   roleId: number;
   totalExperience: number;
-  departmentId: number;
+  departmentName: string;
+  gender: string;
+  Salutation: string;
   collegeName: string;
   bankAccountName: string;
   bankAccountNumber: string;

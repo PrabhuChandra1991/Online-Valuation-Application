@@ -28,4 +28,20 @@ export class TemplateManagementService {
     return this.http.get(`${this.apiUrl}/api/QpTemplate/GetQPTemplateByCourseId/${courseId}`);
   }
 
+  uploadDocument(file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post(`${this.apiUrl}/api/BlobStorage/upload`, formData);
+  }
+
+  deleteDocument(fileName: string): Observable<any> {
+    const encodedFileName = encodeURIComponent(fileName);
+    return this.http.delete(`${this.apiUrl}/api/BlobStorage/delete/${fileName}`);
+  }
+  
+  saveQpTemplate(qpTemplateData: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/api/QpTemplate`, qpTemplateData);
+  }
+  
+
 }

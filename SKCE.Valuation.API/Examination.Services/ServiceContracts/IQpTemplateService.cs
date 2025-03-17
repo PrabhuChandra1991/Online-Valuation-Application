@@ -1,4 +1,5 @@
-﻿using SKCE.Examination.Models.DbModels.QPSettings;
+﻿using SKCE.Examination.Models.DbModels.Common;
+using SKCE.Examination.Models.DbModels.QPSettings;
 using SKCE.Examination.Services.ViewModels.QPSettings;
 using System;
 using System.Collections.Generic;
@@ -15,5 +16,6 @@ namespace SKCE.Examination.Services.ServiceContracts
         Task<List<QPTemplateVM>> GetQPTemplatesAsync();
         Task<QPTemplateVM?> GetQPTemplateAsync(long qpTemplateId);
         Task<List<QPTemplateVM>> GetQPTemplatesByUserIdAsync(long userId);
+        Task<Course> AssignQPTemplate(long userId, long qpTemplateId);
     }
 }

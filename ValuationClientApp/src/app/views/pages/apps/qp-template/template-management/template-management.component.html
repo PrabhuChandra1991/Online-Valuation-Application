@@ -2,7 +2,7 @@
     <div class="row mt-5">
       <div class="col-md-12">
         <!-- Button trigger lg modal -->
-        <button class="btn btn-primary me-1" (click)="openLgModal(lgModal)">Create Template</button>
+        <button class="btn btn-primary me-1" (click)="openLgModal(lgModal)">{{ isEditMode ? 'Edit Template' : 'Create Template' }}</button>
        
       </div>
     
@@ -26,7 +26,7 @@
                 <!-- Template Name Column -->
                 <ng-container matColumnDef="qpTemplateName">
                   <th mat-header-cell *matHeaderCellDef mat-sort-header> Template Name </th>
-                  <td mat-cell *matCellDef="let element"><a mat-button (click)="editTemplate(element.qpTemplateId)" target="_blank">{{ element.qpTemplateName }} </a> </td>
+                  <td mat-cell *matCellDef="let element"><a mat-button (click)="openLgModal(lgModal,element.qpTemplateId)" target="_blank">{{ element.qpTemplateName }} </a> </td>
                 </ng-container>
 
                 <!-- Course Code Column -->

@@ -48,4 +48,9 @@ export class TemplateManagementService {
     return this.http.get(`${this.apiUrl}/api/QpTemplate`);
   }
 
+  getQpTemplateById(qpTemplateId: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/api/QpTemplate/${qpTemplateId}`);
+  }
+  
+
 }

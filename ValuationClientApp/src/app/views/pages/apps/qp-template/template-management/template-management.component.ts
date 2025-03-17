@@ -58,7 +58,7 @@ export class TemplateManagemenComponent implements OnInit, AfterViewInit {
     selectedCourseId: any | null = null;
     qpTemplateData: any = null;
     institutions: any [] = [];
-    isEditMode:boolean;
+    isEditMode:boolean = false;
 
     isUploadedCourseSyllabus = false; 
     uploadedFileNameCourseSyllabus = '';
@@ -74,7 +74,7 @@ export class TemplateManagemenComponent implements OnInit, AfterViewInit {
 
     isUploadedPrintPreviewQPAnswerDocument = false;
     uploadedFileNamePrintPreviewQPAnswer = ''
-     
+
 
     displayedColumns: string[] = ['qpTemplateName', 'courseCode', 'courseName', 'qpTemplateStatusTypeName'];
     dataSource = new MatTableDataSource<any>([]);
@@ -135,11 +135,33 @@ export class TemplateManagemenComponent implements OnInit, AfterViewInit {
       this.dataSource.paginator.firstPage();
     }
   }
-    openLgModal(content: TemplateRef<any>) {
-      this.modalService.open(content, {size: 'lg'}).result.then((result) => {
-        console.log("Modal closed" + result);
-      }).catch((res) => {});
+    // openLgModal(content: TemplateRef<any>) {
+    //   this.modalService.open(content, {size: 'lg'}).result.then((result) => {
+    //     console.log("Modal closed" + result);
+    //   }).catch((res) => {});
+    // }
+
+    openLgModal(content: TemplateRef<any>, qpTemplateId?: string) {
+      if (qpTemplateId) {
+        // Fetch template data for editing
+        this.templateService.getQpTemplateById(qpTemplateId).subscribe({
+          next: (data) => {
+            this.formGroup.patchValue(data); // Assign data to form
+            this.isEditMode = true; // Set edit mode
+            this.modalService.open(content, { size: 'lg' });
+          },
+          error: (err) => {
+            console.error('Error fetching template:', err);
+          }
+        });
+      } else {
+        // Open modal for creating a new template
+        this.isEditMode = false;
+        this.formGroup.reset(); // Reset form for new entry
+        this.modalService.open(content, { size: 'lg' });
+      }
     }
+    
 
     //#region template dialog functionalites
 

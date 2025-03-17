@@ -526,7 +526,7 @@ namespace SKCE.Examination.Services.QPSettings
             };
             AuditHelper.SetAuditPropertiesForInsert(userQPTemplate, 1);
             _context.UserQPTemplates.Add(userQPTemplate);
-
+            await _context.SaveChangesAsync();
             var qpSyllabusDocument = await _context.QPTemplateDocuments.FirstOrDefaultAsync(qptd => qptd.QPDocumentTypeId == 1);
             var userQPSyllabusDocument = new UserQPTemplateDocument()
             {

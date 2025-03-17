@@ -16,6 +16,10 @@ export const routes: Routes = [
         loadChildren: () => import('./views/pages/dashboard/dashboard.routes')
       },
       {
+        path: 'qptemplate',
+        loadChildren: () => import('./views/pages/apps/qp-template/qptemplate.routes')
+      },
+      {
         path: 'apps',
         loadChildren: () => import('./views/pages/apps/apps.routes')
       },

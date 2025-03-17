@@ -12,7 +12,55 @@
             <div class="card-body">
               <h4 class="card-title">Templates</h4>
               <div class="table-responsive">
-                <table class="table table-striped">
+                <mat-form-field appearance="outline">
+                  <mat-label>Search Template</mat-label>
+                  <input matInput (keyup)="applyFilter($event)" placeholder="Search">
+                </mat-form-field>
+                 <!-- Table -->
+              <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+
+                <!-- <ng-container matColumnDef="qpTemplateId">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Template Id </th>
+                  <td mat-cell *matCellDef="let element">{{ element.qpTemplateId }} </td>
+                </ng-container> -->
+                <!-- Template Name Column -->
+                <ng-container matColumnDef="qpTemplateName">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Template Name </th>
+                  <td mat-cell *matCellDef="let element"><a mat-button (click)="editTemplate(element.qpTemplateId)" target="_blank">{{ element.qpTemplateName }} </a> </td>
+                </ng-container>
+
+                <!-- Course Code Column -->
+                <ng-container matColumnDef="courseCode">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Course Code </th>
+                  <td mat-cell *matCellDef="let element"> {{ element.courseCode }} </td>
+                </ng-container>
+
+                <!-- Course Name Number Column -->
+                <ng-container matColumnDef="courseName">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Course Name </th>
+                  <td mat-cell *matCellDef="let element"> {{ element.courseName }} </td>
+                </ng-container>
+
+                <!-- Role ID Column -->
+                <!-- <ng-container matColumnDef="roleId">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Role ID </th>
+                  <td mat-cell *matCellDef="let element"> {{ element.roleId || 'N/A' }} </td>
+                </ng-container> -->
+                <!-- qpTemplateStatusTypeName Column -->
+                <ng-container matColumnDef="qpTemplateStatusTypeName">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Template Status </th>
+                  <td mat-cell *matCellDef="let element"> {{ element.qpTemplateStatusTypeName || 'N/A' }} </td>
+                </ng-container>
+      
+            <!-- Table Header & Row Definitions -->
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        
+          </table>
+        
+            <!-- Pagination -->
+            <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+                <!-- <table class="table table-striped">
                   <thead>
                     <tr>
                       <th>Programme</th>
@@ -89,7 +137,7 @@
                     
                     
                   </tbody>
-                </table>
+                </table> -->
               </div>
               
             </div>

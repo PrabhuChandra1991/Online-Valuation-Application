@@ -43,5 +43,9 @@ export class TemplateManagementService {
     return this.http.post(`${this.apiUrl}/api/QpTemplate`, qpTemplateData);
   }
   
+   // Fetch templated from API
+   getTemplates(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/api/QpTemplate`);
+  }
 
 }

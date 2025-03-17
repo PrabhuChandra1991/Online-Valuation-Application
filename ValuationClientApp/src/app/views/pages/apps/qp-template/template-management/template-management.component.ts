@@ -1,6 +1,6 @@
 
-import { AfterViewInit, OnInit, Component, TemplateRef } from '@angular/core';
-import { NgbDropdownModule, NgbNavModule, NgbTooltip, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { AfterViewInit, OnInit, Component, TemplateRef, ViewChild } from '@angular/core';
+import { NgbDropdownModule, NgbNavModule, NgbTooltip, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { TemplateManagementService } from '../../../services/template-management.service';
 import { CommonModule } from '@angular/common';
@@ -8,8 +8,25 @@ import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatIcon } from '@angular/material/icon';
 import { ToastrService } from 'ngx-toastr';
 import { SpinnerService } from '../../../services/spinner.service';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatTableModule,MatTableDataSource } from '@angular/material/table';
+import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { Router } from '@angular/router';
+import {Template} from '../../../models/template.model';
+
+export interface TemplateData {
+  Programme: string;
+  Semester: string;
+  CourseCode: string;
+  CourseTitle: string;
+  Month: Number;
+  Year: Number;
+}
 
 
+                      
 @Component({
   selector: 'app-template-list',
   imports: [
@@ -19,7 +36,9 @@ import { SpinnerService } from '../../../services/spinner.service';
     NgbTooltip,
     CommonModule,
     ReactiveFormsModule,
-    MatIcon
+    MatIcon,
+    MatFormFieldModule, MatInputModule, MatTableModule, MatSortModule, MatPaginatorModule
+    
 ],
   templateUrl: './template-management.component.html',
   styleUrl: './template-management.component.scss'
@@ -39,6 +58,7 @@ export class TemplateManagemenComponent implements OnInit, AfterViewInit {
     selectedCourseId: any | null = null;
     qpTemplateData: any = null;
     institutions: any [] = [];
+    isEditMode:boolean;
 
     isUploadedCourseSyllabus = false; 
     uploadedFileNameCourseSyllabus = '';
@@ -56,13 +76,21 @@ export class TemplateManagemenComponent implements OnInit, AfterViewInit {
     uploadedFileNamePrintPreviewQPAnswer = ''
      
 
-     
+    displayedColumns: string[] = ['qpTemplateName', 'courseCode', 'courseName', 'qpTemplateStatusTypeName'];
+    dataSource = new MatTableDataSource<any>([]);
+    templates: any [] = [];
+    selectedTemplate: Template | null ;
+    @ViewChild(MatPaginator) paginator: MatPaginator;
+    @ViewChild(MatSort) sort: MatSort;
+    @ViewChild('lgModal') templateModal: any;
+   modalRef!: NgbModalRef;
 
   constructor(private modalService: NgbModal,
               private templateService: TemplateManagementService,
               private fb: FormBuilder,
               private toasterService: ToastrService,
-              private spinnerService: SpinnerService
+              private spinnerService: SpinnerService,
+               private router: Router,
   ) {
 
   }
@@ -83,10 +111,13 @@ export class TemplateManagemenComponent implements OnInit, AfterViewInit {
       });
 
       this.loadCourses();
+
+      this.loadTemplates();
     }
 
   ngAfterViewInit(): void {
-
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
     // Show the chat-content when a chat-item is clicked on tablet and mobile devices
     // document.querySelectorAll('.chat-list .chat-item').forEach(item => {
     //   item.addEventListener('click', event => {
@@ -96,6 +127,14 @@ export class TemplateManagemenComponent implements OnInit, AfterViewInit {
 
   }
 
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
+  }
     openLgModal(content: TemplateRef<any>) {
       this.modalService.open(content, {size: 'lg'}).result.then((result) => {
         console.log("Modal closed" + result);
@@ -104,10 +143,37 @@ export class TemplateManagemenComponent implements OnInit, AfterViewInit {
 
     //#region template dialog functionalites
 
+    loadTemplates(): void {
+      this.templateService.getTemplates().subscribe({
+        next: (data: any[]) => {
+          this.templates = data;
+          this.dataSource.data = this.templates; 
+          this.dataSource.paginator = this.paginator;
+         this.dataSource.sort = this.sort;
+          console.log('qp templated loaded:', this.templates);
+        },
+        error: (error) => {
+          console.error('Error loading qp templated:', error);
+        }
+      });
+    }
+
+    editTemplate(templateId: any) {
+      this.isEditMode = true; // Set edit mode
+      this.router.navigate(['/qptemplate/edit', templateId]); 
+    }
+
+    openEditTemplateDialog(template: any) {
+      this.selectedTemplate = { ...template }; // Load selected user data
+      this.isEditMode = true;
+      this.modalRef = this.modalService.open(this.templateModal, { size: 'lg', backdrop: 'static' });
+    }
+
     loadCourses(): void {
       this.templateService.getCourses().subscribe({
         next: (data) => {
           this.courses = data;
+          
           console.log('Courses loaded:', this.courses);
         },
         error: (error) => {

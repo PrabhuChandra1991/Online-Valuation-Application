@@ -1,4 +1,4 @@
-import { AfterViewInit, OnInit, Component, TemplateRef } from '@angular/core';
+import { AfterViewInit, OnInit, Component, TemplateRef, } from '@angular/core';
 import { NgbDropdownModule, NgbNavModule, NgbTooltip, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 

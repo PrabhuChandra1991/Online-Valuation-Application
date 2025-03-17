@@ -70,7 +70,7 @@ namespace SKCE.Examination.API.Controllers.Common
         {
             var result = await _blobStorageHelper.DeleteFileAsync(fileName);
             if (result)
-                return Ok("File deleted successfully.");
+                return Ok(new { message = "File deleted successfully." });
             else
                 return NotFound("File not found.");
         }

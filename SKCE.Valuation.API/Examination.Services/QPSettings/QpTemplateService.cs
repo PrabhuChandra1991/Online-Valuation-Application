@@ -691,8 +691,8 @@ namespace SKCE.Examination.Services.QPSettings
             var qPTemplates = new List<UserQPTemplateVM>();
             var users = _context.Users.ToList();
             var qpTemplateIds = _context.UserQPTemplates.Where(uqp => uqp.UserId == userId).Select(uqp => uqp.QPTemplateId).ToList<long>();
-            var userQPTemplates = await _context.UserQPTemplates.Where(uqp => uqp.UserId == userId).ToListAsync();
-            var qpTemplates = await _context.QPTemplates.Where(qp => qpTemplateIds.Contains(qp.QPTemplateId)).ToListAsync();
+            var userQPTemplates = _context.UserQPTemplates.Where(uqp => uqp.UserId == userId).ToList();
+            var qpTemplates = _context.QPTemplates.Where(qp => qpTemplateIds.Contains(qp.QPTemplateId)).ToList();
             userQPTemplates.ForEach(userQPTemplate =>
             {
                 qPTemplates.Add(new UserQPTemplateVM() {

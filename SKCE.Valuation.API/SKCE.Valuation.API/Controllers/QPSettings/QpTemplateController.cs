@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SKCE.Examination.Models.DbModels.Common;
 using SKCE.Examination.Services.Common;
+using SKCE.Examination.Services.QPSettings;
 using SKCE.Examination.Services.ServiceContracts;
 using SKCE.Examination.Services.ViewModels.QPSettings;
 
@@ -12,10 +13,10 @@ namespace SKCE.Examination.API.Controllers.QPSettings
     [ApiController]
     public class QpTemplateController : ControllerBase
     {
-        private readonly IQpTemplateService _qpTemplateService;
+        private readonly QpTemplateService _qpTemplateService;
         private readonly IMapper _mapper;
 
-        public QpTemplateController(IQpTemplateService qpTemplateService, IMapper mapper)
+        public QpTemplateController(QpTemplateService qpTemplateService, IMapper mapper)
         {
             _qpTemplateService = qpTemplateService;
             _mapper = mapper;
@@ -40,9 +41,9 @@ namespace SKCE.Examination.API.Controllers.QPSettings
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Course>>> GetQPTemplates()
+        public async Task<ActionResult<IEnumerable<QPTemplateVM>>> GetQPTemplatesAsync()
         {
-            return Ok(await _qpTemplateService.GetQPTemplatesAsync());
+            return Ok( await _qpTemplateService.GetQPTemplatesAsync());
         }
 
         [HttpGet("{qpTemplateId}")]
@@ -58,6 +59,13 @@ namespace SKCE.Examination.API.Controllers.QPSettings
             var course = await _qpTemplateService.GetQPTemplatesByUserIdAsync(userId);
             if (course == null) return NotFound();
             return Ok(course);
+        }
+        [HttpGet("AssignQPTemplate/{userId}/{qpTemplateId}")]
+        public async Task<ActionResult<bool>> AssignQPTemplate(long userId,long qpTemplateId)
+        {
+            var userQPTemplate = await _qpTemplateService.AssignTemplateForQPGenerationAsync(userId,qpTemplateId);
+            if (userQPTemplate == null) return NotFound();
+            return Ok(userQPTemplate);
         }
     }
 }

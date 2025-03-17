@@ -23,7 +23,7 @@ builder.Services.AddCors();
 builder.Services.AddScoped<LoginServices>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IQpTemplateService, QpTemplateService>();
+builder.Services.AddScoped<QpTemplateService>();
 builder.Services.AddScoped<QPDataImportHelper>(); // Register helper
 builder.Services.AddScoped<CourseService>();
 builder.Services.AddAutoMapper(typeof(QPTemplateMappingProfile));
@@ -230,7 +230,9 @@ void SeedQPTemplateStatusType(ExaminationDbContext context)
             new QPTemplateStatusType { Name = "QP Selected" },
             new QPTemplateStatusType { Name = "QP Printed" },
             new QPTemplateStatusType { Name = "QP InProgress" },
-            new QPTemplateStatusType { Name = "QP Submitted"}
+            new QPTemplateStatusType { Name = "Generated QP Submitted"},
+            new QPTemplateStatusType { Name = "Scrutinized QP Submitted"},
+            new QPTemplateStatusType { Name = "Selected QP Submitted"}
         };
 
         foreach (var qpemplateStatusTypes in qpTemplateStatusTypes)

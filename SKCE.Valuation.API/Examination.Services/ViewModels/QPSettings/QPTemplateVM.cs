@@ -82,7 +82,7 @@ namespace SKCE.Examination.Services.ViewModels.QPSettings
         public string QPTemplateExamMonth { get; set; } = string.Empty;
         public long QPTemplateStatusTypeId { get; set; }    
         public string QPTemplateStatusTypeName { get; set; } = string.Empty;
-
         public List<QPTemplateDocumentVM> UserDocuments { get; set; } = new List<QPTemplateDocumentVM>();
     }
+
 }

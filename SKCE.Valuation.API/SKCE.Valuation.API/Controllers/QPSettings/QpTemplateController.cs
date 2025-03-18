@@ -61,13 +61,7 @@ namespace SKCE.Examination.API.Controllers.QPSettings
             if (course == null) return NotFound();
             return Ok(course);
         }
-        [HttpGet("GetQPTemplatesByUserId/{userId}")]
-        public async Task<ActionResult<Course>> GetQPTemplatesByUserId(long userId)
-        {
-            var course = await _qpTemplateService.GetQPTemplatesByUserIdAsync(userId);
-            if (course == null) return NotFound();
-            return Ok(course);
-        }
+        
         [HttpGet("GetUserQPTemplates/{userId}")]
         public async Task<ActionResult<IEnumerable<UserQPTemplateVM>>> GetUserQPTemplatesAsync(long userId)
         {

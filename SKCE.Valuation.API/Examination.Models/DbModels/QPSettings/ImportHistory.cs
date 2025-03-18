@@ -9,17 +9,17 @@ using System.Threading.Tasks;
 
 namespace SKCE.Examination.Models.DbModels.QPSettings
 {
-    [Table("UserQPTemplate", Schema = "dbo")]
-    public class UserQPTemplate : AuditModel
+    [Table("ImportHistory", Schema = "dbo")]
+    public class ImportHistory:AuditModel
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long UserQPTemplateId { get; set; }
+        public long ImportHistoryId { get; set; }
+        public long DocumentId { get; set; }
         public long UserId { get; set; }
-        [ForeignKey("QPTemplate")]
-        public long QPTemplateId { get; set; }
-        public long QPTemplateStatusTypeId { get; set; }
-        public virtual ICollection<UserQPTemplateDocument> Documents { get; set; } = new List<UserQPTemplateDocument>();
-
+        public long TotalCount { get; set; }
+        public long CoursesCount { get; set; }
+        public long InstitutionsCount { get; set; }
+        public long DepartmentsCount { get; set; }
     }
 }

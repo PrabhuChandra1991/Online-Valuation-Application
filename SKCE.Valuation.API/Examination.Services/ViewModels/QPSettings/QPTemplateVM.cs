@@ -23,19 +23,19 @@ namespace SKCE.Examination.Services.ViewModels.QPSettings
         public long StudentCount { get; set; }
         public List<QPTemplateDocumentVM> Documents { get; set; }
         public List<QPTemplateInstitutionVM> Institutions { get; set; }
-        public UserQPTemplateVM UserQPGenerateTemplate { get; set; }
-        public UserQPTemplateVM UserQPScrutinyTemplate { get; set; }
-        public UserQPTemplateVM UserQPSelectionTemplate { get; set; }
+        public UserQPTemplateVM UserQPGenerateTemplate { get; set; } = new UserQPTemplateVM();
+        public UserQPTemplateVM UserQPScrutinyTemplate { get; set; } = new UserQPTemplateVM();
+        public UserQPTemplateVM UserQPSelectionTemplate { get; set; } = new UserQPTemplateVM();
     }
     public class QPTemplateDocumentVM : AuditModel
     {
         public long QPTemplateDocumentId { get; set; }
         public long QPTemplateId { get; set; }
         public long QPDocumentTypeId { get; set; }
-        public string QPDocumentTypeName { get; set; }
+        public string QPDocumentTypeName { get; set; } = string.Empty;
         public long DocumentId { get; set; }
-        public string DocumentName { get; set; }
-        public string DocumentUrl { get; set; }
+        public string DocumentName { get; set; } = string.Empty;
+        public string DocumentUrl { get; set; } = string.Empty;
     }
     public class QPTemplateInstitutionVM : AuditModel
     {
@@ -70,19 +70,19 @@ namespace SKCE.Examination.Services.ViewModels.QPSettings
 
     public class UserQPTemplateVM : AuditModel
     {
-        public string QPTemplateCurrentStateHeader { get; set; }
-        public long UserQPTemplateId { get; set; }
+        public string QPTemplateCurrentStateHeader { get; set; } = string.Empty;
+        public long UserQPTemplateId { get; set; } 
         public long UserId { get; set; }
-        public string UserName { get; set; }
+        public string UserName { get; set; } = string.Empty;
         public long QPTemplateId { get; set; }
-        public string QPTemplateName { get; set; }
-        public string QPTemplateCourseName { get; set; }
-        public string QPTemplateCourseCode { get; set; }
-        public string QPTemplateExamYear { get; set; }
-        public string QPTemplateExamMonth { get; set; }
-        public long QPTemplateStatusTypeId { get; set; }
-        public string QPTemplateStatusTypeName { get;set; }
-        
-        public List<QPTemplateDocumentVM> UserDocuments { get; set; }
+        public string QPTemplateName { get; set; } = string.Empty;
+        public string QPTemplateCourseName { get; set; } = string.Empty;
+        public string QPTemplateCourseCode { get; set; } = string.Empty;
+        public string QPTemplateExamYear { get; set; } = string.Empty;
+        public string QPTemplateExamMonth { get; set; } = string.Empty;
+        public long QPTemplateStatusTypeId { get; set; }    
+        public string QPTemplateStatusTypeName { get; set; } = string.Empty;
+        public List<QPTemplateDocumentVM> UserDocuments { get; set; } = new List<QPTemplateDocumentVM>();
     }
+
 }

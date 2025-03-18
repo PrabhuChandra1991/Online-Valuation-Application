@@ -5,6 +5,9 @@ using SKCE.Examination.Services.ServiceContracts;
 using SKCE.Examination.Services.ViewModels.QPSettings;
 using AutoMapper;
 using Aspose.Words.Drawing;
+using DocumentFormat.OpenXml.Bibliography;
+using DocumentFormat.OpenXml.Drawing.Diagrams;
+using Aspose.Words;
 namespace SKCE.Examination.Services.QPSettings
 {
     public class QpTemplateService 
@@ -44,13 +47,13 @@ namespace SKCE.Examination.Services.QPSettings
                     QPTemplateName = "",
                     QPCode = "",
                     QPTemplateStatusTypeId = 1,
-                    QPTemplateStatusTypeName = "QP Pending for Allocation",
                     Documents = new List<QPTemplateDocumentVM>(),
                     Institutions = new List<QPTemplateInstitutionVM>()
                 }).FirstOrDefaultAsync();
 
             if (qPTemplate == null) return null;
-
+            qPTemplate.QPTemplateStatusTypeName = _context.QPTemplateStatusTypes.FirstOrDefault(qps => qps.QPTemplateStatusTypeId == qPTemplate.QPTemplateStatusTypeId)?.Name ?? string.Empty;
+            
             var courseDepartments = _context.CourseDepartments.Where(cd => cd.CourseId == courseId).ToList();
             if (courseDepartments.Any())
             {
@@ -178,7 +181,6 @@ namespace SKCE.Examination.Services.QPSettings
 
             return qPTemplate;
         }
-
         public async Task<QPTemplate> CreateQpTemplateAsync(QPTemplateVM qPTemplateVM)
         {
             // Create template
@@ -245,7 +247,60 @@ namespace SKCE.Examination.Services.QPSettings
             await _context.SaveChangesAsync();
             return qPTemplate;
         }
-
+        public async Task<QPTemplate?> UpdateQpTemplateAsync(QPTemplateVM qPTemplateVM)
+        {
+            var qpTemplate = await _context.QPTemplates.FirstOrDefaultAsync(q => q.QPTemplateId == qPTemplateVM.QPTemplateId);
+            if (qpTemplate == null) return null;
+            qpTemplate.QPTemplateName = qPTemplateVM.QPTemplateName;
+            qpTemplate.QPCode = qPTemplateVM.QPCode;
+            qpTemplate.QPTemplateStatusTypeId = qPTemplateVM.QPTemplateStatusTypeId;
+            qpTemplate.CourseId = qPTemplateVM.CourseId;
+            qpTemplate.RegulationYear = qPTemplateVM.RegulationYear;
+            qpTemplate.BatchYear = qPTemplateVM.BatchYear;
+            qpTemplate.DegreeTypeId = qPTemplateVM.DegreeTypeId;
+            qpTemplate.ExamYear = qPTemplateVM.ExamYear;
+            qpTemplate.ExamMonth = qPTemplateVM.ExamMonth;
+            qpTemplate.ExamType = qPTemplateVM.ExamType;
+            qpTemplate.Semester = qPTemplateVM.Semester;
+            qpTemplate.StudentCount = qPTemplateVM.StudentCount;
+            AuditHelper.SetAuditPropertiesForUpdate(qpTemplate, 1);
+            qPTemplateVM.Documents.ForEach(d =>
+            {
+                var document = qpTemplate.Documents.FirstOrDefault(qptd => qptd.QPTemplateDocumentId == d.QPTemplateDocumentId);
+                if (document != null)
+                {
+                    document.DocumentId = d.DocumentId;
+                    AuditHelper.SetAuditPropertiesForUpdate(document, 1);
+                }
+            });
+            qPTemplateVM.Institutions.ForEach(i =>
+            {
+                var institution = qpTemplate.Institutions.FirstOrDefault(qpti => qpti.QPTemplateInstitutionId == i.QPTemplateInstitutionId);
+                if (institution != null)
+                {
+                    i.Documents.ForEach(d =>
+                    {
+                        var document = institution.Documents.FirstOrDefault(qptd => qptd.QPTemplateInstitutionDocumentId == d.QPTemplateInstitutionDocumentId);
+                        if (document != null)
+                        {
+                            document.DocumentId = d.DocumentId;
+                            AuditHelper.SetAuditPropertiesForUpdate(document, 1);
+                        }
+                    });
+                    AuditHelper.SetAuditPropertiesForUpdate(institution, 1);
+                }
+            });
+            if(qPTemplateVM.UserQPSelectionTemplate.UserQPTemplateId > 0)
+            {
+                var finalSelectedDocument = qPTemplateVM.UserQPSelectionTemplate.UserDocuments.FirstOrDefault(d=>d.QPDocumentTypeId ==10 && d.DocumentId > 0);
+                if(finalSelectedDocument != null && qpTemplate.QPTemplateStatusTypeId == 5)
+                {
+                   await SubmitSelectedQPAsync(1, qpTemplate.QPTemplateId, finalSelectedDocument.DocumentId);
+                }
+            }
+            await _context.SaveChangesAsync();
+            return qpTemplate;
+        }
         public async Task<List<QPTemplateVM>> GetQPTemplatesAsync()
         {
             var degreeTypes = _context.DegreeTypes.ToList();
@@ -332,7 +387,6 @@ namespace SKCE.Examination.Services.QPSettings
             }
             return qPTemplates;
         }
-
         public async Task<QPTemplateVM?> GetQPTemplateAsync(long qpTemplateId)
         {
             var degreeTypes = _context.DegreeTypes.ToList();
@@ -364,7 +418,6 @@ namespace SKCE.Examination.Services.QPSettings
                     QPTemplateId = d.QPTemplateId,
                     DocumentId = d.DocumentId,
                     QPDocumentTypeId = d.QPDocumentTypeId,
-                    QPDocumentTypeName = QPDocumentTypeDictionary[d.QPDocumentTypeId]
                 }).ToList(),
 
                 Institutions = qpt.Institutions.Select(i => new QPTemplateInstitutionVM
@@ -386,7 +439,6 @@ namespace SKCE.Examination.Services.QPSettings
                         QPTemplateInstitutionId = d.QPTemplateInstitutionId,
                         DocumentId = d.DocumentId,
                         QPDocumentTypeId = d.QPDocumentTypeId,
-                        QPDocumentTypeName = QPDocumentTypeDictionary[d.QPDocumentTypeId],
                     }).ToList()
                 }).ToList()
             }).ToListAsync();
@@ -398,7 +450,16 @@ namespace SKCE.Examination.Services.QPSettings
                 qPTemplate.Documents.ForEach(d => {
                     d.DocumentName = documents.FirstOrDefault(di => di.DocumentId == d.DocumentId)?.Name ?? string.Empty;
                     d.DocumentUrl = documents.FirstOrDefault(di => di.DocumentId == d.DocumentId)?.Url ?? string.Empty;
+
                 });
+                qPTemplate.CourseCode = courses.FirstOrDefault(c => c.CourseId == qPTemplate.CourseId)?.Code ?? string.Empty;
+                qPTemplate.CourseName = courses.FirstOrDefault(c => c.CourseId == qPTemplate.CourseId)?.Name ?? string.Empty;
+                foreach (var document in qPTemplate.Documents)
+                {
+                    document.QPDocumentTypeName = QPDocumentTypeDictionary[document.QPDocumentTypeId];
+                    document.DocumentName = documents.FirstOrDefault(di => di.DocumentId == document.DocumentId)?.Name ?? string.Empty;
+                    document.DocumentUrl = documents.FirstOrDefault(di => di.DocumentId == document.DocumentId)?.Url ?? string.Empty;
+                }
                 foreach (var institution in qPTemplate.Institutions)
                 {
                     institution.InstitutionName = institutions.FirstOrDefault(i => i.InstitutionId == institution.InstitutionId)?.Name ?? string.Empty;
@@ -412,6 +473,10 @@ namespace SKCE.Examination.Services.QPSettings
                         d.DocumentName = documents.FirstOrDefault(di => di.DocumentId == d.DocumentId)?.Name ?? string.Empty;
                         d.DocumentUrl = documents.FirstOrDefault(di => di.DocumentId == d.DocumentId)?.Url ?? string.Empty;
                     });
+                    foreach (var document in institution.Documents)
+                    {
+                        document.QPDocumentTypeName = QPDocumentTypeDictionary[document.QPDocumentTypeId];
+                    }
                 }
 
                 //get User template details
@@ -439,8 +504,13 @@ namespace SKCE.Examination.Services.QPSettings
                             QPTemplateDocumentId = qpd.UserQPTemplateDocumentId,
                             DocumentId = qpd.DocumentId,
                             QPDocumentTypeId = qpd.QPDocumentTypeId,
-                            QPDocumentTypeName = QPDocumentTypeDictionary[qpd.QPDocumentTypeId]
                         }).ToList();
+                    foreach (var userDocument in qPTemplate.UserQPGenerateTemplate.UserDocuments)
+                    {
+                        userDocument.QPDocumentTypeName = QPDocumentTypeDictionary[userDocument.QPDocumentTypeId];
+                        userDocument.DocumentName = documents.FirstOrDefault(di => di.DocumentId == userDocument.DocumentId)?.Name ?? string.Empty;
+                        userDocument.DocumentUrl = documents.FirstOrDefault(di => di.DocumentId == userDocument.DocumentId)?.Url ?? string.Empty;
+                    }
                 }
 
                 // QP Scrutinity template details
@@ -462,22 +532,27 @@ namespace SKCE.Examination.Services.QPSettings
                         QPTemplateStatusTypeName = qpTemplateStatuss.FirstOrDefault(qps => qps.QPTemplateStatusTypeId == ScrutinityUserTemplateDetail?.QPTemplateStatusTypeId)?.Name ?? string.Empty,
                         QPTemplateName = qPTemplate.QPTemplateName,
                     };
-                    qPTemplate.UserQPGenerateTemplate.UserDocuments = _context.UserQPTemplateDocuments
+                    qPTemplate.UserQPScrutinyTemplate.UserDocuments = _context.UserQPTemplateDocuments
                         .Where(qpd => qpd.UserQPTemplateId == (ScrutinityUserTemplateDetail != null ? ScrutinityUserTemplateDetail.UserQPTemplateId : 0))
                         .Select(qpd => new QPTemplateDocumentVM
                         {
                             QPTemplateDocumentId = qpd.UserQPTemplateDocumentId,
                             DocumentId = qpd.DocumentId,
                             QPDocumentTypeId = qpd.QPDocumentTypeId,
-                            QPDocumentTypeName = QPDocumentTypeDictionary[qpd.QPDocumentTypeId]
                         }).ToList();
+                    foreach (var userDocument in qPTemplate.UserQPScrutinyTemplate.UserDocuments)
+                    {
+                        userDocument.DocumentName = documents.FirstOrDefault(di => di.DocumentId == userDocument.DocumentId)?.Name ?? string.Empty;
+                        userDocument.DocumentUrl = documents.FirstOrDefault(di => di.DocumentId == userDocument.DocumentId)?.Url ?? string.Empty;
+                        userDocument.QPDocumentTypeName = QPDocumentTypeDictionary[userDocument.QPDocumentTypeId];
+                    }
                 }
 
                 // QP Selection template details
                 var SelectionUserTemplateDetail = await _context.UserQPTemplates.FirstOrDefaultAsync(qp => qp.QPTemplateStatusTypeId == 12 || qp.QPTemplateStatusTypeId == 13);
                 if (SelectionUserTemplateDetail != null)
                 {
-                    qPTemplate.UserQPScrutinyTemplate = new UserQPTemplateVM()
+                    qPTemplate.UserQPSelectionTemplate = new UserQPTemplateVM()
                     {
                         QPTemplateCurrentStateHeader = "QP Selection Assigned Details",
                         UserQPTemplateId = SelectionUserTemplateDetail?.UserQPTemplateId ?? 0,
@@ -492,15 +567,20 @@ namespace SKCE.Examination.Services.QPSettings
                         QPTemplateStatusTypeName = qpTemplateStatuss.FirstOrDefault(qps => qps.QPTemplateStatusTypeId == SelectionUserTemplateDetail?.QPTemplateStatusTypeId)?.Name ?? string.Empty,
                         QPTemplateName = qPTemplate.QPTemplateName,
                     };
-                    qPTemplate.UserQPGenerateTemplate.UserDocuments = _context.UserQPTemplateDocuments
+                    qPTemplate.UserQPSelectionTemplate.UserDocuments = _context.UserQPTemplateDocuments
                         .Where(qpd => qpd.UserQPTemplateId == (SelectionUserTemplateDetail != null ? SelectionUserTemplateDetail.UserQPTemplateId : 0))
                         .Select(qpd => new QPTemplateDocumentVM
                         {
                             QPTemplateDocumentId = qpd.UserQPTemplateDocumentId,
                             DocumentId = qpd.DocumentId,
                             QPDocumentTypeId = qpd.QPDocumentTypeId,
-                            QPDocumentTypeName = QPDocumentTypeDictionary[qpd.QPDocumentTypeId]
                         }).ToList();
+                    foreach (var userDocument in qPTemplate.UserQPSelectionTemplate.UserDocuments)
+                    {
+                        userDocument.DocumentName = documents.FirstOrDefault(di => di.DocumentId == userDocument.DocumentId)?.Name ?? string.Empty;
+                        userDocument.DocumentUrl = documents.FirstOrDefault(di => di.DocumentId == userDocument.DocumentId)?.Url ?? string.Empty;
+                        userDocument.QPDocumentTypeName = QPDocumentTypeDictionary[userDocument.QPDocumentTypeId];
+                    }
                 }
             }
             return qPTemplates.FirstOrDefault();
@@ -516,18 +596,18 @@ namespace SKCE.Examination.Services.QPSettings
         {
             var qpTemplate = await _context.QPTemplates.FirstOrDefaultAsync(qp => qp.QPTemplateId == qpTemplateId);
             if (qpTemplate == null) return null;
-            qpTemplate.QPTemplateStatusTypeId = 2; //QP Allocated
+            qpTemplate.QPTemplateStatusTypeId = 2; //QP Generation Allocated
 
             var userQPTemplate = new UserQPTemplate()
             {
                 QPTemplateId = qpTemplateId,
                 UserId = userId,
-                QPTemplateStatusTypeId = 8,//QP InProgress
+                QPTemplateStatusTypeId = 8,//Generation QP InProgress
             };
             AuditHelper.SetAuditPropertiesForInsert(userQPTemplate, 1);
             _context.UserQPTemplates.Add(userQPTemplate);
             await _context.SaveChangesAsync();
-            var qpSyllabusDocument = await _context.QPTemplateDocuments.FirstOrDefaultAsync(qptd => qptd.QPDocumentTypeId == 1);
+            var qpSyllabusDocument = await _context.QPTemplateDocuments.FirstOrDefaultAsync(qptd => qptd.QPDocumentTypeId == 1 && qptd.QPTemplateId == qpTemplateId);
             var userQPSyllabusDocument = new UserQPTemplateDocument()
             {
                 QPDocumentTypeId = 1,
@@ -538,7 +618,7 @@ namespace SKCE.Examination.Services.QPSettings
             _context.UserQPTemplateDocuments.Add(userQPSyllabusDocument);
 
 
-            var qpGenerationDocument = await _context.QPTemplateDocuments.FirstOrDefaultAsync(qptd => qptd.QPDocumentTypeId ==3);
+            var qpGenerationDocument = await _context.QPTemplateDocuments.FirstOrDefaultAsync(qptd => qptd.QPDocumentTypeId ==3 && qptd.QPTemplateId == qpTemplateId);
             var userQPDocument = new UserQPTemplateDocument() { 
                 QPDocumentTypeId = 6,
                 UserQPTemplateId =userQPTemplate.UserQPTemplateId,
@@ -546,7 +626,16 @@ namespace SKCE.Examination.Services.QPSettings
             };
             AuditHelper.SetAuditPropertiesForInsert(userQPDocument, 1);
             _context.UserQPTemplateDocuments.Add(userQPDocument);
-           
+
+            var generationQPDocument = new UserQPTemplateDocument()
+            {
+                QPDocumentTypeId = 7,
+                UserQPTemplateId = userQPTemplate.UserQPTemplateId,
+                DocumentId = 0
+            };
+            AuditHelper.SetAuditPropertiesForInsert(generationQPDocument, 1);
+            _context.UserQPTemplateDocuments.Add(generationQPDocument);
+
             await _context.SaveChangesAsync();
             return true;
         }
@@ -564,6 +653,13 @@ namespace SKCE.Examination.Services.QPSettings
             if (userQPTemplate == null) return null;
             userQPTemplate.QPTemplateStatusTypeId = 9;
 
+            var generatedQpDocument = await _context.UserQPTemplateDocuments.FirstOrDefaultAsync(qptd => qptd.QPDocumentTypeId == 7 && qptd.UserQPTemplateId == userQPTemplate.UserQPTemplateId);
+            if (generatedQpDocument != null)
+            {
+                generatedQpDocument.DocumentId = documentId;
+                AuditHelper.SetAuditPropertiesForUpdate(generatedQpDocument, 1);
+            }
+
             AuditHelper.SetAuditPropertiesForUpdate(userQPTemplate, 1);
             await _context.SaveChangesAsync();
             return true;
@@ -571,6 +667,10 @@ namespace SKCE.Examination.Services.QPSettings
 
         public async Task<bool?> AssignTemplateForQPScrutinyAsync(long userId, long qpTemplateId)
         {
+            var qpTemplate = await _context.QPTemplates.FirstOrDefaultAsync(qp => qp.QPTemplateId == qpTemplateId);
+            if (qpTemplate == null) return null;
+            qpTemplate.QPTemplateStatusTypeId = 4; //QP Scrutiny Allocated
+
             var qpUserTemplate = await _context.UserQPTemplates.FirstOrDefaultAsync(qp => qp.QPTemplateId == qpTemplateId && qp.QPTemplateStatusTypeId==9);
             
             if (qpUserTemplate == null) return null;
@@ -579,13 +679,23 @@ namespace SKCE.Examination.Services.QPSettings
             {
                 QPTemplateId = qpUserTemplate.QPTemplateId,
                 UserId = userId,
-                QPTemplateStatusTypeId = 8,//QP InProgress
+                QPTemplateStatusTypeId = 10,//Scrutinize QP InProgress
             };
             AuditHelper.SetAuditPropertiesForInsert(userQPTemplate, 1);
             _context.UserQPTemplates.Add(userQPTemplate);
             await _context.SaveChangesAsync();
 
-            var qpGenerationDocument = await _context.UserQPTemplateDocuments.FirstOrDefaultAsync(qptd => qptd.QPDocumentTypeId == 7);
+            var qpSyllabusDocument = await _context.UserQPTemplateDocuments.FirstOrDefaultAsync(qptd => qptd.QPDocumentTypeId == 1 && qptd.UserQPTemplateId == qpUserTemplate.UserQPTemplateId);
+            var userQPSyllabusDocument = new UserQPTemplateDocument()
+            {
+                QPDocumentTypeId = 1,
+                UserQPTemplateId = userQPTemplate.UserQPTemplateId,
+                DocumentId = qpSyllabusDocument?.DocumentId ?? 0
+            };
+            AuditHelper.SetAuditPropertiesForInsert(userQPSyllabusDocument, 1);
+            _context.UserQPTemplateDocuments.Add(userQPSyllabusDocument);
+
+            var qpGenerationDocument = await _context.UserQPTemplateDocuments.FirstOrDefaultAsync(qptd => qptd.QPDocumentTypeId == 7 && qptd.UserQPTemplateId == qpUserTemplate.UserQPTemplateId);
             var userQPDocument = new UserQPTemplateDocument()
             {
                 QPDocumentTypeId = 8,
@@ -594,6 +704,15 @@ namespace SKCE.Examination.Services.QPSettings
             };
             AuditHelper.SetAuditPropertiesForInsert(userQPDocument, 1);
             _context.UserQPTemplateDocuments.Add(userQPDocument);
+
+            var scrutinizedQPDocument = new UserQPTemplateDocument()
+            {
+                QPDocumentTypeId = 9,
+                UserQPTemplateId = userQPTemplate.UserQPTemplateId,
+                DocumentId = 0
+            };
+            AuditHelper.SetAuditPropertiesForInsert(scrutinizedQPDocument, 1);
+            _context.UserQPTemplateDocuments.Add(scrutinizedQPDocument);
 
             await _context.SaveChangesAsync();
             return true;
@@ -606,36 +725,48 @@ namespace SKCE.Examination.Services.QPSettings
             qpTemplate.QPTemplateStatusTypeId = 5; //QP Pending for Selection
             AuditHelper.SetAuditPropertiesForUpdate(qpTemplate, 1);
 
-            var userQPTemplate = await _context.UserQPTemplates.FirstOrDefaultAsync(uqp => uqp.UserId == userId && uqp.QPTemplateId == qpTemplateId);
-
-            if (userQPTemplate == null) return null;
-            userQPTemplate.QPTemplateStatusTypeId = 10;
-            AuditHelper.SetAuditPropertiesForUpdate(userQPTemplate, 1);
-            await _context.SaveChangesAsync();
-
-            var qpScrutinizedUserTemplate = await _context.UserQPTemplates.FirstOrDefaultAsync(qp => qp.QPTemplateId == qpTemplateId && qp.QPTemplateStatusTypeId == 10);
+            var qpScrutinizedUserTemplate = await _context.UserQPTemplates.FirstOrDefaultAsync(uqp => uqp.UserId == userId && uqp.QPTemplateId == qpTemplateId && uqp.QPTemplateStatusTypeId == 10);
 
             if (qpScrutinizedUserTemplate == null) return null;
+            qpScrutinizedUserTemplate.QPTemplateStatusTypeId = 11;//Scrutinized QP Submitted
+            AuditHelper.SetAuditPropertiesForUpdate(qpScrutinizedUserTemplate, 1);
+           
 
             var userQPTemplateForSelection = new UserQPTemplate()
             {
                 QPTemplateId = qpScrutinizedUserTemplate.QPTemplateId,
                 UserId = 1,
-                QPTemplateStatusTypeId = 8,//QP InProgress
+                QPTemplateStatusTypeId = 12,//Selection QP InProgress
             };
             AuditHelper.SetAuditPropertiesForInsert(userQPTemplateForSelection, 1);
             _context.UserQPTemplates.Add(userQPTemplateForSelection);
             await _context.SaveChangesAsync();
 
-            var qpGenerationDocument = await _context.UserQPTemplateDocuments.FirstOrDefaultAsync(qptd => qptd.QPDocumentTypeId == 9);
+            var scrutinizedQPDocument = await _context.UserQPTemplateDocuments.FirstOrDefaultAsync(qptd => qptd.QPDocumentTypeId == 9 && qptd.UserQPTemplateId == qpScrutinizedUserTemplate.UserQPTemplateId);
+            if(scrutinizedQPDocument != null)
+            {
+                scrutinizedQPDocument.DocumentId = documentId;
+                AuditHelper.SetAuditPropertiesForUpdate(scrutinizedQPDocument, 1);
+            }
+            await _context.SaveChangesAsync();
+
             var userQPDocument = new UserQPTemplateDocument()
             {
-                QPDocumentTypeId = 10,
-                UserQPTemplateId = userQPTemplate.UserQPTemplateId,
-                DocumentId = qpGenerationDocument?.DocumentId ?? 0
+                QPDocumentTypeId = 10,//For QP Selection
+                UserQPTemplateId = userQPTemplateForSelection.UserQPTemplateId,
+                DocumentId = documentId
             };
             AuditHelper.SetAuditPropertiesForInsert(userQPDocument, 1);
             _context.UserQPTemplateDocuments.Add(userQPDocument);
+
+            var selectedQPDocument = new UserQPTemplateDocument()
+            {
+                QPDocumentTypeId = 11,
+                UserQPTemplateId = userQPTemplateForSelection.UserQPTemplateId,
+                DocumentId = 0
+            };
+            AuditHelper.SetAuditPropertiesForInsert(selectedQPDocument, 1);
+            _context.UserQPTemplateDocuments.Add(selectedQPDocument);
 
             await _context.SaveChangesAsync();
             return true;
@@ -649,65 +780,73 @@ namespace SKCE.Examination.Services.QPSettings
             qpTemplate.QPTemplateStatusTypeId = 6; //QP Selected
             AuditHelper.SetAuditPropertiesForUpdate(qpTemplate, 1);
 
-            var userQPTemplate = await _context.UserQPTemplates.FirstOrDefaultAsync(uqp => uqp.UserId == userId && uqp.QPTemplateId == qpTemplateId);
+            var userQPTemplate = await _context.UserQPTemplates.FirstOrDefaultAsync(uqp => uqp.UserId == userId && uqp.QPTemplateId == qpTemplateId && uqp.QPTemplateStatusTypeId ==12);
 
             if (userQPTemplate == null) return null;
-            userQPTemplate.QPTemplateStatusTypeId = 10;
+            userQPTemplate.QPTemplateStatusTypeId = 13;//Selected QP Submitted
             AuditHelper.SetAuditPropertiesForUpdate(userQPTemplate, 1);
             await _context.SaveChangesAsync();
 
-            var qpScrutinizedUserTemplate = await _context.UserQPTemplates.FirstOrDefaultAsync(qp => qp.QPTemplateId == qpTemplateId && qp.QPTemplateStatusTypeId == 10);
 
-            if (qpScrutinizedUserTemplate == null) return null;
-
-            var userQPTemplateForSelection = new UserQPTemplate()
+            var selectedQpDocument = await _context.UserQPTemplateDocuments.FirstOrDefaultAsync(qptd => qptd.QPDocumentTypeId == 11 && qptd.UserQPTemplateId == userQPTemplate.UserQPTemplateId);
+            if(selectedQpDocument != null)
             {
-                QPTemplateId = qpScrutinizedUserTemplate.QPTemplateId,
-                UserId = 1,
-                QPTemplateStatusTypeId = 8,//QP InProgress
-            };
-            AuditHelper.SetAuditPropertiesForInsert(userQPTemplateForSelection, 1);
-            _context.UserQPTemplates.Add(userQPTemplateForSelection);
-            await _context.SaveChangesAsync();
-
-            var qpGenerationDocument = await _context.UserQPTemplateDocuments.FirstOrDefaultAsync(qptd => qptd.QPDocumentTypeId == 9);
-            var userQPDocument = new UserQPTemplateDocument()
-            {
-                QPDocumentTypeId = 10,
-                UserQPTemplateId = userQPTemplate.UserQPTemplateId,
-                DocumentId = qpGenerationDocument?.DocumentId ?? 0
-            };
-            AuditHelper.SetAuditPropertiesForInsert(userQPDocument, 1);
-            _context.UserQPTemplateDocuments.Add(userQPDocument);
-
+                selectedQpDocument.DocumentId = documentId;
+                AuditHelper.SetAuditPropertiesForUpdate(selectedQpDocument, 1);
+            }
             await _context.SaveChangesAsync();
             return true;
         }
         private async Task<List<UserQPTemplateVM>> GetUserQPTemplatesAsync(long userId)
         {
+            try
+            {
             var courses = _context.Courses.ToList();
             var documents = _context.Documents.ToList();
             var qpTemplateStatuss =_context.QPTemplateStatusTypes.ToList();
             var qPTemplates = new List<UserQPTemplateVM>();
             var users = _context.Users.ToList();
-            var qpTemplateIds = _context.UserQPTemplates.Where(uqp => uqp.UserId == userId).Select(uqp => uqp.QPTemplateId).ToList<long>();
             var userQPTemplates = _context.UserQPTemplates.Where(uqp => uqp.UserId == userId).ToList();
-            var qpTemplates = _context.QPTemplates.Where(qp => qpTemplateIds.Contains(qp.QPTemplateId)).ToList();
+            var qpTemplateIds = userQPTemplates.Select(uqp => uqp.QPTemplateId).ToList();
+
+            var qpTemplates = await _context.QPTemplates.Where(qp => qpTemplateIds.Contains(qp.QPTemplateId)).ToListAsync();
             userQPTemplates.ForEach(userQPTemplate =>
             {
                 qPTemplates.Add(new UserQPTemplateVM() {
-                    QPTemplateId = userQPTemplate.QPTemplateId, 
+                    UserQPTemplateId = userQPTemplate.UserQPTemplateId,
+                    QPTemplateId = userQPTemplate.QPTemplateId,
+                    QPTemplateName = qpTemplates.ToList().FirstOrDefault(q => q.QPTemplateId == userQPTemplate.QPTemplateId)?.QPTemplateName ?? string.Empty,
                     UserId = userQPTemplate.UserId,
                     UserName = users.FirstOrDefault(u => u.UserId == userQPTemplate.UserId)?.Name ?? string.Empty,
-                    UserQPTemplateId = userQPTemplate.UserQPTemplateId, 
                     QPTemplateStatusTypeId = userQPTemplate.QPTemplateStatusTypeId, 
                     QPTemplateStatusTypeName = qpTemplateStatuss.FirstOrDefault(qps => qps.QPTemplateStatusTypeId == userQPTemplate.QPTemplateStatusTypeId)?.Name ?? string.Empty,
-                    QPTemplateName = qpTemplates.ToList().FirstOrDefault(q=>q.QPTemplateId== userQPTemplate.QPTemplateId)?.QPTemplateName??string.Empty
+                    
                 });
-
             });
-
-            return qPTemplates;
+                foreach (var qPTemplate in qPTemplates)
+                {
+                    qPTemplate.UserDocuments = _context.UserQPTemplateDocuments
+                        .Where(qpd => qpd.UserQPTemplateId == (qPTemplate != null ? qPTemplate.UserQPTemplateId : 0))
+                        .Select(qpd => new QPTemplateDocumentVM
+                        {
+                            QPTemplateId = qpd.UserQPTemplateId,
+                            QPTemplateDocumentId = qpd.UserQPTemplateDocumentId,
+                            DocumentId = qpd.DocumentId,
+                            QPDocumentTypeId = qpd.QPDocumentTypeId,
+                        }).ToList();
+                    foreach (var userDocument in qPTemplate.UserDocuments)
+                    {
+                        userDocument.QPDocumentTypeName = QPDocumentTypeDictionary[userDocument.QPDocumentTypeId];
+                        userDocument.DocumentName = documents.FirstOrDefault(d => d.DocumentId == userDocument.DocumentId)?.Name ?? string.Empty;
+                        userDocument.DocumentUrl = documents.FirstOrDefault(d => d.DocumentId == userDocument.DocumentId)?.Url ?? string.Empty;
+                    }
+                }
+                return qPTemplates;
+            }
+            catch (Exception ex)
+            {
+                throw ;
+            }
         }
     }
 }

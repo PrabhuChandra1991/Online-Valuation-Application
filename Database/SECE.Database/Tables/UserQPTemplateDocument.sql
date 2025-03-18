@@ -4,7 +4,7 @@
 	[UserQPTemplateId] BIGINT NOT NULL FOREIGN KEY (UserQPTemplateId) REFERENCES [UserQPTemplate](UserQPTemplateId),
 	[QPDocumentTypeId] BIGINT NOT NULL,
 	[DocumentId] BIGINT NOT NULL,
-	[IsActive] BIT DEFAULT 1,
+	[IsActive] BIT NOT NULL,
 	CreatedDate DATETIME DEFAULT GETDATE(),
 	CreatedById BIGINT NOT NULL DEFAULT 1,
 	ModifiedDate DATETIME DEFAULT GETDATE(),

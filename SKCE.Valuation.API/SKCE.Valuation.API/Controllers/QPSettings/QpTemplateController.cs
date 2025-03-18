@@ -39,7 +39,15 @@ namespace SKCE.Examination.API.Controllers.QPSettings
             var result = await _qpTemplateService.CreateQpTemplateAsync(viewModel);
             return CreatedAtAction(nameof(CreateQpTemplate), new { id = result.QPTemplateId }, result);
         }
+        [HttpPost("UpdateQpTemplate/{qpTemplateId}")]
+        public async Task<IActionResult> UpdateQpTemplate(long qpTemplateId,[FromBody] QPTemplateVM viewModel)
+        {
+            if (viewModel == null)
+                return BadRequest("Invalid input data");
 
+            var updatedTemplate = await _qpTemplateService.UpdateQpTemplateAsync(viewModel);
+            return Ok(updatedTemplate);
+        }
         [HttpGet]
         public async Task<ActionResult<IEnumerable<QPTemplateVM>>> GetQPTemplatesAsync()
         {
@@ -53,25 +61,39 @@ namespace SKCE.Examination.API.Controllers.QPSettings
             if (course == null) return NotFound();
             return Ok(course);
         }
-        [HttpGet("GetQPTemplatesByUserId/{userId}")]
-        public async Task<ActionResult<Course>> GetQPTemplatesByUserId(long userId)
+        
+        [HttpGet("GetUserQPTemplates/{userId}")]
+        public async Task<ActionResult<IEnumerable<UserQPTemplateVM>>> GetUserQPTemplatesAsync(long userId)
         {
-            var course = await _qpTemplateService.GetQPTemplatesByUserIdAsync(userId);
-            if (course == null) return NotFound();
-            return Ok(course);
+            return Ok(await _qpTemplateService.GetQPTemplatesByUserIdAsync(userId));
         }
-        [HttpGet("AssignQPTemplate/{userId}/{qpTemplateId}")]
-        public async Task<ActionResult<bool>> AssignQPTemplate(long userId,long qpTemplateId)
+        [HttpGet("AssignQPForGeneration/{userId}/{qpTemplateId}")]
+        public async Task<ActionResult<bool>> AssignQPForGeneration(long userId, long qpTemplateId)
         {
-            var userQPTemplate = await _qpTemplateService.AssignTemplateForQPGenerationAsync(userId,qpTemplateId);
+            var userQPTemplate = await _qpTemplateService.AssignTemplateForQPGenerationAsync(userId, qpTemplateId);
             if (userQPTemplate == null) return NotFound();
             return Ok(userQPTemplate);
         }
-
-        [HttpGet("GetUserQPTemplates/{userId}")]
-        public async Task<ActionResult<IEnumerable<QPTemplateVM>>> GetUserQPTemplatesAsync(long userId)
+        [HttpGet("SubmitGeneratedQP/{userId}/{qpTemplateId}/{documentId}")]
+        public async Task<ActionResult<bool>> SubmitGeneratedQP(long userId, long qpTemplateId, long documentId)
         {
-            return Ok(await _qpTemplateService.GetQPTemplatesByUserIdAsync(userId));
+            var userQPTemplate = await _qpTemplateService.SubmitGeneratedQPAsync(userId, qpTemplateId, documentId);
+            if (userQPTemplate == null) return NotFound();
+            return Ok(userQPTemplate);
+        }
+        [HttpGet("AssignQPForScrutinity/{userId}/{qpTemplateId}")]
+        public async Task<ActionResult<bool>> AssignQPForScrutinity(long userId, long qpTemplateId)
+        {
+            var userQPTemplate = await _qpTemplateService.AssignTemplateForQPScrutinyAsync(userId, qpTemplateId);
+            if (userQPTemplate == null) return NotFound();
+            return Ok(userQPTemplate);
+        }
+        [HttpGet("SubmitScrutinizedQP/{userId}/{qpTemplateId}/{documentId}")]
+        public async Task<ActionResult<bool>> SubmitScrutinizedQP(long userId, long qpTemplateId, long documentId)
+        {
+            var userQPTemplate = await _qpTemplateService.SubmitScrutinizedQPAsync(userId, qpTemplateId, documentId);
+            if (userQPTemplate == null) return NotFound();
+            return Ok(userQPTemplate);
         }
     }
 }

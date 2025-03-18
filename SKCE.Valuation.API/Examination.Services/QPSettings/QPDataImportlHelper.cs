@@ -8,7 +8,9 @@ using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using SKCE.Examination.Models.DbModels.Common;
+using SKCE.Examination.Models.DbModels.QPSettings;
 using SKCE.Examination.Services.Helpers;
+using SKCE.Examination.Services.ViewModels.QPSettings;
 
 public class QPDataImportHelper
 {
@@ -24,6 +26,7 @@ public class QPDataImportHelper
     {
         try
         {
+
             using var spreadsheet = SpreadsheetDocument.Open(excelStream, false);
             var workbookPart = spreadsheet.WorkbookPart;
             var sheet = workbookPart.Workbook.Sheets.GetFirstChild<Sheet>();
@@ -161,14 +164,35 @@ public class QPDataImportHelper
 
             await _dbContext.CourseDepartments.AddRangeAsync(courseDepartMents);
             await _dbContext.SaveChangesAsync();
-           await _azureBlobStorageHelper.UploadFileAsync(excelStream, file.FileName,file.ContentType);
-           return ($"Imported successfully! \n Course Count is " + newCourses.Count + " \n Departmets Count is " + newDepartments.Count);
+            long? documentId = await _azureBlobStorageHelper.UploadFileAsync(excelStream, file.FileName, file.ContentType);
+            
+            _dbContext.ImportHistories.Add(new ImportHistory
+            {
+                DocumentId = documentId ?? 0,
+                TotalCount = courseDepartMents.Count,
+                CoursesCount = newCourses.Count,
+                DepartmentsCount = newDepartments.Count,
+                InstitutionsCount = newInstitutions.Count,
+                UserId = 1,
+                CreatedById = 1,
+                CreatedDate = DateTime.UtcNow,
+                ModifiedById = 1,
+                ModifiedDate = DateTime.UtcNow,
+                IsActive = true
+            });
+            await _dbContext.SaveChangesAsync();
+            return ($"Imported successfully! \n Course Count is " + newCourses.Count + " \n Departmets Count is " + newDepartments.Count);
         }
         catch (Exception ex)
         {
             throw ex;
         }
+        finally
+        {
+            excelStream.Close();
+        }
     }
+        
 
     private static string GetCellValue(WorkbookPart workbookPart, Cell cell)
     {
@@ -178,5 +202,31 @@ public class QPDataImportHelper
         return cell.DataType != null && cell.DataType.Value == CellValues.SharedString
             ? workbookPart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(int.Parse(value)).InnerText
             : value;
+    }
+
+    public async Task<List<ImportHistoryVM>> GetImportHistories()
+    {
+        var documents = await _dbContext.Documents.ToListAsync();
+        var users = await _dbContext.Users.ToListAsync();
+        var importHistories = await _dbContext.ImportHistories
+        .Select(i => new ImportHistoryVM
+        {
+            ImportHistoryId = i.ImportHistoryId,
+            DocumentId = i.DocumentId,
+            TotalCount = i.TotalCount,
+            CoursesCount = i.CoursesCount,
+            DepartmentsCount = i.DepartmentsCount,
+            InstitutionsCount = i.InstitutionsCount,
+            UserId = i.UserId,
+            CreatedDate=i.CreatedDate
+        }).ToListAsync();
+
+        foreach (var importHistory in importHistories)
+        {
+            importHistory.UserName = users.FirstOrDefault(u => u.UserId == importHistory.UserId)?.Name??string.Empty;
+            importHistory.DocumentName = documents.FirstOrDefault(d => d.DocumentId == importHistory.DocumentId)?.Name ?? string.Empty;
+            importHistory.DocumentUrl = documents.FirstOrDefault(d => d.DocumentId == importHistory.DocumentId)?.Url ?? string.Empty;
+        }
+        return importHistories;
     }
 }

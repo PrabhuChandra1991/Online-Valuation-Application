@@ -389,201 +389,211 @@ namespace SKCE.Examination.Services.QPSettings
         }
         public async Task<QPTemplateVM?> GetQPTemplateAsync(long qpTemplateId)
         {
-            var degreeTypes = _context.DegreeTypes.ToList();
-            var institutions = _context.Institutions.ToList();
-            var departments = _context.Departments.ToList();
-            var courses = _context.Courses.ToList();
-            var documents = _context.Documents.ToList();
-            var qpTemplateStatuss = _context.QPTemplateStatusTypes.ToList();
-            var users = _context.Users.ToList();
-            var qPTemplates = new List<QPTemplateVM>();
-            qPTemplates = await _context.QPTemplates.Where(q=>q.QPTemplateId==qpTemplateId).Select(qpt => new QPTemplateVM
+            try
             {
-                QPTemplateId = qpt.QPTemplateId,
-                QPTemplateName = qpt.QPTemplateName,
-                QPCode = qpt.QPCode,
-                QPTemplateStatusTypeId = qpt.QPTemplateStatusTypeId,
-                CourseId = qpt.CourseId,
-                RegulationYear = qpt.RegulationYear,
-                BatchYear = qpt.BatchYear,
-                DegreeTypeId = qpt.DegreeTypeId,
-                ExamYear = qpt.ExamYear,
-                ExamMonth = qpt.ExamMonth,
-                ExamType = qpt.ExamType,
-                Semester = qpt.Semester,
-                StudentCount = qpt.StudentCount,
-                Documents = qpt.Documents.Select(d => new QPTemplateDocumentVM
+                var degreeTypes = _context.DegreeTypes.ToList();
+                var institutions = _context.Institutions.ToList();
+                var departments = _context.Departments.ToList();
+                var courses = _context.Courses.ToList();
+                var documents = _context.Documents.ToList();
+                var qpTemplateStatuss = _context.QPTemplateStatusTypes.ToList();
+                var users = _context.Users.ToList();
+                var qPTemplates = new List<QPTemplateVM>();
+                qPTemplates = await _context.QPTemplates.Where(q => q.QPTemplateId == qpTemplateId).Select(qpt => new QPTemplateVM
                 {
-                    QPTemplateDocumentId = d.QPTemplateDocumentId,
-                    QPTemplateId = d.QPTemplateId,
-                    DocumentId = d.DocumentId,
-                    QPDocumentTypeId = d.QPDocumentTypeId,
-                }).ToList(),
-
-                Institutions = qpt.Institutions.Select(i => new QPTemplateInstitutionVM
-                {
-                    QPTemplateInstitutionId = i.QPTemplateInstitutionId,
-                    QPTemplateId = i.QPTemplateId,
-                    InstitutionId = i.InstitutionId,
-                    StudentCount = i.StudentCount,
-                    Departments = i.Departments.Select(d => new QPTemplateInstitutionDepartmentVM
+                    QPTemplateId = qpt.QPTemplateId,
+                    QPTemplateName = qpt.QPTemplateName,
+                    QPCode = qpt.QPCode,
+                    QPTemplateStatusTypeId = qpt.QPTemplateStatusTypeId,
+                    CourseId = qpt.CourseId,
+                    RegulationYear = qpt.RegulationYear,
+                    BatchYear = qpt.BatchYear,
+                    DegreeTypeId = qpt.DegreeTypeId,
+                    ExamYear = qpt.ExamYear,
+                    ExamMonth = qpt.ExamMonth,
+                    ExamType = qpt.ExamType,
+                    Semester = qpt.Semester,
+                    StudentCount = qpt.StudentCount,
+                    Documents = qpt.Documents.Select(d => new QPTemplateDocumentVM
                     {
-                        QPTemplateInstitutionDepartmentId = d.QPTemplateInstitutionDepartmentId,
-                        QPTemplateInstitutionId = d.QPTemplateInstitutionId,
-                        DepartmentId = d.DepartmentId,
-                        StudentCount = d.StudentCount
-                    }).ToList(),
-                    Documents = i.Documents.Select(d => new QPTemplateInstitutionDocumentVM
-                    {
-                        QPTemplateInstitutionDocumentId = d.QPTemplateInstitutionDocumentId,
-                        QPTemplateInstitutionId = d.QPTemplateInstitutionId,
+                        QPTemplateDocumentId = d.QPTemplateDocumentId,
+                        QPTemplateId = d.QPTemplateId,
                         DocumentId = d.DocumentId,
                         QPDocumentTypeId = d.QPDocumentTypeId,
-                    }).ToList()
-                }).ToList()
-            }).ToListAsync();
+                    }).ToList(),
 
-            foreach (var qPTemplate in qPTemplates)
-            {
-                qPTemplate.DegreeTypeName = degreeTypes.FirstOrDefault(dt => dt.DegreeTypeId == qPTemplate.DegreeTypeId)?.Name ?? string.Empty;
-                qPTemplate.QPTemplateStatusTypeName = qpTemplateStatuss.FirstOrDefault(qps => qps.QPTemplateStatusTypeId == qPTemplate.QPTemplateStatusTypeId)?.Name ?? string.Empty;
-                qPTemplate.Documents.ForEach(d => {
-                    d.DocumentName = documents.FirstOrDefault(di => di.DocumentId == d.DocumentId)?.Name ?? string.Empty;
-                    d.DocumentUrl = documents.FirstOrDefault(di => di.DocumentId == d.DocumentId)?.Url ?? string.Empty;
-
-                });
-                qPTemplate.CourseCode = courses.FirstOrDefault(c => c.CourseId == qPTemplate.CourseId)?.Code ?? string.Empty;
-                qPTemplate.CourseName = courses.FirstOrDefault(c => c.CourseId == qPTemplate.CourseId)?.Name ?? string.Empty;
-                foreach (var document in qPTemplate.Documents)
-                {
-                    document.QPDocumentTypeName = QPDocumentTypeDictionary[document.QPDocumentTypeId];
-                    document.DocumentName = documents.FirstOrDefault(di => di.DocumentId == document.DocumentId)?.Name ?? string.Empty;
-                    document.DocumentUrl = documents.FirstOrDefault(di => di.DocumentId == document.DocumentId)?.Url ?? string.Empty;
-                }
-                foreach (var institution in qPTemplate.Institutions)
-                {
-                    institution.InstitutionName = institutions.FirstOrDefault(i => i.InstitutionId == institution.InstitutionId)?.Name ?? string.Empty;
-                    institution.InstitutionCode = institutions.FirstOrDefault(i => i.InstitutionId == institution.InstitutionId)?.Code ?? string.Empty;
-                    institution.Departments.ForEach(d =>
+                    Institutions = qpt.Institutions.Select(i => new QPTemplateInstitutionVM
                     {
-                        d.DepartmentName = departments.FirstOrDefault(dept => dept.DepartmentId == d.DepartmentId)?.Name ?? string.Empty;
-                        d.DepartmentShortName = departments.FirstOrDefault(dept => dept.DepartmentId == d.DepartmentId)?.ShortName ?? string.Empty;
-                    });
-                    institution.Documents.ForEach(d => {
+                        QPTemplateInstitutionId = i.QPTemplateInstitutionId,
+                        QPTemplateId = i.QPTemplateId,
+                        InstitutionId = i.InstitutionId,
+                        StudentCount = i.StudentCount,
+                        Departments = i.Departments.Select(d => new QPTemplateInstitutionDepartmentVM
+                        {
+                            QPTemplateInstitutionDepartmentId = d.QPTemplateInstitutionDepartmentId,
+                            QPTemplateInstitutionId = d.QPTemplateInstitutionId,
+                            DepartmentId = d.DepartmentId,
+                            StudentCount = d.StudentCount
+                        }).ToList(),
+                        Documents = i.Documents.Select(d => new QPTemplateInstitutionDocumentVM
+                        {
+                            QPTemplateInstitutionDocumentId = d.QPTemplateInstitutionDocumentId,
+                            QPTemplateInstitutionId = d.QPTemplateInstitutionId,
+                            DocumentId = d.DocumentId,
+                            QPDocumentTypeId = d.QPDocumentTypeId,
+                        }).ToList()
+                    }).ToList()
+                }).ToListAsync();
+
+                foreach (var qPTemplate in qPTemplates)
+                {
+                    qPTemplate.DegreeTypeName = degreeTypes.FirstOrDefault(dt => dt.DegreeTypeId == qPTemplate.DegreeTypeId)?.Name ?? string.Empty;
+                    qPTemplate.QPTemplateStatusTypeName = qpTemplateStatuss.FirstOrDefault(qps => qps.QPTemplateStatusTypeId == qPTemplate.QPTemplateStatusTypeId)?.Name ?? string.Empty;
+                    qPTemplate.Documents.ForEach(d => {
                         d.DocumentName = documents.FirstOrDefault(di => di.DocumentId == d.DocumentId)?.Name ?? string.Empty;
                         d.DocumentUrl = documents.FirstOrDefault(di => di.DocumentId == d.DocumentId)?.Url ?? string.Empty;
+
                     });
-                    foreach (var document in institution.Documents)
+                    qPTemplate.CourseCode = courses.FirstOrDefault(c => c.CourseId == qPTemplate.CourseId)?.Code ?? string.Empty;
+                    qPTemplate.CourseName = courses.FirstOrDefault(c => c.CourseId == qPTemplate.CourseId)?.Name ?? string.Empty;
+                    foreach (var document in qPTemplate.Documents)
                     {
                         document.QPDocumentTypeName = QPDocumentTypeDictionary[document.QPDocumentTypeId];
+                        document.DocumentName = documents.FirstOrDefault(di => di.DocumentId == document.DocumentId)?.Name ?? string.Empty;
+                        document.DocumentUrl = documents.FirstOrDefault(di => di.DocumentId == document.DocumentId)?.Url ?? string.Empty;
                     }
-                }
-
-                //get User template details
-                // QP Generation template details
-                var generationUserTemplateDetail = await _context.UserQPTemplates.FirstOrDefaultAsync(qp => qp.QPTemplateStatusTypeId == 8 || qp.QPTemplateStatusTypeId == 9);
-                if (generationUserTemplateDetail != null) {
-                    qPTemplate.UserQPGenerateTemplate = new UserQPTemplateVM() {
-                        QPTemplateCurrentStateHeader = "QP Generation Assigned Details",
-                        UserQPTemplateId = generationUserTemplateDetail?.UserQPTemplateId ?? 0,
-                        UserId = generationUserTemplateDetail?.UserId ?? 0,
-                        UserName = users.FirstOrDefault(u => u.UserId == generationUserTemplateDetail?.UserId)?.Name ?? string.Empty,
-                        QPTemplateId = qPTemplate.QPTemplateId,
-                        QPTemplateCourseCode = qPTemplate.CourseCode,
-                        QPTemplateCourseName = qPTemplate.CourseName,
-                        QPTemplateExamMonth = qPTemplate.ExamMonth,
-                        QPTemplateExamYear = qPTemplate.ExamYear,
-                        QPTemplateStatusTypeId = generationUserTemplateDetail?.QPTemplateStatusTypeId ?? 0,
-                        QPTemplateStatusTypeName = qpTemplateStatuss.FirstOrDefault(qps => qps.QPTemplateStatusTypeId == generationUserTemplateDetail?.QPTemplateStatusTypeId)?.Name ?? string.Empty,
-                        QPTemplateName = qPTemplate.QPTemplateName,
-                    };
-                    qPTemplate.UserQPGenerateTemplate.UserDocuments = _context.UserQPTemplateDocuments
-                        .Where(qpd => qpd.UserQPTemplateId == (generationUserTemplateDetail != null ? generationUserTemplateDetail.UserQPTemplateId : 0))
-                        .Select(qpd => new QPTemplateDocumentVM
+                    foreach (var institution in qPTemplate.Institutions)
+                    {
+                        institution.InstitutionName = institutions.FirstOrDefault(i => i.InstitutionId == institution.InstitutionId)?.Name ?? string.Empty;
+                        institution.InstitutionCode = institutions.FirstOrDefault(i => i.InstitutionId == institution.InstitutionId)?.Code ?? string.Empty;
+                        institution.Departments.ForEach(d =>
                         {
-                            QPTemplateDocumentId = qpd.UserQPTemplateDocumentId,
-                            DocumentId = qpd.DocumentId,
-                            QPDocumentTypeId = qpd.QPDocumentTypeId,
-                        }).ToList();
-                    foreach (var userDocument in qPTemplate.UserQPGenerateTemplate.UserDocuments)
-                    {
-                        userDocument.QPDocumentTypeName = QPDocumentTypeDictionary[userDocument.QPDocumentTypeId];
-                        userDocument.DocumentName = documents.FirstOrDefault(di => di.DocumentId == userDocument.DocumentId)?.Name ?? string.Empty;
-                        userDocument.DocumentUrl = documents.FirstOrDefault(di => di.DocumentId == userDocument.DocumentId)?.Url ?? string.Empty;
-                    }
-                }
-
-                // QP Scrutinity template details
-                var ScrutinityUserTemplateDetail = await _context.UserQPTemplates.FirstOrDefaultAsync(qp => qp.QPTemplateStatusTypeId == 10 || qp.QPTemplateStatusTypeId == 11);
-                if (ScrutinityUserTemplateDetail != null)
-                {
-                    qPTemplate.UserQPScrutinyTemplate = new UserQPTemplateVM()
-                    {
-                        QPTemplateCurrentStateHeader = "QP Scrutinity Assigned Details",
-                        UserQPTemplateId = ScrutinityUserTemplateDetail?.UserQPTemplateId ?? 0,
-                        UserId = ScrutinityUserTemplateDetail?.UserId ?? 0,
-                        UserName = users.FirstOrDefault(u => u.UserId == ScrutinityUserTemplateDetail?.UserId)?.Name ?? string.Empty,
-                        QPTemplateId = qPTemplate.QPTemplateId,
-                        QPTemplateCourseCode = qPTemplate.CourseCode,
-                        QPTemplateCourseName = qPTemplate.CourseName,
-                        QPTemplateExamMonth = qPTemplate.ExamMonth,
-                        QPTemplateExamYear = qPTemplate.ExamYear,
-                        QPTemplateStatusTypeId = ScrutinityUserTemplateDetail?.QPTemplateStatusTypeId ?? 0,
-                        QPTemplateStatusTypeName = qpTemplateStatuss.FirstOrDefault(qps => qps.QPTemplateStatusTypeId == ScrutinityUserTemplateDetail?.QPTemplateStatusTypeId)?.Name ?? string.Empty,
-                        QPTemplateName = qPTemplate.QPTemplateName,
-                    };
-                    qPTemplate.UserQPScrutinyTemplate.UserDocuments = _context.UserQPTemplateDocuments
-                        .Where(qpd => qpd.UserQPTemplateId == (ScrutinityUserTemplateDetail != null ? ScrutinityUserTemplateDetail.UserQPTemplateId : 0))
-                        .Select(qpd => new QPTemplateDocumentVM
+                            d.DepartmentName = departments.FirstOrDefault(dept => dept.DepartmentId == d.DepartmentId)?.Name ?? string.Empty;
+                            d.DepartmentShortName = departments.FirstOrDefault(dept => dept.DepartmentId == d.DepartmentId)?.ShortName ?? string.Empty;
+                        });
+                        institution.Documents.ForEach(d => {
+                            d.DocumentName = documents.FirstOrDefault(di => di.DocumentId == d.DocumentId)?.Name ?? string.Empty;
+                            d.DocumentUrl = documents.FirstOrDefault(di => di.DocumentId == d.DocumentId)?.Url ?? string.Empty;
+                        });
+                        foreach (var document in institution.Documents)
                         {
-                            QPTemplateDocumentId = qpd.UserQPTemplateDocumentId,
-                            DocumentId = qpd.DocumentId,
-                            QPDocumentTypeId = qpd.QPDocumentTypeId,
-                        }).ToList();
-                    foreach (var userDocument in qPTemplate.UserQPScrutinyTemplate.UserDocuments)
-                    {
-                        userDocument.DocumentName = documents.FirstOrDefault(di => di.DocumentId == userDocument.DocumentId)?.Name ?? string.Empty;
-                        userDocument.DocumentUrl = documents.FirstOrDefault(di => di.DocumentId == userDocument.DocumentId)?.Url ?? string.Empty;
-                        userDocument.QPDocumentTypeName = QPDocumentTypeDictionary[userDocument.QPDocumentTypeId];
+                            document.QPDocumentTypeName = QPDocumentTypeDictionary[document.QPDocumentTypeId];
+                        }
                     }
-                }
 
-                // QP Selection template details
-                var SelectionUserTemplateDetail = await _context.UserQPTemplates.FirstOrDefaultAsync(qp => qp.QPTemplateStatusTypeId == 12 || qp.QPTemplateStatusTypeId == 13);
-                if (SelectionUserTemplateDetail != null)
-                {
-                    qPTemplate.UserQPSelectionTemplate = new UserQPTemplateVM()
+                    //get User template details
+                    // QP Generation template details
+                    var generationUserTemplateDetail = await _context.UserQPTemplates.FirstOrDefaultAsync(qp => qp.QPTemplateStatusTypeId == 8 || qp.QPTemplateStatusTypeId == 9);
+                    if (generationUserTemplateDetail != null)
                     {
-                        QPTemplateCurrentStateHeader = "QP Selection Assigned Details",
-                        UserQPTemplateId = SelectionUserTemplateDetail?.UserQPTemplateId ?? 0,
-                        UserId = SelectionUserTemplateDetail?.UserId ?? 0,
-                        UserName = users.FirstOrDefault(u => u.UserId == SelectionUserTemplateDetail?.UserId)?.Name ?? string.Empty,
-                        QPTemplateId = qPTemplate.QPTemplateId,
-                        QPTemplateCourseCode = qPTemplate.CourseCode,
-                        QPTemplateCourseName = qPTemplate.CourseName,
-                        QPTemplateExamMonth = qPTemplate.ExamMonth,
-                        QPTemplateExamYear = qPTemplate.ExamYear,
-                        QPTemplateStatusTypeId = SelectionUserTemplateDetail?.QPTemplateStatusTypeId ?? 0,
-                        QPTemplateStatusTypeName = qpTemplateStatuss.FirstOrDefault(qps => qps.QPTemplateStatusTypeId == SelectionUserTemplateDetail?.QPTemplateStatusTypeId)?.Name ?? string.Empty,
-                        QPTemplateName = qPTemplate.QPTemplateName,
-                    };
-                    qPTemplate.UserQPSelectionTemplate.UserDocuments = _context.UserQPTemplateDocuments
-                        .Where(qpd => qpd.UserQPTemplateId == (SelectionUserTemplateDetail != null ? SelectionUserTemplateDetail.UserQPTemplateId : 0))
-                        .Select(qpd => new QPTemplateDocumentVM
+                        qPTemplate.UserQPGenerateTemplate = new UserQPTemplateVM()
                         {
-                            QPTemplateDocumentId = qpd.UserQPTemplateDocumentId,
-                            DocumentId = qpd.DocumentId,
-                            QPDocumentTypeId = qpd.QPDocumentTypeId,
-                        }).ToList();
-                    foreach (var userDocument in qPTemplate.UserQPSelectionTemplate.UserDocuments)
+                            QPTemplateCurrentStateHeader = "QP Generation Assigned Details",
+                            UserQPTemplateId = generationUserTemplateDetail?.UserQPTemplateId ?? 0,
+                            UserId = generationUserTemplateDetail?.UserId ?? 0,
+                            UserName = users.FirstOrDefault(u => u.UserId == generationUserTemplateDetail?.UserId)?.Name ?? string.Empty,
+                            QPTemplateId = qPTemplate.QPTemplateId,
+                            QPTemplateCourseCode = qPTemplate.CourseCode,
+                            QPTemplateCourseName = qPTemplate.CourseName,
+                            QPTemplateExamMonth = qPTemplate.ExamMonth,
+                            QPTemplateExamYear = qPTemplate.ExamYear,
+                            QPTemplateStatusTypeId = generationUserTemplateDetail?.QPTemplateStatusTypeId ?? 0,
+                            QPTemplateStatusTypeName = qpTemplateStatuss.FirstOrDefault(qps => qps.QPTemplateStatusTypeId == generationUserTemplateDetail?.QPTemplateStatusTypeId)?.Name ?? string.Empty,
+                            QPTemplateName = qPTemplate.QPTemplateName,
+                        };
+                        qPTemplate.UserQPGenerateTemplate.UserDocuments = _context.UserQPTemplateDocuments
+                            .Where(qpd => qpd.UserQPTemplateId == (generationUserTemplateDetail != null ? generationUserTemplateDetail.UserQPTemplateId : 0))
+                            .Select(qpd => new QPTemplateDocumentVM
+                            {
+                                QPTemplateDocumentId = qpd.UserQPTemplateDocumentId,
+                                DocumentId = qpd.DocumentId,
+                                QPDocumentTypeId = qpd.QPDocumentTypeId,
+                            }).ToList();
+                        foreach (var userDocument in qPTemplate.UserQPGenerateTemplate.UserDocuments)
+                        {
+                            userDocument.QPDocumentTypeName = QPDocumentTypeDictionary[userDocument.QPDocumentTypeId];
+                            userDocument.DocumentName = documents.FirstOrDefault(di => di.DocumentId == userDocument.DocumentId)?.Name ?? string.Empty;
+                            userDocument.DocumentUrl = documents.FirstOrDefault(di => di.DocumentId == userDocument.DocumentId)?.Url ?? string.Empty;
+                        }
+                    }
+
+                    // QP Scrutinity template details
+                    var ScrutinityUserTemplateDetail = await _context.UserQPTemplates.FirstOrDefaultAsync(qp => qp.QPTemplateStatusTypeId == 10 || qp.QPTemplateStatusTypeId == 11);
+                    if (ScrutinityUserTemplateDetail != null)
                     {
-                        userDocument.DocumentName = documents.FirstOrDefault(di => di.DocumentId == userDocument.DocumentId)?.Name ?? string.Empty;
-                        userDocument.DocumentUrl = documents.FirstOrDefault(di => di.DocumentId == userDocument.DocumentId)?.Url ?? string.Empty;
-                        userDocument.QPDocumentTypeName = QPDocumentTypeDictionary[userDocument.QPDocumentTypeId];
+                        qPTemplate.UserQPScrutinyTemplate = new UserQPTemplateVM()
+                        {
+                            QPTemplateCurrentStateHeader = "QP Scrutinity Assigned Details",
+                            UserQPTemplateId = ScrutinityUserTemplateDetail?.UserQPTemplateId ?? 0,
+                            UserId = ScrutinityUserTemplateDetail?.UserId ?? 0,
+                            UserName = users.FirstOrDefault(u => u.UserId == ScrutinityUserTemplateDetail?.UserId)?.Name ?? string.Empty,
+                            QPTemplateId = qPTemplate.QPTemplateId,
+                            QPTemplateCourseCode = qPTemplate.CourseCode,
+                            QPTemplateCourseName = qPTemplate.CourseName,
+                            QPTemplateExamMonth = qPTemplate.ExamMonth,
+                            QPTemplateExamYear = qPTemplate.ExamYear,
+                            QPTemplateStatusTypeId = ScrutinityUserTemplateDetail?.QPTemplateStatusTypeId ?? 0,
+                            QPTemplateStatusTypeName = qpTemplateStatuss.FirstOrDefault(qps => qps.QPTemplateStatusTypeId == ScrutinityUserTemplateDetail?.QPTemplateStatusTypeId)?.Name ?? string.Empty,
+                            QPTemplateName = qPTemplate.QPTemplateName,
+                        };
+                        qPTemplate.UserQPScrutinyTemplate.UserDocuments = _context.UserQPTemplateDocuments
+                            .Where(qpd => qpd.UserQPTemplateId == (ScrutinityUserTemplateDetail != null ? ScrutinityUserTemplateDetail.UserQPTemplateId : 0))
+                            .Select(qpd => new QPTemplateDocumentVM
+                            {
+                                QPTemplateDocumentId = qpd.UserQPTemplateDocumentId,
+                                DocumentId = qpd.DocumentId,
+                                QPDocumentTypeId = qpd.QPDocumentTypeId,
+                            }).ToList();
+                        foreach (var userDocument in qPTemplate.UserQPScrutinyTemplate.UserDocuments)
+                        {
+                            userDocument.DocumentName = documents.FirstOrDefault(di => di.DocumentId == userDocument.DocumentId)?.Name ?? string.Empty;
+                            userDocument.DocumentUrl = documents.FirstOrDefault(di => di.DocumentId == userDocument.DocumentId)?.Url ?? string.Empty;
+                            userDocument.QPDocumentTypeName = QPDocumentTypeDictionary[userDocument.QPDocumentTypeId];
+                        }
+                    }
+
+                    // QP Selection template details
+                    var SelectionUserTemplateDetail = await _context.UserQPTemplates.FirstOrDefaultAsync(qp => qp.QPTemplateStatusTypeId == 12 || qp.QPTemplateStatusTypeId == 13);
+                    if (SelectionUserTemplateDetail != null)
+                    {
+                        qPTemplate.UserQPSelectionTemplate = new UserQPTemplateVM()
+                        {
+                            QPTemplateCurrentStateHeader = "QP Selection Assigned Details",
+                            UserQPTemplateId = SelectionUserTemplateDetail?.UserQPTemplateId ?? 0,
+                            UserId = SelectionUserTemplateDetail?.UserId ?? 0,
+                            UserName = users.FirstOrDefault(u => u.UserId == SelectionUserTemplateDetail?.UserId)?.Name ?? string.Empty,
+                            QPTemplateId = qPTemplate.QPTemplateId,
+                            QPTemplateCourseCode = qPTemplate.CourseCode,
+                            QPTemplateCourseName = qPTemplate.CourseName,
+                            QPTemplateExamMonth = qPTemplate.ExamMonth,
+                            QPTemplateExamYear = qPTemplate.ExamYear,
+                            QPTemplateStatusTypeId = SelectionUserTemplateDetail?.QPTemplateStatusTypeId ?? 0,
+                            QPTemplateStatusTypeName = qpTemplateStatuss.FirstOrDefault(qps => qps.QPTemplateStatusTypeId == SelectionUserTemplateDetail?.QPTemplateStatusTypeId)?.Name ?? string.Empty,
+                            QPTemplateName = qPTemplate.QPTemplateName,
+                        };
+                        qPTemplate.UserQPSelectionTemplate.UserDocuments = _context.UserQPTemplateDocuments
+                            .Where(qpd => qpd.UserQPTemplateId == (SelectionUserTemplateDetail != null ? SelectionUserTemplateDetail.UserQPTemplateId : 0))
+                            .Select(qpd => new QPTemplateDocumentVM
+                            {
+                                QPTemplateDocumentId = qpd.UserQPTemplateDocumentId,
+                                DocumentId = qpd.DocumentId,
+                                QPDocumentTypeId = qpd.QPDocumentTypeId,
+                            }).ToList();
+                        foreach (var userDocument in qPTemplate.UserQPSelectionTemplate.UserDocuments)
+                        {
+                            userDocument.DocumentName = documents.FirstOrDefault(di => di.DocumentId == userDocument.DocumentId)?.Name ?? string.Empty;
+                            userDocument.DocumentUrl = documents.FirstOrDefault(di => di.DocumentId == userDocument.DocumentId)?.Url ?? string.Empty;
+                            userDocument.QPDocumentTypeName = QPDocumentTypeDictionary[userDocument.QPDocumentTypeId];
+                        }
                     }
                 }
+                return qPTemplates.FirstOrDefault();
             }
-            return qPTemplates.FirstOrDefault();
+            catch (Exception ex)
+            {
+                throw;
+            }
+
         }
 
         public async Task<List<UserQPTemplateVM>> GetQPTemplatesByUserIdAsync(long userId)

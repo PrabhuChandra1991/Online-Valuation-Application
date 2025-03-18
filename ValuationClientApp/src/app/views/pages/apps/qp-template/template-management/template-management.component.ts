@@ -166,6 +166,7 @@ export class TemplateManagemenComponent implements OnInit, AfterViewInit {
     //#region template dialog functionalites
 
     loadTemplates(): void {
+      this.spinnerService.toggleSpinnerState(true);
       this.templateService.getTemplates().subscribe({
         next: (data: any[]) => {
           this.templates = data;
@@ -177,7 +178,9 @@ export class TemplateManagemenComponent implements OnInit, AfterViewInit {
         error: (error) => {
           console.error('Error loading qp templated:', error);
         }
+        
       });
+      this.spinnerService.toggleSpinnerState(false);
     }
 
     editTemplate(templateId: any) {

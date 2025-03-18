@@ -69,7 +69,7 @@ namespace SKCE.Examination.API.Controllers.QPSettings
         }
 
         [HttpGet("GetUserQPTemplates/{userId}")]
-        public async Task<ActionResult<IEnumerable<QPTemplateVM>>> GetUserQPTemplatesAsync(long userId)
+        public async Task<ActionResult<IEnumerable<UserQPTemplateVM>>> GetUserQPTemplatesAsync(long userId)
         {
             return Ok(await _qpTemplateService.GetQPTemplatesByUserIdAsync(userId));
         }

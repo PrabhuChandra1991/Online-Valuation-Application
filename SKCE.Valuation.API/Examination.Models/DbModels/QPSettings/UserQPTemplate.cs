@@ -19,5 +19,7 @@ namespace SKCE.Examination.Models.DbModels.QPSettings
         [ForeignKey("QPTemplate")]
         public long QPTemplateId { get; set; }
         public long QPTemplateStatusTypeId { get; set; }
+        public virtual ICollection<UserQPTemplateDocument> Documents { get; set; } = new List<UserQPTemplateDocument>();
+
     }
 }

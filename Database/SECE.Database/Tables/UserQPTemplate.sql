@@ -4,7 +4,7 @@
 	[UserId] BIGINT NOT NULL,
 	[QPTemplateId] BIGINT NOT NULL FOREIGN KEY (QPTemplateId) REFERENCES [QPTemplate](QPTemplateId),
 	[QPTemplateStatusTypeId] BIGINT NOT NULL,
-	[IsActive] BIGINT NOT NULL,
+	[IsActive] BIT NOT NULL,
 	[CreatedDate] DATETIME NOT NULL,
 	[CreatedById] BIGINT NOT NULL,
 	[ModifiedDate] DATETIME NULL,

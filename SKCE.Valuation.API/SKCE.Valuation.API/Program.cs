@@ -229,9 +229,11 @@ void SeedQPTemplateStatusType(ExaminationDbContext context)
             new QPTemplateStatusType { Name = "QP Pending for Selection"},
             new QPTemplateStatusType { Name = "QP Selected" },
             new QPTemplateStatusType { Name = "QP Printed" },
-            new QPTemplateStatusType { Name = "QP InProgress" },
+            new QPTemplateStatusType { Name = "Generation QP InProgress" },
             new QPTemplateStatusType { Name = "Generated QP Submitted"},
+            new QPTemplateStatusType { Name = "Scrutinize QP InProgress" },
             new QPTemplateStatusType { Name = "Scrutinized QP Submitted"},
+            new QPTemplateStatusType { Name = "Selection QP InProgress" },
             new QPTemplateStatusType { Name = "Selected QP Submitted"}
         };
 

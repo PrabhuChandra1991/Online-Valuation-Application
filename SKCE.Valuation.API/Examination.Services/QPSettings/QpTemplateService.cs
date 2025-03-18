@@ -46,13 +46,13 @@ namespace SKCE.Examination.Services.QPSettings
                     QPTemplateName = "",
                     QPCode = "",
                     QPTemplateStatusTypeId = 1,
-                    QPTemplateStatusTypeName = "QP Pending for Allocation",
                     Documents = new List<QPTemplateDocumentVM>(),
                     Institutions = new List<QPTemplateInstitutionVM>()
                 }).FirstOrDefaultAsync();
 
             if (qPTemplate == null) return null;
-
+            qPTemplate.QPTemplateStatusTypeName = _context.QPTemplateStatusTypes.FirstOrDefault(qps => qps.QPTemplateStatusTypeId == qPTemplate.QPTemplateStatusTypeId)?.Name ?? string.Empty;
+            
             var courseDepartments = _context.CourseDepartments.Where(cd => cd.CourseId == courseId).ToList();
             if (courseDepartments.Any())
             {
@@ -588,13 +588,13 @@ namespace SKCE.Examination.Services.QPSettings
         {
             var qpTemplate = await _context.QPTemplates.FirstOrDefaultAsync(qp => qp.QPTemplateId == qpTemplateId);
             if (qpTemplate == null) return null;
-            qpTemplate.QPTemplateStatusTypeId = 2; //QP Allocated
+            qpTemplate.QPTemplateStatusTypeId = 2; //QP Generation Allocated
 
             var userQPTemplate = new UserQPTemplate()
             {
                 QPTemplateId = qpTemplateId,
                 UserId = userId,
-                QPTemplateStatusTypeId = 8,//QP InProgress
+                QPTemplateStatusTypeId = 8,//Generation QP InProgress
             };
             AuditHelper.SetAuditPropertiesForInsert(userQPTemplate, 1);
             _context.UserQPTemplates.Add(userQPTemplate);
@@ -660,7 +660,7 @@ namespace SKCE.Examination.Services.QPSettings
             {
                 QPTemplateId = qpUserTemplate.QPTemplateId,
                 UserId = userId,
-                QPTemplateStatusTypeId = 8,//QP InProgress
+                QPTemplateStatusTypeId = 10,//Scrutinize QP InProgress
             };
             AuditHelper.SetAuditPropertiesForInsert(userQPTemplate, 1);
             _context.UserQPTemplates.Add(userQPTemplate);
@@ -675,6 +675,15 @@ namespace SKCE.Examination.Services.QPSettings
             };
             AuditHelper.SetAuditPropertiesForInsert(userQPDocument, 1);
             _context.UserQPTemplateDocuments.Add(userQPDocument);
+
+            var scrutinizedQPDocument = new UserQPTemplateDocument()
+            {
+                QPDocumentTypeId = 9,
+                UserQPTemplateId = userQPTemplate.UserQPTemplateId,
+                DocumentId = 0
+            };
+            AuditHelper.SetAuditPropertiesForInsert(scrutinizedQPDocument, 1);
+            _context.UserQPTemplateDocuments.Add(scrutinizedQPDocument);
 
             await _context.SaveChangesAsync();
             return true;
@@ -694,7 +703,7 @@ namespace SKCE.Examination.Services.QPSettings
             AuditHelper.SetAuditPropertiesForUpdate(userQPTemplate, 1);
             await _context.SaveChangesAsync();
 
-            var qpScrutinizedUserTemplate = await _context.UserQPTemplates.FirstOrDefaultAsync(qp => qp.QPTemplateId == qpTemplateId && qp.QPTemplateStatusTypeId == 10);
+            var qpScrutinizedUserTemplate = await _context.UserQPTemplates.FirstOrDefaultAsync(qp => qp.QPTemplateId == qpTemplateId && qp.QPTemplateStatusTypeId == 11);
 
             if (qpScrutinizedUserTemplate == null) return null;
 
@@ -718,6 +727,15 @@ namespace SKCE.Examination.Services.QPSettings
             AuditHelper.SetAuditPropertiesForInsert(userQPDocument, 1);
             _context.UserQPTemplateDocuments.Add(userQPDocument);
 
+            var selectedQPDocument = new UserQPTemplateDocument()
+            {
+                QPDocumentTypeId = 11,
+                UserQPTemplateId = userQPTemplate.UserQPTemplateId,
+                DocumentId = 0
+            };
+            AuditHelper.SetAuditPropertiesForInsert(selectedQPDocument, 1);
+            _context.UserQPTemplateDocuments.Add(selectedQPDocument);
+
             await _context.SaveChangesAsync();
             return true;
         }
@@ -730,7 +748,7 @@ namespace SKCE.Examination.Services.QPSettings
             qpTemplate.QPTemplateStatusTypeId = 6; //QP Selected
             AuditHelper.SetAuditPropertiesForUpdate(qpTemplate, 1);
 
-            var userQPTemplate = await _context.UserQPTemplates.FirstOrDefaultAsync(uqp => uqp.UserId == userId && uqp.QPTemplateId == qpTemplateId);
+            var userQPTemplate = await _context.UserQPTemplates.FirstOrDefaultAsync(uqp => uqp.UserId == userId && uqp.QPTemplateId == qpTemplateId && uqp.QPTemplateStatusTypeId ==12);
 
             if (userQPTemplate == null) return null;
             userQPTemplate.QPTemplateStatusTypeId = 13;//Selected QP Submitted
@@ -738,16 +756,12 @@ namespace SKCE.Examination.Services.QPSettings
             await _context.SaveChangesAsync();
 
 
-            var qpGenerationDocument = await _context.UserQPTemplateDocuments.FirstOrDefaultAsync(qptd => qptd.QPDocumentTypeId == 9);
-            var userQPDocument = new UserQPTemplateDocument()
+            var selectedQpDocument = await _context.UserQPTemplateDocuments.FirstOrDefaultAsync(qptd => qptd.QPDocumentTypeId == 11);
+            if(selectedQpDocument != null)
             {
-                QPDocumentTypeId = 11,//Selected QP
-                UserQPTemplateId = userQPTemplate.UserQPTemplateId,
-                DocumentId = qpGenerationDocument?.DocumentId ?? 0
-            };
-            AuditHelper.SetAuditPropertiesForInsert(userQPDocument, 1);
-            _context.UserQPTemplateDocuments.Add(userQPDocument);
-
+                selectedQpDocument.DocumentId = documentId;
+                AuditHelper.SetAuditPropertiesForUpdate(selectedQpDocument, 1);
+            }
             await _context.SaveChangesAsync();
             return true;
         }

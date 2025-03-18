@@ -73,8 +73,8 @@ namespace SKCE.Examination.API.Controllers.QPSettings
         {
             return Ok(await _qpTemplateService.GetQPTemplatesByUserIdAsync(userId));
         }
-        [HttpGet("AssignQPTemplate/{userId}/{qpTemplateId}")]
-        public async Task<ActionResult<bool>> AssignQPTemplate(long userId, long qpTemplateId)
+        [HttpGet("AssignQPForGeneration/{userId}/{qpTemplateId}")]
+        public async Task<ActionResult<bool>> AssignQPForGeneration(long userId, long qpTemplateId)
         {
             var userQPTemplate = await _qpTemplateService.AssignTemplateForQPGenerationAsync(userId, qpTemplateId);
             if (userQPTemplate == null) return NotFound();

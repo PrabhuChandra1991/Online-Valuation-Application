@@ -1,5 +1,6 @@
 ﻿using SKCE.Examination.Services.Helpers;
 using Microsoft.AspNetCore.Mvc;
+using SKCE.Examination.Services.ViewModels.QPSettings;
 
 namespace SKCE.Examination.API.Controllers.QPSettings
 {
@@ -27,6 +28,15 @@ namespace SKCE.Examination.API.Controllers.QPSettings
             var importedInfo = await _qPDataImportHelper.ImportQPDataByExcel(stream, file);
 
             return Ok(new { Message = importedInfo });
+        }
+
+        /// <summary>
+        /// Get import history list.
+        /// </summary>
+        [HttpGet("GetImportHistories")]
+        public async Task<ActionResult<IEnumerable<ImportHistoryVM>>> GetImportHistories()
+        {
+            return Ok(await _qPDataImportHelper.GetImportHistories());
         }
     }
 }

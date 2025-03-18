@@ -31,6 +31,7 @@ namespace SKCE.Examination.Models.DbModels.Common
         public DbSet<Document> Documents { get; set; }
         public DbSet<DegreeType> DegreeTypes { get; set; }
         public DbSet<ExamMonth> ExamMonths { get; set; }
+        public DbSet<ImportHistory> ImportHistories { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
         }

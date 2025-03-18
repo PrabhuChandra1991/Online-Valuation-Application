@@ -39,14 +39,14 @@ namespace SKCE.Examination.API.Controllers.QPSettings
             var result = await _qpTemplateService.CreateQpTemplateAsync(viewModel);
             return CreatedAtAction(nameof(CreateQpTemplate), new { id = result.QPTemplateId }, result);
         }
-        [HttpPost]
-        public async Task<IActionResult> UpdateQpTemplate([FromBody] QPTemplateVM viewModel)
+        [HttpPost("UpdateQpTemplate/{qpTemplateId}")]
+        public async Task<IActionResult> UpdateQpTemplate(long qpTemplateId,[FromBody] QPTemplateVM viewModel)
         {
             if (viewModel == null)
                 return BadRequest("Invalid input data");
 
-            var result = await _qpTemplateService.UpdateQpTemplateAsync(viewModel);
-            return CreatedAtAction(nameof(UpdateQpTemplate), new { id = viewModel?.QPTemplateId }, result);
+            var updatedTemplate = await _qpTemplateService.UpdateQpTemplateAsync(viewModel);
+            return Ok(updatedTemplate);
         }
         [HttpGet]
         public async Task<ActionResult<IEnumerable<QPTemplateVM>>> GetQPTemplatesAsync()

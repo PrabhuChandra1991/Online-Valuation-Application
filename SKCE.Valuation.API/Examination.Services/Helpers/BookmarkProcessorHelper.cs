@@ -93,10 +93,10 @@ namespace SKCE.Examination.Services.Helpers
                 }
 
                 // Save the modified document as PDF
-                var previewPdfPath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}_{2}_{3}_{4}.pdf", qPTemplate.QPTemplateName, qPTemplate.QPCode, qPTemplate.ExamYear, DateTime.UtcNow.ToLongDateString(), DateTime.UtcNow.ToShortTimeString()));
+                var previewPdfPath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}.pdf", qPTemplate.QPTemplateName, DateTime.Now.ToString("ddMMyyyyhhmmss")));
                 templateDoc.Save(previewPdfPath, SaveFormat.Pdf);
 
-                var securePdfPath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}_{2}_{3}_{4}_Secure.pdf", qPTemplate.QPTemplateName, qPTemplate.QPCode, qPTemplate.ExamYear, DateTime.UtcNow.ToLongDateString(), DateTime.UtcNow.ToShortTimeString()));
+                var securePdfPath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}_Secure.pdf", qPTemplate.QPTemplateName,DateTime.Now.ToString("ddMMyyyyhhmmss")));
                 SecurePdf(previewPdfPath, securePdfPath);
                 OpenPdfInBrowser(securePdfPath);
 
@@ -173,7 +173,7 @@ namespace SKCE.Examination.Services.Helpers
 
             // Set security privileges
             DocumentPrivilege privileges = DocumentPrivilege.ForbidAll; // Deny all permissions
-            privileges.AllowScreenReaders = true; // Allow screen readers if needed
+            //privileges.AllowScreenReaders = true; // Allow screen readers if needed
 
             // Apply security settings
             PdfFileSecurity fileSecurity = new PdfFileSecurity(pdfDocument);

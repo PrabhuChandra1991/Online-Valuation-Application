@@ -47,25 +47,26 @@
     <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
   </div>
   <div class="modal-body">
-    <form >
+    <form [formGroup]="templateAssignmentForm">
       <div class="row">
         <div class="col-md-6">
           <div class="mb-3">
             <label for="template"
               class="form-label">Template</label>
-            <select class="form-select" id="template" >
-              <option selected disabled>Select Course</option>
-              <option *ngFor="let template of templates" [value]="template.courseId">
+            <select class="form-select" id="template" formControlName="templateId" >
+              <option selected disabled>Select Template</option>
+              <option *ngFor="let template of templates" [value]="template.qpTemplateId">
                 {{ template.courseCode }} - {{ template.qpTemplateName }}
               </option>
             </select>
+            
           </div>
         </div><!-- Col -->
         <div class="col-sm-6">
           <div class="mb-4">
             <label for="qpTemplateName"
               class="form-label">Experts</label>
-              <select class="form-select" id="expert" >
+              <select class="form-select" id="expert" formControlName="userId">
                 <option selected disabled>Select Expert</option>
                 <option *ngFor="let user of users" [value]="user.userId">
                   {{ user.name }}
@@ -80,6 +81,6 @@
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-secondary" (click)="modal.close('by: close button')">Close</button>
-    <button type="button" class="btn btn-primary" >Save changes</button>
+    <button type="button" class="btn btn-primary" (click)="onSave()">Save changes</button>
   </div>
 </ng-template>

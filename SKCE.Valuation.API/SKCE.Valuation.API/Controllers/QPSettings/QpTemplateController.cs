@@ -55,13 +55,19 @@ namespace SKCE.Examination.API.Controllers.QPSettings
         }
 
         [HttpGet("{qpTemplateId}")]
-        public async Task<ActionResult<Course>> GetQPTemplate(long qpTemplateId)
+        public async Task<ActionResult<QPTemplateVM>> GetQPTemplate(long qpTemplateId)
         {
-            var course = await _qpTemplateService.GetQPTemplateAsync(qpTemplateId);
-            if (course == null) return NotFound();
-            return Ok(course);
+            var qPTemplate = await _qpTemplateService.GetQPTemplateAsync(qpTemplateId);
+            if (qPTemplate == null) return NotFound();
+            return Ok(qPTemplate);
         }
-        
+
+        [HttpGet("GetQPTemplatesByStatusId/{statusId}")]
+        public async Task<ActionResult<IEnumerable<QPTemplateVM>>> GetQPTemplatesByStatusId(long statusId)
+        {
+            return Ok(await _qpTemplateService.GetQPTemplateByStatusIdAsync(statusId));
+        }
+
         [HttpGet("GetUserQPTemplates/{userId}")]
         public async Task<ActionResult<IEnumerable<UserQPTemplateVM>>> GetUserQPTemplatesAsync(long userId)
         {
@@ -94,6 +100,13 @@ namespace SKCE.Examination.API.Controllers.QPSettings
             var userQPTemplate = await _qpTemplateService.SubmitScrutinizedQPAsync(userId, qpTemplateId, documentId);
             if (userQPTemplate == null) return NotFound();
             return Ok(userQPTemplate);
+        }
+
+        [HttpGet("PrintSelectedQP/{qpTemplateId}/{qpCode}/{isForPrint}")]
+        public async Task<ActionResult<bool>> PrintSelectedQP(long qpTemplateId,string qpCode,bool isForPrint)
+        {
+            var result = await _qpTemplateService.PrintSelectedQPAsync(qpTemplateId, qpCode,isForPrint);
+            return Ok(result);
         }
     }
 }

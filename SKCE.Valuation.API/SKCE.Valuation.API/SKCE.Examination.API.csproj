@@ -34,4 +34,10 @@
     <ProjectReference Include="..\Examination.Services\SKCE.Examination.Services.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Aspose.Wordsfor.NET.lic">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

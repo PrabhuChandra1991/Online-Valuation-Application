@@ -2,8 +2,6 @@
 using Azure.Storage.Blobs.Models;
 using Microsoft.Extensions.Configuration;
 using SKCE.Examination.Models.DbModels.Common;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace SKCE.Examination.Services.Helpers
 {
@@ -66,6 +64,46 @@ namespace SKCE.Examination.Services.Helpers
             }
 
             return (null, null);
+        }
+
+        // Download Word document from Azure Blob
+        public async Task<Aspose.Words.Document> DownloadWordDocumentFromBlob(string blobName)
+        {
+            BlobContainerClient containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
+            BlobClient blobClient = containerClient.GetBlobClient(blobName);
+
+            if (await blobClient.ExistsAsync())
+            {
+                using MemoryStream stream = new MemoryStream();
+                await blobClient.DownloadToAsync(stream);
+                return new Aspose.Words.Document(new MemoryStream(stream.ToArray()));
+            }
+            else
+            {
+                throw new Exception($"Blob {blobName} not found in container {_containerName}.");
+            }
+        }
+
+        // Uploads a file to Azure Blob Storage
+        public async Task<long> UploadFileToBlob(string filePath, string fileName)
+        {
+            BlobContainerClient containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
+            BlobClient blobClient = containerClient.GetBlobClient(fileName);
+
+            await using FileStream uploadFileStream = File.OpenRead(filePath);
+            await blobClient.UploadAsync(uploadFileStream, new BlobHttpHeaders { ContentType = "application/pdf" });
+
+            // Save file metadata in the database
+            var document = new Document
+            {
+                Name = blobClient.Name,
+                Url = blobClient.Uri.ToString()
+            };
+            AuditHelper.SetAuditPropertiesForInsert(document, 1);
+            _context.Documents.Add(document);
+            await _context.SaveChangesAsync();
+
+            return document.DocumentId; // Return the generated Document ID
         }
 
         /// <summary>

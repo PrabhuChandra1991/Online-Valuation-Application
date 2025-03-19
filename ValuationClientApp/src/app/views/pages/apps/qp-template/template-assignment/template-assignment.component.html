@@ -1,7 +1,8 @@
 <div class="container">
  
     <div class="row mt-2">
-      <div class="col-md-12">
+
+      <div class="col-md-12" *ngIf="isAdmin">
         <!-- Button trigger lg modal -->
         <button class="btn btn-primary me-1" (click)="openAssignModal(lgModal)">Assign Template</button>
        
@@ -12,7 +13,7 @@
           <div class="card-body">
             <h4 class="card-title">Assigned Templates</h4>
             <div class="table-responsive">
-              <table class="table table-striped mt-0">
+              <!-- <table class="table table-striped mt-0">
                 <thead>
                   <tr>
                     <th># </th>
@@ -28,7 +29,48 @@
                     <td colspan="6" class="text-center">No data to display</td>
                   </tr>
                 </tbody>
-              </table>
+              </table> -->
+              <!-- Search Input -->
+              <mat-form-field appearance="outline">
+                <mat-label>Search User</mat-label>
+                <input matInput (keyup)="applyFilter($event)" placeholder="Search">
+              </mat-form-field>
+
+              <!-- Table -->
+              <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+
+                <!-- Name Column -->
+                <ng-container matColumnDef="qpTemplateName">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Template Name</th>
+                  <td mat-cell *matCellDef="let element"> {{ element.qpTemplateName }} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="documentName">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Course Syllabus Document </th>
+                  <td mat-cell *matCellDef="let element"><a mat-button href={{element.userDocuments[0].documentUrl}} target="_blank">{{ element.userDocuments[0].documentName }} </a>   </td>
+                </ng-container>
+
+                <ng-container matColumnDef="qpeneration">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> QP Generation </th>
+                  <td mat-cell *matCellDef="let element"><a mat-button href={{element.userDocuments[1].documentUrl}} target="_blank">{{ element.userDocuments[1].documentName }} </a>   </td>
+                </ng-container>
+
+
+                <!-- Mobile Number Column -->
+                <ng-container matColumnDef="qpTemplateStatusTypeName">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Status </th>
+                  <td mat-cell *matCellDef="let element"> {{ element.qpTemplateStatusTypeName }} </td>
+                </ng-container>
+              
+
+            <!-- Table Header & Row Definitions --> 
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        
+          </table>
+        
+            <!-- Pagination -->
+            <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
             </div>
             
           </div>

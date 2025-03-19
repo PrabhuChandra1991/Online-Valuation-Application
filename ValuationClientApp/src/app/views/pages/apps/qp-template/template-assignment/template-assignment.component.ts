@@ -4,6 +4,10 @@ import { NgScrollbarModule } from 'ngx-scrollbar';
 import { TemplateManagementService } from '../../../services/template-management.service';
 import { CommonModule } from '@angular/common';
 import { UserService } from '../../../services/user.service';
+import { FormBuilder, FormGroup, FormArray, Validators, FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
+import { SpinnerService } from '../../../services/spinner.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-template-assignment',
@@ -12,31 +16,44 @@ import { UserService } from '../../../services/user.service';
     NgbDropdownModule,
     NgScrollbarModule,
     NgbTooltip,
-    CommonModule
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule
 ],
   templateUrl: './template-assignment.component.html',
   styleUrl: './template-assignment.component.scss'
 })
-export class TemplateAssignmentComponent implements AfterViewInit {
+export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
   defaultNavActiveId = 1;
   basicModalCode: any;
     scrollableModalCode: any;
     verticalCenteredModalCode: any;
     optionalSizesModalCode: any;
-  
+    templateAssignmentForm!: FormGroup;
     basicModalCloseResult: string = '';
     users: any[] = [];
     templates: any[] = [];
-
+   
     selectedCourseId: any | null = null;
     qpTemplateData: any = null;
     constructor(private modalService: NgbModal,
       private templateService: TemplateManagementService,
-      private userService: UserService
-    ) { }
+      private userService: UserService,
+      private fb: FormBuilder,
+      private toasterService: ToastrService,
+      private spinnerService: SpinnerService,
+      private router: Router
+    ) { 
+      this.templateAssignmentForm = this.fb.group({
+        templateId: ['', Validators.required],
+        userId: ['', Validators.required]
+      });
+
+    }
   
     ngOnInit(): void {
      
+       
       this.loadTemplates();
 
       this.loadExperts();
@@ -89,7 +106,28 @@ export class TemplateAssignmentComponent implements AfterViewInit {
       }
     });
   }
-  save() {
-    console.log('passs');
+  onSave() {
+    if (this.templateAssignmentForm.valid) {
+    
+      this.spinnerService.toggleSpinnerState(true);
+      const formData = this.templateAssignmentForm.value;
+     
+      this.templateService.assignQpTemplateToUser(formData.userId,formData.templateId).subscribe({
+        next: (response) => {
+          console.log('Assigned successful:', response);
+          this.spinnerService.toggleSpinnerState(false);
+          this.toasterService.success('Qp Template assigned successfully')
+          this.modalService.dismissAll();
+          
+        },
+        error: (error) => {
+          console.error('Save failed:', error);
+          this.toasterService.error('Save failed:', error)
+          this.spinnerService.toggleSpinnerState(false);
+        }
+      });
+    } else {
+      this.toasterService.warning('Please fill in all required fields.');
+    }
   }
 }

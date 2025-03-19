@@ -4,7 +4,7 @@ import { NgbDropdownModule, NgbNavModule, NgbTooltip, NgbModal, NgbModalRef } fr
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { TemplateManagementService } from '../../../services/template-management.service';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule,Validators } from '@angular/forms';
 import { MatIcon } from '@angular/material/icon';
 import { ToastrService } from 'ngx-toastr';
 import { SpinnerService } from '../../../services/spinner.service';
@@ -108,6 +108,7 @@ export class TemplateManagemenComponent implements OnInit, AfterViewInit {
         semester:  [{ value: '', disabled: true }],
         institutionName: [{ value: '', disabled: true }],
         studentCount: [{ value: '', disabled: true }],
+        courseId: ['', Validators.required]
       });
 
       this.loadCourses();
@@ -166,6 +167,7 @@ export class TemplateManagemenComponent implements OnInit, AfterViewInit {
     //#region template dialog functionalites
 
     loadTemplates(): void {
+      this.spinnerService.toggleSpinnerState(true);
       this.templateService.getTemplates().subscribe({
         next: (data: any[]) => {
           this.templates = data;
@@ -177,7 +179,9 @@ export class TemplateManagemenComponent implements OnInit, AfterViewInit {
         error: (error) => {
           console.error('Error loading qp templated:', error);
         }
+        
       });
+      this.spinnerService.toggleSpinnerState(false);
     }
 
     editTemplate(templateId: any) {
@@ -187,6 +191,8 @@ export class TemplateManagemenComponent implements OnInit, AfterViewInit {
 
     openEditTemplateDialog(template: any) {
       this.selectedTemplate = { ...template }; // Load selected user data
+      
+      console.log('loaded template' + template)
       this.isEditMode = true;
       this.modalRef = this.modalService.open(this.templateModal, { size: 'lg', backdrop: 'static' });
     }

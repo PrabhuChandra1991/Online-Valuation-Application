@@ -52,5 +52,10 @@ export class TemplateManagementService {
     return this.http.get<any>(`${this.apiUrl}/api/QpTemplate/${qpTemplateId}`);
   }
   
+  assignQpTemplateToUser(userId: any,templateId: any): Observable<any> {
+    return this.http.get(`${this.apiUrl}/api/QpTemplate/AssignQPForGeneration/${userId}/${templateId}`);
+  }
+
+  
 
 }

@@ -216,6 +216,7 @@ export class TemplateManagemenComponent implements OnInit, AfterViewInit {
     }
   
     fetchQPTemplate(courseId: number): void {
+      this.spinnerService.toggleSpinnerState(true);
       this.templateService.getQPTemplateByCourseId(courseId).subscribe((response) => {
         this.qpTemplateData = response;
         this.institutions = response.institutions;
@@ -233,6 +234,7 @@ export class TemplateManagemenComponent implements OnInit, AfterViewInit {
             studentCount:  response.institutions[0]?.studentCount || ''
           });
         }
+        this.spinnerService.toggleSpinnerState(false);
         console.log("qpTemplate",JSON.stringify(this.qpTemplateData)  );
       });
     }

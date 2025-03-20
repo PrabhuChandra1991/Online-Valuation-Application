@@ -22,5 +22,11 @@ export class ImportService {
       importData(formData: FormData): Observable<any> {
           return this.http.post(`${this.apiUrl}/api/QPDataImport/importQPDataByExcel`, formData);
         }
+        importSyllabusDocuments(formData: FormData): Observable<any> {
+          return this.http.post(`${this.apiUrl}/api/QPDataImport/importSyllabusDocuments`, formData);
+        }
+        importQPDocuments(formData: FormData): Observable<any> {
+          return this.http.post(`${this.apiUrl}/api/QPDataImport/ImportQPDocuments`, formData);
+        }
   
 }

@@ -1,12 +1,12 @@
 <div class="container">
     <div class="row mt-4">
       <div class="col-md-12">
-        <form [formGroup]="masterForm" (ngSubmit)="submit()">
+        <form [formGroup]="masterDataForm" (ngSubmit)="submitMasterQPData()">
           <div class="row">
             <div class="col-sm-6">
               <div class="mb-3">
                 <label class="form-label" for="filename">Upload Master Data from Eval Pro <span class="text-danger"> *</span> </label>
-                <input class="form-control " value="f['file']" type="file" id="masterfile" formControlName="file" (change)="onFileChange($event)">
+                <input class="form-control " value="f['file']" type="file" id="masterfile" formControlName="file" (change)="onMasterDataFileChange($event)">
                 <div *ngIf="f['file'].touched && f['file'].invalid" class="alert alert-danger">
                   <div *ngIf="f['file'].errors && f['file'].errors['required']">
                   File is required.
@@ -17,19 +17,21 @@
             </div>
             <div class="row">
               <div class="col-md-12">
-              <button type="submit" class="btn btn-primary" >
+              <button type="submit" class="btn btn-primary">
                 Import Master Data from Eval Pro
               </button>
               </div>
             </div>
+          </form>
             <br>
+            <form [formGroup]="courseSyllabusDocumentsForm" (ngSubmit)="submitSyllabusDocuments()" >
           <div class="row">
             <div class="col-sm-6">
               <div class="mb-3">
                 <label class="form-label" for="filename">Upload course syllabus templates <span class="text-danger"> *</span> </label>
-                <input class="form-control " value="f['file']" type="file" id="masterfile" formControlName="file" (change)="onFileChange($event)">
-                <div *ngIf="f['file'].touched && f['file'].invalid" class="alert alert-danger">
-                  <div *ngIf="f['file'].errors && f['file'].errors['required']">
+                <input class="form-control " multiple value="courseSyllabusDocumentsFormF['file']" type="file" id="masterfile" formControlName="file" (change)="onCourseSyllabusDocumentFileChange($event)">
+                <div *ngIf="courseSyllabusDocumentsFormF['file'].touched && courseSyllabusDocumentsFormF['file'].invalid" class="alert alert-danger">
+                  <div *ngIf="courseSyllabusDocumentsFormF['file'].errors && courseSyllabusDocumentsFormF['file'].errors['required']">
                   File is required.
                   </div>
               </div>
@@ -43,14 +45,16 @@
               </button>
               </div>
             </div>
+          </form>
             <br>
+            <form [formGroup]="qpDocumentsForm" (ngSubmit)="submitQPDocuments()">
             <div class="row">
               <div class="col-sm-6">
                 <div class="mb-3">
                   <label class="form-label" for="filename">Upload QP and QP Answer Key templates <span class="text-danger"> *</span> </label>
-                  <input class="form-control " value="f['file']" type="file" id="masterfile" formControlName="file" (change)="onFileChange($event)">
-                  <div *ngIf="f['file'].touched && f['file'].invalid" class="alert alert-danger">
-                    <div *ngIf="f['file'].errors && f['file'].errors['required']">
+                  <input class="form-control " multiple value="qpDocumentsformf['file']" type="file" id="masterfile" formControlName="file" (change)="onQpDocumentFileChange($event)">
+                  <div *ngIf="qpDocumentsformf['file'].touched && qpDocumentsformf['file'].invalid" class="alert alert-danger">
+                    <div *ngIf="qpDocumentsformf['file'].errors && qpDocumentsformf['file'].errors['required']">
                     File is required.
                     </div>
                 </div>

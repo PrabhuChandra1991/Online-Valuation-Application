@@ -233,15 +233,14 @@ namespace SKCE.Examination.Services.QPSettings
             });
             _context.QPTemplates.Add(qPTemplate);
             await _context.SaveChangesAsync();
-
-            qPTemplateVM.Institutions.ForEach(async i =>
+            qPTemplate.Institutions.ForEach(i =>
             {
-                var qpTemplateinstitution = await _context.QPTemplateInstitutions.FirstOrDefaultAsync(qpti => qpti.InstitutionId == i.InstitutionId);
-                if(qpTemplateinstitution != null)
+                var institutionVM = qPTemplateVM.Institutions.FirstOrDefault(qpti => qpti.InstitutionId == i.InstitutionId);
+                if(institutionVM != null)
                 {
-                    i.UserQPGenerateTemplates.ForEach(async u =>
+                    institutionVM.UserQPGenerateTemplates.ForEach(u =>
                     {
-                       await AssignTemplateForQPGenerationAsync(u.UserId, qpTemplateinstitution.QPTemplateInstitutionId);
+                        AssignTemplateForQPGenerationAsync(u.UserId, i.QPTemplateInstitutionId);
                     });
                 }
             });
@@ -884,11 +883,11 @@ namespace SKCE.Examination.Services.QPSettings
         {
             return await GetUserQPTemplatesAsync(userId);
         }
-        public async Task<bool?> AssignTemplateForQPGenerationAsync(long userId, long QPTemplateInstitutionId)
+        public bool? AssignTemplateForQPGenerationAsync(long userId, long QPTemplateInstitutionId)
         {
-            var qpTemplateInstitution = await _context.QPTemplateInstitutions.FirstOrDefaultAsync(qpti => qpti.QPTemplateInstitutionId == QPTemplateInstitutionId);
+            var qpTemplateInstitution =  _context.QPTemplateInstitutions.FirstOrDefault(qpti => qpti.QPTemplateInstitutionId == QPTemplateInstitutionId);
             if (qpTemplateInstitution == null) return null;
-            var qpTemplate = await _context.QPTemplates.FirstOrDefaultAsync(qp => qp.QPTemplateId == qpTemplateInstitution.QPTemplateId);
+            var qpTemplate =  _context.QPTemplates.FirstOrDefault(qp => qp.QPTemplateId == qpTemplateInstitution.QPTemplateId);
             if (qpTemplate == null) return null;
             qpTemplate.QPTemplateStatusTypeId = 2; //QP Generation Allocated
 
@@ -900,8 +899,8 @@ namespace SKCE.Examination.Services.QPSettings
             };
             AuditHelper.SetAuditPropertiesForInsert(userQPTemplate, 1);
             _context.UserQPTemplates.Add(userQPTemplate);
-            await _context.SaveChangesAsync();
-            var qpSyllabusDocument = await _context.QPTemplateDocuments.FirstOrDefaultAsync(qptd => qptd.QPDocumentTypeId == 1 && qptd.QPTemplateId == qpTemplate.QPTemplateId);
+             _context.SaveChanges();
+            var qpSyllabusDocument = _context.QPTemplateDocuments.FirstOrDefault(qptd => qptd.QPDocumentTypeId == 1 && qptd.QPTemplateId == qpTemplate.QPTemplateId);
             var userQPSyllabusDocument = new UserQPTemplateDocument()
             {
                 QPDocumentTypeId = 1,
@@ -912,7 +911,7 @@ namespace SKCE.Examination.Services.QPSettings
             _context.UserQPTemplateDocuments.Add(userQPSyllabusDocument);
 
 
-            var qpGenerationDocument = await _context.QPTemplateInstitutionDocuments.FirstOrDefaultAsync(qptd => qptd.QPDocumentTypeId ==3 && qptd.QPTemplateInstitutionDocumentId == QPTemplateInstitutionId);
+            var qpGenerationDocument = _context.QPTemplateInstitutionDocuments.FirstOrDefault(qptd => qptd.QPDocumentTypeId ==3 && qptd.QPTemplateInstitutionId == QPTemplateInstitutionId);
             var userQPDocument = new UserQPTemplateDocument() { 
                 QPDocumentTypeId = 4,
                 UserQPTemplateId =userQPTemplate.UserQPTemplateId,
@@ -930,7 +929,7 @@ namespace SKCE.Examination.Services.QPSettings
             AuditHelper.SetAuditPropertiesForInsert(generationQPDocument, 1);
             _context.UserQPTemplateDocuments.Add(generationQPDocument);
 
-            await _context.SaveChangesAsync();
+             _context.SaveChanges();
             return true;
         }
         public async Task<bool?> SubmitGeneratedQPAsync(long userId, long QPTemplateInstitutionId, long documentId)

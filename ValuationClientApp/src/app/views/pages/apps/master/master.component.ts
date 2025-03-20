@@ -19,7 +19,7 @@ export class MasterComponent {
 
   isSubmitting = false;
   fileName = '';
-
+  syllabusDocsPending='';
   masterDataForm = new FormGroup({
     name: new FormControl('', [Validators.required, Validators.minLength(3)]),
     file: new FormControl('', [Validators.required]),
@@ -107,7 +107,8 @@ export class MasterComponent {
        
     this.ImportService.importSyllabusDocuments(formData)
     .subscribe({
-      next: () => {
+      next: (response) => {
+        this.syllabusDocsPending = response.message;
         this.toastr.success('Data imported successfully!');
         this.courseSyllabusDocumentsFormF['file'].setValue([]);
       },

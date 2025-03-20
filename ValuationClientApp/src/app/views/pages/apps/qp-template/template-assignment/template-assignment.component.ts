@@ -93,7 +93,7 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
               userId: [''],
               expert1: ['', Validators.required],
               expert2: [''],
-              documentId1:['', Validators.required],
+              documentId1:[''],
               documentId2:['']
             });
 
@@ -229,8 +229,8 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
          institutionName: response.institutions[0]?.institutionName || '',
          studentCount:  response.institutions[0]?.studentCount || ''
        });
-
-       this.templates = this.qpTemplateData.documents;
+       
+        this.templates =this.qpTemplateData.qpDocuments;
 
        console.log("qpTemplate",JSON.stringify(this.qpTemplateData)  );
      }
@@ -240,24 +240,28 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
 
   onSave() {
     if (this.templateAssignmentForm.valid) {
-    
+      this.qpTemplateData.qpDocuments.forEach((doc: any) => {
+        doc.qpAssignedUsers[0].userId = this.templateAssignmentForm.get('expert1')?.value;
+        doc.qpAssignedUsers[1].userId = this.templateAssignmentForm.get('expert2')?.value;
+      });
       this.spinnerService.toggleSpinnerState(true);
-      const formData = this.templateAssignmentForm.value;
+      const formData = this.qpTemplateData;
      console.log('form data',JSON.stringify(formData));
-      // this.templateService.assignQpTemplateToUser(formData.userId,formData.templateId).subscribe({
-      //   next: (response) => {
-      //     console.log('Assigned successful:', response);
-      //     this.spinnerService.toggleSpinnerState(false);
-      //     this.toasterService.success('Qp Template assigned successfully')
-      //     this.modalService.dismissAll();
+
+      this.templateService.CreateQpTemplate(formData).subscribe({
+        next: (response) => {
+          console.log('Assigned successful:', response);
+          this.spinnerService.toggleSpinnerState(false);
+          this.toasterService.success('Qp Template assigned successfully')
+          this.modalService.dismissAll();
           
-      //   },
-      //   error: (error) => {
-      //     console.error('Save failed:', error);
-      //     this.toasterService.error('Save failed:', error)
-      //     this.spinnerService.toggleSpinnerState(false);
-      //   }
-      // });
+        },
+        error: (error) => {
+          console.error('Save failed:', error);
+          this.toasterService.error('Save failed:', error)
+          this.spinnerService.toggleSpinnerState(false);
+        }
+      });
     } else {
       this.toasterService.warning('Please fill in all required fields.');
     }

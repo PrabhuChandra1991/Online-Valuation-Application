@@ -19,6 +19,8 @@ namespace SKCE.Examination.Models.DbModels.QPSettings
         [ForeignKey("QPTemplateInstitution")]
         public long QPTemplateInstitutionId { get; set; }
         public long QPTemplateStatusTypeId { get; set; }
+        [ForeignKey("QPDocument")]
+        public long QPDocumentId { get; set; }
         public virtual ICollection<UserQPTemplateDocument> Documents { get; set; } = new List<UserQPTemplateDocument>();
 
     }

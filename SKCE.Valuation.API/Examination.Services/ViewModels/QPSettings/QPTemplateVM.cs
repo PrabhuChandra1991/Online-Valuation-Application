@@ -23,7 +23,23 @@ namespace SKCE.Examination.Services.ViewModels.QPSettings
         public long StudentCount { get; set; }
         public List<QPTemplateDocumentVM> Documents { get; set; }
         public List<QPTemplateInstitutionVM> Institutions { get; set; }
-        
+        public List<QPDocumentVM> QPDocuments { get; set; } = new List<QPDocumentVM>();
+    }
+    public class QPDocumentVM
+    {
+        public long QPDocumentId { get; set; }
+        public string QPDocumentName { get; set; }
+        public long InstitutionId { get; set; }
+        public List<QPDocumentUserVM> QPAssignedUsers { get; set; } = new List<QPDocumentUserVM>();
+        public List<QPDocumentUserVM> QPScrutinityUsers { get; set; } = new List<QPDocumentUserVM>();
+        public List<QPDocumentUserVM> QPSelectedUsers { get; set; } = new List<QPDocumentUserVM>();
+    }
+    public class QPDocumentUserVM
+    {
+        public long UserId { get; set; }
+        public string  UserName { get; set; }
+        public long StatusTypeId { get; set; }
+        public string StatusTypeName { get; set; } = string.Empty;
     }
     public class QPTemplateDocumentVM : AuditModel
     {
@@ -82,6 +98,7 @@ namespace SKCE.Examination.Services.ViewModels.QPSettings
         public string QPTemplateExamMonth { get; set; } = string.Empty;
         public long QPTemplateStatusTypeId { get; set; }    
         public string QPTemplateStatusTypeName { get; set; } = string.Empty;
+        public long QPDocumentId { get; set; }
         public List<QPTemplateDocumentVM> UserDocuments { get; set; } = new List<QPTemplateDocumentVM>();
     }
     public class QPDocumentValidationVM

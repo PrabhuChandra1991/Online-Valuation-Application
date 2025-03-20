@@ -29,14 +29,12 @@ namespace SKCE.Examination.Services.QPSettings
             { 8, "For QP Selection" },
             { 9, "Selected QP" }
         };
-
         public QpTemplateService(ExaminationDbContext context, IMapper mapper, BookmarkProcessor bookmarkProcessor)
         {
             _bookmarkProcessor = bookmarkProcessor;
             _context = context;
             _mapper = mapper;
         }
-
         public async Task<QPTemplateVM?> GetQPTemplateByCourseIdAsync(long courseId)
         {
             var documents = _context.Documents.ToList();
@@ -55,6 +53,7 @@ namespace SKCE.Examination.Services.QPSettings
                 }).FirstOrDefaultAsync();
 
             if (qPTemplate == null) return null;
+            qPTemplate.QPDocuments = new List<QPDocumentVM>();
             qPTemplate.QPTemplateStatusTypeName = _context.QPTemplateStatusTypes.FirstOrDefault(qps => qps.QPTemplateStatusTypeId == qPTemplate.QPTemplateStatusTypeId)?.Name ?? string.Empty;
             var courseDepartments = _context.CourseDepartments.Where(cd => cd.CourseId == courseId).ToList();
             if (courseDepartments.Any())
@@ -69,7 +68,7 @@ namespace SKCE.Examination.Services.QPSettings
                 qPTemplate.StudentCount = courseDepartments.Sum(cd => cd.StudentCount);
             }
             qPTemplate.DegreeTypeName = _context.DegreeTypes.FirstOrDefault(dt => dt.DegreeTypeId == qPTemplate.DegreeTypeId)?.Name ?? string.Empty;
-            qPTemplate.QPTemplateName = $"{qPTemplate.CourseCode}-{qPTemplate.CourseName} for {qPTemplate.RegulationYear}-{qPTemplate.ExamYear}-{qPTemplate.ExamMonth}-{qPTemplate.DegreeTypeName}-{qPTemplate.ExamType}";
+            qPTemplate.QPTemplateName = $"{qPTemplate.CourseCode} for {qPTemplate.RegulationYear}-{qPTemplate.ExamYear}-{qPTemplate.ExamMonth}-{qPTemplate.DegreeTypeName}-{qPTemplate.ExamType}";
 
             AuditHelper.SetAuditPropertiesForInsert(qPTemplate, 1);
             
@@ -85,6 +84,7 @@ namespace SKCE.Examination.Services.QPSettings
                     QPDocumentTypeName = QPDocumentTypeDictionary[1]
                 });
             }
+            
             foreach (var document in qPTemplate.Documents)
             {
                 document.DocumentName = documents.FirstOrDefault(di => di.DocumentId == document.DocumentId)?.Name ?? string.Empty;
@@ -154,8 +154,17 @@ namespace SKCE.Examination.Services.QPSettings
                             QPTemplateInstitutionId = institutionVM.QPTemplateInstitutionId,
                             DocumentId = qpAkDocument.DocumentId,
                             QPDocumentTypeId = 3,
-                            QPDocumentTypeName = QPDocumentTypeDictionary[3]
+                            QPDocumentTypeName = QPDocumentTypeDictionary[3],
                         });
+                        var qpDocumentForGeneration = new QPDocumentVM
+                        {
+                            QPDocumentId = qpAkDocument.QPDocumentId,
+                            InstitutionId = qpAkDocument.InstitutionId,
+                            QPDocumentName = qpAkDocument.QPDocumentName,
+                        };
+                        qpDocumentForGeneration.QPAssignedUsers.Add(new QPDocumentUserVM { UserId = 0, UserName = string.Empty });
+                        qpDocumentForGeneration.QPAssignedUsers.Add(new QPDocumentUserVM { UserId = 0, UserName = string.Empty });
+                        qPTemplate.QPDocuments.Add(qpDocumentForGeneration);
                     }
                     foreach (var qPDocument in institutionVM.Documents)
                     {
@@ -233,14 +242,15 @@ namespace SKCE.Examination.Services.QPSettings
             });
             _context.QPTemplates.Add(qPTemplate);
             await _context.SaveChangesAsync();
-            qPTemplate.Institutions.ForEach(i =>
+            qPTemplateVM.QPDocuments.ForEach(i =>
             {
-                var institutionVM = qPTemplateVM.Institutions.FirstOrDefault(qpti => qpti.InstitutionId == i.InstitutionId);
+                var institutionVM = qPTemplate.Institutions.FirstOrDefault(qpti => qpti.InstitutionId == i.InstitutionId);
                 if(institutionVM != null)
                 {
-                    institutionVM.UserQPGenerateTemplates.ForEach(u =>
+                    i.QPAssignedUsers.ForEach(u =>
                     {
-                        AssignTemplateForQPGenerationAsync(u.UserId, i.QPTemplateInstitutionId);
+                        if(u.UserId > 0)
+                        AssignTemplateForQPGenerationAsync(u.UserId, institutionVM.QPTemplateInstitutionId,i.QPDocumentId);
                     });
                 }
             });
@@ -398,6 +408,7 @@ namespace SKCE.Examination.Services.QPSettings
                             QPTemplateExamYear = qPTemplate.ExamYear,
                             QPTemplateStatusTypeId = u.QPTemplateStatusTypeId,
                             QPTemplateName = qPTemplate.QPTemplateName,
+                            QPDocumentId= u.QPDocumentId,
                             UserDocuments = _context.UserQPTemplateDocuments.Where(ud => ud.UserQPTemplateId == u.UserQPTemplateId)
                                 .Select(ud => new QPTemplateDocumentVM
                                 {
@@ -416,6 +427,28 @@ namespace SKCE.Examination.Services.QPSettings
                             d.DocumentUrl = documents.FirstOrDefault(di => di.DocumentId == d.DocumentId)?.Url ?? string.Empty;
                             d.QPDocumentTypeName = QPDocumentTypeDictionary[d.QPDocumentTypeId];
                         });
+                        if (!qPTemplate.QPDocuments.Any(qpd => qpd.QPDocumentId == userTemplate.QPDocumentId))
+                        {
+                            var qpGenerationDocument = _context.QPDocuments.FirstOrDefault(qpd => qpd.QPDocumentId == userTemplate.QPDocumentId);
+                            if (qpGenerationDocument != null)
+                            {
+                                qPTemplate.QPDocuments.Add(new QPDocumentVM
+                                {
+                                    QPDocumentId = qpGenerationDocument.QPDocumentId,
+                                    InstitutionId = qpGenerationDocument.InstitutionId,
+                                    QPDocumentName = qpGenerationDocument.QPDocumentName,
+                                });
+                            }
+                        }
+                        qPTemplate.QPDocuments.FirstOrDefault(qpd => qpd.QPDocumentId == userTemplate.QPDocumentId)?.QPAssignedUsers.Add(
+                            new QPDocumentUserVM
+                            {
+                                UserId = userTemplate.UserId,
+                                UserName = userTemplate.UserName,
+                                StatusTypeId = userTemplate.QPTemplateStatusTypeId,
+                                StatusTypeName = userTemplate.QPTemplateStatusTypeName
+                            });
+
                     }
                     institution.UserQPScrutinyTemplates = _context.UserQPTemplates.Where(u => u.QPTemplateInstitutionId == institution.QPTemplateInstitutionId && (u.QPTemplateStatusTypeId == 10 || u.QPTemplateStatusTypeId == 11))
                         .Select(u => new UserQPTemplateVM
@@ -429,6 +462,7 @@ namespace SKCE.Examination.Services.QPSettings
                             QPTemplateExamYear = qPTemplate.ExamYear,
                             QPTemplateStatusTypeId = u.QPTemplateStatusTypeId,
                             QPTemplateName = qPTemplate.QPTemplateName,
+                            QPDocumentId = u.QPDocumentId,
                             UserDocuments = _context.UserQPTemplateDocuments.Where(ud => ud.UserQPTemplateId == u.UserQPTemplateId)
                                 .Select(ud => new QPTemplateDocumentVM
                                 {
@@ -447,7 +481,29 @@ namespace SKCE.Examination.Services.QPSettings
                             d.DocumentUrl = documents.FirstOrDefault(di => di.DocumentId == d.DocumentId)?.Url ?? string.Empty;
                             d.QPDocumentTypeName = QPDocumentTypeDictionary[d.QPDocumentTypeId];
                         });
-                    };
+                        if (!qPTemplate.QPDocuments.Any(qpd => qpd.QPDocumentId == userTemplate.QPDocumentId))
+                        {
+                            var qpGenerationDocument = _context.QPDocuments.FirstOrDefault(qpd => qpd.QPDocumentId == userTemplate.QPDocumentId);
+                            if (qpGenerationDocument != null)
+                            {
+                                qPTemplate.QPDocuments.Add(new QPDocumentVM
+                                {
+                                    QPDocumentId = qpGenerationDocument.QPDocumentId,
+                                    InstitutionId = qpGenerationDocument.InstitutionId,
+                                    QPDocumentName = qpGenerationDocument.QPDocumentName,
+                                });
+                            }
+                        }
+                        qPTemplate.QPDocuments.FirstOrDefault(qpd => qpd.QPDocumentId == userTemplate.QPDocumentId)?.QPScrutinityUsers.Add(
+                            new QPDocumentUserVM
+                            {
+                                UserId = userTemplate.UserId,
+                                UserName = userTemplate.UserName,
+                                StatusTypeId = userTemplate.QPTemplateStatusTypeId,
+                                StatusTypeName = userTemplate.QPTemplateStatusTypeName
+                            });
+                    }
+                    ;
                     institution.UserQPSelectionTemplates = _context.UserQPTemplates.Where(u => u.QPTemplateInstitutionId == institution.QPTemplateInstitutionId && (u.QPTemplateStatusTypeId == 12 || u.QPTemplateStatusTypeId == 13))
                         .Select(u => new UserQPTemplateVM
                         {
@@ -460,6 +516,7 @@ namespace SKCE.Examination.Services.QPSettings
                             QPTemplateExamYear = qPTemplate.ExamYear,
                             QPTemplateStatusTypeId = u.QPTemplateStatusTypeId,
                             QPTemplateName = qPTemplate.QPTemplateName,
+                            QPDocumentId = u.QPDocumentId,
                             UserDocuments = _context.UserQPTemplateDocuments.Where(ud => ud.UserQPTemplateId == u.UserQPTemplateId)
                                 .Select(ud => new QPTemplateDocumentVM
                                 {
@@ -478,6 +535,27 @@ namespace SKCE.Examination.Services.QPSettings
                             d.DocumentUrl = documents.FirstOrDefault(di => di.DocumentId == d.DocumentId)?.Url ?? string.Empty;
                             d.QPDocumentTypeName = QPDocumentTypeDictionary[d.QPDocumentTypeId];
                         });
+                        if (!qPTemplate.QPDocuments.Any(qpd => qpd.QPDocumentId == userTemplate.QPDocumentId))
+                        {
+                            var qpGenerationDocument = _context.QPDocuments.FirstOrDefault(qpd => qpd.QPDocumentId == userTemplate.QPDocumentId);
+                            if (qpGenerationDocument != null)
+                            {
+                                qPTemplate.QPDocuments.Add(new QPDocumentVM
+                                {
+                                    QPDocumentId = qpGenerationDocument.QPDocumentId,
+                                    InstitutionId = qpGenerationDocument.InstitutionId,
+                                    QPDocumentName = qpGenerationDocument.QPDocumentName,
+                                });
+                            }
+                        }
+                        qPTemplate.QPDocuments.FirstOrDefault(qpd => qpd.QPDocumentId == userTemplate.QPDocumentId)?.QPSelectedUsers.Add(
+                            new QPDocumentUserVM
+                            {
+                                UserId = userTemplate.UserId,
+                                UserName = userTemplate.UserName,
+                                StatusTypeId = userTemplate.QPTemplateStatusTypeId,
+                                StatusTypeName = userTemplate.QPTemplateStatusTypeName
+                            });
                     }
                 }
             }
@@ -540,7 +618,6 @@ namespace SKCE.Examination.Services.QPSettings
                         }).ToList()
                     }).ToList()
                 }).ToListAsync();
-
                 foreach (var qPTemplate in qPTemplates)
                 {
                     qPTemplate.DegreeTypeName = degreeTypes.FirstOrDefault(dt => dt.DegreeTypeId == qPTemplate.DegreeTypeId)?.Name ?? string.Empty;
@@ -589,13 +666,14 @@ namespace SKCE.Examination.Services.QPSettings
                                 QPTemplateExamYear = qPTemplate.ExamYear,
                                 QPTemplateStatusTypeId = u.QPTemplateStatusTypeId,
                                 QPTemplateName = qPTemplate.QPTemplateName,
+                                QPDocumentId= u.QPDocumentId,
                                 UserDocuments = _context.UserQPTemplateDocuments.Where(ud => ud.UserQPTemplateId == u.UserQPTemplateId)
-                                    .Select(ud => new QPTemplateDocumentVM
-                                    {
-                                        QPTemplateDocumentId = ud.UserQPTemplateDocumentId,
-                                        DocumentId = ud.DocumentId,
-                                        QPDocumentTypeId = ud.QPDocumentTypeId
-                                    }).ToList()
+                                .Select(ud => new QPTemplateDocumentVM
+                                {
+                                    QPTemplateDocumentId = ud.UserQPTemplateDocumentId,
+                                    DocumentId = ud.DocumentId,
+                                    QPDocumentTypeId = ud.QPDocumentTypeId
+                                }).ToList()
                             }).ToList();
                         foreach (var userTemplate in institution.UserQPGenerateTemplates)
                         {
@@ -607,7 +685,28 @@ namespace SKCE.Examination.Services.QPSettings
                                 d.DocumentUrl = documents.FirstOrDefault(di => di.DocumentId == d.DocumentId)?.Url ?? string.Empty;
                                 d.QPDocumentTypeName = QPDocumentTypeDictionary[d.QPDocumentTypeId];
                             });
+                            if (!qPTemplate.QPDocuments.Any(qpd => qpd.QPDocumentId == userTemplate.QPDocumentId))
+                            {
+                                var qpGenerationDocument = _context.QPDocuments.FirstOrDefault(qpd => qpd.QPDocumentId == userTemplate.QPDocumentId);
+                                if (qpGenerationDocument != null)
+                                {
+                                    qPTemplate.QPDocuments.Add(new QPDocumentVM
+                                    {
+                                        QPDocumentId = qpGenerationDocument.QPDocumentId,
+                                        InstitutionId = qpGenerationDocument.InstitutionId,
+                                        QPDocumentName = qpGenerationDocument.QPDocumentName,
+                                    });
+                                }
+                            }
+                            qPTemplate.QPDocuments.FirstOrDefault(qpd => qpd.QPDocumentId == userTemplate.QPDocumentId)?.QPAssignedUsers.Add(
+                                new QPDocumentUserVM {
+                                    UserId = userTemplate.UserId,
+                                    UserName = userTemplate.UserName,
+                                    StatusTypeId = userTemplate.QPTemplateStatusTypeId,
+                                    StatusTypeName = userTemplate.QPTemplateStatusTypeName
+                                });
                         }
+                        
                         // QP Scrutiny template details
                         institution.UserQPScrutinyTemplates = _context.UserQPTemplates.Where(u => u.QPTemplateInstitutionId == institution.QPTemplateInstitutionId && (u.QPTemplateStatusTypeId == 10 || u.QPTemplateStatusTypeId == 11))
                             .Select(u => new UserQPTemplateVM
@@ -621,6 +720,7 @@ namespace SKCE.Examination.Services.QPSettings
                                 QPTemplateExamYear = qPTemplate.ExamYear,
                                 QPTemplateStatusTypeId = u.QPTemplateStatusTypeId,
                                 QPTemplateName = qPTemplate.QPTemplateName,
+                                QPDocumentId = u.QPDocumentId,
                                 UserDocuments = _context.UserQPTemplateDocuments.Where(ud => ud.UserQPTemplateId == u.UserQPTemplateId)
                                     .Select(ud => new QPTemplateDocumentVM
                                     {
@@ -639,6 +739,27 @@ namespace SKCE.Examination.Services.QPSettings
                                 d.DocumentUrl = documents.FirstOrDefault(di => di.DocumentId == d.DocumentId)?.Url ?? string.Empty;
                                 d.QPDocumentTypeName = QPDocumentTypeDictionary[d.QPDocumentTypeId];
                             });
+                            if (!qPTemplate.QPDocuments.Any(qpd => qpd.QPDocumentId == userTemplate.QPDocumentId))
+                            {
+                                var qpGenerationDocument = _context.QPDocuments.FirstOrDefault(qpd => qpd.QPDocumentId == userTemplate.QPDocumentId);
+                                if (qpGenerationDocument != null)
+                                {
+                                    qPTemplate.QPDocuments.Add(new QPDocumentVM
+                                    {
+                                        QPDocumentId = qpGenerationDocument.QPDocumentId,
+                                        InstitutionId = qpGenerationDocument.InstitutionId,
+                                        QPDocumentName = qpGenerationDocument.QPDocumentName,
+                                    });
+                                }
+                            }
+                            qPTemplate.QPDocuments.FirstOrDefault(qpd => qpd.QPDocumentId == userTemplate.QPDocumentId)?.QPScrutinityUsers.Add(
+                                new QPDocumentUserVM
+                                {
+                                    UserId = userTemplate.UserId,
+                                    UserName = userTemplate.UserName,
+                                    StatusTypeId = userTemplate.QPTemplateStatusTypeId,
+                                    StatusTypeName = userTemplate.QPTemplateStatusTypeName
+                                });
                         }
                         // QP Selection template details
                         institution.UserQPSelectionTemplates = _context.UserQPTemplates.Where(u => u.QPTemplateInstitutionId == institution.QPTemplateInstitutionId && (u.QPTemplateStatusTypeId == 12 || u.QPTemplateStatusTypeId == 13))
@@ -653,6 +774,7 @@ namespace SKCE.Examination.Services.QPSettings
                                 QPTemplateExamYear = qPTemplate.ExamYear,
                                 QPTemplateStatusTypeId = u.QPTemplateStatusTypeId,
                                 QPTemplateName = qPTemplate.QPTemplateName,
+                                QPDocumentId = u.QPDocumentId,
                                 UserDocuments = _context.UserQPTemplateDocuments.Where(ud => ud.UserQPTemplateId == u.UserQPTemplateId)
                                     .Select(ud => new QPTemplateDocumentVM
                                     {
@@ -671,11 +793,29 @@ namespace SKCE.Examination.Services.QPSettings
                                 d.DocumentUrl = documents.FirstOrDefault(di => di.DocumentId == d.DocumentId)?.Url ?? string.Empty;
                                 d.QPDocumentTypeName = QPDocumentTypeDictionary[d.QPDocumentTypeId];
                             });
+                            if (!qPTemplate.QPDocuments.Any(qpd => qpd.QPDocumentId == userTemplate.QPDocumentId))
+                            {
+                                var qpGenerationDocument = _context.QPDocuments.FirstOrDefault(qpd => qpd.QPDocumentId == userTemplate.QPDocumentId);
+                                if (qpGenerationDocument != null)
+                                {
+                                    qPTemplate.QPDocuments.Add(new QPDocumentVM
+                                    {
+                                        QPDocumentId = qpGenerationDocument.QPDocumentId,
+                                        InstitutionId = qpGenerationDocument.InstitutionId,
+                                        QPDocumentName = qpGenerationDocument.QPDocumentName,
+                                    });
+                                }
+                            }
+                            qPTemplate.QPDocuments.FirstOrDefault(qpd => qpd.QPDocumentId == userTemplate.QPDocumentId)?.QPSelectedUsers.Add(
+                                new QPDocumentUserVM
+                                {
+                                    UserId = userTemplate.UserId,
+                                    UserName = userTemplate.UserName,
+                                    StatusTypeId = userTemplate.QPTemplateStatusTypeId,
+                                    StatusTypeName = userTemplate.QPTemplateStatusTypeName
+                                });
                         }
-                            
                     }
-
-                    
                 }
                 return qPTemplates.FirstOrDefault();
             }
@@ -683,7 +823,6 @@ namespace SKCE.Examination.Services.QPSettings
             {
                 throw;
             }
-
         }
         public async Task<List<QPTemplateVM>> GetQPTemplateByStatusIdAsync(long statusId)
         {
@@ -883,7 +1022,7 @@ namespace SKCE.Examination.Services.QPSettings
         {
             return await GetUserQPTemplatesAsync(userId);
         }
-        public bool? AssignTemplateForQPGenerationAsync(long userId, long QPTemplateInstitutionId)
+        public bool? AssignTemplateForQPGenerationAsync(long userId, long QPTemplateInstitutionId,long QPDocumentId)
         {
             var qpTemplateInstitution =  _context.QPTemplateInstitutions.FirstOrDefault(qpti => qpti.QPTemplateInstitutionId == QPTemplateInstitutionId);
             if (qpTemplateInstitution == null) return null;
@@ -896,6 +1035,7 @@ namespace SKCE.Examination.Services.QPSettings
                 QPTemplateInstitutionId = qpTemplateInstitution.QPTemplateInstitutionId,
                 UserId = userId,
                 QPTemplateStatusTypeId = 8,//Generation QP InProgress
+                QPDocumentId = QPDocumentId
             };
             AuditHelper.SetAuditPropertiesForInsert(userQPTemplate, 1);
             _context.UserQPTemplates.Add(userQPTemplate);
@@ -975,6 +1115,7 @@ namespace SKCE.Examination.Services.QPSettings
                 QPTemplateInstitutionId = qpUserTemplate.QPTemplateInstitutionId,
                 UserId = userId,
                 QPTemplateStatusTypeId = 10,//Scrutinize QP InProgress
+                QPDocumentId = qpUserTemplate.QPDocumentId
             };
             AuditHelper.SetAuditPropertiesForInsert(userQPTemplate, 1);
             _context.UserQPTemplates.Add(userQPTemplate);
@@ -1034,6 +1175,7 @@ namespace SKCE.Examination.Services.QPSettings
                 QPTemplateInstitutionId = qpScrutinizedUserTemplate.QPTemplateInstitutionId,
                 UserId = 1,
                 QPTemplateStatusTypeId = 12,//Selection QP InProgress
+                QPDocumentId = qpScrutinizedUserTemplate.QPDocumentId
             };
             AuditHelper.SetAuditPropertiesForInsert(userQPTemplateForSelection, 1);
             _context.UserQPTemplates.Add(userQPTemplateForSelection);
@@ -1177,10 +1319,7 @@ namespace SKCE.Examination.Services.QPSettings
                     if (selectedQpDocument != null && qpDocumentWithAnswerToPrint != null)
                         await PrintQPAnswerDocumentByInstitutionAsync(qpTemplate, institution, selectedQpDocument, qpDocumentWithAnswerToPrint);
                 }
-
-
             }
-            
             return true;
         }
         private async Task<bool> PrintQPDocumentByInstitutionAsync(QPTemplate qPTemplate, QPTemplateInstitution qPTemplateInstitution, UserQPTemplateDocument selectedQPDocument, QPTemplateInstitutionDocument documentToPrint, bool isForPrint)

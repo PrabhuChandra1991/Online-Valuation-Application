@@ -4,6 +4,7 @@
 	[InstitutionId] BIGINT NOT NULL FOREIGN KEY (InstitutionId) REFERENCES [Institution](InstitutionId),
 	[RegulationYear] NVARCHAR(50) NOT NULL,
 	[DegreeTypeName] NVARCHAR(50) NOT NULL,
+	[QPDocumentName] NVARCHAR(50) NOT NULL DEFAULT '' ,
 	[DocumentId] BIGINT NOT NULL,
 	[DocumentTypeId] BIGINT NOT NULL,
 	[IsActive] BIT DEFAULT 1,

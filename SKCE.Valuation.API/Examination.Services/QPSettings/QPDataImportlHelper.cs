@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using Aspose.Words;
+using DocumentFormat.OpenXml.Office2010.Word;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Http;
@@ -11,6 +14,7 @@ using SKCE.Examination.Models.DbModels.Common;
 using SKCE.Examination.Models.DbModels.QPSettings;
 using SKCE.Examination.Services.Helpers;
 using SKCE.Examination.Services.ViewModels.QPSettings;
+using Document = Aspose.Words.Document;
 
 public class QPDataImportHelper
 {
@@ -314,7 +318,8 @@ public class QPDataImportHelper
                         RegulationYear = regulation,
                         DegreeTypeName = degreeTypeName,
                         DocumentTypeId = documetTypeId,
-                        DocumentId = documentId
+                        DocumentId = documentId,
+                        QPDocumentName= file.FileName.Trim().Split('.')[0]
                     };
                     AuditHelper.SetAuditPropertiesForInsert(qpDocument, 1);
                     _dbContext.QPDocuments.Add(qpDocument);
@@ -322,6 +327,67 @@ public class QPDataImportHelper
             }
         });
         await _dbContext.SaveChangesAsync();
+        var qPDocuments = _dbContext.QPDocuments.ToList();
+        foreach (var qpDocument in qPDocuments) {
+            if (qpDocument.DocumentTypeId != 3) continue;
+            if(!_dbContext.QPDocumentBookMarks.Any(qpb=>qpb.QPDocumentId == qpDocument.QPDocumentId))
+            {
+                var qpSelectedDocument = _dbContext.Documents.FirstOrDefault(d => d.DocumentId == qpDocument.DocumentId);
+                if (qpSelectedDocument != null)
+                {
+                    Aspose.Words.Document sourceDoc = _azureBlobStorageHelper.DownloadWordDocumentFromBlob(qpSelectedDocument.Name).Result;
+                    // Iterate through all bookmarks in the source document
+                    var bookmarkNames = sourceDoc.Range.Bookmarks.Select(b => b.Name).ToList();
+                    var qpDocumentBookMarks = new List<QPDocumentBookMark>();
+                    foreach (Aspose.Words.Bookmark bookmark in sourceDoc.Range.Bookmarks)
+                    {
+                        var qPDocumentBookMark = new QPDocumentBookMark
+                        {
+                            QPDocumentId = qpDocument.QPDocumentId,
+                            BookMarkName = bookmark.Name,
+                            BookMarkText = ConvertToBase64(ConvertBookmarkRangeToHtml(bookmark.BookmarkStart, bookmark.BookmarkEnd))
+                        };
+                        AuditHelper.SetAuditPropertiesForInsert(qPDocumentBookMark, 1);
+                        qpDocumentBookMarks.Add(qPDocumentBookMark);
+                    }
+                    _dbContext.QPDocumentBookMarks.AddRange(qpDocumentBookMarks);
+                }
+            }
+        }
+        await _dbContext.SaveChangesAsync();
         return true;
+    }
+    private static string ConvertToBase64(string text)
+    {
+        byte[] textBytes = Encoding.UTF8.GetBytes(text);
+        return Convert.ToBase64String(textBytes);
+    }
+    private static string ConvertBookmarkRangeToHtml(Node startNode, Node endNode)
+    {
+        // Create a temporary document with just the bookmark range
+        Document tempDoc = new Document();
+        DocumentBuilder builder = new DocumentBuilder(tempDoc);
+
+        //Node currentNode = startNode;
+        Node currentNode = startNode.NextSibling;
+        while (currentNode != null && currentNode != endNode)
+        {
+            Node importedNode = tempDoc.ImportNode(currentNode, true, ImportFormatMode.KeepSourceFormatting);
+            builder.InsertNode(importedNode);
+            //tempDoc.FirstSection.Body.AppendChild(importedNode);
+            currentNode = currentNode.NextSibling;
+        }
+        Aspose.Words.Saving.HtmlSaveOptions htmlSaveOptions = new Aspose.Words.Saving.HtmlSaveOptions();
+        htmlSaveOptions.ExportImagesAsBase64 = true;
+        htmlSaveOptions.ExportHeadersFootersMode = Aspose.Words.Saving.ExportHeadersFootersMode.PerSection;
+        htmlSaveOptions.SaveFormat = Aspose.Words.SaveFormat.Html;
+        htmlSaveOptions.PrettyFormat = true;
+
+        // Convert the document range to HTML
+        using (MemoryStream ms = new MemoryStream())
+        {
+            tempDoc.Save(ms, htmlSaveOptions);
+            return Encoding.UTF8.GetString(ms.ToArray());
+        }
     }
 }

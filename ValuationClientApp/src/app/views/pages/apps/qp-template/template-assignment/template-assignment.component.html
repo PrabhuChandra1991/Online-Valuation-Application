@@ -189,69 +189,41 @@
           </div>
         </div><!-- Col -->          
       </div><!-- Row -->
-      <div class="row">
-        <div class="col-md-6">
-          <div class="mb-3">
-            <label for="template"
-              class="form-label">Template</label>
-            <select class="form-select" id="template1" formControlName="documentId1" >
-              <option selected disabled>Select Template</option>
-              <option *ngFor="let template of templates" [value]="template.documentId">
-                {{ template.documentName }}
-              </option>
-            </select>
-                       
+      <div *ngIf="qpTemplateData" >
+        <div class="row" *ngFor="let qpDocument of qpTemplateData.qpDocuments">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label for="template"
+                class="form-label">Template Name: {{qpDocument.qpDocumentName}}</label>
+            </div>
+          </div><!-- Col -->
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="mb-4">
+                <label for="qpTemplateName"
+                  class="form-label">Expert - 1</label>
+                  <select class="form-select" id="expert1" formControlName="expert1">
+                    <option selected disabled>Select Expert</option>
+                    <option *ngFor="let user of users" [value]="user.userId" [disabled]="templateAssignmentForm.controls['expert2'].value == user.userId">
+                      {{ user.name }}
+                    </option>
+                  </select>
+              </div>
+            </div><!-- Col -->
+            <div class="col-sm-6">
+              <div class="mb-4">
+                <label for="qpTemplateName"
+                  class="form-label">Expert - 2</label>
+                  <select class="form-select" id="expert2" formControlName="expert2">
+                    <option selected disabled>Select Expert</option>
+                    <option *ngFor="let user of users" [value]="user.userId" [disabled]="templateAssignmentForm.controls['expert1'].value == user.userId">
+                      {{ user.name }}
+                    </option>
+                  </select>
+              </div>
+            </div><!-- Col -->
           </div>
-        </div><!-- Col -->
-        <div class="col-sm-6">
-          <div class="mb-4">
-            <label for="qpTemplateName"
-              class="form-label">Expert - 1</label>
-              <select class="form-select" id="expert1" formControlName="expert1">
-                <option selected disabled>Select Expert</option>
-                <option *ngFor="let user of users" [value]="user.userId" [disabled]="templateAssignmentForm.controls['expert2'].value == user.userId">
-                  {{ user.name }}
-                </option>
-              </select>
-              
-             
-          </div>
-        </div><!-- Col -->
-      </div>
-      <div class="row">
-        <div class="col-md-6">
-          <div class="mb-3">
-            <label for="template"
-              class="form-label">Template</label>
-            <select class="form-select"  id="template2"  formControlName="documentId2"
-             >
-              <option selected disabled>Select Template</option>
-              <option *ngFor="let template of templates" [value]="template.documentId">
-                {{ template.documentName }}
-              </option>
-            </select>
-                       
-          </div>
-        </div><!-- Col -->
-        <div class="col-sm-6">
-          <div class="mb-4">
-            <label for="qpTemplateName"
-              class="form-label">Experts - 2</label>
-              <select class="form-select"  id="expert2" formControlName="expert2" >
-                <option selected disabled>Select Expert</option>
-                <option *ngFor="let user of users; let x = index" value="{{user.userId}}" [disabled]="templateAssignmentForm.controls['expert1'].value == user.userId">
-                  {{user.name}}
-                </option>
-                <!-- <ng-container *ngFor="let user of users; let x = index">
-                  <option *ngFor="let user of users" value="{{user.userId}}"
-                  [attr.data-hidden] = "user.userId === templateAssignmentForm.controls['userId'].value">
-                {{user.name}}
-                 </option>
-                 </ng-container> -->
-              </select>
-             
-          </div>
-        </div><!-- Col -->
+        </div>
       </div>
     </form>
   </div>

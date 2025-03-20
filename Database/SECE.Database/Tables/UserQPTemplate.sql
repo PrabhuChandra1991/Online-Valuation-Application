@@ -2,7 +2,7 @@
 (
 	[UserQPTemplateId] BIGINT NOT NULL PRIMARY KEY IDENTITY(1,1),
 	[UserId] BIGINT NOT NULL,
-	[QPTemplateId] BIGINT NOT NULL FOREIGN KEY (QPTemplateId) REFERENCES [QPTemplate](QPTemplateId),
+	[QPTemplateInstitutionId] BIGINT NOT NULL FOREIGN KEY (QPTemplateInstitutionId) REFERENCES [QPTemplateInstitution](QPTemplateInstitutionId),
 	[QPTemplateStatusTypeId] BIGINT NOT NULL,
 	[IsActive] BIT NOT NULL,
 	[CreatedDate] DATETIME NOT NULL,

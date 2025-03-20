@@ -30,7 +30,7 @@ namespace SKCE.Examination.API.Controllers.QPSettings
             return Ok(qpTemplate);
         }
 
-        [HttpPost]
+        [HttpPost("CreateQpTemplate")]
         public async Task<IActionResult> CreateQpTemplate([FromBody] QPTemplateVM viewModel)
         {
             if (viewModel == null)

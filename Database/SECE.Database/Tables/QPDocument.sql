@@ -1,0 +1,14 @@
+﻿CREATE TABLE [dbo].[QPDocument]
+(
+	[QPDocumentId] BIGINT NOT NULL PRIMARY KEY IDENTITY(1,1),
+	[InstitutionId] BIGINT NOT NULL FOREIGN KEY (InstitutionId) REFERENCES [Institution](InstitutionId),
+	[RegulationYear] NVARCHAR(50) NOT NULL,
+	[DegreeTypeName] NVARCHAR(50) NOT NULL,
+	[DocumentId] BIGINT NOT NULL,
+	[DocumentTypeId] BIGINT NOT NULL,
+	[IsActive] BIT DEFAULT 1,
+	CreatedDate DATETIME DEFAULT GETDATE(),
+	CreatedById BIGINT NOT NULL DEFAULT 1,
+	ModifiedDate DATETIME DEFAULT GETDATE(),
+	ModifiedById BIGINT NOT NULL DEFAULT 1
+)

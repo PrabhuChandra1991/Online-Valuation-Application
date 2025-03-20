@@ -2,10 +2,52 @@
     <div class="row mt-4">
       <div class="col-md-12">
         <form [formGroup]="masterForm" (ngSubmit)="submit()">
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="mb-3">
+                <label class="form-label" for="filename">Upload Master Data from Eval Pro <span class="text-danger"> *</span> </label>
+                <input class="form-control " value="f['file']" type="file" id="masterfile" formControlName="file" (change)="onFileChange($event)">
+                <div *ngIf="f['file'].touched && f['file'].invalid" class="alert alert-danger">
+                  <div *ngIf="f['file'].errors && f['file'].errors['required']">
+                  File is required.
+                  </div>
+              </div>
+              </div>
+            </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+              <button type="submit" class="btn btn-primary" >
+                Import Master Data from Eval Pro
+              </button>
+              </div>
+            </div>
+            <br>
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="mb-3">
+                <label class="form-label" for="filename">Upload course syllabus templates <span class="text-danger"> *</span> </label>
+                <input class="form-control " value="f['file']" type="file" id="masterfile" formControlName="file" (change)="onFileChange($event)">
+                <div *ngIf="f['file'].touched && f['file'].invalid" class="alert alert-danger">
+                  <div *ngIf="f['file'].errors && f['file'].errors['required']">
+                  File is required.
+                  </div>
+              </div>
+              </div>
+            </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+              <button type="submit" class="btn btn-primary" >
+                Import Course syllabus templates
+              </button>
+              </div>
+            </div>
+            <br>
             <div class="row">
               <div class="col-sm-6">
                 <div class="mb-3">
-                  <label class="form-label" for="filename">Master Data <span class="text-danger"> *</span> </label>
+                  <label class="form-label" for="filename">Upload QP and QP Answer Key templates <span class="text-danger"> *</span> </label>
                   <input class="form-control " value="f['file']" type="file" id="masterfile" formControlName="file" (change)="onFileChange($event)">
                   <div *ngIf="f['file'].touched && f['file'].invalid" class="alert alert-danger">
                     <div *ngIf="f['file'].errors && f['file'].errors['required']">
@@ -18,7 +60,7 @@
               <div class="row">
                 <div class="col-md-12">
                 <button type="submit" class="btn btn-primary" >
-                  Import Data
+                  Import QP and QP Answer Key templates
                 </button>
                 </div>
               </div>

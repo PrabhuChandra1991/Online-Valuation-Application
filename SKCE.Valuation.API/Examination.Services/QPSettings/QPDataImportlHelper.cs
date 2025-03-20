@@ -161,11 +161,20 @@ public class QPDataImportHelper
                     IsActive = true,
                 });
             }
-
-            await _dbContext.CourseDepartments.AddRangeAsync(courseDepartMents);
+            var existingCourseDepartments = _dbContext.CourseDepartments.ToList();
+            var newCourseDepartments = new HashSet<CourseDepartment>();
+            foreach (var courseDepartment in courseDepartMents)
+            {
+                if (!existingCourseDepartments.Any(x => x.InstitutionId == courseDepartment.InstitutionId && x.RegulationYear == courseDepartment.RegulationYear && x.BatchYear == courseDepartment.BatchYear && x.DegreeTypeId == courseDepartment.DegreeTypeId && x.DepartmentId == courseDepartment.DepartmentId && x.ExamType == courseDepartment.ExamType && x.Semester == courseDepartment.Semester && x.ExamMonth == courseDepartment.ExamMonth && x.ExamYear == courseDepartment.ExamYear && x.CourseId == courseDepartment.CourseId))
+                {
+                    AuditHelper.SetAuditPropertiesForInsert(courseDepartment, 1);
+                    newCourseDepartments.Add(courseDepartment);
+                }
+            }
+            await _dbContext.CourseDepartments.AddRangeAsync(newCourseDepartments);
             await _dbContext.SaveChangesAsync();
             long? documentId = await _azureBlobStorageHelper.UploadFileAsync(excelStream, file.FileName, file.ContentType);
-            
+
             _dbContext.ImportHistories.Add(new ImportHistory
             {
                 DocumentId = documentId ?? 0,
@@ -192,7 +201,7 @@ public class QPDataImportHelper
             excelStream.Close();
         }
     }
-        
+
 
     private static string GetCellValue(WorkbookPart workbookPart, Cell cell)
     {
@@ -218,15 +227,101 @@ public class QPDataImportHelper
             DepartmentsCount = i.DepartmentsCount,
             InstitutionsCount = i.InstitutionsCount,
             UserId = i.UserId,
-            CreatedDate=i.CreatedDate
+            CreatedDate = i.CreatedDate
         }).ToListAsync();
 
         foreach (var importHistory in importHistories)
         {
-            importHistory.UserName = users.FirstOrDefault(u => u.UserId == importHistory.UserId)?.Name??string.Empty;
+            importHistory.UserName = users.FirstOrDefault(u => u.UserId == importHistory.UserId)?.Name ?? string.Empty;
             importHistory.DocumentName = documents.FirstOrDefault(d => d.DocumentId == importHistory.DocumentId)?.Name ?? string.Empty;
             importHistory.DocumentUrl = documents.FirstOrDefault(d => d.DocumentId == importHistory.DocumentId)?.Url ?? string.Empty;
         }
         return importHistories;
+    }
+
+    public async Task<string> ImportSyllabusDocuments(List<IFormFile> files)
+    {
+        var documentMissingCourses = "Syllabus documents are missing for ";
+        var courses = _dbContext.Courses.ToList();
+        var courseSyllabusDocuments = _dbContext.CourseSyllabusDocuments.ToList();
+        files.ForEach(file =>
+        {
+            var documentId = _azureBlobStorageHelper.UploadFileAsync(file.OpenReadStream(), file.FileName, file.ContentType);
+            var courseId = courses.FirstOrDefault(c => file.FileName.Contains(c.Code))?.CourseId;
+            if (courseId != null)
+            {
+                if (!courseSyllabusDocuments.Any(cs => cs.CourseId == courseId.Value))
+                {
+                    var courseSyllabusDocument = new CourseSyllabusDocument
+                    {
+                        CourseId = courseId.Value,
+                        DocumentId = documentId.Result,
+                    };
+                    AuditHelper.SetAuditPropertiesForInsert(courseSyllabusDocument, 1);
+                    _dbContext.CourseSyllabusDocuments.AddAsync(courseSyllabusDocument);
+                }
+                else
+                {
+                    var existingCourseSyllabusDocument = _dbContext.CourseSyllabusDocuments.FirstOrDefault(cs => cs.CourseId == courseId.Value);
+                    if (existingCourseSyllabusDocument != null)
+                    {
+                        existingCourseSyllabusDocument.DocumentId = documentId.Result;
+                        AuditHelper.SetAuditPropertiesForUpdate(existingCourseSyllabusDocument, 1);
+                    }
+                }
+            }
+        });
+        await _dbContext.SaveChangesAsync();
+        _dbContext.Courses.ToList().ForEach(c =>
+         {
+             if (!_dbContext.CourseSyllabusDocuments.Any(cs => cs.CourseId == c.CourseId))
+             {
+                 documentMissingCourses += c.Code + ", ";
+             }
+         });
+
+        return documentMissingCourses;
+    }
+
+    public async Task<bool> ImportQPDocuments(List<IFormFile> files, List<QPDocumentValidationVM> qPDocumentValidationVMs)
+    {
+        var courseDepartments = _dbContext.CourseDepartments.ToList();
+        var institutions = _dbContext.Institutions.ToList();
+        var qpDocuments = _dbContext.QPDocuments.ToList();
+        files.ForEach(file =>
+        {
+            var documentId = _azureBlobStorageHelper.UploadFileAsync(file.OpenReadStream(), file.FileName, file.ContentType).Result;
+            var institution = institutions.FirstOrDefault(i => file.FileName.Split('_')[0].Equals(i.Code));
+            var regulation = file.FileName.Split('_')[1];
+            var degreeTypeName = file.FileName.Split('_')[2];
+            var documetTypeId = file.FileName.Split('_')[3].Equals("QP.docx") ? 2 : 3;
+            if (institution != null)
+            {
+                if (qpDocuments.Any(qp => qp.InstitutionId == institution.InstitutionId && qp.RegulationYear == regulation && qp.DegreeTypeName == degreeTypeName && qp.DocumentTypeId == documetTypeId))
+                {
+                    var existingQPDocument = _dbContext.QPDocuments.FirstOrDefault(qp => qp.InstitutionId == institution.InstitutionId && qp.RegulationYear == regulation && qp.DegreeTypeName == degreeTypeName && qp.DocumentTypeId == documetTypeId);
+                    if (existingQPDocument != null)
+                    {
+                        existingQPDocument.DocumentId = documentId;
+                        AuditHelper.SetAuditPropertiesForUpdate(existingQPDocument, 1);
+                    }
+                }
+                else
+                {
+                    var qpDocument = new QPDocument
+                    {
+                        InstitutionId = institution.InstitutionId,
+                        RegulationYear = regulation,
+                        DegreeTypeName = degreeTypeName,
+                        DocumentTypeId = documetTypeId,
+                        DocumentId = documentId
+                    };
+                    AuditHelper.SetAuditPropertiesForInsert(qpDocument, 1);
+                    _dbContext.QPDocuments.Add(qpDocument);
+                }
+            }
+        });
+        await _dbContext.SaveChangesAsync();
+        return true;
     }
 }

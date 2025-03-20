@@ -17,7 +17,9 @@ namespace SKCE.Examination.Models.DbModels.Common
         public DbSet<Department> Departments { get; set; }
         public DbSet<Designation> Designations { get; set; }
         public DbSet<Institution> Institutions { get; set; }
+        public DbSet<QPDocument> QPDocuments { get; set; }
         public DbSet<Course> Courses { get; set; }
+        public DbSet<CourseSyllabusDocument> CourseSyllabusDocuments { get; set; }
         public DbSet<CourseDepartment> CourseDepartments { get; set; }
         public DbSet<QPTag> QPTags { get; set; }
         public DbSet<QPTemplateStatusType> QPTemplateStatusTypes { get; set; }

@@ -116,7 +116,7 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
   loadExperts(): void {
     this.userService.getUsers().subscribe({
       next: (data) => {
-        this.users = data;
+        this.users = data.filter((user: any) => user.userId != 1);
         
         console.log('Users loaded:', this.users);
       },
@@ -127,7 +127,7 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
   }
 
   loadTemplates(): void {
-    this.templateService.getTemplates().subscribe({
+    this.templateService.getTemplatesByStatusId(1).subscribe({
       next: (data: any[]) => {
         this.templates = data;
        

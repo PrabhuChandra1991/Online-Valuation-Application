@@ -44,7 +44,7 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
    
     selectedCourseId: any | null = null;
     qpTemplateData: any = null;
-
+    courses: any[] = [];
     displayedColumns: string[] = ['qpTemplateName', 'documentName','qpeneration' ,'qpTemplateStatusTypeName'];
     dataSource = new MatTableDataSource<any>([]);
       @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -57,16 +57,49 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
       private spinnerService: SpinnerService,
       private router: Router
     ) { 
-      this.templateAssignmentForm = this.fb.group({
-        templateId: ['', Validators.required],
-        userId: ['', Validators.required]
-      });
+      // this.templateAssignmentForm = this.fb.group({
+      //   templateId: ['', Validators.required],
+      //   userId: ['', Validators.required],
+      //   qpTemplateName: [''],
+      //   degreeTypeName: [{ value: '', disabled: true }],
+      //   regulationYear: [{ value: '', disabled: true }],
+      //   batchYear: [{ value: '', disabled: true }],
+      //   examYear: [{ value: '', disabled: true }],
+      //   examMonth: [{ value: '', disabled: true }],
+      //   examType:  [{ value: '', disabled: true }],
+      //   semester:  [{ value: '', disabled: true }],
+      //   institutionName: [{ value: '', disabled: true }],
+      //   studentCount: [{ value: '', disabled: true }],
+      //   courseId: ['', Validators.required]
+      // });
 
     }
   
     ngOnInit(): void {
      
-      this.loadTemplates();
+      this.templateAssignmentForm = this.fb.group({
+              qpTemplateName: [''],
+              degreeTypeName: [{ value: '', disabled: true }],
+              regulationYear: [{ value: '', disabled: true }],
+              batchYear: [{ value: '', disabled: true }],
+              examYear: [{ value: '', disabled: true }],
+              examMonth: [{ value: '', disabled: true }],
+              examType:  [{ value: '', disabled: true }],
+              semester:  [{ value: '', disabled: true }],
+              institutionName: [{ value: '', disabled: true }],
+              studentCount: [{ value: '', disabled: true }],
+              courseId: ['', Validators.required],
+              templateId: [''],
+              userId: [''],
+              expert1: ['', Validators.required],
+              expert2: [''],
+              documentId1:['', Validators.required],
+              documentId2:['']
+            });
+
+      this.loadCourses();
+
+     // this.loadTemplates();
 
       this.loadExperts();
 
@@ -138,6 +171,18 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
       }
     });
   }
+  loadCourses(): void {
+    this.templateService.getCourses().subscribe({
+      next: (data) => {
+        this.courses = data;
+        
+        console.log('Courses loaded:', this.courses);
+      },
+      error: (error) => {
+        console.error('Error loading courses:', error);
+      }
+    });
+  }
 
   loadAssignedTemplates(): void {
     const loggedData = localStorage.getItem('userData');
@@ -162,26 +207,57 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
     
   }
 
+  onCourseChange(event: Event): void {
+    this.selectedCourseId = (event.target as HTMLSelectElement).value;
+   this.fetchQPTemplate(this.selectedCourseId);
+ }
+
+ fetchQPTemplate(courseId: number): void {
+   this.templateService.getQPTemplateByCourseId(courseId).subscribe((response) => {
+     this.qpTemplateData = response;
+     //this.institutions = response.institutions;
+     if(this.qpTemplateData)
+     {
+       this.templateAssignmentForm.patchValue({
+         degreeTypeName: response.degreeTypeName,
+         regulationYear: response.regulationYear,
+         batchYear: response.batchYear,
+         examYear: response.examYear,
+         examMonth:  response.examMonth,
+         examType: response.examType,
+         semester: response.semester,
+         institutionName: response.institutions[0]?.institutionName || '',
+         studentCount:  response.institutions[0]?.studentCount || ''
+       });
+
+       this.templates = this.qpTemplateData.documents;
+
+       console.log("qpTemplate",JSON.stringify(this.qpTemplateData)  );
+     }
+     //console.log("qpTemplate",JSON.stringify(this.qpTemplateData)  );
+   });
+ }
+
   onSave() {
     if (this.templateAssignmentForm.valid) {
     
       this.spinnerService.toggleSpinnerState(true);
       const formData = this.templateAssignmentForm.value;
-     
-      this.templateService.assignQpTemplateToUser(formData.userId,formData.templateId).subscribe({
-        next: (response) => {
-          console.log('Assigned successful:', response);
-          this.spinnerService.toggleSpinnerState(false);
-          this.toasterService.success('Qp Template assigned successfully')
-          this.modalService.dismissAll();
+     console.log('form data',JSON.stringify(formData));
+      // this.templateService.assignQpTemplateToUser(formData.userId,formData.templateId).subscribe({
+      //   next: (response) => {
+      //     console.log('Assigned successful:', response);
+      //     this.spinnerService.toggleSpinnerState(false);
+      //     this.toasterService.success('Qp Template assigned successfully')
+      //     this.modalService.dismissAll();
           
-        },
-        error: (error) => {
-          console.error('Save failed:', error);
-          this.toasterService.error('Save failed:', error)
-          this.spinnerService.toggleSpinnerState(false);
-        }
-      });
+      //   },
+      //   error: (error) => {
+      //     console.error('Save failed:', error);
+      //     this.toasterService.error('Save failed:', error)
+      //     this.spinnerService.toggleSpinnerState(false);
+      //   }
+      // });
     } else {
       this.toasterService.warning('Please fill in all required fields.');
     }

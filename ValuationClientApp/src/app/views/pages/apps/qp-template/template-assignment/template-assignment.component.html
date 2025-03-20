@@ -55,13 +55,29 @@
                   <td mat-cell *matCellDef="let element"><a mat-button href={{element.userDocuments[1].documentUrl}} target="_blank">{{ element.userDocuments[1].documentName }} </a>   </td>
                 </ng-container>
 
+                <ng-container matColumnDef="expert-1">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Expert - 1 </th>
+                  <td mat-cell *matCellDef="let element"> </td>
+                </ng-container>
 
                 <!-- Mobile Number Column -->
+                <ng-container matColumnDef="status-1">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Status </th>
+                  <td mat-cell *matCellDef="let element"> {{ element.qpTemplateStatusTypeName }} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="expert-2">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Expert - 2 </th>
+                  <td mat-cell *matCellDef="let element">{{ element.qpTemplateStatusTypeName }} </td>
+                </ng-container>
+                <ng-container matColumnDef="status-2">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Status </th>
+                  <td mat-cell *matCellDef="let element"> {{ element.qpTemplateStatusTypeName }} </td>
+                </ng-container>
                 <ng-container matColumnDef="qpTemplateStatusTypeName">
                   <th mat-header-cell *matHeaderCellDef mat-sort-header> Status </th>
                   <td mat-cell *matCellDef="let element"> {{ element.qpTemplateStatusTypeName }} </td>
                 </ng-container>
-              
 
             <!-- Table Header & Row Definitions --> 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
@@ -94,31 +110,149 @@
         <div class="col-md-6">
           <div class="mb-3">
             <label for="template"
-              class="form-label">Template</label>
-            <select class="form-select" id="template" formControlName="templateId" >
-              <option selected disabled>Select Template</option>
-              <option *ngFor="let template of templates" [value]="template.qpTemplateId">
-                {{ template.courseCode }} - {{ template.qpTemplateName }}
+              class="form-label">Course</label>
+            <select class="form-select" formControlName="courseId" id="course" (change)="onCourseChange($event)">
+              <option selected disabled>Select Course</option>
+              <option *ngFor="let course of courses" [value]="course.courseId" selected="">
+                {{course.code}} - {{ course.name }}
               </option>
             </select>
             
           </div>
         </div><!-- Col -->
+            
+      
+      </div><!-- Row -->
+      
+      <div class="row">
+        <div class="col-sm-4">
+          <div class="mb-3">
+            <label for="degreeTypeName"
+              class="form-label">Degree Type</label>
+              <input type="text" class="form-control" formControlName="degreeTypeName">
+          </div>
+        </div><!-- Col -->
+        <div class="col-sm-4">
+          <div class="mb-3">
+            <label for="regulationYear"
+              class="form-label">Requlation Year</label>
+              <input type="text" class="form-control" formControlName = "regulationYear" placeholder="Enter Regulation Year">
+               
+          </div>
+        </div><!-- Col -->
+        <div class="col-sm-4">
+          <div class="mb-3">
+            <label for="batchYear" class="form-label">Batch Year
+            </label>
+            <input type="text" class="form-control" formControlName = "batchYear" placeholder="Enter Batch Year">
+          </div>
+        </div><!-- Col -->
+      </div><!-- Row -->
+      
+      <div class="row">
+        <div class="col-sm-4">
+          <div class="mb-3">
+            <label for="examYear"
+              class="form-label">Exam Year</label>
+              <input type="text" class="form-control" formControlName = "examYear"/>
+          </div>
+        </div><!-- Col -->
+        <div class="col-sm-4">
+          <div class="mb-3">
+            <label for="examMonth"
+              class="form-label">Exam Month</label>
+              <input type="text" class="form-control" formControlName = "examMonth"  placeholder="Enter Exam Month">
+          </div>
+        </div><!-- Col -->
+        <div class="col-sm-4">
+          <div class="mb-3">
+            <label for="examType" class="form-label">Exam Type
+            </label>
+            <input type="text" class="form-control" formControlName = "examType" placeholder="">
+          </div>
+        </div><!-- Col -->
+      </div><!-- Row -->
+
+      <div class="row">
+        <div class="col-sm-4">
+          <div class="mb-3">
+            <label for="semester"
+              class="form-label">Semester</label>
+              <input type="text" class="form-control" formControlName = "semester"/>
+          </div>
+        </div><!-- Col -->
+        <div class="col-sm-4">
+          <div class="mb-3">
+            <label for="studentCount"
+              class="form-label">Students Count</label>
+              <input type="text" class="form-control" formControlName = "studentCount">
+          </div>
+        </div><!-- Col -->          
+      </div><!-- Row -->
+      <div class="row">
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label for="template"
+              class="form-label">Template</label>
+            <select class="form-select" id="template1" formControlName="documentId1" >
+              <option selected disabled>Select Template</option>
+              <option *ngFor="let template of templates" [value]="template.documentId">
+                {{ template.documentName }}
+              </option>
+            </select>
+                       
+          </div>
+        </div><!-- Col -->
         <div class="col-sm-6">
           <div class="mb-4">
             <label for="qpTemplateName"
-              class="form-label">Experts</label>
-              <select class="form-select" id="expert" formControlName="userId">
+              class="form-label">Expert - 1</label>
+              <select class="form-select" id="expert1" formControlName="expert1">
                 <option selected disabled>Select Expert</option>
-                <option *ngFor="let user of users" [value]="user.userId">
+                <option *ngFor="let user of users" [value]="user.userId" [disabled]="templateAssignmentForm.controls['expert2'].value == user.userId">
                   {{ user.name }}
                 </option>
               </select>
+              
+             
           </div>
         </div><!-- Col -->
-      
-      </div><!-- Row -->
-
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label for="template"
+              class="form-label">Template</label>
+            <select class="form-select"  id="template2"  formControlName="documentId2"
+             >
+              <option selected disabled>Select Template</option>
+              <option *ngFor="let template of templates" [value]="template.documentId">
+                {{ template.documentName }}
+              </option>
+            </select>
+                       
+          </div>
+        </div><!-- Col -->
+        <div class="col-sm-6">
+          <div class="mb-4">
+            <label for="qpTemplateName"
+              class="form-label">Experts - 2</label>
+              <select class="form-select"  id="expert2" formControlName="expert2" >
+                <option selected disabled>Select Expert</option>
+                <option *ngFor="let user of users; let x = index" value="{{user.userId}}" [disabled]="templateAssignmentForm.controls['expert1'].value == user.userId">
+                  {{user.name}}
+                </option>
+                <!-- <ng-container *ngFor="let user of users; let x = index">
+                  <option *ngFor="let user of users" value="{{user.userId}}"
+                  [attr.data-hidden] = "user.userId === templateAssignmentForm.controls['userId'].value">
+                {{user.name}}
+                 </option>
+                 </ng-container> -->
+              </select>
+             
+          </div>
+        </div><!-- Col -->
+      </div>
     </form>
   </div>
   <div class="modal-footer">

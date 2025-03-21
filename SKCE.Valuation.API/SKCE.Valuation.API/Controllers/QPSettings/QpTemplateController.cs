@@ -73,13 +73,13 @@ namespace SKCE.Examination.API.Controllers.QPSettings
         {
             return Ok(await _qpTemplateService.GetQPTemplatesByUserIdAsync(userId));
         }
-        [HttpGet("AssignQPForGeneration/{userId}/{qpTemplateId}")]
-        public async Task<ActionResult<bool>> AssignQPForGeneration(long userId, long qpTemplateId)
-        {
-            var userQPTemplate = await _qpTemplateService.AssignTemplateForQPGenerationAsync(userId, qpTemplateId);
-            if (userQPTemplate == null) return NotFound();
-            return Ok(userQPTemplate);
-        }
+        //[HttpGet("AssignQPForGeneration/{userId}/{qpTemplateId}")]
+        //public ActionResult<bool> AssignQPForGeneration(long userId, long qpTemplateId)
+        //{
+        //    var userQPTemplate =  _qpTemplateService.AssignTemplateForQPGenerationAsync(userId, qpTemplateId);
+        //    if (userQPTemplate == null) return NotFound();
+        //    return Ok(userQPTemplate);
+        //}
         [HttpGet("SubmitGeneratedQP/{userId}/{qpTemplateId}/{documentId}")]
         public async Task<ActionResult<bool>> SubmitGeneratedQP(long userId, long qpTemplateId, long documentId)
         {
@@ -107,6 +107,12 @@ namespace SKCE.Examination.API.Controllers.QPSettings
         {
             var result = await _qpTemplateService.PrintSelectedQPAsync(qpTemplateId, qpCode,isForPrint);
             return Ok(result);
+        }
+
+        [HttpGet("GetExpertsForQPAssignment")]
+        public async Task<ActionResult<IEnumerable<QPAssignmentExpertVM>>> GetExpertsForQPAssignment()
+        {
+            return Ok(await _qpTemplateService.GetExpertsForQPAssignmentAsync());
         }
     }
 }

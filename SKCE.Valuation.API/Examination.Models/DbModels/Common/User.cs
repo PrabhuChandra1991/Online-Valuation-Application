@@ -13,7 +13,7 @@ namespace SKCE.Examination.Models.DbModels.Common
         public long UserId { get; set; }
 
         [MaxLength(255)]
-        public string? Name { get; set; }
+        public string Name { get; set; }
 
         [Required, EmailAddress]
         public required string Email { get; set; }

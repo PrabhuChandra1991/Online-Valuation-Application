@@ -28,9 +28,9 @@ namespace SKCE.Examination.Models.DbModels.QPSettings
         public required long Semester { get; set; }
         public required long StudentCount { get; set; }
 
-        public virtual ICollection<QPTemplateDocument> Documents { get; set; } = new List<QPTemplateDocument>();
+        public virtual List<QPTemplateDocument> Documents { get; set; } = new List<QPTemplateDocument>();
 
-        public virtual ICollection<QPTemplateInstitution> Institutions { get; set; } = new List<QPTemplateInstitution>();
+        public virtual List<QPTemplateInstitution> Institutions { get; set; } = new List<QPTemplateInstitution>();
 
     }
 }

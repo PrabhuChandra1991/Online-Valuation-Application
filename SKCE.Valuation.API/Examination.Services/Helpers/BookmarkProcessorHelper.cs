@@ -10,6 +10,8 @@ using MigraDoc.Rendering;
 using PdfSharp.Pdf.IO;
 using PdfSharp.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Words.Tables;
+using Aspose.Words.Drawing;
 
 namespace SKCE.Examination.Services.Helpers
 {
@@ -85,7 +87,8 @@ namespace SKCE.Examination.Services.Helpers
                             //    // Convert extracted nodes to HTML string
                             //    bookmarkHtml = ConvertNodesToHtml(extractedNodes);
                             //}
-                            bookmarkHtml = ConvertBookmarkRangeToHtml(bookmark.BookmarkStart, bookmark.BookmarkEnd);
+                            bookmarkHtml = ExtractBookmarkContentAsHtml(sourceDoc, bookmarkName);
+                            //bookmarkHtml = ConvertBookmarkRangeToHtml(bookmark.BookmarkStart, bookmark.BookmarkEnd);
                         }
                     }
                     // Replace bookmark content in the template document
@@ -113,6 +116,69 @@ namespace SKCE.Examination.Services.Helpers
             }
         }
 
+        /// <summary>
+        /// Extracts text, images, and tables inside a bookmark and converts it to an HTML string.
+        /// </summary>
+        public static string ExtractBookmarkContentAsHtml(Document sourceDoc, string bookmarkName)
+        {
+            // Load the Word document
+            Document doc = sourceDoc;
+
+            // Check if the bookmark exists
+            Aspose.Words.Bookmark bookmark = doc.Range.Bookmarks[bookmarkName];
+            if (bookmark == null)
+                throw new Exception($"Bookmark '{bookmarkName}' not found in the document.");
+
+            // Create a new document to extract content
+            Document extractedDoc = new Document();
+            DocumentBuilder builder = new DocumentBuilder(extractedDoc);
+
+            StringBuilder htmlBuilder = new StringBuilder();
+
+            // Loop through all nodes inside the bookmark
+            Node currentNode = bookmark.BookmarkStart;
+            while (currentNode != null && currentNode != bookmark.BookmarkEnd)
+            {
+                if (currentNode is Paragraph paragraph)
+                {
+                    htmlBuilder.Append("<p>");
+                    foreach (Run run in paragraph.Runs)
+                    {
+                        htmlBuilder.Append(run.Text); // Append text content
+                    }
+                    htmlBuilder.Append("</p>");
+                }
+                else if (currentNode is Table table)
+                {
+                    htmlBuilder.Append("<table border='1'>");
+                    foreach (Row row in table.Rows)
+                    {
+                        htmlBuilder.Append("<tr>");
+                        foreach (Cell cell in row.Cells)
+                        {
+                            htmlBuilder.Append("<td>").Append(cell.GetText().Trim()).Append("</td>");
+                        }
+                        htmlBuilder.Append("</tr>");
+                    }
+                    htmlBuilder.Append("</table>");
+                }
+                else if (currentNode is Shape shape && shape.HasImage)
+                {
+                    // Convert image to Base64 string
+                    MemoryStream imageStream = new MemoryStream();
+                    shape.ImageData.Save(imageStream);
+                    string base64Image = Convert.ToBase64String(imageStream.ToArray());
+
+                    // Generate HTML image tag
+                    string imgTag = $"<img src='data:image/png;base64,{base64Image}' />";
+                    htmlBuilder.Append(imgTag);
+                }
+
+                currentNode = currentNode.NextSibling; // Move to the next node
+            }
+
+            return htmlBuilder.ToString();
+        }
         private static string ConvertBookmarkRangeToHtml(Node startNode, Node endNode)
         {
             // Create a temporary document with just the bookmark range
@@ -124,7 +190,14 @@ namespace SKCE.Examination.Services.Helpers
             while (currentNode != null && currentNode != endNode)
             {
                 Node importedNode = tempDoc.ImportNode(currentNode, true, ImportFormatMode.KeepSourceFormatting);
-                builder.InsertNode(importedNode);
+                if (importedNode != null)
+                {
+                    if (importedNode is Paragraph || importedNode is Run || importedNode is Table || importedNode is Shape)
+                    {
+                        tempDoc.FirstSection.Body.AppendChild(importedNode);
+                    }
+                }
+                //builder.InsertNode(importedNode);
                 //tempDoc.FirstSection.Body.AppendChild(importedNode);
                 currentNode = currentNode.NextSibling;
             }

@@ -582,6 +582,7 @@ onGenderChange(event: Event) {
 
     //map formdata to user object
      let userData =  this.mapFormDataToUserObject (formData);
+      userData.isEnabled = true;
       this.updateUser(userData);
       console.log('Final Object:', JSON.stringify(userData));
     // } else {

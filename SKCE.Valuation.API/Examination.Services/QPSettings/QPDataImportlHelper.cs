@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using Aspose.Words;
+using DocumentFormat.OpenXml.Office2010.Word;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Http;
@@ -11,6 +14,7 @@ using SKCE.Examination.Models.DbModels.Common;
 using SKCE.Examination.Models.DbModels.QPSettings;
 using SKCE.Examination.Services.Helpers;
 using SKCE.Examination.Services.ViewModels.QPSettings;
+using Document = Aspose.Words.Document;
 
 public class QPDataImportHelper
 {
@@ -241,15 +245,16 @@ public class QPDataImportHelper
 
     public async Task<string> ImportSyllabusDocuments(List<IFormFile> files)
     {
-        var documentMissingCourses = "Syllabus documents are missing for ";
+        var documentMissingCourses = "Syllabus documents are missing for total ";
         var courses = _dbContext.Courses.ToList();
         var courseSyllabusDocuments = _dbContext.CourseSyllabusDocuments.ToList();
+        List<string> missingCourses = new List<string>();
         files.ForEach(file =>
         {
-            var documentId = _azureBlobStorageHelper.UploadFileAsync(file.OpenReadStream(), file.FileName, file.ContentType);
             var courseId = courses.FirstOrDefault(c => file.FileName.Contains(c.Code))?.CourseId;
             if (courseId != null)
             {
+                var documentId = _azureBlobStorageHelper.UploadFileAsync(file.OpenReadStream(), file.FileName, file.ContentType);
                 if (!courseSyllabusDocuments.Any(cs => cs.CourseId == courseId.Value))
                 {
                     var courseSyllabusDocument = new CourseSyllabusDocument
@@ -270,17 +275,21 @@ public class QPDataImportHelper
                     }
                 }
             }
+            else
+                missingCourses.Add(file.FileName);
         });
         await _dbContext.SaveChangesAsync();
+       
+        List<string> courseCods = new List<string>();
         _dbContext.Courses.ToList().ForEach(c =>
          {
              if (!_dbContext.CourseSyllabusDocuments.Any(cs => cs.CourseId == c.CourseId))
              {
-                 documentMissingCourses += c.Code + ", ";
+                 courseCods.Add(c.Code);
              }
          });
-
-        return documentMissingCourses;
+        if(missingCourses.Count > 0) return ($"Course is missing for uploaded files {string.Join(", ", missingCourses)} and Syllabus documents are missing for total {courseCods.Count} courses and course cods are {string.Join(", ", courseCods)}.");
+        return ($"Syllabus documents are missing for total {courseCods.Count} courses and course cods are {string.Join(", ", courseCods)}.");
     }
 
     public async Task<bool> ImportQPDocuments(List<IFormFile> files, List<QPDocumentValidationVM> qPDocumentValidationVMs)
@@ -288,15 +297,17 @@ public class QPDataImportHelper
         var courseDepartments = _dbContext.CourseDepartments.ToList();
         var institutions = _dbContext.Institutions.ToList();
         var qpDocuments = _dbContext.QPDocuments.ToList();
+        var missingInstitutions = new List<string>();
         files.ForEach(file =>
         {
-            var documentId = _azureBlobStorageHelper.UploadFileAsync(file.OpenReadStream(), file.FileName, file.ContentType).Result;
             var institution = institutions.FirstOrDefault(i => file.FileName.Split('_')[0].Equals(i.Code));
             var regulation = file.FileName.Split('_')[1];
             var degreeTypeName = file.FileName.Split('_')[2];
-            var documetTypeId = file.FileName.Split('_')[3].Equals("QP.docx") ? 2 : 3;
+            var examType = file.FileName.Split('_')[3];
+            var documetTypeId = file.FileName.Split('_')[4].Equals("QP.docx") ? 2 : 3;
             if (institution != null)
             {
+                var documentId = _azureBlobStorageHelper.UploadFileAsync(file.OpenReadStream(), file.FileName, file.ContentType).Result;
                 if (qpDocuments.Any(qp => qp.InstitutionId == institution.InstitutionId && qp.RegulationYear == regulation && qp.DegreeTypeName == degreeTypeName && qp.DocumentTypeId == documetTypeId))
                 {
                     var existingQPDocument = _dbContext.QPDocuments.FirstOrDefault(qp => qp.InstitutionId == institution.InstitutionId && qp.RegulationYear == regulation && qp.DegreeTypeName == degreeTypeName && qp.DocumentTypeId == documetTypeId);
@@ -314,14 +325,86 @@ public class QPDataImportHelper
                         RegulationYear = regulation,
                         DegreeTypeName = degreeTypeName,
                         DocumentTypeId = documetTypeId,
-                        DocumentId = documentId
+                        DocumentId = documentId,
+                        QPDocumentName = file.FileName.Trim().Split('.')[0],
+                        ExamType = examType
                     };
                     AuditHelper.SetAuditPropertiesForInsert(qpDocument, 1);
                     _dbContext.QPDocuments.Add(qpDocument);
                 }
             }
+            else
+                missingInstitutions.Add(file.FileName);
         });
         await _dbContext.SaveChangesAsync();
+        //await ExtractBookMarks();
         return true;
+    }
+
+    private async Task ExtractBookMarks()
+    {
+        var qPDocuments = _dbContext.QPDocuments.ToList();
+        foreach (var qpDocument in qPDocuments)
+        {
+            if (qpDocument.DocumentTypeId != 3) continue;
+            if (!_dbContext.QPDocumentBookMarks.Any(qpb => qpb.QPDocumentId == qpDocument.QPDocumentId))
+            {
+                var qpSelectedDocument = _dbContext.Documents.FirstOrDefault(d => d.DocumentId == qpDocument.DocumentId);
+                if (qpSelectedDocument != null)
+                {
+                    Aspose.Words.Document sourceDoc = _azureBlobStorageHelper.DownloadWordDocumentFromBlob(qpSelectedDocument.Name).Result;
+                    // Iterate through all bookmarks in the source document
+                    var bookmarkNames = sourceDoc.Range.Bookmarks.Select(b => b.Name).ToList();
+                    var qpDocumentBookMarks = new List<QPDocumentBookMark>();
+                    foreach (Aspose.Words.Bookmark bookmark in sourceDoc.Range.Bookmarks)
+                    {
+                        var qPDocumentBookMark = new QPDocumentBookMark
+                        {
+                            QPDocumentId = qpDocument.QPDocumentId,
+                            BookMarkName = bookmark.Name,
+                            BookMarkText = ConvertToBase64(ConvertBookmarkRangeToHtml(bookmark.BookmarkStart, bookmark.BookmarkEnd))
+                        };
+                        AuditHelper.SetAuditPropertiesForInsert(qPDocumentBookMark, 1);
+                        qpDocumentBookMarks.Add(qPDocumentBookMark);
+                    }
+                    _dbContext.QPDocumentBookMarks.AddRange(qpDocumentBookMarks);
+                }
+            }
+        }
+        await _dbContext.SaveChangesAsync();
+    }
+
+    private static string ConvertToBase64(string text)
+    {
+        byte[] textBytes = Encoding.UTF8.GetBytes(text);
+        return Convert.ToBase64String(textBytes);
+    }
+    private static string ConvertBookmarkRangeToHtml(Node startNode, Node endNode)
+    {
+        // Create a temporary document with just the bookmark range
+        Document tempDoc = new Document();
+        DocumentBuilder builder = new DocumentBuilder(tempDoc);
+
+        //Node currentNode = startNode;
+        Node currentNode = startNode.NextSibling;
+        while (currentNode != null && currentNode != endNode)
+        {
+            Node importedNode = tempDoc.ImportNode(currentNode, true, ImportFormatMode.KeepSourceFormatting);
+            builder.InsertNode(importedNode);
+            //tempDoc.FirstSection.Body.AppendChild(importedNode);
+            currentNode = currentNode.NextSibling;
+        }
+        Aspose.Words.Saving.HtmlSaveOptions htmlSaveOptions = new Aspose.Words.Saving.HtmlSaveOptions();
+        htmlSaveOptions.ExportImagesAsBase64 = true;
+        htmlSaveOptions.ExportHeadersFootersMode = Aspose.Words.Saving.ExportHeadersFootersMode.PerSection;
+        htmlSaveOptions.SaveFormat = Aspose.Words.SaveFormat.Html;
+        htmlSaveOptions.PrettyFormat = true;
+
+        // Convert the document range to HTML
+        using (MemoryStream ms = new MemoryStream())
+        {
+            tempDoc.Save(ms, htmlSaveOptions);
+            return Encoding.UTF8.GetString(ms.ToArray());
+        }
     }
 }

@@ -34,6 +34,8 @@ namespace SKCE.Examination.Models.DbModels.Common
         public DbSet<DegreeType> DegreeTypes { get; set; }
         public DbSet<ExamMonth> ExamMonths { get; set; }
         public DbSet<ImportHistory> ImportHistories { get; set; }
+        public DbSet<QPDocumentBookMark> QPDocumentBookMarks { get; set; }
+        public DbSet<UserQPDocumentBookMark> UserQPDocumentBookMarks { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
         }

@@ -71,9 +71,9 @@
             <div class="row mb-4">
               <div class="col-sm-6">
                 <label class="form-label">Department <span class="text-danger">*</span></label>
-                <input type="text" formControlName="department" class="form-control"  />
+                <input type="text" formControlName="departmentName" class="form-control"  />
                 <span class="text-danger"
-                    *ngIf="(userForm.controls.department.touched) && userForm.controls.department.errors?.required">
+                    *ngIf="(userForm.controls.departmentName.touched) && userForm.controls.departmentName.errors?.required">
                     Department is required
                 </span>
               </div>

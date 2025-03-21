@@ -44,8 +44,8 @@ export class TemplateManagementService {
   }
   
    // Fetch templated from API
-   getTemplates(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/api/QpTemplate`);
+   getTemplates(institutionId:number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/api/QpTemplate/GetQPTemplates/${institutionId}`);
   }
   // Fetch templated from API
   getTemplatesByStatusId(statusId:number): Observable<any> {

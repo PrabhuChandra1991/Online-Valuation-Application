@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.Bibliography;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SKCE.Examination.Models.DbModels.Common;
@@ -48,10 +49,10 @@ namespace SKCE.Examination.API.Controllers.QPSettings
             var updatedTemplate = await _qpTemplateService.UpdateQpTemplateAsync(viewModel);
             return Ok(updatedTemplate);
         }
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<QPTemplateVM>>> GetQPTemplatesAsync()
+        [HttpGet("GetQPTemplates/{institutionId}")]
+        public async Task<ActionResult<IEnumerable<QPTemplateVM>>> GetQPTemplates(long institutionId)
         {
-            return Ok( await _qpTemplateService.GetQPTemplatesAsync());
+            return Ok( await _qpTemplateService.GetQPTemplatesAsync(institutionId));
         }
 
         [HttpGet("{qpTemplateId}")]

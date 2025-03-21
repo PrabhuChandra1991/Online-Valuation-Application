@@ -30,6 +30,7 @@ namespace SKCE.Examination.Services.ViewModels.QPSettings
         public long QPDocumentId { get; set; }
         public string QPDocumentName { get; set; }
         public long InstitutionId { get; set; }
+        public long QPOnlyDocumentId { get; set; }
         public List<QPDocumentUserVM> QPAssignedUsers { get; set; } = new List<QPDocumentUserVM>();
         public List<QPDocumentUserVM> QPScrutinityUsers { get; set; } = new List<QPDocumentUserVM>();
         public List<QPDocumentUserVM> QPSelectedUsers { get; set; } = new List<QPDocumentUserVM>();
@@ -102,6 +103,7 @@ namespace SKCE.Examination.Services.ViewModels.QPSettings
         public long QPTemplateStatusTypeId { get; set; }    
         public string QPTemplateStatusTypeName { get; set; } = string.Empty;
         public long QPDocumentId { get; set; }
+        public bool IsQPOnly { get; set; }
         public List<QPTemplateDocumentVM> UserDocuments { get; set; } = new List<QPTemplateDocumentVM>();
     }
     public class QPDocumentValidationVM

@@ -109,7 +109,7 @@ namespace SKCE.Examination.Services.QPSettings
                         Departments = new List<QPTemplateInstitutionDepartmentVM>()
                     };
                     var degreeTypeName = string.Empty;
-                    if (qPTemplate.DegreeTypeName == "UG" || qPTemplate.DegreeTypeName == "PG")
+                    if (qPTemplate.DegreeTypeName == "UG")
                         degreeTypeName = "UG-PG(ME)";
 
                     var departmentVMs = courseDepartments.Join(departments, cd => cd.DepartmentId, d => d.DepartmentId, (cd, d) => new { cd, d })
@@ -125,9 +125,6 @@ namespace SKCE.Examination.Services.QPSettings
                     institutionVM.Departments = departmentVMs;
                     foreach (var department in institutionVM.Departments)
                     {
-                        if (qPTemplate.DegreeTypeName == "PG" && department.DepartmentShortName == "MBA")
-                            degreeTypeName = $"{qPTemplate.DegreeTypeName}({department.DepartmentShortName})";
-
                         AuditHelper.SetAuditPropertiesForInsert(department, 1);
                     }
                   
@@ -144,7 +141,7 @@ namespace SKCE.Examination.Services.QPSettings
                             QPDocumentTypeName = QPDocumentTypeDictionary[2]
                         });
                     }
-                    var qpAkDocument = _context.QPDocuments.FirstOrDefault(d => d.InstitutionId == institution.InstitutionId && d.RegulationYear == qPTemplate.RegulationYear && d.DegreeTypeName == degreeTypeName && d.DocumentTypeId == 3);
+                    var qpAkDocument = _context.QPDocuments.FirstOrDefault(d => d.InstitutionId == institution.InstitutionId && d.RegulationYear == qPTemplate.RegulationYear && d.DegreeTypeName == qPTemplate.DegreeTypeName && d.DocumentTypeId == 3 && d.ExamType.ToLower().Contains(qPTemplate.ExamType.ToLower()));
                     
                     if(qpAkDocument != null)
                     {
@@ -162,8 +159,8 @@ namespace SKCE.Examination.Services.QPSettings
                             InstitutionId = qpAkDocument.InstitutionId,
                             QPDocumentName = qpAkDocument.QPDocumentName,
                         };
-                        qpDocumentForGeneration.QPAssignedUsers.Add(new QPDocumentUserVM { UserId = 0, UserName = string.Empty });
-                        qpDocumentForGeneration.QPAssignedUsers.Add(new QPDocumentUserVM { UserId = 0, UserName = string.Empty });
+                        qpDocumentForGeneration.QPAssignedUsers.Add(new QPDocumentUserVM { UserQPTemplateId=0,IsQPOnly=false,StatusTypeId=8, StatusTypeName = "", UserId = 0, UserName = string.Empty });
+                        qpDocumentForGeneration.QPAssignedUsers.Add(new QPDocumentUserVM { UserQPTemplateId = 0, IsQPOnly = false, StatusTypeId = 8, StatusTypeName="", UserId = 0, UserName = string.Empty });
                         qPTemplate.QPDocuments.Add(qpDocumentForGeneration);
                     }
                     foreach (var qPDocument in institutionVM.Documents)
@@ -1304,7 +1301,7 @@ namespace SKCE.Examination.Services.QPSettings
             AuditHelper.SetAuditPropertiesForUpdate(qpTemplate, 1);
             await _context.SaveChangesAsync();
 
-            var userQPTemplate = await _context.UserQPTemplates.FirstOrDefaultAsync(uqp => uqp.QPTemplateInstitutionId == qpTemplateInstitutionId && uqp.QPTemplateStatusTypeId == 13);
+            var userQPTemplate = await _context.UserQPTemplates.FirstOrDefaultAsync(uqp => uqp.QPTemplateInstitutionId == qpTemplateInstitutionId && uqp.QPTemplateStatusTypeId == 12);
             if (userQPTemplate != null)
             {
                 var selectedQpDocument = await _context.UserQPTemplateDocuments.FirstOrDefaultAsync(qptd => qptd.QPDocumentTypeId == 9 && qptd.UserQPTemplateId == userQPTemplate.UserQPTemplateId);
@@ -1333,6 +1330,23 @@ namespace SKCE.Examination.Services.QPSettings
         private async Task<bool> PrintQPAnswerDocumentByInstitutionAsync(QPTemplate qPTemplate, QPTemplateInstitution qPTemplateInstitution, UserQPTemplateDocument selectedQPDocument, QPTemplateInstitutionDocument documentToPrint)
         {
             return true;
+        }
+
+        public async Task<IEnumerable<QPAssignmentExpertVM>> GetExpertsForQPAssignmentAsync()
+        {
+            var users = await _context.Users.Where(u => u.IsEnabled && u.UserId != 1).ToListAsync();
+            var userQPTemplates = await _context.UserQPTemplates.Where(uqp => uqp.QPTemplateStatusTypeId == 8 || uqp.QPTemplateStatusTypeId == 10).ToListAsync();
+            var qpAssignmentExperts = new List<QPAssignmentExpertVM>();
+            foreach (var user in users)
+            {
+                qpAssignmentExperts.Add(new QPAssignmentExpertVM
+                {
+                    UserId = user.UserId,
+                    UserName =$"{user.Name}-{user.CollegeName}-{user.DepartmentName}",
+                    IsAvailableForQPAssignment = (userQPTemplates.Where(uqp => uqp.UserId == user.UserId).ToList().Count < 3)
+                });
+            }
+            return qpAssignmentExperts;
         }
     }
 }

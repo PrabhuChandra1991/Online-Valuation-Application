@@ -147,7 +147,7 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
   // }
 
   loadExperts(): void {
-    this.userService.getUsers().subscribe({
+    this.templateService.getExpertsForQPAssignment().subscribe({
       next: (data) => {
         this.users = data.filter((user: any) => user.userId != 1);
         

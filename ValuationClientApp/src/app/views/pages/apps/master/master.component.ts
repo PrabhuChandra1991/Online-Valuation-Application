@@ -95,7 +95,7 @@ export class MasterComponent {
 
     this.spinnerService.toggleSpinnerState(true);
     const formData = new FormData();
-  
+    this.syllabusDocsPending ='';
     const fileSourceValue = this.courseSyllabusDocumentsForm.get('fileSource')?.value;
   
     if (fileSourceValue !== null && fileSourceValue !== undefined) {

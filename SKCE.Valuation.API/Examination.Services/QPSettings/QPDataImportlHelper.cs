@@ -245,15 +245,16 @@ public class QPDataImportHelper
 
     public async Task<string> ImportSyllabusDocuments(List<IFormFile> files)
     {
-        var documentMissingCourses = "Syllabus documents are missing for ";
+        var documentMissingCourses = "Syllabus documents are missing for total ";
         var courses = _dbContext.Courses.ToList();
         var courseSyllabusDocuments = _dbContext.CourseSyllabusDocuments.ToList();
+        List<string> missingCourses = new List<string>();
         files.ForEach(file =>
         {
-            var documentId = _azureBlobStorageHelper.UploadFileAsync(file.OpenReadStream(), file.FileName, file.ContentType);
             var courseId = courses.FirstOrDefault(c => file.FileName.Contains(c.Code))?.CourseId;
             if (courseId != null)
             {
+                var documentId = _azureBlobStorageHelper.UploadFileAsync(file.OpenReadStream(), file.FileName, file.ContentType);
                 if (!courseSyllabusDocuments.Any(cs => cs.CourseId == courseId.Value))
                 {
                     var courseSyllabusDocument = new CourseSyllabusDocument
@@ -274,17 +275,21 @@ public class QPDataImportHelper
                     }
                 }
             }
+            else
+                missingCourses.Add(file.FileName);
         });
         await _dbContext.SaveChangesAsync();
+       
+        List<string> courseCods = new List<string>();
         _dbContext.Courses.ToList().ForEach(c =>
          {
              if (!_dbContext.CourseSyllabusDocuments.Any(cs => cs.CourseId == c.CourseId))
              {
-                 documentMissingCourses += c.Code + ", ";
+                 courseCods.Add(c.Code);
              }
          });
-
-        return documentMissingCourses;
+        if(missingCourses.Count > 0) return ($"Course is missing for uploaded files {string.Join(", ", missingCourses)} and Syllabus documents are missing for total {courseCods.Count} courses and course cods are {string.Join(", ", courseCods)}.");
+        return ($"Syllabus documents are missing for total {courseCods.Count} courses and course cods are {string.Join(", ", courseCods)}.");
     }
 
     public async Task<bool> ImportQPDocuments(List<IFormFile> files, List<QPDocumentValidationVM> qPDocumentValidationVMs)
@@ -292,15 +297,17 @@ public class QPDataImportHelper
         var courseDepartments = _dbContext.CourseDepartments.ToList();
         var institutions = _dbContext.Institutions.ToList();
         var qpDocuments = _dbContext.QPDocuments.ToList();
+        var missingInstitutions = new List<string>();
         files.ForEach(file =>
         {
-            var documentId = _azureBlobStorageHelper.UploadFileAsync(file.OpenReadStream(), file.FileName, file.ContentType).Result;
             var institution = institutions.FirstOrDefault(i => file.FileName.Split('_')[0].Equals(i.Code));
             var regulation = file.FileName.Split('_')[1];
             var degreeTypeName = file.FileName.Split('_')[2];
-            var documetTypeId = file.FileName.Split('_')[3].Equals("QP.docx") ? 2 : 3;
+            var examType = file.FileName.Split('_')[3];
+            var documetTypeId = file.FileName.Split('_')[4].Equals("QP.docx") ? 2 : 3;
             if (institution != null)
             {
+                var documentId = _azureBlobStorageHelper.UploadFileAsync(file.OpenReadStream(), file.FileName, file.ContentType).Result;
                 if (qpDocuments.Any(qp => qp.InstitutionId == institution.InstitutionId && qp.RegulationYear == regulation && qp.DegreeTypeName == degreeTypeName && qp.DocumentTypeId == documetTypeId))
                 {
                     var existingQPDocument = _dbContext.QPDocuments.FirstOrDefault(qp => qp.InstitutionId == institution.InstitutionId && qp.RegulationYear == regulation && qp.DegreeTypeName == degreeTypeName && qp.DocumentTypeId == documetTypeId);
@@ -319,18 +326,28 @@ public class QPDataImportHelper
                         DegreeTypeName = degreeTypeName,
                         DocumentTypeId = documetTypeId,
                         DocumentId = documentId,
-                        QPDocumentName= file.FileName.Trim().Split('.')[0]
+                        QPDocumentName = file.FileName.Trim().Split('.')[0],
+                        ExamType = examType
                     };
                     AuditHelper.SetAuditPropertiesForInsert(qpDocument, 1);
                     _dbContext.QPDocuments.Add(qpDocument);
                 }
             }
+            else
+                missingInstitutions.Add(file.FileName);
         });
         await _dbContext.SaveChangesAsync();
+        //await ExtractBookMarks();
+        return true;
+    }
+
+    private async Task ExtractBookMarks()
+    {
         var qPDocuments = _dbContext.QPDocuments.ToList();
-        foreach (var qpDocument in qPDocuments) {
+        foreach (var qpDocument in qPDocuments)
+        {
             if (qpDocument.DocumentTypeId != 3) continue;
-            if(!_dbContext.QPDocumentBookMarks.Any(qpb=>qpb.QPDocumentId == qpDocument.QPDocumentId))
+            if (!_dbContext.QPDocumentBookMarks.Any(qpb => qpb.QPDocumentId == qpDocument.QPDocumentId))
             {
                 var qpSelectedDocument = _dbContext.Documents.FirstOrDefault(d => d.DocumentId == qpDocument.DocumentId);
                 if (qpSelectedDocument != null)
@@ -355,8 +372,8 @@ public class QPDataImportHelper
             }
         }
         await _dbContext.SaveChangesAsync();
-        return true;
     }
+
     private static string ConvertToBase64(string text)
     {
         byte[] textBytes = Encoding.UTF8.GetBytes(text);

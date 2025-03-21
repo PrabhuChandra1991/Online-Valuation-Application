@@ -36,10 +36,13 @@ namespace SKCE.Examination.Services.ViewModels.QPSettings
     }
     public class QPDocumentUserVM
     {
+        public long UserQPTemplateId { get; set; }
         public long UserId { get; set; }
         public string  UserName { get; set; }
         public long StatusTypeId { get; set; }
         public string StatusTypeName { get; set; } = string.Empty;
+        public bool IsQPOnly { get; set; }
+
     }
     public class QPTemplateDocumentVM : AuditModel
     {
@@ -104,5 +107,11 @@ namespace SKCE.Examination.Services.ViewModels.QPSettings
     public class QPDocumentValidationVM
     {
         
+    }
+    public class QPAssignmentExpertVM
+    {
+        public long UserId { get; set; }
+        public string UserName { get; set; }
+        public bool IsAvailableForQPAssignment { get; set; }
     }
 }

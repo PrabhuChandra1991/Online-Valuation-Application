@@ -10,11 +10,12 @@ export const MENU: MenuItem[] = [
     role: [1]
   },
   {
-    label: 'Template Management',
-    icon: 'clipboard',
-    link: '/apps/qptemplate',
+    label: 'Master Data',
+    icon: 'list',
+    link: '/apps/master',
     role: [1]
   },
+  
 {
     label: 'Template Assignment',
     icon: 'check-square',
@@ -22,11 +23,12 @@ export const MENU: MenuItem[] = [
     role: [1]
   },
   {
-    label: 'Master Data',
-    icon: 'list',
-    link: '/apps/master',
+    label: 'Template Management',
+    icon: 'clipboard',
+    link: '/apps/qptemplate',
     role: [1]
   },
+
   {
     label: 'Assigned Template',
     icon: 'list',

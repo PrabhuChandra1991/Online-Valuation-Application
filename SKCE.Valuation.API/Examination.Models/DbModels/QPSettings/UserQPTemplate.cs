@@ -21,6 +21,7 @@ namespace SKCE.Examination.Models.DbModels.QPSettings
         public long QPTemplateStatusTypeId { get; set; }
         [ForeignKey("QPDocument")]
         public long QPDocumentId { get; set; }
+        public bool IsQPOnly { get; set; }
         public virtual ICollection<UserQPTemplateDocument> Documents { get; set; } = new List<UserQPTemplateDocument>();
 
     }

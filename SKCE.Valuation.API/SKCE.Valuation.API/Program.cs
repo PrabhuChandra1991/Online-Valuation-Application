@@ -82,8 +82,7 @@ app.MapControllers();
 app.UseRouting();
 // Enable CORS Middleware
 //app.UseCors("AllowSpecificOrigins");
-app.UseCors(
-               options => options.SetIsOriginAllowed(x => _ = true)
+app.UseCors(options => options.SetIsOriginAllowed(x => _ = true)
                .AllowAnyMethod()
                .AllowAnyHeader()
                .AllowCredentials()
@@ -117,26 +116,7 @@ void SeedDefaultUser(ExaminationDbContext context)
             BankIFSCCode = "",
             IsEnabled = true,
         };
-        //seed default qualifications
-        foreach (var degreeType in context.DegreeTypes.OrderBy(d => d.DegreeTypeId))
-        {
-            var degreeTypeName = string.Format("{0}{1}:", degreeType.DegreeTypeId == 2 ? "*" : "", degreeType.Name);
-            var userQualification = new UserQualification { UserId = defaultUser.UserId, Title = degreeTypeName + ":", Specialization = "", Name = "", IsCompleted = false };
-            AuditHelper.SetAuditPropertiesForInsert(userQualification, 1);
-            defaultUser.UserQualifications.Add(userQualification);
-        }
-
-        //seed current designation
-        var currentDesignation = new UserDesignation() { UserId = defaultUser.UserId, DesignationId = 0, Experience = 0, IsCurrent = true };
-        AuditHelper.SetAuditPropertiesForInsert(currentDesignation, 1);
-        defaultUser.UserDesignations.Add(currentDesignation);
-
-        //seed one previou designation
-        var previousDesignation = new UserDesignation() { UserId = defaultUser.UserId, DesignationId = 0, Experience = 0, IsCurrent = false };
-        AuditHelper.SetAuditPropertiesForInsert(previousDesignation, 1);
-        defaultUser.UserDesignations.Add(previousDesignation);
         AuditHelper.SetAuditPropertiesForInsert(defaultUser, 1);
-
         context.Users.Add(defaultUser);
         context.SaveChanges(); // Commit to Database
     }

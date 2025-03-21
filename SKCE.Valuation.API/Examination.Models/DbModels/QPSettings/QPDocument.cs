@@ -20,6 +20,7 @@ namespace SKCE.Examination.Models.DbModels.QPSettings
         public string RegulationYear { get; set; }
         public string DegreeTypeName { get; set; }
         public string QPDocumentName { get; set; }
+        public string ExamType { get; set; }
         public long DocumentId { get; set; }
         public long DocumentTypeId { get; set; }
     }

@@ -108,5 +108,11 @@ namespace SKCE.Examination.API.Controllers.QPSettings
             var result = await _qpTemplateService.PrintSelectedQPAsync(qpTemplateId, qpCode,isForPrint);
             return Ok(result);
         }
+
+        [HttpGet("GetExpertsForQPAssignment")]
+        public async Task<ActionResult<IEnumerable<QPAssignmentExpertVM>>> GetExpertsForQPAssignment()
+        {
+            return Ok(await _qpTemplateService.GetExpertsForQPAssignmentAsync());
+        }
     }
 }

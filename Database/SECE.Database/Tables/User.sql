@@ -18,7 +18,7 @@
     BankName NVARCHAR(255)  NULL,
     BankBranchName NVARCHAR(255)  NULL,
     BankIFSCCode NVARCHAR(20)  NULL,
-    IsEnabled BIT DEFAULT 1,
+    IsEnabled BIT DEFAULT 0,
     IsActive BIT DEFAULT 1,
     CreatedDate DATETIME DEFAULT GETDATE(),
     CreatedById BIGINT  NULL,

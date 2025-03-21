@@ -203,9 +203,9 @@
                 <label for="qpTemplateName"
                   class="form-label">Expert - 1</label>
                   <select class="form-select" id="expert1" formControlName="expert1">
-                    <option selected disabled>Select Expert</option>
+                    <option selected>Select Expert</option>
                     <option *ngFor="let user of users" [value]="user.userId" [disabled]="templateAssignmentForm.controls['expert2'].value == user.userId">
-                      {{ user.name }}
+                      {{ user.userName }}
                     </option>
                   </select>
               </div>
@@ -215,9 +215,9 @@
                 <label for="qpTemplateName"
                   class="form-label">Expert - 2</label>
                   <select class="form-select" id="expert2" formControlName="expert2">
-                    <option selected disabled>Select Expert</option>
+                    <option selected >Select Expert</option>
                     <option *ngFor="let user of users" [value]="user.userId" [disabled]="templateAssignmentForm.controls['expert1'].value == user.userId">
-                      {{ user.name }}
+                      {{ user.userName }}
                     </option>
                   </select>
               </div>

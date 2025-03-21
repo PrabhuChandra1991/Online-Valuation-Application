@@ -67,5 +67,8 @@ export class TemplateManagementService {
   CreateQpTemplate(formData: FormData): Observable<any> {
     return this.http.post(`${this.apiUrl}/api/QpTemplate/CreateQpTemplate`,formData);
   }
+  getExpertsForQPAssignment(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/api/QpTemplate/GetExpertsForQPAssignment`);
+  }
 
 }

@@ -7,6 +7,7 @@
 	[QPDocumentName] NVARCHAR(50) NOT NULL DEFAULT '' ,
 	[DocumentId] BIGINT NOT NULL,
 	[DocumentTypeId] BIGINT NOT NULL,
+	[ExamType] NVARCHAR(50) NOT NULL DEFAULT 'Regular',
 	[IsActive] BIT DEFAULT 1,
 	CreatedDate DATETIME DEFAULT GETDATE(),
 	CreatedById BIGINT NOT NULL DEFAULT 1,

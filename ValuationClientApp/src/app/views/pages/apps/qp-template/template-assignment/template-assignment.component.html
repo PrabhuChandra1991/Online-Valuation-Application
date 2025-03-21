@@ -189,6 +189,39 @@
           </div>
         </div><!-- Col -->          
       </div><!-- Row -->
+      @for (institution of this.qpTemplateData.institutions; track $index) {
+          @for (item of institution.documents; track $index) {
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="template"
+                    class="form-label">Template</label>
+                    <input type="text" class="form-control" formControlName = "documentId1" [value]="item.documentName">
+                  <!-- <select class="form-select" id="template1" formControlName="documentId1" >
+                    <option selected disabled>Select Template</option>
+                    <option *ngFor="let template of templates" [value]="template.documentId">
+                      {{ template.documentName }}
+                    </option>
+                  </select> -->
+                             
+                </div>
+              </div><!-- Col -->
+              <div class="col-sm-6">
+                <div class="mb-4">
+                  <label for="qpTemplateName"
+                    class="form-label">Expert - {{$index+1}}</label>
+                    <select class="form-select" id="expert1" formControlName="expert1">
+                      <option selected disabled>Select Expert</option>
+                      <option *ngFor="let user of users" [value]="user.userId" [disabled]="templateAssignmentForm.controls['expert2'].value == user.userId">
+                        {{ user.name }}
+                      </option>
+                    </select>
+                  
+                </div>
+              </div><!-- Col -->
+            </div>
+          }
+      }
       <div class="row">
         <div class="col-md-6">
           <div class="mb-3">
@@ -199,8 +232,7 @@
               <option *ngFor="let template of templates" [value]="template.documentId">
                 {{ template.documentName }}
               </option>
-            </select>
-                       
+            </select>                       
           </div>
         </div><!-- Col -->
         <div class="col-sm-6">
@@ -213,8 +245,7 @@
                   {{ user.name }}
                 </option>
               </select>
-              
-             
+            
           </div>
         </div><!-- Col -->
       </div>

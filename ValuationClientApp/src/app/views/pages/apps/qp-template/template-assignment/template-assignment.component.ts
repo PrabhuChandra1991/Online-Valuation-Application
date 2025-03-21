@@ -230,9 +230,9 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
          studentCount:  response.institutions[0]?.studentCount || ''
        });
 
-       this.templates = this.qpTemplateData.documents;
+       this.templates = this.qpTemplateData;
 
-       console.log("qpTemplate",JSON.stringify(this.qpTemplateData)  );
+       console.log("qpTemplate",JSON.stringify(this.qpTemplateData));
      }
      //console.log("qpTemplate",JSON.stringify(this.qpTemplateData)  );
    });

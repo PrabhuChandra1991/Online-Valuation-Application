@@ -15,6 +15,8 @@ using Document = Aspose.Words.Document;
 using Microsoft.AspNetCore.Http;
 using Shape = Aspose.Words.Drawing.Shape;
 using System.Text.RegularExpressions;
+using Aspose.Pdf.Operators;
+using System.Text;
 namespace SKCE.Examination.Services.QPSettings
 {
     public class QpTemplateService 
@@ -1178,25 +1180,21 @@ namespace SKCE.Examination.Services.QPSettings
             return true;
         }
 
-        public async Task<object> ValidateGeneratedQPAndPreview(long userId, long QPTemplateInstitutionId, Document doc) {
-            List<string> validationResults = new List<string>();
+        public async Task<string> ValidateGeneratedQPAndPreview(long userId, long QPTemplateInstitutionId, Document doc) {
             var qpTemplateInstitution = await _context.QPTemplateInstitutions.FirstOrDefaultAsync(qpti => qpti.QPTemplateInstitutionId == QPTemplateInstitutionId);
             if (qpTemplateInstitution == null)
             {
-                validationResults.Add("User QP assignment is missing.");
-                return validationResults;
+                return ("User QP assignment is missing.");
             }
             var userQPTemplate = await _context.UserQPTemplates.FirstOrDefaultAsync(uqp => uqp.UserId == userId && uqp.QPTemplateInstitutionId == qpTemplateInstitution.QPTemplateInstitutionId);
             if (userQPTemplate == null)
             {
-                validationResults.Add("User QP assignment is missing.");
-                return validationResults;
+                return ("User QP assignment is missing.");
             }
             var qpDocument = await _context.QPDocuments.FirstOrDefaultAsync(qpd => qpd.QPDocumentId == userQPTemplate.QPDocumentId);
             if (qpDocument == null)
             {
-                validationResults.Add("User QP documemt is missing.");
-                return validationResults;
+                return("User QP documemt is missing.");
             }
             if (qpDocument.DegreeTypeName == "UG")
             {
@@ -1206,24 +1204,18 @@ namespace SKCE.Examination.Services.QPSettings
             {
                  return await PGQPValidationAsync(userQPTemplate, doc);
             }
-            return validationResults;
+            return string.Empty;
         }
 
-        private async Task<object> PGQPValidationAsync(UserQPTemplate userQPTemplate, Document doc)
+        private async Task<string> PGQPValidationAsync(UserQPTemplate userQPTemplate, Document doc)
         {
             List<string> validationResults = new List<string>();
             int totalMarks = 0;
             int expectedMarks = 20; // Part A should have 20 marks
-            return new
-            {
-                ValidationResults = validationResults,
-                TotalMarks = totalMarks,
-                IsMarksValid = false,
-                MarksMessage = ""
-            };
+            return string.Empty;
         }
 
-        private async Task<object> UGQPValidationAsync(UserQPTemplate userQPTemplate, Document document)
+        private async Task<string> UGQPValidationAsync(UserQPTemplate userQPTemplate, Document doc)
         {
             List<string> validationResults = new List<string>();
             Dictionary<string, int> coMarks = new Dictionary<string, int>();
@@ -1234,114 +1226,218 @@ namespace SKCE.Examination.Services.QPSettings
 
             int totalMarks = 0;
             int expectedMarks = 20; // Expected marks for Part A
-            // Define bookmarks to ignore
-            HashSet<string> ignoredBookmarks = new HashSet<string>
+
+            //// Define bookmarks to ignore
+            //HashSet<string> ignoredBookmarks = new HashSet<string>
+            //{
+            //    "QPCODE","EXAMMONTH","EXAMYEAR","REGULATIONYEAR","PROGRAMME","SEMESTER","COURSECODE","COURSETITLE","COURSEOUTCOMES","SUPPORTCATALOGS" // Add bookmark names to ignore
+            //};
+            //foreach (Aspose.Words.Bookmark bookmark in document.Range.Bookmarks)
+            //{
+            //    string bookmarkName = bookmark.Name;
+
+            //    // Skip ignored bookmarks
+            //    if (ignoredBookmarks.Contains(bookmarkName) || bookmarkName.Contains("_") || bookmarkName.Contains("IMG"))
+            //    {
+            //        //validationResults.Add($"🔹 Ignored bookmark '{bookmarkName}'.");
+            //        continue;
+            //    }
+
+            //    Node startNode = bookmark.BookmarkStart;
+            //    Node endNode = bookmark.BookmarkEnd;
+
+            //    if (startNode == null || endNode == null)
+            //    {
+            //        validationResults.Add($"❌ Bookmark '{bookmarkName}' is incomplete.");
+            //        continue;
+            //    }
+
+            //    bool hasContent = false;
+            //    Node currentNode = startNode;
+            //    string questionText = "";
+
+            //    while (currentNode != null && currentNode != endNode)
+            //    {
+            //        if (currentNode is Paragraph paragraph && !string.IsNullOrWhiteSpace(paragraph.GetText().Trim()))
+            //        {
+            //            questionText = paragraph.GetText().Trim();
+            //            hasContent = true;
+            //        }
+            //        currentNode = currentNode.NextSibling;
+            //    }
+
+            //    if (!hasContent)
+            //    {
+            //        validationResults.Add($"⚠ Bookmark '{bookmarkName}' is empty.");
+            //        continue;
+            //    }
+
+            //    // Extract Marks, CO, and BT from the question
+            //    int marks = ExtractMarksFromQuestion(questionText);
+            //    string co = ExtractCOFromQuestion(questionText);
+            //    string bt = ExtractBTFromQuestion(questionText);
+
+            //    totalMarks += marks;
+            //    validationResults.Add($"✅ Bookmark '{bookmarkName}' validated. Marks: {marks}, CO: {co}, BT: {bt}");
+
+            //    // Aggregate marks per CO
+            //    if (!string.IsNullOrEmpty(co) && allCOs.Contains(co))
+            //    {
+            //        if (!coMarks.ContainsKey(co))
+            //            coMarks[co] = 0;
+            //        coMarks[co] += marks;
+            //    }
+
+            //    // Aggregate marks per BT
+            //    if (!string.IsNullOrEmpty(bt) && allBTs.Contains(bt))
+            //    {
+            //        if (!btMarks.ContainsKey(bt))
+            //            btMarks[bt] = 0;
+            //        btMarks[bt] += marks;
+            //    }
+            //}
+            // Process Q1 to Q10
+            //for (int qNo = 1; qNo <= 10; qNo++)
+            //{
+            //    string questionBookmark = $"Q{qNo}";
+            //    string coBookmark = $"Q{qNo}CO";
+            //    string btBookmark = $"Q{qNo}BT";
+            //    string marksBookmark = $"Q{qNo}Marks";
+
+            //    string co = ExtractBookmarkText(doc, coBookmark);
+            //    string bt = ExtractBookmarkText(doc, btBookmark);
+            //    int marks = ExtractMarksFromBookmark(doc, marksBookmark);
+
+            //    totalMarks += marks;
+
+            //    validationResults.Add($"✅ Q{qNo}: CO={co}, BT={bt}, Marks={marks}");
+
+            //    // Aggregate marks per CO
+            //    if (!string.IsNullOrEmpty(co) && allCOs.Contains(co))
+            //    {
+            //        if (!coMarks.ContainsKey(co))
+            //            coMarks[co] = 0;
+            //        coMarks[co] += marks;
+            //    }
+
+            //    // Aggregate marks per BT
+            //    if (!string.IsNullOrEmpty(bt) && allBTs.Contains(bt))
+            //    {
+            //        if (!btMarks.ContainsKey(bt))
+            //            btMarks[bt] = 0;
+            //        btMarks[bt] += marks;
+            //    }
+            //}
+            //// Marks validation check
+            //bool isMarksCorrect = totalMarks == expectedMarks;
+            //string marksValidationMessage = isMarksCorrect
+            //    ? $"✅ Total marks for Part A is correct ({totalMarks}/{expectedMarks})."
+            //    : $"❌ Incorrect marks for Part A ({totalMarks}/{expectedMarks}).";
+
+            //// Identify missing COs and BTs
+            //var missingCOs = allCOs.Except(coMarks.Keys).ToList();
+            //var missingBTs = allBTs.Except(btMarks.Keys).ToList();
+
+            //return new
+            //{
+            //    ValidationResults = validationResults,
+            //    TotalMarks = totalMarks,
+            //    IsMarksValid = isMarksCorrect,
+            //    MarksMessage = marksValidationMessage,
+            //    CO_Marks_Distribution = coMarks.Select(kvp => new { CO = kvp.Key, Marks = kvp.Value }).ToList(),
+            //    BT_Marks_Distribution = btMarks.Select(kvp => new { BT = kvp.Key, Marks = kvp.Value }).ToList(),
+            //    Missing_COs = missingCOs,
+            //    Missing_BTs = missingBTs
+            //};
+
+            StringBuilder htmlTable = new StringBuilder();
+            htmlTable.Append("<h2>Part A: Question Validation</h2>");
+            htmlTable.Append("<table border='1' cellpadding='5' cellspacing='0' style='border-collapse: collapse;'>");
+            htmlTable.Append("<tr><th>Question</th><th>CO</th><th>BT</th><th>Marks</th></tr>");
+
+            for (int qNo = 1; qNo <= 10; qNo++)
             {
-                "QPCODE","EXAMMONTH","EXAMYEAR","REGULATIONYEAR","PROGRAMME","SEMESTER","COURSECODE","COURSETITLE","COURSEOUTCOMES","SUPPORTCATALOGS" // Add bookmark names to ignore
-            };
-            foreach (Aspose.Words.Bookmark bookmark in document.Range.Bookmarks)
-            {
-                string bookmarkName = bookmark.Name;
+                string questionBookmark = $"Q{qNo}";
+                string coBookmark = $"Q{qNo}CO";
+                string btBookmark = $"Q{qNo}BT";
+                string marksBookmark = $"Q{qNo}Marks";
 
-                // Skip ignored bookmarks
-                if (ignoredBookmarks.Contains(bookmarkName) || bookmarkName.Contains("_") || bookmarkName.Contains("IMG"))
-                {
-                    //validationResults.Add($"🔹 Ignored bookmark '{bookmarkName}'.");
-                    continue;
-                }
-
-                Node startNode = bookmark.BookmarkStart;
-                Node endNode = bookmark.BookmarkEnd;
-
-                if (startNode == null || endNode == null)
-                {
-                    validationResults.Add($"❌ Bookmark '{bookmarkName}' is incomplete.");
-                    continue;
-                }
-
-                bool hasContent = false;
-                Node currentNode = startNode;
-                string questionText = "";
-
-                while (currentNode != null && currentNode != endNode)
-                {
-                    if (currentNode is Paragraph paragraph && !string.IsNullOrWhiteSpace(paragraph.GetText().Trim()))
-                    {
-                        questionText = paragraph.GetText().Trim();
-                        hasContent = true;
-                    }
-                    currentNode = currentNode.NextSibling;
-                }
-
-                if (!hasContent)
-                {
-                    validationResults.Add($"⚠ Bookmark '{bookmarkName}' is empty.");
-                    continue;
-                }
-
-                // Extract Marks, CO, and BT from the question
-                int marks = ExtractMarksFromQuestion(questionText);
-                string co = ExtractCOFromQuestion(questionText);
-                string bt = ExtractBTFromQuestion(questionText);
+                string co = ExtractBookmarkText(doc, coBookmark);
+                string bt = ExtractBookmarkText(doc, btBookmark);
+                int marks = ExtractMarksFromBookmark(doc, marksBookmark);
 
                 totalMarks += marks;
-                validationResults.Add($"✅ Bookmark '{bookmarkName}' validated. Marks: {marks}, CO: {co}, BT: {bt}");
 
-                // Aggregate marks per CO
+                // Add row to HTML table
+                htmlTable.Append($"<tr><td>Q{qNo}</td><td>{co}</td><td>{bt}</td><td>{marks}</td></tr>");
+
                 if (!string.IsNullOrEmpty(co) && allCOs.Contains(co))
                 {
-                    if (!coMarks.ContainsKey(co))
-                        coMarks[co] = 0;
+                    if (!coMarks.ContainsKey(co)) coMarks[co] = 0;
                     coMarks[co] += marks;
                 }
 
-                // Aggregate marks per BT
                 if (!string.IsNullOrEmpty(bt) && allBTs.Contains(bt))
                 {
-                    if (!btMarks.ContainsKey(bt))
-                        btMarks[bt] = 0;
+                    if (!btMarks.ContainsKey(bt)) btMarks[bt] = 0;
                     btMarks[bt] += marks;
                 }
             }
 
-            // Marks validation check
+            htmlTable.Append("</table>");
+
             bool isMarksCorrect = totalMarks == expectedMarks;
             string marksValidationMessage = isMarksCorrect
                 ? $"✅ Total marks for Part A is correct ({totalMarks}/{expectedMarks})."
                 : $"❌ Incorrect marks for Part A ({totalMarks}/{expectedMarks}).";
 
-            // Identify missing COs and BTs
             var missingCOs = allCOs.Except(coMarks.Keys).ToList();
             var missingBTs = allBTs.Except(btMarks.Keys).ToList();
 
-            return new
+            htmlTable.Append($"<h3>{marksValidationMessage}</h3>");
+
+            // CO Marks Distribution
+            htmlTable.Append("<h2>CO Marks Distribution</h2><table border='1' cellpadding='5' cellspacing='0' style='border-collapse: collapse;'><tr><th>CO</th><th>Marks</th></tr>");
+            foreach (var kvp in coMarks)
             {
-                ValidationResults = validationResults,
-                TotalMarks = totalMarks,
-                IsMarksValid = isMarksCorrect,
-                MarksMessage = marksValidationMessage,
-                CO_Marks_Distribution = coMarks.Select(kvp => new { CO = kvp.Key, Marks = kvp.Value }).ToList(),
-                BT_Marks_Distribution = btMarks.Select(kvp => new { BT = kvp.Key, Marks = kvp.Value }).ToList(),
-                Missing_COs = missingCOs,
-                Missing_BTs = missingBTs
-            };
+                htmlTable.Append($"<tr><td>{kvp.Key}</td><td>{kvp.Value}</td></tr>");
+            }
+            htmlTable.Append("</table>");
+
+            // BT Marks Distribution
+            htmlTable.Append("<h2>BT Marks Distribution</h2><table border='1' cellpadding='5' cellspacing='0' style='border-collapse: collapse;'><tr><th>BT</th><th>Marks</th></tr>");
+            foreach (var kvp in btMarks)
+            {
+                htmlTable.Append($"<tr><td>{kvp.Key}</td><td>{kvp.Value}</td></tr>");
+            }
+            htmlTable.Append("</table>");
+
+            // Missing COs & BTs
+            if (missingCOs.Count > 0)
+                htmlTable.Append($"<h3 style='color:red;'>Missing COs: {string.Join(", ", missingCOs)}</h3>");
+            if (missingBTs.Count > 0)
+                htmlTable.Append($"<h3 style='color:red;'>Missing BTs: {string.Join(", ", missingBTs)}</h3>");
+
+            return htmlTable.ToString();
         }
-        private static int ExtractMarksFromQuestion(string text)
+        private static string ExtractBookmarkText(Document doc, string bookmarkName)
         {
-            Match match = Regex.Match(text, @"(\d+)\s*Marks", RegexOptions.IgnoreCase);
-            return match.Success ? int.Parse(match.Groups[1].Value) : 0;
+            Bookmark bookmark = doc.Range.Bookmarks[bookmarkName];
+            if (bookmark != null)
+            {
+                return bookmark.Text.Trim();
+            }
+            return "Unknown";
         }
 
-        private static string ExtractCOFromQuestion(string text)
+        private static int ExtractMarksFromBookmark(Document doc, string bookmarkName)
         {
-            Match match = Regex.Match(text, @"CO(\d+)", RegexOptions.IgnoreCase);
-            return match.Success ? $"CO{match.Groups[1].Value}" : "Unknown";
-        }
-
-        private static string ExtractBTFromQuestion(string text)
-        {
-            Match match = Regex.Match(text, @"BT(\d+)", RegexOptions.IgnoreCase);
-            return match.Success ? $"BT{match.Groups[1].Value}" : "Unknown";
+            Bookmark bookmark = doc.Range.Bookmarks[bookmarkName];
+            if (bookmark != null && int.TryParse(bookmark.Text.Trim(), out int marks))
+            {
+                return marks;
+            }
+            return 0; // Default to 0 if marks not found
         }
         public async Task<bool?> SubmitGeneratedQPAsync(long userId, long QPTemplateInstitutionId, long documentId)
         {

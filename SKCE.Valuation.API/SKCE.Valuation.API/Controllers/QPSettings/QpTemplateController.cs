@@ -3,10 +3,12 @@ using DocumentFormat.OpenXml.Bibliography;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SKCE.Examination.Models.DbModels.Common;
+using SKCE.Examination.Models.DbModels.QPSettings;
 using SKCE.Examination.Services.Common;
 using SKCE.Examination.Services.QPSettings;
 using SKCE.Examination.Services.ServiceContracts;
 using SKCE.Examination.Services.ViewModels.QPSettings;
+using Document = Aspose.Words.Document;
 
 namespace SKCE.Examination.API.Controllers.QPSettings
 {
@@ -41,7 +43,7 @@ namespace SKCE.Examination.API.Controllers.QPSettings
             return CreatedAtAction(nameof(CreateQpTemplate), new { id = result.QPTemplateId }, result);
         }
         [HttpPost("UpdateQpTemplate/{qpTemplateId}")]
-        public async Task<IActionResult> UpdateQpTemplate(long qpTemplateId,[FromBody] QPTemplateVM viewModel)
+        public async Task<IActionResult> UpdateQpTemplate(long qpTemplateId, [FromBody] QPTemplateVM viewModel)
         {
             if (viewModel == null)
                 return BadRequest("Invalid input data");
@@ -52,7 +54,7 @@ namespace SKCE.Examination.API.Controllers.QPSettings
         [HttpGet("GetQPTemplates/{institutionId}")]
         public async Task<ActionResult<IEnumerable<QPTemplateVM>>> GetQPTemplates(long institutionId)
         {
-            return Ok( await _qpTemplateService.GetQPTemplatesAsync(institutionId));
+            return Ok(await _qpTemplateService.GetQPTemplatesAsync(institutionId));
         }
 
         [HttpGet("{qpTemplateId}")]
@@ -104,9 +106,9 @@ namespace SKCE.Examination.API.Controllers.QPSettings
         }
 
         [HttpGet("PrintSelectedQP/{qpTemplateId}/{qpCode}/{isForPrint}")]
-        public async Task<ActionResult<bool>> PrintSelectedQP(long qpTemplateId,string qpCode,bool isForPrint)
+        public async Task<ActionResult<bool>> PrintSelectedQP(long qpTemplateId, string qpCode, bool isForPrint)
         {
-            var result = await _qpTemplateService.PrintSelectedQPAsync(qpTemplateId, qpCode,isForPrint);
+            var result = await _qpTemplateService.PrintSelectedQPAsync(qpTemplateId, qpCode, isForPrint);
             return Ok(result);
         }
 
@@ -114,6 +116,32 @@ namespace SKCE.Examination.API.Controllers.QPSettings
         public async Task<ActionResult<IEnumerable<QPAssignmentExpertVM>>> GetExpertsForQPAssignment()
         {
             return Ok(await _qpTemplateService.GetExpertsForQPAssignmentAsync());
+        }
+
+        [HttpPost("ValidateGeneratedQPAndPreview/{userId}/{QPTemplateInstitutionId}")]
+        public async Task<IActionResult> ValidateGeneratedQPAndPreview(long userId, long QPTemplateInstitutionId, IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("Invalid file. Please upload a valid Word document.");
+
+            try
+            {
+                // Save uploaded file to MemoryStream
+                using var stream = new MemoryStream();
+                await file.CopyToAsync(stream);
+                stream.Position = 0;
+
+                // Load Word document from stream
+                Document doc = new Document(stream);
+                // Get and validate bookmarks
+               var validationResult = await _qpTemplateService.ValidateGeneratedQPAndPreview(userId, QPTemplateInstitutionId, doc);
+
+                return Ok(validationResult);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error processing document: {ex.Message}");
+            }
         }
     }
 }

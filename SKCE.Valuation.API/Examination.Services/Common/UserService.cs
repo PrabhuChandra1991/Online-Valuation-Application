@@ -45,6 +45,7 @@ namespace SKCE.Examination.Services.Common
         {
             try
             {
+                user.IsEnabled = false;
                 //seed default qualifications
                 foreach (var degreeType in _context.DegreeTypes.OrderBy(d=>d.DegreeTypeId))
                 {

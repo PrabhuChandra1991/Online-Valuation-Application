@@ -22,6 +22,7 @@ namespace SKCE.Examination.Services.Common
             var qpTemplates = _context.QPTemplates.ToList();
             foreach (var course in courses)
             {
+                if (!_context.CourseSyllabusDocuments.Any(c => c.CourseId == course.CourseId)) continue;
                 var qpTemplate = qpTemplates.FirstOrDefault(qpt => qpt.CourseId == course.CourseId);
                 if (qpTemplate != null)
                 {

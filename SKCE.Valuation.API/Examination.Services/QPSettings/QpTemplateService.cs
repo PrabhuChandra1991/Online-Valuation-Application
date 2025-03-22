@@ -11,6 +11,10 @@ using Aspose.Words;
 using SKCE.Examination.Services.Helpers;
 using System.Runtime.InteropServices;
 using DocumentFormat.OpenXml.Office2010.Word;
+using Document = Aspose.Words.Document;
+using Microsoft.AspNetCore.Http;
+using Shape = Aspose.Words.Drawing.Shape;
+using System.Text.RegularExpressions;
 namespace SKCE.Examination.Services.QPSettings
 {
     public class QpTemplateService 
@@ -18,6 +22,7 @@ namespace SKCE.Examination.Services.QPSettings
         private readonly ExaminationDbContext _context;
         private readonly IMapper _mapper;
         private readonly BookmarkProcessor _bookmarkProcessor;
+        private readonly AzureBlobStorageHelper _azureBlobStorageHelper;
         private static readonly Dictionary<long, string> QPDocumentTypeDictionary = new Dictionary<long, string>
         {
             { 1, "Course syllabus document" },
@@ -30,11 +35,12 @@ namespace SKCE.Examination.Services.QPSettings
             { 8, "For QP Selection" },
             { 9, "Selected QP" }
         };
-        public QpTemplateService(ExaminationDbContext context, IMapper mapper, BookmarkProcessor bookmarkProcessor)
+        public QpTemplateService(ExaminationDbContext context, IMapper mapper, BookmarkProcessor bookmarkProcessor, AzureBlobStorageHelper azureBlobStorageHelper)
         {
             _bookmarkProcessor = bookmarkProcessor;
             _context = context;
             _mapper = mapper;
+            _azureBlobStorageHelper = azureBlobStorageHelper;
         }
         public async Task<QPTemplateVM?> GetQPTemplateByCourseIdAsync(long courseId)
         {
@@ -86,6 +92,7 @@ namespace SKCE.Examination.Services.QPSettings
                 return await GetQPTemplateAsync(qpTemplateId);
 
             var syllabusDocument = _context.CourseSyllabusDocuments.FirstOrDefault(d => d.CourseId == qPTemplate.CourseId);
+            if (syllabusDocument == null) throw new Exception("Course syllabus Document is not uploaded.");
             if (syllabusDocument != null)
             {
                 qPTemplate.Documents.Add(new QPTemplateDocumentVM
@@ -1169,6 +1176,172 @@ namespace SKCE.Examination.Services.QPSettings
 
              _context.SaveChanges();
             return true;
+        }
+
+        public async Task<object> ValidateGeneratedQPAndPreview(long userId, long QPTemplateInstitutionId, Document doc) {
+            List<string> validationResults = new List<string>();
+            var qpTemplateInstitution = await _context.QPTemplateInstitutions.FirstOrDefaultAsync(qpti => qpti.QPTemplateInstitutionId == QPTemplateInstitutionId);
+            if (qpTemplateInstitution == null)
+            {
+                validationResults.Add("User QP assignment is missing.");
+                return validationResults;
+            }
+            var userQPTemplate = await _context.UserQPTemplates.FirstOrDefaultAsync(uqp => uqp.UserId == userId && uqp.QPTemplateInstitutionId == qpTemplateInstitution.QPTemplateInstitutionId);
+            if (userQPTemplate == null)
+            {
+                validationResults.Add("User QP assignment is missing.");
+                return validationResults;
+            }
+            var qpDocument = await _context.QPDocuments.FirstOrDefaultAsync(qpd => qpd.QPDocumentId == userQPTemplate.QPDocumentId);
+            if (qpDocument == null)
+            {
+                validationResults.Add("User QP documemt is missing.");
+                return validationResults;
+            }
+            if (qpDocument.DegreeTypeName == "UG")
+            {
+                  return await UGQPValidationAsync(userQPTemplate, doc);
+            }
+            else if (qpDocument.DegreeTypeName == "PG")
+            {
+                 return await PGQPValidationAsync(userQPTemplate, doc);
+            }
+            return validationResults;
+        }
+
+        private async Task<object> PGQPValidationAsync(UserQPTemplate userQPTemplate, Document doc)
+        {
+            List<string> validationResults = new List<string>();
+            int totalMarks = 0;
+            int expectedMarks = 20; // Part A should have 20 marks
+            return new
+            {
+                ValidationResults = validationResults,
+                TotalMarks = totalMarks,
+                IsMarksValid = false,
+                MarksMessage = ""
+            };
+        }
+
+        private async Task<object> UGQPValidationAsync(UserQPTemplate userQPTemplate, Document document)
+        {
+            List<string> validationResults = new List<string>();
+            Dictionary<string, int> coMarks = new Dictionary<string, int>();
+            Dictionary<string, int> btMarks = new Dictionary<string, int>();
+
+            HashSet<string> allCOs = new HashSet<string> { "CO1", "CO2", "CO3", "CO4", "CO5", "CO6" }; // Predefined COs
+            HashSet<string> allBTs = new HashSet<string> { "U", "AP", "AN" }; // Predefined BTs
+
+            int totalMarks = 0;
+            int expectedMarks = 20; // Expected marks for Part A
+            // Define bookmarks to ignore
+            HashSet<string> ignoredBookmarks = new HashSet<string>
+            {
+                "QPCODE","EXAMMONTH","EXAMYEAR","REGULATIONYEAR","PROGRAMME","SEMESTER","COURSECODE","COURSETITLE","COURSEOUTCOMES","SUPPORTCATALOGS" // Add bookmark names to ignore
+            };
+            foreach (Aspose.Words.Bookmark bookmark in document.Range.Bookmarks)
+            {
+                string bookmarkName = bookmark.Name;
+
+                // Skip ignored bookmarks
+                if (ignoredBookmarks.Contains(bookmarkName) || bookmarkName.Contains("_") || bookmarkName.Contains("IMG"))
+                {
+                    //validationResults.Add($"🔹 Ignored bookmark '{bookmarkName}'.");
+                    continue;
+                }
+
+                Node startNode = bookmark.BookmarkStart;
+                Node endNode = bookmark.BookmarkEnd;
+
+                if (startNode == null || endNode == null)
+                {
+                    validationResults.Add($"❌ Bookmark '{bookmarkName}' is incomplete.");
+                    continue;
+                }
+
+                bool hasContent = false;
+                Node currentNode = startNode;
+                string questionText = "";
+
+                while (currentNode != null && currentNode != endNode)
+                {
+                    if (currentNode is Paragraph paragraph && !string.IsNullOrWhiteSpace(paragraph.GetText().Trim()))
+                    {
+                        questionText = paragraph.GetText().Trim();
+                        hasContent = true;
+                    }
+                    currentNode = currentNode.NextSibling;
+                }
+
+                if (!hasContent)
+                {
+                    validationResults.Add($"⚠ Bookmark '{bookmarkName}' is empty.");
+                    continue;
+                }
+
+                // Extract Marks, CO, and BT from the question
+                int marks = ExtractMarksFromQuestion(questionText);
+                string co = ExtractCOFromQuestion(questionText);
+                string bt = ExtractBTFromQuestion(questionText);
+
+                totalMarks += marks;
+                validationResults.Add($"✅ Bookmark '{bookmarkName}' validated. Marks: {marks}, CO: {co}, BT: {bt}");
+
+                // Aggregate marks per CO
+                if (!string.IsNullOrEmpty(co) && allCOs.Contains(co))
+                {
+                    if (!coMarks.ContainsKey(co))
+                        coMarks[co] = 0;
+                    coMarks[co] += marks;
+                }
+
+                // Aggregate marks per BT
+                if (!string.IsNullOrEmpty(bt) && allBTs.Contains(bt))
+                {
+                    if (!btMarks.ContainsKey(bt))
+                        btMarks[bt] = 0;
+                    btMarks[bt] += marks;
+                }
+            }
+
+            // Marks validation check
+            bool isMarksCorrect = totalMarks == expectedMarks;
+            string marksValidationMessage = isMarksCorrect
+                ? $"✅ Total marks for Part A is correct ({totalMarks}/{expectedMarks})."
+                : $"❌ Incorrect marks for Part A ({totalMarks}/{expectedMarks}).";
+
+            // Identify missing COs and BTs
+            var missingCOs = allCOs.Except(coMarks.Keys).ToList();
+            var missingBTs = allBTs.Except(btMarks.Keys).ToList();
+
+            return new
+            {
+                ValidationResults = validationResults,
+                TotalMarks = totalMarks,
+                IsMarksValid = isMarksCorrect,
+                MarksMessage = marksValidationMessage,
+                CO_Marks_Distribution = coMarks.Select(kvp => new { CO = kvp.Key, Marks = kvp.Value }).ToList(),
+                BT_Marks_Distribution = btMarks.Select(kvp => new { BT = kvp.Key, Marks = kvp.Value }).ToList(),
+                Missing_COs = missingCOs,
+                Missing_BTs = missingBTs
+            };
+        }
+        private static int ExtractMarksFromQuestion(string text)
+        {
+            Match match = Regex.Match(text, @"(\d+)\s*Marks", RegexOptions.IgnoreCase);
+            return match.Success ? int.Parse(match.Groups[1].Value) : 0;
+        }
+
+        private static string ExtractCOFromQuestion(string text)
+        {
+            Match match = Regex.Match(text, @"CO(\d+)", RegexOptions.IgnoreCase);
+            return match.Success ? $"CO{match.Groups[1].Value}" : "Unknown";
+        }
+
+        private static string ExtractBTFromQuestion(string text)
+        {
+            Match match = Regex.Match(text, @"BT(\d+)", RegexOptions.IgnoreCase);
+            return match.Success ? $"BT{match.Groups[1].Value}" : "Unknown";
         }
         public async Task<bool?> SubmitGeneratedQPAsync(long userId, long QPTemplateInstitutionId, long documentId)
         {

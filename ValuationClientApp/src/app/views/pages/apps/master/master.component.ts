@@ -65,8 +65,8 @@ export class MasterComponent {
        
     this.ImportService.importData(formData)
     .subscribe({
-      next: () => {
-        this.toastr.success('Data imported successfully!');
+      next: (response) => {
+        this.toastr.success(response.message);
         this.f['file'].setValue('');
       },
       error: () => {

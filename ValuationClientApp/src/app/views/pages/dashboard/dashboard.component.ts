@@ -2,7 +2,6 @@ import { AfterViewInit, Component, ElementRef, OnInit, TemplateRef, viewChild, V
 import { NgbCalendar, NgbDatepickerModule, NgbDateStruct, NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormBuilder, FormGroup, FormArray, Validators, FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { NgApexchartsModule } from 'ng-apexcharts';
-import { FeatherIconDirective } from '../../../core/feather-icon/feather-icon.directive';
 import { CommonModule } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 import { UserService } from '../services/user.service';
@@ -13,7 +12,6 @@ import { ActivatedRoute } from '@angular/router';
 import { DashboardService } from '../services/dashboard.service';
 import { UserAreaOfSpecialization  } from '../models/userAreaOfSpecialization.model';
 import { UserDesignation } from '../models/userDesignation.model';
-import { delay, Observable } from 'rxjs';
 import {UserProfile} from '../models/userProfile.model';
 import { UserQualification } from '../models/userQualification';
 import { User } from '../models/user.model';
@@ -23,6 +21,8 @@ import { SpinnerService } from '../services/spinner.service';
 
 const currentDate = new Date().toISOString();
 
+
+
 @Component({
   selector: 'app-dashboard',
   imports: [
@@ -31,7 +31,6 @@ const currentDate = new Date().toISOString();
     NgbDropdownModule,
     NgbDatepickerModule,
     NgApexchartsModule,
-    FeatherIconDirective,
     CommonModule,
     MatIcon,
     MatCheckboxModule,
@@ -59,6 +58,8 @@ export class DashboardComponent implements OnInit   {
   designationForm!: FormGroup;
   specializationForm!: FormGroup;
   userCourseForm!: FormGroup;
+  qualificationInput!: FormGroup;
+
   selectedDesignationIndex: number | null = null;
   selectedSpecializationIndex: number | null = null;
   selectedUserCourseIndex: number | null = null;
@@ -71,9 +72,21 @@ export class DashboardComponent implements OnInit   {
   selectedSalutation:any;
   selectedGender:any;
   showCurrentPostion:boolean = true;
+  isFormInvalid : boolean = true;
   @ViewChild('editSpecializationModal') editSpecializationModal!: TemplateRef<any>;
   @ViewChild('editDesignationModal') editDesignationModal!: TemplateRef<any>;
   @ViewChild('editUserCourseModal') editUserCourseModal!: TemplateRef<any>;
+
+  validationErrors: { [key: string]: boolean } = {
+    ugName: false,
+    ugSpecialization: false,
+    pgName: false,
+    pgSpecialization: false,
+    phdSpecialization:false
+  };
+
+  
+  
   
   //this should be load from dashboard service 
   salutations = [
@@ -182,13 +195,19 @@ export class DashboardComponent implements OnInit   {
       designationId: ['', Validators.required],
       collegeName: ['', Validators.required],
       bankAccountName: ['', Validators.required],
-      bankAccountNumber: ['', Validators.pattern('^[0-9]+$')],
+      bankAccountNumber: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
       bankBranchName: ['', Validators.required],
       bankName:['', Validators.required],
       bankIFSCCode: ['', Validators.required],
       specializations: this.fb.array([]),
       designations: this.fb.array([]),
-      ugName: ['', [Validators.required]],
+
+      // qualificationInput: this.fb.group({
+      //   ugName: ['', Validators.required],
+      //   ugSpecialization: ['']
+      // }),
+      
+      ugName: ['', Validators.required],
       ugSpecialization: ['', [Validators.required]],
       pgName: ['', [Validators.required]],
       pgSpecialization: ['', [Validators.required]],
@@ -215,9 +234,57 @@ export class DashboardComponent implements OnInit   {
     //getting master data
     this.degreeTypes = this.getDegreeTypes();
     this.designations = this.getdesignations();
-    
+
+
+    this.userForm.controls['name'].valueChanges.subscribe(value => {
+      if (value) {
+        this.userForm.controls['bankAccountName'].setValue(value);
+        this.userForm.controls['bankAccountName'].disable();
+      }
+    });
+
   }
+ 
+  onInput(field: string, event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    this.validationErrors[field] = value.trim() === '';
+  }
+
+  onBlur(controlName: string): void {
+
+    const inputMap: { [key: string]: ElementRef | undefined } = {
+      ugName: this.ugNameInput,
+      pgName: this.pgNameInput,
+      ugSpecialization: this.ugSpecializationInput,
+      pgSpecialization: this.pgSpecializationInput,
+      phdSpecialization: this.phdSpecializationInput
+    };
   
+    const inputRef = inputMap[controlName];
+  
+    if (inputRef && inputRef.nativeElement) {
+      const value = inputRef.nativeElement.value?.trim();
+      this.validationErrors[controlName] = value === '';
+    }
+  }
+
+  validateInputs(): void {
+    const inputsToValidate = [
+      { key: 'ugName', ref: this.ugNameInput },
+      { key: 'pgName', ref: this.pgNameInput },
+      { key: 'ugSpecialization', ref: this.ugSpecializationInput },
+      { key: 'pgSpecialization', ref: this.pgSpecializationInput },
+      { key: 'phdSpecialization', ref: this.phdSpecializationInput }
+    ];
+  
+    inputsToValidate.forEach(input => {
+      if (input.ref && input.ref.nativeElement) {
+        const value = input?.ref?.nativeElement?.value?.trim();
+        this.validationErrors[input.key] = !value;
+      }
+    });
+  }
+
   getDegreeTypes() {
     // Replace this with your API call
     // For now, returning the static data
@@ -277,24 +344,24 @@ export class DashboardComponent implements OnInit   {
 
             salutationId: salutation?.id,
             genderId: gender?.id,
-            name: selectedUser.name,
-            email: selectedUser.email,
-            mobileNumber: Number(selectedUser.mobileNumber),
-            collegeName: selectedUser.collegeName,
-            ugName: ugQualification.name,
-            departmentName:selectedUser.departmentName,
-            ugSpecialization: ugQualification.specialization,
-            pgName:pgQualification.name,
-            pgSpecialization: pgQualification.specialization,
-            bankAccountName: selectedUser.bankAccountName,
+            name: selectedUser?.name,
+            email: selectedUser?.email,
+            mobileNumber: Number(selectedUser?.mobileNumber),
+            collegeName: selectedUser?.collegeName,
+            ugName: ugQualification?ugQualification.name:'',
+            departmentName:selectedUser?.departmentName,
+            ugSpecialization: ugQualification?ugQualification.specialization:'',
+            pgName:pgQualification?pgQualification.name:'',
+            pgSpecialization: pgQualification?pgQualification.specialization:'',
+            bankAccountName: selectedUser?.name,
             bankAccountNumber: selectedUser.bankAccountNumber,
-            bankBranchName: selectedUser.bankBranchName,
+            bankBranchName: selectedUser?.bankBranchName,
             bankName:selectedUser.bankName,
             bankIFSCCode: selectedUser.bankIFSCCode,
             department:selectedUser.departmentName,
-            hasPhd : phdQualification.isCompleted,
-            phdSpecialization:phdQualification.specialization,
-            userId:selectedUser.userId
+            hasPhd : phdQualification?phdQualification.isCompleted:false,
+            phdSpecialization:phdQualification?phdQualification.specialization:'',
+            userId:selectedUser?.userId
             
         });
 
@@ -567,27 +634,98 @@ onGenderChange(event: Event) {
   this.userForm.patchValue({ genderId: selectedValue });
 }
 
+isCustomFormInvalid(): boolean {
+  const excludedFields = new Set([
+    'ugName',
+    'ugSpecialization',
+    'pgName',
+    'pgSpecialization',
+    'phdSpecialization',
+    'designationId',
+    'department'
+  ]);
+
+  let isInvalid = false;
+
+  Object.keys(this.userForm.controls).forEach(controlName => {
+    if (!excludedFields.has(controlName)) {
+      const control = this.userForm.get(controlName);
+      if (control && control.invalid) {
+        isInvalid = true;
+      }
+    }
+  });
+
+  return isInvalid;
+}
+
+validateTableData(): boolean {
+  const errorMessages: string[] = [];
+
+  if (!this.specializations?.length) {
+    errorMessages.push('Please add at least one area of specialization.');
+  }
+
+  if (!this.designations?.length) {
+    errorMessages.push('Please add at least one designation experience.');
+  }
+
+  if (!this.userCourses?.length) {
+    errorMessages.push('Please add at least one user course(s).');
+  }
+
+  if (errorMessages.length > 0) {
+    const formattedMessage = errorMessages.length === 1
+      ? errorMessages[0]
+      : errorMessages.map((msg, index) => `${index + 1}. ${msg}`).join('<br/>');
+
+    this.toastr.error(formattedMessage, 'Table Data Error', {
+      enableHtml: true,
+    });
+
+    return false; 
+  }
+
+  return true;
+}
+
 
 // Submit Form including Specialization & Qualification
   onSubmit() {
-    // if (this.userForm.valid) {
-      this.spinnerService.toggleSpinnerState(true);
-      const formData = {
-        ...this.userForm.value,
-        specializations: this.specializations,
-        designations: this.designations,
-        courses: this.userCourses,
-        userQualifications :this.userQualifications
-      };
 
-    //map formdata to user object
-     let userData =  this.mapFormDataToUserObject (formData);
-      userData.isEnabled = true;
-      this.updateUser(userData);
-      console.log('Final Object:', JSON.stringify(userData));
-    // } else {
-    //   console.log('Form is invalid');
-    // }
+    this.validateInputs();
+
+    const isCustomInvalid = this.isCustomFormInvalid();
+    const isTableDataInvalid = !this.validateTableData();
+  
+    const isFormChanged = this.userForm.dirty;
+    const isFormInvalid = isCustomInvalid;
+  
+    if (isFormInvalid) {
+      this.userForm.markAllAsTouched();
+      return;
+    }
+
+    if (isTableDataInvalid) {
+      return;
+    }
+
+    // Proceed with submission
+    this.spinnerService.toggleSpinnerState(true);
+
+    const formData = {
+      ...this.userForm.value,
+      specializations: this.specializations,
+      designations: this.designations,
+      courses: this.userCourses,
+      userQualifications: this.userQualifications
+    };
+
+    const userData = this.mapFormDataToUserObject(formData);
+    userData.isEnabled = true;
+
+    this.updateUser(userData);
+    console.log('Final Object:', JSON.stringify(userData));
   }
 
    mapFormDataToUserObject(formData: any) {
@@ -604,7 +742,7 @@ onGenderChange(event: Event) {
      }
 
      if (ugCourse) {
-       pgCourse.name =this.pgNameInput.nativeElement.value;;
+       pgCourse.name = this.pgNameInput.nativeElement.value;;
        pgCourse.specialization = this.pgSpecializationInput.nativeElement.value;
      }
 
@@ -627,7 +765,7 @@ onGenderChange(event: Event) {
       totalExperience: formData.totalExperience || 0,
       departmentName: formData.departmentName || '',
       collegeName: formData.collegeName || '',
-      bankAccountName: formData.bankAccountName || '',
+      bankAccountName: formData.name  || '',
       bankName : formData.bankName || '',
       bankAccountNumber: formData.bankAccountNumber || '',
       bankBranchName: formData.bankBranchName || '',

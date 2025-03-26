@@ -9,5 +9,6 @@ namespace SKCE.Examination.Services.ServiceContracts
         Task<User> AddUserAsync(User user);
         Task<User> UpdateUserAsync(User user);
         Task<bool> DeleteUserAsync(long id);
+        Task<bool> CheckSameNameOtherUserExists(string Name, long userId);
     }
 }

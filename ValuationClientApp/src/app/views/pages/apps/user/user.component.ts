@@ -154,6 +154,7 @@ export class UserComponent implements OnInit{
           salutation: '',
           mobileNumber:userData.mobileNumber.toString() || '',
           roleId: 3,
+          mode:'',
           totalExperience: 0,
           departmentName: '',
           collegeName: '',
@@ -171,7 +172,7 @@ export class UserComponent implements OnInit{
           createdById:  1,
           createdDate: new Date().toISOString(),
           modifiedById: 1,
-          modifiedDate:''
+          modifiedDate:'',
         };
   
         console.log('userObj', JSON.stringify(userObj));

@@ -2,6 +2,7 @@
 using SKCE.Examination.Services.ServiceContracts;
 using Microsoft.AspNetCore.Mvc;
 using SKCE.Examination.Services.ViewModels.Common;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace SKCE.Examination.API.Controllers.Common
 {
@@ -51,10 +52,24 @@ namespace SKCE.Examination.API.Controllers.Common
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(int id, User user)
         {
-            if (id != user.UserId) return BadRequest();
-
-            var updatedUser = await _userService.UpdateUserAsync(user);
-            return Ok(updatedUser);
+            try
+            {
+                if (id != user.UserId) return BadRequest();
+                var duplicateUserCheck = await _userService.CheckSameNameOtherUserExists(user.Name, user.UserId);
+                if (!duplicateUserCheck)
+                {
+                    var updatedUser = await _userService.UpdateUserAsync(user);
+                    return Ok(updatedUser);
+                }
+                else
+                {
+                    return BadRequest(new ResultModel() { Message = "User Name is already exists." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResultModel() { Message = "User update action is failed." });
+            }
         }
 
         // DELETE: api/user/5

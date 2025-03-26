@@ -167,8 +167,9 @@ export class TemplateManagemenComponent implements OnInit, AfterViewInit {
     //#region template dialog functionalites
 
     loadTemplates(): void {
+      let institutionId = 2;
       this.spinnerService.toggleSpinnerState(true);
-      this.templateService.getTemplates().subscribe({
+      this.templateService.getTemplates(institutionId).subscribe({
         next: (data: any[]) => {
           this.templates = data;
           this.dataSource.data = this.templates; 

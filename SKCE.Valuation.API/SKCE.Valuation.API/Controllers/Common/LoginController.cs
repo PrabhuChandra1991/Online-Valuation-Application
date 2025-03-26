@@ -35,7 +35,7 @@ namespace SKCE.Examination.API.Controllers.Common
             if (user != null)
                 return Ok(user);
 
-            return BadRequest(new ResultModel { Message = "Invalid or expired password." });
+            return BadRequest(new ResultModel { Message = "Invalid Credentials or expired password." });
         }
     }
 }

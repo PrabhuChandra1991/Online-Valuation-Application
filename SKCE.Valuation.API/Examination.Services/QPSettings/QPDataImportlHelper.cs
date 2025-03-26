@@ -30,6 +30,7 @@ public class QPDataImportHelper
     {
         try
         {
+            if(_dbContext.CourseDepartments.Any(cd=>cd.IsActive)) return "There are active pending courses to complete QP generation for previous examination.";
 
             using var spreadsheet = SpreadsheetDocument.Open(excelStream, false);
             var workbookPart = spreadsheet.WorkbookPart;

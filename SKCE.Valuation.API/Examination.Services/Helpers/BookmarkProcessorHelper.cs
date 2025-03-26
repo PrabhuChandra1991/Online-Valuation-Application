@@ -139,7 +139,12 @@ namespace SKCE.Examination.Services.Helpers
             Node currentNode = bookmark.BookmarkStart;
             while (currentNode != null && currentNode != bookmark.BookmarkEnd)
             {
-                if (currentNode is Paragraph paragraph)
+                Node importedNode = extractedDoc.ImportNode(currentNode, true, ImportFormatMode.KeepSourceFormatting);
+                if (currentNode is Run runtext)
+                {
+                    builder.InsertNode(importedNode);
+                }
+                else if (currentNode is Paragraph paragraph)
                 {
                     htmlBuilder.Append("<p>");
                     foreach (Run run in paragraph.Runs)
@@ -147,6 +152,7 @@ namespace SKCE.Examination.Services.Helpers
                         htmlBuilder.Append(run.Text); // Append text content
                     }
                     htmlBuilder.Append("</p>");
+                    builder.InsertHtml(htmlBuilder.ToString());
                 }
                 else if (currentNode is Table table)
                 {
@@ -161,6 +167,7 @@ namespace SKCE.Examination.Services.Helpers
                         htmlBuilder.Append("</tr>");
                     }
                     htmlBuilder.Append("</table>");
+                    builder.InsertHtml(htmlBuilder.ToString());
                 }
                 else if (currentNode is Shape shape && shape.HasImage)
                 {
@@ -172,12 +179,25 @@ namespace SKCE.Examination.Services.Helpers
                     // Generate HTML image tag
                     string imgTag = $"<img src='data:image/png;base64,{base64Image}' />";
                     htmlBuilder.Append(imgTag);
+                    builder.InsertHtml(htmlBuilder.ToString());
                 }
 
                 currentNode = currentNode.NextSibling; // Move to the next node
             }
 
-            return htmlBuilder.ToString();
+            Aspose.Words.Saving.HtmlSaveOptions htmlSaveOptions = new Aspose.Words.Saving.HtmlSaveOptions();
+            htmlSaveOptions.ExportImagesAsBase64 = true;
+            htmlSaveOptions.ExportHeadersFootersMode = Aspose.Words.Saving.ExportHeadersFootersMode.PerSection;
+            htmlSaveOptions.SaveFormat = Aspose.Words.SaveFormat.Html;
+            htmlSaveOptions.PrettyFormat = true;
+
+            // Convert the document range to HTML
+            using (MemoryStream ms = new MemoryStream())
+            {
+                extractedDoc.Save(ms, htmlSaveOptions);
+                return Encoding.UTF8.GetString(ms.ToArray());
+            }
+           // return htmlBuilder.ToString();
         }
         private static string ConvertBookmarkRangeToHtml(Node startNode, Node endNode)
         {
@@ -192,13 +212,16 @@ namespace SKCE.Examination.Services.Helpers
                 Node importedNode = tempDoc.ImportNode(currentNode, true, ImportFormatMode.KeepSourceFormatting);
                 if (importedNode != null)
                 {
-                    if (importedNode is Paragraph || importedNode is Run || importedNode is Table || importedNode is Shape)
+                    if (importedNode is Paragraph || importedNode is Table || importedNode is Shape)
                     {
                         tempDoc.FirstSection.Body.AppendChild(importedNode);
+                    }else
+                    {
+                        builder.InsertNode(importedNode);
+                        //tempDoc.FirstSection.Body.AppendChild(importedNode);
                     }
                 }
-                //builder.InsertNode(importedNode);
-                //tempDoc.FirstSection.Body.AppendChild(importedNode);
+                
                 currentNode = currentNode.NextSibling;
             }
             Aspose.Words.Saving.HtmlSaveOptions htmlSaveOptions = new Aspose.Words.Saving.HtmlSaveOptions();

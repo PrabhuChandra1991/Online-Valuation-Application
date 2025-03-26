@@ -20,6 +20,7 @@ export class MasterComponent {
   isSubmitting = false;
   fileName = '';
   syllabusDocsPending='';
+  duplicateImportAlert = '';
   masterDataForm = new FormGroup({
     name: new FormControl('', [Validators.required, Validators.minLength(3)]),
     file: new FormControl('', [Validators.required]),
@@ -65,8 +66,9 @@ export class MasterComponent {
        
     this.ImportService.importData(formData)
     .subscribe({
-      next: () => {
-        this.toastr.success('Data imported successfully!');
+      next: (response) => {
+        this.duplicateImportAlert = response.message;
+        this.toastr.success(response.message);
         this.f['file'].setValue('');
       },
       error: () => {

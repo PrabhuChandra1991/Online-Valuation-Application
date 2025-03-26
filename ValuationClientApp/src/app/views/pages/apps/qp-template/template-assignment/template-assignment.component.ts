@@ -241,8 +241,8 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
   onSave() {
     if (this.templateAssignmentForm.valid) {
       this.qpTemplateData.qpDocuments.forEach((doc: any) => {
-        doc.qpAssignedUsers[0].userId = this.templateAssignmentForm.get('expert1')?.value;
-        doc.qpAssignedUsers[1].userId = this.templateAssignmentForm.get('expert2')?.value;
+        doc.qpAssignedUsers[0].userId =  (this.templateAssignmentForm.get('expert1')?.value == '')?0:this.templateAssignmentForm.get('expert1')?.value; 
+        doc.qpAssignedUsers[1].userId = (this.templateAssignmentForm.get('expert2')?.value=='')?0:this.templateAssignmentForm.get('expert2')?.value;
       });
       this.spinnerService.toggleSpinnerState(true);
       const formData = this.qpTemplateData;

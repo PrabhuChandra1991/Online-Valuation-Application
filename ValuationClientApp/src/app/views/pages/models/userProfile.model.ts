@@ -58,6 +58,7 @@ interface UserCourse {
     salutation: string;
     mobileNumber: string;
     roleId: number;
+    mode: string;
     totalExperience: number;
     departmentName: string;
     collegeName: string;

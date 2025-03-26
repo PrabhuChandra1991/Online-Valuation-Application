@@ -1227,129 +1227,6 @@ namespace SKCE.Examination.Services.QPSettings
             int totalMarks = 0;
             int expectedMarks = 20; // Expected marks for Part A
 
-            //// Define bookmarks to ignore
-            //HashSet<string> ignoredBookmarks = new HashSet<string>
-            //{
-            //    "QPCODE","EXAMMONTH","EXAMYEAR","REGULATIONYEAR","PROGRAMME","SEMESTER","COURSECODE","COURSETITLE","COURSEOUTCOMES","SUPPORTCATALOGS" // Add bookmark names to ignore
-            //};
-            //foreach (Aspose.Words.Bookmark bookmark in document.Range.Bookmarks)
-            //{
-            //    string bookmarkName = bookmark.Name;
-
-            //    // Skip ignored bookmarks
-            //    if (ignoredBookmarks.Contains(bookmarkName) || bookmarkName.Contains("_") || bookmarkName.Contains("IMG"))
-            //    {
-            //        //validationResults.Add($"🔹 Ignored bookmark '{bookmarkName}'.");
-            //        continue;
-            //    }
-
-            //    Node startNode = bookmark.BookmarkStart;
-            //    Node endNode = bookmark.BookmarkEnd;
-
-            //    if (startNode == null || endNode == null)
-            //    {
-            //        validationResults.Add($"❌ Bookmark '{bookmarkName}' is incomplete.");
-            //        continue;
-            //    }
-
-            //    bool hasContent = false;
-            //    Node currentNode = startNode;
-            //    string questionText = "";
-
-            //    while (currentNode != null && currentNode != endNode)
-            //    {
-            //        if (currentNode is Paragraph paragraph && !string.IsNullOrWhiteSpace(paragraph.GetText().Trim()))
-            //        {
-            //            questionText = paragraph.GetText().Trim();
-            //            hasContent = true;
-            //        }
-            //        currentNode = currentNode.NextSibling;
-            //    }
-
-            //    if (!hasContent)
-            //    {
-            //        validationResults.Add($"⚠ Bookmark '{bookmarkName}' is empty.");
-            //        continue;
-            //    }
-
-            //    // Extract Marks, CO, and BT from the question
-            //    int marks = ExtractMarksFromQuestion(questionText);
-            //    string co = ExtractCOFromQuestion(questionText);
-            //    string bt = ExtractBTFromQuestion(questionText);
-
-            //    totalMarks += marks;
-            //    validationResults.Add($"✅ Bookmark '{bookmarkName}' validated. Marks: {marks}, CO: {co}, BT: {bt}");
-
-            //    // Aggregate marks per CO
-            //    if (!string.IsNullOrEmpty(co) && allCOs.Contains(co))
-            //    {
-            //        if (!coMarks.ContainsKey(co))
-            //            coMarks[co] = 0;
-            //        coMarks[co] += marks;
-            //    }
-
-            //    // Aggregate marks per BT
-            //    if (!string.IsNullOrEmpty(bt) && allBTs.Contains(bt))
-            //    {
-            //        if (!btMarks.ContainsKey(bt))
-            //            btMarks[bt] = 0;
-            //        btMarks[bt] += marks;
-            //    }
-            //}
-            // Process Q1 to Q10
-            //for (int qNo = 1; qNo <= 10; qNo++)
-            //{
-            //    string questionBookmark = $"Q{qNo}";
-            //    string coBookmark = $"Q{qNo}CO";
-            //    string btBookmark = $"Q{qNo}BT";
-            //    string marksBookmark = $"Q{qNo}Marks";
-
-            //    string co = ExtractBookmarkText(doc, coBookmark);
-            //    string bt = ExtractBookmarkText(doc, btBookmark);
-            //    int marks = ExtractMarksFromBookmark(doc, marksBookmark);
-
-            //    totalMarks += marks;
-
-            //    validationResults.Add($"✅ Q{qNo}: CO={co}, BT={bt}, Marks={marks}");
-
-            //    // Aggregate marks per CO
-            //    if (!string.IsNullOrEmpty(co) && allCOs.Contains(co))
-            //    {
-            //        if (!coMarks.ContainsKey(co))
-            //            coMarks[co] = 0;
-            //        coMarks[co] += marks;
-            //    }
-
-            //    // Aggregate marks per BT
-            //    if (!string.IsNullOrEmpty(bt) && allBTs.Contains(bt))
-            //    {
-            //        if (!btMarks.ContainsKey(bt))
-            //            btMarks[bt] = 0;
-            //        btMarks[bt] += marks;
-            //    }
-            //}
-            //// Marks validation check
-            //bool isMarksCorrect = totalMarks == expectedMarks;
-            //string marksValidationMessage = isMarksCorrect
-            //    ? $"✅ Total marks for Part A is correct ({totalMarks}/{expectedMarks})."
-            //    : $"❌ Incorrect marks for Part A ({totalMarks}/{expectedMarks}).";
-
-            //// Identify missing COs and BTs
-            //var missingCOs = allCOs.Except(coMarks.Keys).ToList();
-            //var missingBTs = allBTs.Except(btMarks.Keys).ToList();
-
-            //return new
-            //{
-            //    ValidationResults = validationResults,
-            //    TotalMarks = totalMarks,
-            //    IsMarksValid = isMarksCorrect,
-            //    MarksMessage = marksValidationMessage,
-            //    CO_Marks_Distribution = coMarks.Select(kvp => new { CO = kvp.Key, Marks = kvp.Value }).ToList(),
-            //    BT_Marks_Distribution = btMarks.Select(kvp => new { BT = kvp.Key, Marks = kvp.Value }).ToList(),
-            //    Missing_COs = missingCOs,
-            //    Missing_BTs = missingBTs
-            //};
-
             StringBuilder htmlTable = new StringBuilder();
             htmlTable.Append("<h2>Part A: Question Validation</h2>");
             htmlTable.Append("<table border='1' cellpadding='5' cellspacing='0' style='border-collapse: collapse;'>");
@@ -1381,6 +1258,11 @@ namespace SKCE.Examination.Services.QPSettings
                 {
                     if (!btMarks.ContainsKey(bt)) btMarks[bt] = 0;
                     btMarks[bt] += marks;
+                }
+                if(qNo == 9)
+                {
+                    // Add Total row to HTML table
+                    htmlTable.Append($"<tr><td></td><td></td><td>Total</td><td>{totalMarks}</td></tr>");
                 }
             }
 
@@ -1417,6 +1299,85 @@ namespace SKCE.Examination.Services.QPSettings
                 htmlTable.Append($"<h3 style='color:red;'>Missing COs: {string.Join(", ", missingCOs)}</h3>");
             if (missingBTs.Count > 0)
                 htmlTable.Append($"<h3 style='color:red;'>Missing BTs: {string.Join(", ", missingBTs)}</h3>");
+
+            return $"{htmlTable.ToString()} \n\n {ValidatePartB(doc)}";
+        }
+
+        public static string ValidatePartB(Document doc)
+        {
+            StringBuilder htmlTable = new StringBuilder();
+            htmlTable.Append("<h2>Part B: Question Validation</h2>");
+            htmlTable.Append("<table border='1' cellpadding='5' cellspacing='0' style='border-collapse: collapse;'>");
+            htmlTable.Append("<tr><th>Question</th><th>SubQ1 Text</th><th>SubQ1 CO</th><th>SubQ1 BT</th><th>SubQ1 Marks</th><th>SubQ2 Text</th><th>SubQ2 CO</th><th>SubQ2 BT</th><th>SubQ2 Marks</th><th>Total Marks</th></tr>");
+
+            List<string> errors = new List<string>();
+            HashSet<string> validBTs = new() { "U", "AP", "AN" };
+            HashSet<string> validCOs = new() { "CO1", "CO2", "CO3", "CO4", "CO5", "CO6" };
+            HashSet<int> validMarks = new() { 6, 8, 10 };
+
+            int totalPartBMarks = 0;
+            int expectedPartBMarks = 160;
+
+            for (int qNo = 11; qNo <= 20; qNo++)
+            {
+                string subQ1Text = ExtractBookmarkText(doc, $"Q{qNo}SubQ1");
+                string subQ1CO = ExtractBookmarkText(doc, $"Q{qNo}SubQ1CO");
+                string subQ1BT = ExtractBookmarkText(doc, $"Q{qNo}SubQ1BT");
+                int subQ1Marks = ExtractMarksFromBookmark(doc, $"Q{qNo}SubQ1Marks");
+
+                string subQ2Text = ExtractBookmarkText(doc, $"Q{qNo}SubQ2");
+                string subQ2CO = ExtractBookmarkText(doc, $"Q{qNo}SubQ2CO");
+                string subQ2BT = ExtractBookmarkText(doc, $"Q{qNo}SubQ2BT");
+                int subQ2Marks = ExtractMarksFromBookmark(doc, $"Q{qNo}SubQ2Marks");
+
+                string qpakAssigned = ExtractBookmarkText(doc, $"Q{qNo}QPAK");
+                string subQ2AnswerKey = ExtractBookmarkText(doc, $"Q{qNo}SubQ2AnswerKey");
+
+                int totalMarks = subQ1Marks + subQ2Marks;
+                totalPartBMarks += totalMarks;
+
+                // Validations
+                if (string.IsNullOrEmpty(subQ1Text)) errors.Add($"❌ Q{qNo} SubQ1 text is empty.");
+                if (string.IsNullOrEmpty(subQ1CO) || !validCOs.Contains(subQ1CO)) errors.Add($"❌ Q{qNo} SubQ1 CO is invalid.");
+                if (string.IsNullOrEmpty(subQ1BT) || !validBTs.Contains(subQ1BT)) errors.Add($"❌ Q{qNo} SubQ1 BT is invalid.");
+                if (!validMarks.Contains(subQ1Marks)) errors.Add($"❌ Q{qNo} SubQ1 Marks should be 6, 8, or 10.");
+
+                if (string.IsNullOrEmpty(subQ2Text)) errors.Add($"❌ Q{qNo} SubQ2 text is empty.");
+                if (string.IsNullOrEmpty(subQ2CO) || !validCOs.Contains(subQ2CO)) errors.Add($"❌ Q{qNo} SubQ2 CO is invalid.");
+                if (string.IsNullOrEmpty(subQ2BT) || !validBTs.Contains(subQ2BT)) errors.Add($"❌ Q{qNo} SubQ2 BT is invalid.");
+                if (!validMarks.Contains(subQ2Marks)) errors.Add($"❌ Q{qNo} SubQ2 Marks should be 6, 8, or 10.");
+
+                if (!string.IsNullOrEmpty(qpakAssigned) && string.IsNullOrEmpty(subQ2AnswerKey)) errors.Add($"❌ Q{qNo} Answer key is missing for SubQ2 (QPAK assigned).");
+
+                if (totalMarks != 16) errors.Add($"❌ Q{qNo} Total Marks = {totalMarks} (should be 16).");
+
+                // Add to table
+                htmlTable.Append($"<tr><td>Q{qNo}</td><td>{subQ1Text}</td><td>{subQ1CO}</td><td>{subQ1BT}</td><td>{subQ1Marks}</td><td>{subQ2Text}</td><td>{subQ2CO}</td><td>{subQ2BT}</td><td>{subQ2Marks}</td><td>{totalMarks}</td></tr>");
+            }
+
+            htmlTable.Append("</table>");
+
+            bool isPartBValid = totalPartBMarks == expectedPartBMarks;
+            string marksValidationMessage = isPartBValid
+                ? $"✅ Total Part B Marks are correct ({totalPartBMarks}/{expectedPartBMarks})."
+                : $"❌ Total Part B Marks are incorrect ({totalPartBMarks}/{expectedPartBMarks}).";
+
+            htmlTable.Append($"<h3>{marksValidationMessage}</h3>");
+
+            if (errors.Count > 0)
+            {
+                htmlTable.Append("<h3 style='color:red;'>Validation Errors:</h3>");
+                htmlTable.Append("<ul>");
+                foreach (var error in errors)
+                {
+                    htmlTable.Append($"<li>{error}</li>");
+                }
+                htmlTable.Append("</ul>");
+            }
+            else
+            {
+                htmlTable.Append("<h3 style='color:green;'>✅ No validation errors found.</h3>");
+            }
 
             return htmlTable.ToString();
         }

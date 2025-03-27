@@ -1,7 +1,7 @@
 import { MenuItem } from './menu.model';
 
 export const MENU: MenuItem[] = [
- 
+
   {
     label: 'User Management',
     icon: 'home',
@@ -15,7 +15,13 @@ export const MENU: MenuItem[] = [
     link: '/apps/master',
     role: [1]
   },
-  
+  {
+    label: 'Import History',
+    icon: 'list',
+    link: '/apps/importhistory',
+    role: [1]
+  },
+
 {
     label: 'Template Assignment',
     icon: 'check-square',
@@ -34,7 +40,7 @@ export const MENU: MenuItem[] = [
     icon: 'list',
     link: '/apps/assigntemplate',
     role: [2]
-  }  
+  }
 
   // {
   //   label: 'Calendar',

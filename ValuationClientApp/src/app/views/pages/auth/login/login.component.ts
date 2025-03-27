@@ -27,7 +27,7 @@ export class LoginComponent implements OnInit {
   userEmail:string='';
   userOtp ?:number;
 
-  constructor(private router: Router, private route: ActivatedRoute, 
+  constructor(private router: Router, private route: ActivatedRoute,
     private toastr: ToastrService,private spinnerService: SpinnerService,
   private LoginService: LoginService) {}
 
@@ -54,35 +54,77 @@ export class LoginComponent implements OnInit {
     //e.preventDefault();
     this.spinnerService.toggleSpinnerState(true);
      //
-    this.LoginService.requestPassword(this.userObj).subscribe((result:any)=>{
-     console.log(result);
-      this.toastr.success(result['message']);
-      this.isOTPRequested = true;
-      this.spinnerService.toggleSpinnerState(false);
+    this.LoginService.requestPassword(this.userObj)
+    .subscribe({
+      next: (response) => {
+        console.log(response);
+        this.toastr.success(response['message']);
+        this.isOTPRequested = true;
+      },
+      error: (res) => {
+        console.log(res);
+        this.toastr.error(res['error']['message']);
+        this.spinnerService.toggleSpinnerState(false);
+      },
+      complete: () => {
+        this.spinnerService.toggleSpinnerState(false);
+       }
     });
+    // .subscribe((result:any)=>{
+    //  console.log(result);
+    //   this.toastr.success(result['message']);
+    //   this.isOTPRequested = true;
+    //   this.spinnerService.toggleSpinnerState(false);
+    // });
 
   }
 
   login() {
-    
+
     debugger;
     //
     this.spinnerService.toggleSpinnerState(true);
-    this.LoginService.login(this.userObj).subscribe((result:any)=>{
-      debugger;
-      localStorage.setItem('isLoggedin', 'true');
-      localStorage.setItem('userData',JSON.stringify(result));
+    this.LoginService.login(this.userObj)
+    .subscribe({
+      next: (response) => {
+        console.log(response);
+        localStorage.setItem('isLoggedin', 'true');
+        localStorage.setItem('userData',JSON.stringify(response));
 
-      this.isOTPRequested = false;
-      
-      if (localStorage.getItem('isLoggedin') === 'true') {
-        if(result.roleId == 1)
-          this.router.navigate(['/apps/user']);
-        else 
-          this.router.navigate(['/apps/assigntemplate']);
-         }
-         this.spinnerService.toggleSpinnerState(false);
-    });
+        //this.toastr.success(response['message']);
+        this.isOTPRequested = true;
+
+        if (localStorage.getItem('isLoggedin') === 'true') {
+              if(response.roleId == 1)
+                this.router.navigate(['/apps/user']);
+              else
+                this.router.navigate(['/apps/assigntemplate']);
+               }
+      },
+      error: (res) => {
+        console.log(res);
+        this.toastr.error(res['error']['message']);
+        this.spinnerService.toggleSpinnerState(false);
+      },
+      complete: () => {
+        this.spinnerService.toggleSpinnerState(false);
+       }
+    })
+    // .subscribe((result:any)=>{
+    //   debugger;
+    //   localStorage.setItem('isLoggedin', 'true');
+    //   localStorage.setItem('userData',JSON.stringify(result));
+
+    //   this.isOTPRequested = false;
+
+    //   if (localStorage.getItem('isLoggedin') === 'true') {
+    //     if(result.roleId == 1)
+    //       this.router.navigate(['/apps/user']);
+    //     else
+    //       this.router.navigate(['/apps/assigntemplate']);
+    //      }
+    //      this.spinnerService.toggleSpinnerState(false);
+    // });
 
   }
 

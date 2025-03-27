@@ -13,6 +13,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import {MatCheckboxModule} from '@angular/material/checkbox';
 
 @Component({
   selector: 'app-template-assignment',
@@ -24,7 +25,8 @@ import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    MatFormFieldModule, MatInputModule, MatTableModule, MatSortModule, MatPaginatorModule
+    MatFormFieldModule, MatInputModule, MatTableModule, MatSortModule, MatPaginatorModule,
+    MatCheckboxModule
 ],
   templateUrl: './template-assignment.component.html',
   styleUrl: './template-assignment.component.scss'
@@ -41,7 +43,7 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
     basicModalCloseResult: string = '';
     users: any[] = [];
     templates: any[] = [];
-   
+
     selectedCourseId: any | null = null;
     qpTemplateData: any = null;
     courses: any[] = [];
@@ -56,7 +58,7 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
       private toasterService: ToastrService,
       private spinnerService: SpinnerService,
       private router: Router
-    ) { 
+    ) {
       // this.templateAssignmentForm = this.fb.group({
       //   templateId: ['', Validators.required],
       //   userId: ['', Validators.required],
@@ -74,9 +76,9 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
       // });
 
     }
-  
+
     ngOnInit(): void {
-     
+
       this.templateAssignmentForm = this.fb.group({
               qpTemplateName: [''],
               degreeTypeName: [{ value: '', disabled: true }],
@@ -113,7 +115,7 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
 
         this.isAdmin = userData.roleId == 1;
       }
-      
+
     }
 
   ngAfterViewInit(): void {
@@ -150,7 +152,7 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
     this.templateService.getExpertsForQPAssignment().subscribe({
       next: (data) => {
         this.users = data.filter((user: any) => user.userId != 1);
-        
+
         console.log('Users loaded:', this.users);
       },
       error: (error) => {
@@ -163,7 +165,7 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
     this.templateService.getTemplatesByStatusId(1).subscribe({
       next: (data: any[]) => {
         this.templates = data;
-       
+
         console.log('qp templated loaded:', this.templates);
       },
       error: (error) => {
@@ -175,7 +177,7 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
     this.templateService.getCourses().subscribe({
       next: (data) => {
         this.courses = data;
-        
+
         console.log('Courses loaded:', this.courses);
       },
       error: (error) => {
@@ -189,11 +191,11 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
     debugger;
     if (loggedData) {
       const userData = JSON.parse(loggedData);
-      
+
       this.templateService.getAssignedQpTemplateByUser(userData.userId).subscribe({
         next: (data: any[]) => {
           this.templates = data;
-          this.dataSource.data = this.templates; 
+          this.dataSource.data = this.templates;
           this.dataSource.paginator = this.paginator;
          this.dataSource.sort = this.sort;
           console.log('assigned qp templated loaded:', this.templates);
@@ -204,7 +206,7 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
       });
     }
 
-    
+
   }
 
   onCourseChange(event: Event): void {
@@ -229,7 +231,7 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
          institutionName: response.institutions[0]?.institutionName || '',
          studentCount:  response.institutions[0]?.studentCount || ''
        });
-       
+
         this.templates =this.qpTemplateData.qpDocuments;
 
        console.log("qpTemplate",JSON.stringify(this.qpTemplateData));
@@ -241,7 +243,7 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
   onSave() {
     if (this.templateAssignmentForm.valid) {
       this.qpTemplateData.qpDocuments.forEach((doc: any) => {
-        doc.qpAssignedUsers[0].userId =  (this.templateAssignmentForm.get('expert1')?.value == '')?0:this.templateAssignmentForm.get('expert1')?.value; 
+        doc.qpAssignedUsers[0].userId =  (this.templateAssignmentForm.get('expert1')?.value == '')?0:this.templateAssignmentForm.get('expert1')?.value;
         doc.qpAssignedUsers[1].userId = (this.templateAssignmentForm.get('expert2')?.value=='')?0:this.templateAssignmentForm.get('expert2')?.value;
       });
       this.spinnerService.toggleSpinnerState(true);
@@ -254,7 +256,7 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
           this.spinnerService.toggleSpinnerState(false);
           this.toasterService.success('Qp Template assigned successfully')
           this.modalService.dismissAll();
-          
+
         },
         error: (error) => {
           console.error('Save failed:', error);

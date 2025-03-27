@@ -94,7 +94,7 @@
                   <p class="fs-12px text-secondary">Project status</p>
                 </div>
                 <p class="fs-12px text-secondary">2 min ago</p>
-              </div>	
+              </div>
             </a>
             <a href="" (click)="false" class="dropdown-item d-flex align-items-center py-2">
               <div class="me-3">
@@ -106,7 +106,7 @@
                   <p class="fs-12px text-secondary">Client meeting</p>
                 </div>
                 <p class="fs-12px text-secondary">30 min ago</p>
-              </div>	
+              </div>
             </a>
             <a href="" (click)="false" class="dropdown-item d-flex align-items-center py-2">
               <div class="me-3">
@@ -118,7 +118,7 @@
                   <p class="fs-12px text-secondary">Project updates</p>
                 </div>
                 <p class="fs-12px text-secondary">1 hrs ago</p>
-              </div>	
+              </div>
             </a>
             <a href="" (click)="false" class="dropdown-item d-flex align-items-center py-2">
               <div class="me-3">
@@ -130,7 +130,7 @@
                   <p class="fs-12px text-secondary">Project deatline</p>
                 </div>
                 <p class="fs-12px text-secondary">2 hrs ago</p>
-              </div>	
+              </div>
             </a>
             <a href="" (click)="false" class="dropdown-item d-flex align-items-center py-2">
               <div class="me-3">
@@ -142,7 +142,7 @@
                   <p class="fs-12px text-secondary">New record</p>
                 </div>
                 <p class="fs-12px text-secondary">5 hrs ago</p>
-              </div>	
+              </div>
             </a>
           </div>
           <div class="px-3 py-2 d-flex align-items-center justify-content-center border-top">
@@ -150,7 +150,7 @@
           </div>
         </div>
       </li> -->
-      
+
       <li class="nav-item nav-profile" ngbDropdown>
         <a class="nav-link w-30px h-30px ms-1 rounded-circle" ngbDropdownToggle id="profileDropdown">
           <img class="w-30px rounded-circle" src="https://png.pngtree.com/png-clipart/20191120/original/pngtree-outline-user-icon-png-image_5045523.jpg" alt="profile">
@@ -161,7 +161,7 @@
               <img class="w-80px h-80px rounded-circle" src="https://placehold.co/80x80" alt="">
             </div>
             <div class="text-center">
-              <p class="tx-16 fw-bolder">{{userObj.username}}</p>
+              <p class="tx-16 fw-bolder">{{userObj.username}} - {{userObj.mode}}</p>
               <p class="fs-12px text-secondary">{{userObj.email}}</p>
             </div>
           </div>
@@ -202,6 +202,6 @@
     <a href="" class="sidebar-toggler" (click)="toggleSidebar($event)">
       <i class="feather icon-menu"></i>
     </a>
-    
+
   </div>
 </nav>

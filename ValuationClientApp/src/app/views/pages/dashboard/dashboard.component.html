@@ -311,12 +311,16 @@
       <div class="mb-3">
         <label>Area of Specialization <span class="text-danger">*</span></label>
         <input type="text" class="form-control" formControlName="areaOfSpecializationName" />
+          <span class="text-danger" *ngIf="specializationForm.controls.areaOfSpecializationName.touched && 
+                       (specializationForm.controls.areaOfSpecializationName.errors?.['required'] )">
+          Area of specialization is required.
+        </span>
       </div>
     </form>
   </div>
   <div class="modal-footer">
     <button class="btn btn-danger" (click)="modal.dismiss()" >Cancel</button>
-    <button class="btn btn-primary" (click)="saveSpecialization()">Save</button>
+    <button class="btn btn-primary" [disabled]="!specializationForm.valid" (click)="saveSpecialization()">Save</button>
   </div>
 </ng-template>
 
@@ -329,15 +333,24 @@
   <div class="modal-body">
     <form [formGroup]="designationForm">
       <div class="mb-3">
-        <label>Designation</label>
+        <label>Designation<span class="text-danger">*</span></label>
         <select class="form-select" formControlName="expName">
-          <option selected disabled>Select Designation <span class="text-danger">*</span></option>
+          <option selected disabled>Select Designation</option>
           <option *ngFor="let desig of designationTypes" [value]="desig.DesignationId">{{ desig.Name }}</option>
         </select>
+          <span class="text-danger" *ngIf="designationForm.controls.expName.touched && 
+                       (designationForm.controls.expName.errors?.['required'] )">
+          Designation is required.
+        </span>
       </div>
       <div class="mb-3">
         <label>Experience <span class="text-danger">*</span></label>
         <input type="number" class="form-control" formControlName="experience" />
+        <span class="text-danger" *ngIf="designationForm.controls.experience.touched && 
+                (designationForm.controls.experience.errors?.['required'] || 
+                designationForm.controls.experience.errors?.['min'])">
+          Experience is required. Minimum value is 1.
+        </span>
       </div>
       <div class="mb-3" *ngIf="showCurrentPostion">
         <mat-checkbox formControlName="isCurrent">Is Current Position?</mat-checkbox>
@@ -346,7 +359,7 @@
   </div>
   <div class="modal-footer">
     <button class="btn btn-danger" (click)="modal.dismiss()" >Cancel</button>
-    <button class="btn btn-primary" (click)="saveExperience()">Save</button>
+    <button class="btn btn-primary" [disabled]="!designationForm.valid" (click)="saveExperience()">Save</button>
   </div>
 </ng-template>
 
@@ -361,16 +374,29 @@
       <div class="mb-3">
         <label>Course Name <span class="text-danger">*</span></label>
         <input type="text" class="form-control" formControlName="courseName" />
+         <span class="text-danger" *ngIf="userCourseForm.controls.courseName.touched && 
+                       (userCourseForm.controls.courseName.errors?.['required'] )">
+          Course name is required.
+        </span>
       </div>
       <div class="mb-3">
         <label>Degree Type <span class="text-danger">*</span></label>
         <select formControlName="degreeTypeId" class="form-select">
           <option *ngFor="let degree of degreeTypes" [value]="degree.DegreeTypeId">{{ degree.Name }}</option>
         </select>
+        <span class="text-danger" *ngIf="userCourseForm.controls.degreeTypeId.touched && 
+                       (userCourseForm.controls.degreeTypeId.errors?.['required'] )">
+          Degree type is required.
+        </span>
       </div>
       <div class="mb-3">
         <label>Years Handled <span class="text-danger">*</span></label>
         <input type="number" class="form-control" formControlName="numberOfYearsHandled" />
+        <span class="text-danger" *ngIf="userCourseForm.controls.numberOfYearsHandled.touched && 
+                       (userCourseForm.controls.numberOfYearsHandled.errors?.['required'] || 
+                        userCourseForm.controls.numberOfYearsHandled.errors?.['min'])">
+          Year(s) handled is required. Minimum value is 1.
+        </span>
       </div>
       <div class="mb-3">
         <input type="checkbox" formControlName="isHandledInLast2Semester" />
@@ -380,6 +406,6 @@
   </div>
   <div class="modal-footer">
     <button class="btn btn-danger" (click)="modal.dismiss()">Cancel</button>
-    <button class="btn btn-primary" (click)="saveUserCourse()">Save</button>
+    <button class="btn btn-primary" [disabled]="!userCourseForm.valid" (click)="saveUserCourse()">Save</button>
   </div>
 </ng-template>

@@ -68,7 +68,7 @@ export class DashboardComponent implements OnInit   {
   userCourses :any [] = [];
   qualification : UserQualification;
   Salutation:any;
-  selectedUser:User;
+  selectedUser:UserProfile;
   selectedSalutation:any;
   selectedGender:any;
   showCurrentPostion:boolean = true;
@@ -182,7 +182,7 @@ export class DashboardComponent implements OnInit   {
 
     this.designationForm = this.fb.group({
       expName: ['', Validators.required],
-      experience: ['', Validators.required],
+      experience: ['', [Validators.required, Validators.min(1)]],
       isCurrent: [false]
     });
 
@@ -215,6 +215,7 @@ export class DashboardComponent implements OnInit   {
       hasPhd: [false], // Checkbox for PhD completion,
       salutationId:['', Validators.required],
       department:['', Validators.required],
+      mode:['']
     });
   }
 
@@ -361,8 +362,8 @@ export class DashboardComponent implements OnInit   {
             department:selectedUser.departmentName,
             hasPhd : phdQualification?phdQualification.isCompleted:false,
             phdSpecialization:phdQualification?phdQualification.specialization:'',
-            userId:selectedUser?.userId
-            
+            userId:selectedUser?.userId,
+            mode:selectedUser?.mode
         });
 
         this.userForm.updateValueAndValidity();
@@ -392,11 +393,30 @@ export class DashboardComponent implements OnInit   {
   }
 
   saveSpecialization() {
+
+    const isDuplicate = this.specializations.some((specilization , index)=> 
+      index !== this.selectedSpecializationIndex &&
+      specilization.areaOfSpecializationName.trim().toLowerCase() === this.specializationForm.value.areaOfSpecializationName.trim().toLowerCase()
+    );
+       
+    if (isDuplicate) {
+      this.toastr.error('This area of specialization already exists.');
+      return;
+    }
+
     if (this.selectedSpecializationIndex !== null) {
       // Update the existing specialization
       this.specializations[this.selectedSpecializationIndex].areaOfSpecializationName = this.specializationForm.value.areaOfSpecializationName;      
     this.selectedSpecializationIndex = 0; // Clear the selection
     } else {
+
+      if (this.specializations.length >= 3) {
+        this.toastr.error('Maximum of 3 area of specializations allowed.');
+        return;
+      }
+     
+    
+
       // If no specialization is selected, add a new one
       let newSpecialization: UserAreaOfSpecialization = {
         userAreaOfSpecializationId: 0,
@@ -463,6 +483,20 @@ openDesignationModal() {
 
 saveExperience() {
 
+  let experienceFormValue = this?.designationForm?.value;
+
+  const isDuplicate = this.designations.some((exp, index) =>
+    index !== this.selectedDesignationIndex &&
+    exp.designationId == experienceFormValue.expName &&
+    exp.experience == experienceFormValue.experience 
+    //exp.isCurrent === (experienceFormValue.isCurrent ? true : false)
+  );
+  
+  if (isDuplicate) {
+    this.toastr.error('This experience already exists.');
+    return;
+  }
+
   if (this.selectedDesignationIndex !== null) {
 
     // Update the existing Qualification
@@ -471,6 +505,23 @@ saveExperience() {
     this.designations[this.selectedDesignationIndex].isCurrent = this.designationForm.value.isCurrent;
 
   } else {
+
+    
+    if (this.designations.length >= 10) {
+      this.toastr.error('Maximum of 10 experience allowed.');
+      return;
+    }
+   
+    // const isDuplicate = this.designations.some(exp => 
+    //   exp.designationId === experienceFormValue.expName &&
+    //   exp.experience ===  experienceFormValue.experience)
+    //   // exp.isCurrent ===  experienceFormValue.isCurrent ? true : false)
+       
+    // if (isDuplicate) {
+    //   this.toastr.error('This experience already exists.')
+    //   return;
+    // }
+    
     // If no Qualification is selected, add a new one
     let newDesignation: UserDesignation = {
       userDesignationId:0,
@@ -556,6 +607,21 @@ getDesignationName(Id: number) {
  saveUserCourse() {
    if (this.userCourseForm.valid) {
      const newCourse = this.userCourseForm.value;
+
+     const isDuplicate = this.userCourses.some((course, index) =>
+      index !== this.selectedUserCourseIndex &&
+      course.courseName.trim().toLowerCase() == newCourse.courseName.trim().toLowerCase() &&
+      course.degreeTypeId == newCourse.degreeTypeId &&
+      course.numberOfYearsHandled == newCourse.numberOfYearsHandled &&
+      course.isHandledInLast2Semester == (newCourse.isHandledInLast2Semester ? true : false)
+    );
+
+    if (isDuplicate) {
+      this.toastr.error('This course already exists.')
+      return;
+    }
+
+
      if (this.selectedUserCourseIndex !== null) {
        // Edit existing course
        this.userCourses[this.selectedUserCourseIndex].courseName = newCourse.courseName;
@@ -563,6 +629,24 @@ getDesignationName(Id: number) {
        this.userCourses[this.selectedUserCourseIndex].numberOfYearsHandled = newCourse.numberOfYearsHandled;
        this.userCourses[this.selectedUserCourseIndex].isHandledInLast2Semester = newCourse.isHandledInLast2Semester;
      } else {
+
+      if (this.userCourses.length >= 15) {
+        this.toastr.error('Maximum of 15 courses allowed.');
+        return;
+      }
+
+      // const isDuplicate = this.userCourses.some(course => 
+      //   course.courseName.trim().toLowerCase() == newCourse.courseName.trim().toLowerCase() &&
+      //   course.degreeTypeId == newCourse.degreeTypeId &&
+      //   course.numberOfYearsHandled == newCourse.numberOfYearsHandled &&
+      //   course.isHandledInLast2Semester == (newCourse.isHandledInLast2Semester ? true : false)
+      // );
+    
+      // if (isDuplicate) {
+      //   this.toastr.error('This course already exists.')
+      //   return;
+      // }
+
        // Add new course
        let newCourseObj: UserCourse = {
          userCourseId: 0,
@@ -722,8 +806,6 @@ validateTableData(): boolean {
     };
 
     const userData = this.mapFormDataToUserObject(formData);
-    userData.isEnabled = true;
-
     this.updateUser(userData);
     console.log('Final Object:', JSON.stringify(userData));
   }
@@ -761,7 +843,8 @@ validateTableData(): boolean {
       gender: formData.genderId || '',
       salutation: formData.salutationId || '',
       mobileNumber: formData.mobileNumber || '',
-      roleId: formData.roleId || 0,
+      roleId:  this.selectedUser?.roleId || 0,
+      mode: this.selectedUser?.mode || '',
       totalExperience: formData.totalExperience || 0,
       departmentName: formData.departmentName || '',
       collegeName: formData.collegeName || '',

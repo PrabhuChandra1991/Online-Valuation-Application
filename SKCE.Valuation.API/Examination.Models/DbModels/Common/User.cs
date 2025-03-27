@@ -2,6 +2,7 @@
 using SKCE.Examination.Models.DbModels.Common;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace SKCE.Examination.Models.DbModels.Common
 {
@@ -22,7 +23,9 @@ namespace SKCE.Examination.Models.DbModels.Common
         [MaxLength(15)]
         public required string MobileNumber { get; set; }
         public long? RoleId { get; set; }
-        public string Mode { get; set; }
+
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)] // Mark as computed
+        public string? Mode { get; set; }
         public long? TotalExperience { get; set; }
         public string DepartmentName { get; set; } 
         public string? CollegeName { get; set; }

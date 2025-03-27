@@ -1,5 +1,6 @@
 ﻿using SKCE.Examination.Models.DbModels.QPSettings;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.Serialization;
 
 namespace SKCE.Examination.Models.DbModels.Common
 {
@@ -38,6 +39,16 @@ namespace SKCE.Examination.Models.DbModels.Common
         public DbSet<UserQPDocumentBookMark> UserQPDocumentBookMarks { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+        }
+
+        public override int SaveChanges()
+        {
+            foreach (var entry in ChangeTracker.Entries<User>())
+            {
+                entry.Property(u => u.Mode).IsModified = false; // Ignore Mode
+            }
+            return base.SaveChanges();
         }
     }
 }

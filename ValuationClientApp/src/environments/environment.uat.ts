@@ -1,4 +1,4 @@
 export const environment = {
     production: false,
-    apiURL : "https://skce-online-examination-uat-api.azurewebsites.net/"
+    apiURL : "https://skce-examination-uat-api-gnfkgaatc2ehd5dt.centralindia-01.azurewebsites.net/"
 };

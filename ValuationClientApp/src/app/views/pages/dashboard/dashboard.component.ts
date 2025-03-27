@@ -23,6 +23,7 @@ const currentDate = new Date().toISOString();
 
 
 
+
 @Component({
   selector: 'app-dashboard',
   imports: [
@@ -52,7 +53,7 @@ export class DashboardComponent implements OnInit   {
   @ViewChild('phdSpecializationInput') phdSpecializationInput!: ElementRef;
   @ViewChild('salutation') salutationInput!: ElementRef;
   @ViewChild('gender') genderInput!: ElementRef;
-  
+
 
   userForm!: FormGroup;
   designationForm!: FormGroup;
@@ -77,6 +78,11 @@ export class DashboardComponent implements OnInit   {
   @ViewChild('editDesignationModal') editDesignationModal!: TemplateRef<any>;
   @ViewChild('editUserCourseModal') editUserCourseModal!: TemplateRef<any>;
 
+  isMaxReached: boolean = false;
+  maxAllowedCount:number = 10;
+
+  isUserEnabled = false;
+
   validationErrors: { [key: string]: boolean } = {
     ugName: false,
     ugSpecialization: false,
@@ -85,10 +91,10 @@ export class DashboardComponent implements OnInit   {
     phdSpecialization:false
   };
 
-  
-  
-  
-  //this should be load from dashboard service 
+
+
+
+  //this should be load from dashboard service
   salutations = [
     { id: 'Mr.', name: 'Mr.' },
     { id: 'Ms.', name: 'Ms.' },
@@ -96,7 +102,7 @@ export class DashboardComponent implements OnInit   {
     { id: 'Dr.', name: 'Dr.' },
     { id: 'Prof.', name: 'Prof.' }
   ];
-    
+
 
   genders = [
     { id: 'Male', name: 'Male' },
@@ -124,17 +130,17 @@ export class DashboardComponent implements OnInit   {
       CreatedById: 1,
       ModifiedDate: currentDate,
       ModifiedById: 1
-    },
-    {
-      DegreeTypeId: 3,
-      Name: 'Ph.D',
-      Code: 'Ph.D',
-      IsActive: 1,
-      CreatedDate: currentDate,
-      CreatedById: 1,
-      ModifiedDate: currentDate,
-      ModifiedById: 1
     }
+    // {
+    //   DegreeTypeId: 3,
+    //   Name: 'Ph.D',
+    //   Code: 'Ph.D',
+    //   IsActive: 1,
+    //   CreatedDate: currentDate,
+    //   CreatedById: 1,
+    //   ModifiedDate: currentDate,
+    //   ModifiedById: 1
+    // }
   ];
 
   designationTypes = [{ DesignationId: 1, Name: "Professor" }, { DesignationId: 2, Name: "Associate Professor" }, { DesignationId: 3, Name: "Assistant Professor" }];
@@ -152,7 +158,7 @@ export class DashboardComponent implements OnInit   {
     isCurrent: false
   }));
 
- 
+
   // Local storage of Specialization & Qualification
   specializations: any[] = [];
 
@@ -192,7 +198,7 @@ export class DashboardComponent implements OnInit   {
       email: ['', [Validators.required, Validators.email]],
       mobileNumber: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
       departmentName: ['', Validators.required],
-      designationId: ['', Validators.required],
+      designationId: ['', [Validators.required],Validators.pattern('^[a-zA-Z \-\']+')],
       collegeName: ['', Validators.required],
       bankAccountName: ['', Validators.required],
       bankAccountNumber: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
@@ -206,7 +212,7 @@ export class DashboardComponent implements OnInit   {
       //   ugName: ['', Validators.required],
       //   ugSpecialization: ['']
       // }),
-      
+
       ugName: ['', Validators.required],
       ugSpecialization: ['', [Validators.required]],
       pgName: ['', [Validators.required]],
@@ -245,7 +251,7 @@ export class DashboardComponent implements OnInit   {
     });
 
   }
- 
+
   onInput(field: string, event: Event): void {
     const value = (event.target as HTMLInputElement).value;
     this.validationErrors[field] = value.trim() === '';
@@ -260,9 +266,9 @@ export class DashboardComponent implements OnInit   {
       pgSpecialization: this.pgSpecializationInput,
       phdSpecialization: this.phdSpecializationInput
     };
-  
+
     const inputRef = inputMap[controlName];
-  
+
     if (inputRef && inputRef.nativeElement) {
       const value = inputRef.nativeElement.value?.trim();
       this.validationErrors[controlName] = value === '';
@@ -277,7 +283,7 @@ export class DashboardComponent implements OnInit   {
       { key: 'pgSpecialization', ref: this.pgSpecializationInput },
       { key: 'phdSpecialization', ref: this.phdSpecializationInput }
     ];
-  
+
     inputsToValidate.forEach(input => {
       if (input.ref && input.ref.nativeElement) {
         const value = input?.ref?.nativeElement?.value?.trim();
@@ -303,6 +309,12 @@ export class DashboardComponent implements OnInit   {
     const loggedData = localStorage.getItem('userData');
     if (loggedData) {
       const userData = JSON.parse(loggedData);
+
+      if(userData.isEnabled)
+        this.isUserEnabled = true;
+        //this.userForm.controls['name'].disable();
+
+
       console.log("localstoreUserData",userData);
     }
   }
@@ -312,6 +324,8 @@ export class DashboardComponent implements OnInit   {
     this.userService.getUser(userId).subscribe({
       next: (data) => {
        let selectedUser = data;
+       console.log('user Data',data );
+
        if(selectedUser)
        {
         this.selectedUser = selectedUser;
@@ -320,19 +334,19 @@ export class DashboardComponent implements OnInit   {
         this.designations = selectedUser.userDesignations;
         this.specializations = selectedUser.userAreaOfSpecializations;
         this.userQualifications = selectedUser.userQualifications;
-        this.userCourses = selectedUser.userCourses; 
-        
-        //filter data for qualification section 
+        this.userCourses = selectedUser.userCourses;
+
+        //filter data for qualification section
         let ugQualification = selectedUser.userQualifications.find((f: { title: string }) => f.title.includes('UG'));
         let pgQualification = selectedUser.userQualifications.find((f: { title: string }) => f.title.includes('PG'));
         let phdQualification = selectedUser.userQualifications.find((f: { title: string }) => f.title.includes('Ph'));
 
         let salutation = this.salutations.find(f => f.name == selectedUser.salutation);
         let gender = this.genders.find(f => f.name == selectedUser.gender);
-      
+
         this.salutationInput.nativeElement.value = salutation?.id;
         this.genderInput.nativeElement.value = gender?.id;
-        
+
           console.log('gender',gender);
           console.log("salutation",salutation);
           console.log("user",selectedUser);
@@ -364,12 +378,17 @@ export class DashboardComponent implements OnInit   {
             phdSpecialization:phdQualification?phdQualification.specialization:'',
             userId:selectedUser?.userId,
             mode:selectedUser?.mode
+
         });
 
         this.userForm.updateValueAndValidity();
-        
+
+        if(selectedUser.isEnabled)
+          this.isUserEnabled = true;
+          //this.userForm.controls['name'].disable();
+
         console.log("after patch",this.userForm.value);
-        
+
 
        }
         console.log('selectedUser Details:', selectedUser);
@@ -394,11 +413,11 @@ export class DashboardComponent implements OnInit   {
 
   saveSpecialization() {
 
-    const isDuplicate = this.specializations.some((specilization , index)=> 
+    const isDuplicate = this.specializations.some((specilization , index)=>
       index !== this.selectedSpecializationIndex &&
       specilization.areaOfSpecializationName.trim().toLowerCase() === this.specializationForm.value.areaOfSpecializationName.trim().toLowerCase()
     );
-       
+
     if (isDuplicate) {
       this.toastr.error('This area of specialization already exists.');
       return;
@@ -406,7 +425,7 @@ export class DashboardComponent implements OnInit   {
 
     if (this.selectedSpecializationIndex !== null) {
       // Update the existing specialization
-      this.specializations[this.selectedSpecializationIndex].areaOfSpecializationName = this.specializationForm.value.areaOfSpecializationName;      
+      this.specializations[this.selectedSpecializationIndex].areaOfSpecializationName = this.specializationForm.value.areaOfSpecializationName;
     this.selectedSpecializationIndex = 0; // Clear the selection
     } else {
 
@@ -414,8 +433,8 @@ export class DashboardComponent implements OnInit   {
         this.toastr.error('Maximum of 3 area of specializations allowed.');
         return;
       }
-     
-    
+
+
 
       // If no specialization is selected, add a new one
       let newSpecialization: UserAreaOfSpecialization = {
@@ -423,18 +442,19 @@ export class DashboardComponent implements OnInit   {
         userId: this.selectedUserId,
         areaOfSpecializationName: this.specializationForm.value.areaOfSpecializationName,
         isActive: true,
-        createdDate: currentDate, 
+        createdDate: currentDate,
         createdById: this.selectedUserId,
         modifiedDate: currentDate,
         modifiedById: this.selectedUserId
       };
-      
+
       this.specializations.push(newSpecialization);
     }
-    
+
     this.modalService.dismissAll(); // Close the modal
     this.specializationForm.reset(); // Reset the form
   }
+
 
   // Open Specialization Modal for editing
   editSpecialization(index: number) {
@@ -488,10 +508,10 @@ saveExperience() {
   const isDuplicate = this.designations.some((exp, index) =>
     index !== this.selectedDesignationIndex &&
     exp.designationId == experienceFormValue.expName &&
-    exp.experience == experienceFormValue.experience 
+    exp.experience == experienceFormValue.experience
     //exp.isCurrent === (experienceFormValue.isCurrent ? true : false)
   );
-  
+
   if (isDuplicate) {
     this.toastr.error('This experience already exists.');
     return;
@@ -506,22 +526,22 @@ saveExperience() {
 
   } else {
 
-    
-    if (this.designations.length >= 10) {
-      this.toastr.error('Maximum of 10 experience allowed.');
+
+    if (this.designations.length >= 3) {
+      this.toastr.error('Maximum of 3 experience allowed.');
       return;
     }
-   
-    // const isDuplicate = this.designations.some(exp => 
+
+    // const isDuplicate = this.designations.some(exp =>
     //   exp.designationId === experienceFormValue.expName &&
     //   exp.experience ===  experienceFormValue.experience)
     //   // exp.isCurrent ===  experienceFormValue.isCurrent ? true : false)
-       
+
     // if (isDuplicate) {
     //   this.toastr.error('This experience already exists.')
     //   return;
     // }
-    
+
     // If no Qualification is selected, add a new one
     let newDesignation: UserDesignation = {
       userDesignationId:0,
@@ -535,10 +555,10 @@ saveExperience() {
       modifiedById: this.selectedUserId,
       modifiedDate: currentDate
     };
-    
+
     this.designations.push(newDesignation);
   }
-  
+
   this.modalService.dismissAll(); // Close the modal
   this.designationForm.reset(); // Reset the form
   this.selectedDesignationIndex = null; // Clear the selection
@@ -584,7 +604,7 @@ getDesignationName(Id: number) {
 //#endregion
 
 //#region Course grid Section
- 
+
  // This function opens the modal for adding or editing courses
  openUserCourseModal(selectedIndex: number | null = null) {
    this.selectedUserCourseIndex = selectedIndex;
@@ -596,78 +616,78 @@ getDesignationName(Id: number) {
      // Reset the form for adding new course
      this.userCourseForm.reset();
    }
- 
+
    const modalRef = this.modalService.open(this.editUserCourseModal);
    modalRef.result.then(() => {
      this.saveUserCourse();
    }).catch(() => {});
  }
- 
+
  // Function to save course (either adding new or editing)
  saveUserCourse() {
-   if (this.userCourseForm.valid) {
-     const newCourse = this.userCourseForm.value;
+  if (this.userCourseForm.valid) {
+    const newCourse = this.userCourseForm.value;
 
-     const isDuplicate = this.userCourses.some((course, index) =>
-      index !== this.selectedUserCourseIndex &&
-      course.courseName.trim().toLowerCase() == newCourse.courseName.trim().toLowerCase() &&
-      course.degreeTypeId == newCourse.degreeTypeId &&
-      course.numberOfYearsHandled == newCourse.numberOfYearsHandled &&
-      course.isHandledInLast2Semester == (newCourse.isHandledInLast2Semester ? true : false)
-    );
+    const isDuplicate = this.userCourses.some((course, index) =>
+     index !== this.selectedUserCourseIndex &&
+     course.courseName.trim().toLowerCase() == newCourse.courseName.trim().toLowerCase() &&
+     course.degreeTypeId == newCourse.degreeTypeId &&
+     course.numberOfYearsHandled == newCourse.numberOfYearsHandled &&
+     course.isHandledInLast2Semester == (newCourse.isHandledInLast2Semester ? true : false)
+   );
 
-    if (isDuplicate) {
-      this.toastr.error('This course already exists.')
-      return;
-    }
+   if (isDuplicate) {
+     this.toastr.error('This course already exists.')
+     return;
+   }
 
 
-     if (this.selectedUserCourseIndex !== null) {
-       // Edit existing course
-       this.userCourses[this.selectedUserCourseIndex].courseName = newCourse.courseName;
-       this.userCourses[this.selectedUserCourseIndex].degreeTypeId = newCourse.degreeTypeId;
-       this.userCourses[this.selectedUserCourseIndex].numberOfYearsHandled = newCourse.numberOfYearsHandled;
-       this.userCourses[this.selectedUserCourseIndex].isHandledInLast2Semester = newCourse.isHandledInLast2Semester;
-     } else {
+    if (this.selectedUserCourseIndex !== null) {
+      // Edit existing course
+      this.userCourses[this.selectedUserCourseIndex].courseName = newCourse.courseName;
+      this.userCourses[this.selectedUserCourseIndex].degreeTypeId = newCourse.degreeTypeId;
+      this.userCourses[this.selectedUserCourseIndex].numberOfYearsHandled = newCourse.numberOfYearsHandled;
+      this.userCourses[this.selectedUserCourseIndex].isHandledInLast2Semester = newCourse.isHandledInLast2Semester;
+    } else {
 
-      if (this.userCourses.length >= 15) {
-        this.toastr.error('Maximum of 15 courses allowed.');
-        return;
-      }
-
-      // const isDuplicate = this.userCourses.some(course => 
-      //   course.courseName.trim().toLowerCase() == newCourse.courseName.trim().toLowerCase() &&
-      //   course.degreeTypeId == newCourse.degreeTypeId &&
-      //   course.numberOfYearsHandled == newCourse.numberOfYearsHandled &&
-      //   course.isHandledInLast2Semester == (newCourse.isHandledInLast2Semester ? true : false)
-      // );
-    
-      // if (isDuplicate) {
-      //   this.toastr.error('This course already exists.')
-      //   return;
-      // }
-
-       // Add new course
-       let newCourseObj: UserCourse = {
-         userCourseId: 0,
-         userId: this.selectedUserId,
-         courseName: newCourse.courseName,
-         degreeTypeId: newCourse.degreeTypeId,
-         numberOfYearsHandled: newCourse.numberOfYearsHandled,
-         isHandledInLast2Semester: newCourse.isHandledInLast2Semester?newCourse.isHandledInLast2Semester:false ,
-         isActive: true,
-         createdById: this.selectedUserId,
-         createdDate: currentDate,
-         modifiedById: this.selectedUserId,
-         modifiedDate: currentDate
-       }
-       this.userCourses.push(newCourseObj);
+     if (this.userCourses.length >= 15) {
+       this.toastr.error('Maximum of 15 courses allowed.');
+       return;
      }
 
-     this.modalService.dismissAll(); // Close the modal
-     this.userCourseForm.reset();
-   }
- }
+     // const isDuplicate = this.userCourses.some(course =>
+     //   course.courseName.trim().toLowerCase() == newCourse.courseName.trim().toLowerCase() &&
+     //   course.degreeTypeId == newCourse.degreeTypeId &&
+     //   course.numberOfYearsHandled == newCourse.numberOfYearsHandled &&
+     //   course.isHandledInLast2Semester == (newCourse.isHandledInLast2Semester ? true : false)
+     // );
+
+     // if (isDuplicate) {
+     //   this.toastr.error('This course already exists.')
+     //   return;
+     // }
+
+      // Add new course
+      let newCourseObj: UserCourse = {
+        userCourseId: 0,
+        userId: this.selectedUserId,
+        courseName: newCourse.courseName,
+        degreeTypeId: newCourse.degreeTypeId,
+        numberOfYearsHandled: newCourse.numberOfYearsHandled,
+        isHandledInLast2Semester: newCourse.isHandledInLast2Semester?newCourse.isHandledInLast2Semester:false ,
+        isActive: true,
+        createdById: this.selectedUserId,
+        createdDate: currentDate,
+        modifiedById: this.selectedUserId,
+        modifiedDate: currentDate
+      }
+      this.userCourses.push(newCourseObj);
+    }
+
+    this.modalService.dismissAll(); // Close the modal
+    this.userCourseForm.reset();
+  }
+}
 
  editUserCourse(index: number) {
   this.selectedUserCourseIndex = index;
@@ -688,12 +708,12 @@ getDesignationName(Id: number) {
   }).catch(() => {});  // Handle any modal close error
 }
 
- 
+
  // Function to delete a course
  deleteUserCourse(index: number) {
    this.userCourses.splice(index, 1);
  }
- 
+
  // Helper function to get the name of a degree type from the degreeTypes array
  getDegreeTypeName(degreeTypeId: number) {
    const degree = this.degreeTypes.find(d => d.DegreeTypeId == degreeTypeId);
@@ -705,7 +725,7 @@ getDesignationName(Id: number) {
     if(data)
       data.isCompleted = !data.isCompleted;
   }
- 
+
  //#endregion
 
  onSalutationChange(event: Event) {
@@ -767,7 +787,7 @@ validateTableData(): boolean {
       enableHtml: true,
     });
 
-    return false; 
+    return false;
   }
 
   return true;
@@ -781,10 +801,10 @@ validateTableData(): boolean {
 
     const isCustomInvalid = this.isCustomFormInvalid();
     const isTableDataInvalid = !this.validateTableData();
-  
+
     const isFormChanged = this.userForm.dirty;
     const isFormInvalid = isCustomInvalid;
-  
+
     if (isFormInvalid) {
       this.userForm.markAllAsTouched();
       return;
@@ -806,6 +826,8 @@ validateTableData(): boolean {
     };
 
     const userData = this.mapFormDataToUserObject(formData);
+    //userData.isEnabled = true;
+
     this.updateUser(userData);
     console.log('Final Object:', JSON.stringify(userData));
   }
@@ -834,7 +856,7 @@ validateTableData(): boolean {
     }
 
 
-     
+
     const userObj: UserProfile = {
 
       userId: this.selectedUserId || 0,
@@ -864,12 +886,12 @@ validateTableData(): boolean {
       modifiedById: this.selectedUserId || 0,
       modifiedDate: currentDate || ''
     };
-    
+
     return userObj;
   }
 
   getQualification(formData: any): UserQualification {
-   
+
     const userQualification: UserQualification = {
 
       userQualificationId: formData.userQualificationId,
@@ -885,7 +907,7 @@ validateTableData(): boolean {
       modifiedDate: formData.modifiedDate
     };
 
-    
+
 
     return userQualification;
   }
@@ -894,7 +916,7 @@ validateTableData(): boolean {
     this.userService.updateUser(userData.userId, userData).subscribe({
       next: () => {
         this.toastr.success('User updated successfully!');
-        
+
       },
       error: () => {
         this.toastr.error('Failed to update user. Please try again.');

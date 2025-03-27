@@ -9,7 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { UserFormComponent } from '../../forms/shared/user-form.component';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'; 
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { User  } from '../../models/user.model';
 import { ToastrService } from 'ngx-toastr';
 import {MatButtonModule} from '@angular/material/button';
@@ -24,7 +24,7 @@ import { SpinnerService } from '../../services/spinner.service';
           NgScrollbarModule,
           NgbTooltip,
           MatTableModule,
-          MatPaginatorModule, 
+          MatPaginatorModule,
           MatSortModule,
           MatIconModule,
           MatLabel,
@@ -53,7 +53,7 @@ export class UserComponent implements OnInit{
   @ViewChild(MatSort) sort!: MatSort;
 
   constructor(private userService: UserService,
-    private modalService: NgbModal, 
+    private modalService: NgbModal,
     private toastr: ToastrService,
     private router: Router,
     private spinnerService: SpinnerService) {}
@@ -65,7 +65,7 @@ export class UserComponent implements OnInit{
   loadUsers() {
     // this.userService.getUsers().subscribe(
     //   (data: any[]) => {
-    //     console.log("API Data:", data);  // Debugging step 
+    //     console.log("API Data:", data);  // Debugging step
     //     this.dataSource = new MatTableDataSource(data);
     //     this.dataSource.paginator = this.paginator;
     //     this.dataSource.sort = this.sort;
@@ -84,7 +84,7 @@ export class UserComponent implements OnInit{
     // }, error => {
     //   console.error('Error fetching users:', error);
     // });
-  
+
 
     this.userService.getUsers().subscribe(
       (data: any[]) => {
@@ -104,9 +104,9 @@ export class UserComponent implements OnInit{
 
   editUser(userId: any) {
     this.isEditMode = true; // Set edit mode
-    this.router.navigate(['/dashboard/edit', userId]); 
+    this.router.navigate(['/dashboard/edit', userId]);
   }
-  
+
 
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
@@ -138,7 +138,7 @@ export class UserComponent implements OnInit{
       // Create logic
       this.createUser(userData);
     }
-   
+
   }
 
   createUser(userData: any) {
@@ -146,14 +146,14 @@ export class UserComponent implements OnInit{
     this.spinnerService.toggleSpinnerState(true);
     this.isSubmitting = true;
     const userObj: UserProfile = {
-    
+
           userId: 0,
           name: userData.name || '',
           email: userData.email || '',
           gender:  '',
           salutation: '',
           mobileNumber:userData.mobileNumber.toString() || '',
-          roleId: 3,
+          roleId: 2,
           mode:'',
           totalExperience: 0,
           departmentName: '',
@@ -174,7 +174,7 @@ export class UserComponent implements OnInit{
           modifiedById: 1,
           modifiedDate:'',
         };
-  
+
         console.log('userObj', JSON.stringify(userObj));
     this.userService.addUser(userObj).subscribe({
       next: () => {
@@ -183,11 +183,14 @@ export class UserComponent implements OnInit{
         this.modalRef.close();
         this.spinnerService.toggleSpinnerState(false);
       },
-      error: () => {
-        this.toastr.error('Failed to add user. Please try again.');
+      error: (res) => {
+        this.toastr.error(res['error']['message']);
+        this.spinnerService.toggleSpinnerState(false);
+
       },
       complete: () => {
         this.isSubmitting = false;
+        this.spinnerService.toggleSpinnerState(false);
       }
     });
   }
@@ -203,11 +206,13 @@ export class UserComponent implements OnInit{
         this.loadUsers();
         this.modalRef.close();
       },
-      error: () => {
-        this.toastr.error('Failed to update user. Please try again.');
+      error: (res) => {
+        this.toastr.error(res['error']['message']);
+        this.spinnerService.toggleSpinnerState(false);
       },
       complete: () => {
         this.isSubmitting = false;
+        this.spinnerService.toggleSpinnerState(false);
       }
     });
   }

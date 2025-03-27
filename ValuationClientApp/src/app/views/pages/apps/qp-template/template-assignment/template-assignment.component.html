@@ -190,6 +190,7 @@
         </div><!-- Col -->
       </div><!-- Row -->
       <div *ngIf="qpTemplateData" >
+
         <div formArrayName="qpDocuments">
           <div class="row" *ngFor="let qpDocument of qpTemplateData.qpDocuments; let docIndex = index" [formGroupName]="docIndex">
             <div class="col-md-6">
@@ -222,6 +223,7 @@
                     Is only for QP?
                   </mat-checkbox>
                 </div>
+
               </div>
             </div>
       

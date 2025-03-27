@@ -266,7 +266,7 @@ updateIsQPOnly(docIndex: number, userIndex: number, isChecked: boolean) {
   const qpDocumentsArray = this.templateAssignmentForm.get('qpDocuments') as FormArray;
 
   this.qpTemplateData?.qpDocuments?.forEach((doc:any) => {
-   // const assignedUsersArray = this.fb.array([this.fb.group]); // FormArray for qpAssignedUsers
+    
     const assignedUsersArray = this.fb.array<FormGroup>([]); 
 
     doc.qpAssignedUsers.forEach((user:any) => {

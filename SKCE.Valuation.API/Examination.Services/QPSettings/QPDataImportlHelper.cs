@@ -222,6 +222,7 @@ public class QPDataImportHelper
     {
         var documents = await _dbContext.Documents.ToListAsync();
         var users = await _dbContext.Users.ToListAsync();
+        var courses = await _dbContext.Courses.Select(c => c.Code).ToListAsync();
         var importHistories = await _dbContext.ImportHistories
         .Select(i => new ImportHistoryVM
         {
@@ -232,7 +233,7 @@ public class QPDataImportHelper
             DepartmentsCount = i.DepartmentsCount,
             InstitutionsCount = i.InstitutionsCount,
             UserId = i.UserId,
-            CreatedDate = i.CreatedDate
+            CreatedDate = i.CreatedDate,
         }).ToListAsync();
 
         foreach (var importHistory in importHistories)
@@ -240,6 +241,7 @@ public class QPDataImportHelper
             importHistory.UserName = users.FirstOrDefault(u => u.UserId == importHistory.UserId)?.Name ?? string.Empty;
             importHistory.DocumentName = documents.FirstOrDefault(d => d.DocumentId == importHistory.DocumentId)?.Name ?? string.Empty;
             importHistory.DocumentUrl = documents.FirstOrDefault(d => d.DocumentId == importHistory.DocumentId)?.Url ?? string.Empty;
+            importHistory.Courses = string.Join(", ", courses);
         }
         return importHistories;
     }

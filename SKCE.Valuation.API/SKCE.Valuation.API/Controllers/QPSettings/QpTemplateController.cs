@@ -7,6 +7,7 @@ using SKCE.Examination.Models.DbModels.QPSettings;
 using SKCE.Examination.Services.Common;
 using SKCE.Examination.Services.QPSettings;
 using SKCE.Examination.Services.ServiceContracts;
+using SKCE.Examination.Services.ViewModels.Common;
 using SKCE.Examination.Services.ViewModels.QPSettings;
 using Document = Aspose.Words.Document;
 
@@ -136,7 +137,7 @@ namespace SKCE.Examination.API.Controllers.QPSettings
                 // Get and validate bookmarks
                var validationResult = await _qpTemplateService.ValidateGeneratedQPAndPreview(userId, QPTemplateInstitutionId, doc);
 
-                return Ok(validationResult);
+                return Ok(new ResultModel() { Message = validationResult.message, InValid= validationResult.inValidForSubmission });
             }
             catch (Exception ex)
             {

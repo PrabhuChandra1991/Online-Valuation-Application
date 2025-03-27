@@ -1180,42 +1180,44 @@ namespace SKCE.Examination.Services.QPSettings
             return true;
         }
 
-        public async Task<string> ValidateGeneratedQPAndPreview(long userId, long QPTemplateInstitutionId, Document doc) {
+        public async Task<(string message, bool inValidForSubmission)> ValidateGeneratedQPAndPreview(long userId, long QPTemplateInstitutionId, Document doc) {
             var qpTemplateInstitution = await _context.QPTemplateInstitutions.FirstOrDefaultAsync(qpti => qpti.QPTemplateInstitutionId == QPTemplateInstitutionId);
             if (qpTemplateInstitution == null)
             {
-                return ("User QP assignment is missing.");
+                return ("User QP assignment is missing.",true);
             }
             var userQPTemplate = await _context.UserQPTemplates.FirstOrDefaultAsync(uqp => uqp.UserId == userId && uqp.QPTemplateInstitutionId == qpTemplateInstitution.QPTemplateInstitutionId);
             if (userQPTemplate == null)
             {
-                return ("User QP assignment is missing.");
+                return ("User QP assignment is missing.", true);
             }
             var qpDocument = await _context.QPDocuments.FirstOrDefaultAsync(qpd => qpd.QPDocumentId == userQPTemplate.QPDocumentId);
             if (qpDocument == null)
             {
-                return("User QP documemt is missing.");
+                return ("User QP documemt is missing.",true);
             }
             if (qpDocument.DegreeTypeName == "UG")
             {
-                  return await UGQPValidationAsync(userQPTemplate, doc);
+                var ugValidations = await UGQPValidationAsync(userQPTemplate, doc);
+                  return (ugValidations.Item1, ugValidations.Item2) ;
             }
             else if (qpDocument.DegreeTypeName == "PG")
             {
-                 return await PGQPValidationAsync(userQPTemplate, doc);
+                var pgValidations = await PGQPValidationAsync(userQPTemplate, doc);
+                return (pgValidations.Item1, pgValidations.Item2);
             }
-            return string.Empty;
+            return (string.Empty,true);
         }
 
-        private async Task<string> PGQPValidationAsync(UserQPTemplate userQPTemplate, Document doc)
+        private async Task<(string message, bool inValidForSubmission)> PGQPValidationAsync(UserQPTemplate userQPTemplate, Document doc)
         {
             List<string> validationResults = new List<string>();
             int totalMarks = 0;
             int expectedMarks = 20; // Part A should have 20 marks
-            return string.Empty;
+            return (string.Empty,true);
         }
 
-        private async Task<string> UGQPValidationAsync(UserQPTemplate userQPTemplate, Document doc)
+        private async Task<Tuple<string,bool>> UGQPValidationAsync(UserQPTemplate userQPTemplate, Document doc)
         {
             List<string> validationResults = new List<string>();
             Dictionary<string, int> coMarks = new Dictionary<string, int>();
@@ -1259,7 +1261,7 @@ namespace SKCE.Examination.Services.QPSettings
                     if (!btMarks.ContainsKey(bt)) btMarks[bt] = 0;
                     btMarks[bt] += marks;
                 }
-                if(qNo == 9)
+                if(qNo == 10)
                 {
                     // Add Total row to HTML table
                     htmlTable.Append($"<tr><td></td><td></td><td>Total</td><td>{totalMarks}</td></tr>");
@@ -1300,10 +1302,11 @@ namespace SKCE.Examination.Services.QPSettings
             if (missingBTs.Count > 0)
                 htmlTable.Append($"<h3 style='color:red;'>Missing BTs: {string.Join(", ", missingBTs)}</h3>");
 
-            return $"{htmlTable.ToString()} \n\n {ValidatePartB(doc)}";
+            var partBResults = ValidatePartB(doc);
+            return Tuple.Create($"{htmlTable.ToString()} \n\n {partBResults.Item1}", partBResults.Item2);
         }
 
-        public static string ValidatePartB(Document doc)
+        public static Tuple<string,bool> ValidatePartB(Document doc)
         {
             StringBuilder htmlTable = new StringBuilder();
             htmlTable.Append("<h2>Part B: Question Validation</h2>");
@@ -1320,15 +1323,15 @@ namespace SKCE.Examination.Services.QPSettings
 
             for (int qNo = 11; qNo <= 20; qNo++)
             {
-                string subQ1Text = ExtractBookmarkText(doc, $"Q{qNo}SubQ1");
-                string subQ1CO = ExtractBookmarkText(doc, $"Q{qNo}SubQ1CO");
-                string subQ1BT = ExtractBookmarkText(doc, $"Q{qNo}SubQ1BT");
-                int subQ1Marks = ExtractMarksFromBookmark(doc, $"Q{qNo}SubQ1Marks");
+                string subQ1Text = ExtractBookmarkText(doc, $"Q{qNo}I");
+                string subQ1CO = ExtractBookmarkText(doc, $"Q{qNo}ICO");
+                string subQ1BT = ExtractBookmarkText(doc, $"Q{qNo}IBT");
+                int subQ1Marks = ExtractMarksFromBookmark(doc, $"Q{qNo}IMarks");
 
-                string subQ2Text = ExtractBookmarkText(doc, $"Q{qNo}SubQ2");
-                string subQ2CO = ExtractBookmarkText(doc, $"Q{qNo}SubQ2CO");
-                string subQ2BT = ExtractBookmarkText(doc, $"Q{qNo}SubQ2BT");
-                int subQ2Marks = ExtractMarksFromBookmark(doc, $"Q{qNo}SubQ2Marks");
+                string subQ2Text = ExtractBookmarkText(doc, $"Q{qNo}II");
+                string subQ2CO = ExtractBookmarkText(doc, $"Q{qNo}IICO");
+                string subQ2BT = ExtractBookmarkText(doc, $"Q{qNo}IIBT");
+                int subQ2Marks = ExtractMarksFromBookmark(doc, $"Q{qNo}IIMarks");
 
                 string qpakAssigned = ExtractBookmarkText(doc, $"Q{qNo}QPAK");
                 string subQ2AnswerKey = ExtractBookmarkText(doc, $"Q{qNo}SubQ2AnswerKey");
@@ -1379,7 +1382,7 @@ namespace SKCE.Examination.Services.QPSettings
                 htmlTable.Append("<h3 style='color:green;'>✅ No validation errors found.</h3>");
             }
 
-            return htmlTable.ToString();
+            return Tuple.Create(htmlTable.ToString(), errors.Any());
         }
         private static string ExtractBookmarkText(Document doc, string bookmarkName)
         {

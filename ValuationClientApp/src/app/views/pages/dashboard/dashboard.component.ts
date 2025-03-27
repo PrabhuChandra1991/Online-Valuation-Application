@@ -311,7 +311,8 @@ export class DashboardComponent implements OnInit   {
       const userData = JSON.parse(loggedData);
 
       if(userData.isEnabled)
-        this.userForm.controls['name'].disable();
+        this.isUserEnabled = true;
+        //this.userForm.controls['name'].disable();
 
 
       console.log("localstoreUserData",userData);
@@ -328,9 +329,6 @@ export class DashboardComponent implements OnInit   {
        if(selectedUser)
        {
         this.selectedUser = selectedUser;
-
-        if(selectedUser.isEnabled)
-          this.userForm.controls['name'].disable();
 
         //assign child elements dynamically
         this.designations = selectedUser.userDesignations;
@@ -384,6 +382,10 @@ export class DashboardComponent implements OnInit   {
         });
 
         this.userForm.updateValueAndValidity();
+
+        if(selectedUser.isEnabled)
+          this.isUserEnabled = true;
+          //this.userForm.controls['name'].disable();
 
         console.log("after patch",this.userForm.value);
 

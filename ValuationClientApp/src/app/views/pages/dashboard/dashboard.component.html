@@ -23,7 +23,7 @@
               <!-- Name -->
               <div class="col-sm-4">
               <label class="form-label">Name <span class="text-danger"> *</span></label>
-              <input type="text" class="form-control"  formControlName="name" />
+              <input type="text" class="form-control"  formControlName="name" [attr.readonly] = '!isUserEnabled'/>
               <span class="text-danger"
                   *ngIf="(userForm.controls.name.touched) && userForm.controls.name.errors?.required">
                   Name is required

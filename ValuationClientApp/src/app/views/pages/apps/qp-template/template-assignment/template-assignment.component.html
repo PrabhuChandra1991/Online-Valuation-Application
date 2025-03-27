@@ -190,50 +190,43 @@
         </div><!-- Col -->
       </div><!-- Row -->
       <div *ngIf="qpTemplateData" >
-        <div class="row" *ngFor="let qpDocument of qpTemplateData.qpDocuments">
-          <div class="col-md-6">
-            <div class="mb-3">
-              <label for="template"
-                class="form-label">Template Name: {{qpDocument.qpDocumentName}}</label>
-            </div>
-          </div><!-- Col -->
-          <div class="row">
-            <div class="col-sm-6">
-              <div class="mb-4">
-                <label for="qpTemplateName"
-                  class="form-label">Expert - 1</label>
-                  <select class="form-select" id="expert1" formControlName="expert1">
-                    <option selected>Select Expert</option>
-                    <option *ngFor="let user of users" [value]="user.userId" [disabled]="templateAssignmentForm.controls['expert2'].value == user.userId">
-                      {{ user.userName }}
-                    </option>
-                  </select>
-              </div>
-            </div><!-- Col -->
-            <div class="col-sm-6">
-              <div class="mb-4">
-                <label for="qpTemplateName"
-                  class="form-label">Expert - 2</label>
-                  <select class="form-select" id="expert2" formControlName="expert2">
-                    <option selected >Select Expert</option>
-                    <option *ngFor="let user of users" [value]="user.userId" [disabled]="templateAssignmentForm.controls['expert1'].value == user.userId">
-                      {{ user.userName }}
-                    </option>
-                  </select>
-              </div>
-            </div><!-- Col -->
-          </div>
-          <div class="row">
-            <div class="col-sm-6">
-              <div class="mb-4">
-                <mat-checkbox class="checkbox" formControlName="qp1" >Is only for QP?</mat-checkbox>
+
+        <div formArrayName="qpDocuments">
+          <div class="row" *ngFor="let qpDocument of qpTemplateData.qpDocuments; let docIndex = index" [formGroupName]="docIndex">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Template Name: {{ qpDocument.qpDocumentName }}</label>
               </div>
             </div>
-            <div class="col-sm-6">
-              <div class="mb-4">
-                <mat-checkbox formControlName="qp2" >Is only for QP?</mat-checkbox>
+            
+            <!-- Loop through assigned users -->
+            <div formArrayName="qpAssignedUsers">
+              <div class="row" *ngFor="let assignedUser of qpDocument.qpAssignedUsers; let userIndex = index" [formGroupName]="userIndex">
+                <!-- Expert Selection -->
+                <div class="col-sm-8">
+                  <div class="mb-4">
+                    <label class="form-label">Expert - {{ userIndex + 1 }}</label>
+                    <select class="form-select" formControlName="userId"
+                            (change)="updateUserDetails(docIndex, userIndex,$event)">
+                      <option value="">Select Expert</option>
+                      <option *ngFor="let user of users" [value]="user.userId"
+                              [disabled]="isUserAlreadySelected(qpDocument.qpAssignedUsers, user.userId, userIndex)">
+                        {{ user.userName }}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+      
+                <!-- Is QP Only Checkbox -->
+                <div class="col-sm-4 d-flex align-items-center">
+                  <mat-checkbox class="checkbox" formControlName="isQPOnly" (change)="updateIsQPOnly(docIndex, userIndex, $event.checked)">
+                    Is only for QP?
+                  </mat-checkbox>
+                </div>
+
               </div>
             </div>
+      
           </div>
         </div>
       </div>

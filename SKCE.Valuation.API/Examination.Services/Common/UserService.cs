@@ -38,7 +38,7 @@ namespace SKCE.Examination.Services.Common
             .Include(u => u.UserAreaOfSpecializations)
             .Include(u => u.UserQualifications)
             .Include(u => u.UserDesignations)
-            .FirstOrDefaultAsync(u => u.UserId == id); ;
+            .FirstOrDefaultAsync(u => u.UserId == id);
         }
 
         public async Task<User> AddUserAsync(User user)

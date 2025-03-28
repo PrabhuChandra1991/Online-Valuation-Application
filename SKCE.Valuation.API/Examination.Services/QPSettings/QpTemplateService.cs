@@ -17,12 +17,16 @@ using Shape = Aspose.Words.Drawing.Shape;
 using System.Text.RegularExpressions;
 using Aspose.Pdf.Operators;
 using System.Text;
+using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.Extensions.Configuration;
 namespace SKCE.Examination.Services.QPSettings
 {
     public class QpTemplateService 
     {
         private readonly ExaminationDbContext _context;
         private readonly IMapper _mapper;
+        private readonly EmailService _emailService;
+        private readonly IConfiguration _configuration;
         private readonly BookmarkProcessor _bookmarkProcessor;
         private readonly AzureBlobStorageHelper _azureBlobStorageHelper;
         private static readonly Dictionary<long, string> QPDocumentTypeDictionary = new Dictionary<long, string>
@@ -37,12 +41,14 @@ namespace SKCE.Examination.Services.QPSettings
             { 8, "For QP Selection" },
             { 9, "Selected QP" }
         };
-        public QpTemplateService(ExaminationDbContext context, IMapper mapper, BookmarkProcessor bookmarkProcessor, AzureBlobStorageHelper azureBlobStorageHelper)
+        public QpTemplateService(ExaminationDbContext context, IMapper mapper, IConfiguration configuration, BookmarkProcessor bookmarkProcessor, AzureBlobStorageHelper azureBlobStorageHelper, EmailService emailService)
         {
             _bookmarkProcessor = bookmarkProcessor;
             _context = context;
             _mapper = mapper;
+            _emailService = emailService;
             _azureBlobStorageHelper = azureBlobStorageHelper;
+            _configuration = configuration;
         }
         public async Task<QPTemplateVM?> GetQPTemplateByCourseIdAsync(long courseId)
         {
@@ -215,6 +221,8 @@ namespace SKCE.Examination.Services.QPSettings
                 Semester = qPTemplateVM.Semester,
                 StudentCount = qPTemplateVM.StudentCount
             };
+            var courseDetails = _context.Courses.FirstOrDefault(c => c.CourseId == qPTemplateVM.CourseId);
+            var degreeType = _context.DegreeTypes.FirstOrDefault(c => c.DegreeTypeId == qPTemplateVM.DegreeTypeId);
             AuditHelper.SetAuditPropertiesForInsert(qPTemplate, 1);
             qPTemplateVM.Documents.ForEach(d => qPTemplate.Documents.Add(new QPTemplateDocument
             {
@@ -267,8 +275,22 @@ namespace SKCE.Examination.Services.QPSettings
                 {
                     i.QPAssignedUsers.ForEach(u =>
                     {
-                        if(u.UserId > 0)
-                        AssignTemplateForQPGenerationAsync(u, institutionVM.QPTemplateInstitutionId,i);
+                        if (u.UserId > 0)
+                        {
+                            AssignTemplateForQPGenerationAsync(u, institutionVM.QPTemplateInstitutionId, i);
+                            var emailUser = _context.Users.FirstOrDefault(us => us.UserId == u.UserId);
+                            //send email
+                            if (emailUser != null)
+                            {
+                                _emailService.SendEmailAsync(emailUser.Email, "Question Paper Assignment Notification – Sri Krishna Institutions, Coimbatore",
+                                  $"Dear {emailUser.Name}," +
+                                  $"\n\nYou have been assigned to generate a Question Paper for the following course:" +
+                                  $"\n\n Course:{courseDetails.Code} - {courseDetails.Name} \n Degree Type: {degreeType.Name}" +
+                                  $"\n\nPlease review the assigned question paper and submit it before the due date." +
+                                  $"\n To View Assignment please click here {_configuration["LoginUrl"]}" +
+                                  $"\n\nContact Details:\nName:\nContact Number:\n\nThank you for your cooperation. We look forward to your valuable contribution to our institution.\n\nWarm regards,\nSri Krishna College of Engineering and Technology").Wait();
+                            }
+                        }
                     });
                 }
             });
@@ -291,6 +313,8 @@ namespace SKCE.Examination.Services.QPSettings
             qpTemplate.Semester = qPTemplateVM.Semester;
             qpTemplate.StudentCount = qPTemplateVM.StudentCount;
             AuditHelper.SetAuditPropertiesForUpdate(qpTemplate, 1);
+            var courseDetails = _context.Courses.FirstOrDefault(c => c.CourseId == qPTemplateVM.CourseId);
+            var degreeType = _context.DegreeTypes.FirstOrDefault(c => c.DegreeTypeId == qPTemplateVM.DegreeTypeId);
             qPTemplateVM.Documents.ForEach(d =>
             {
                 var document = qpTemplate.Documents.FirstOrDefault(qptd => qptd.QPTemplateDocumentId == d.QPTemplateDocumentId);
@@ -321,6 +345,18 @@ namespace SKCE.Examination.Services.QPSettings
                             AuditHelper.SetAuditPropertiesForInsert(newAssignedUser, 1);
                             _context.UserQPTemplates.Add(newAssignedUser);
                              _context.SaveChanges();
+                            var emailUser = _context.Users.FirstOrDefault(us => us.UserId == assignedUser.UserId);
+                            //send email
+                            if (emailUser != null)
+                            {
+                                _emailService.SendEmailAsync(emailUser.Email, "Question Paper Assignment Notification – Sri Krishna Institutions, Coimbatore",
+                                  $"Dear {emailUser.Name}," +
+                                  $"\n\nYou have been assigned to generate a Question Paper for the following course:" +
+                                  $"\n\n Course:{courseDetails.Code} - {courseDetails.Name} \n Degree Type: {degreeType.Name} \n\n" +
+                                  $"\n\nPlease review the assigned question paper and submit it before the due date." +
+                                  $"\n To View Assignment please click here {_configuration["LoginUrl"]}" +
+                                  $"\n\nContact Details:\nName:\nContact Number:\n\nThank you for your cooperation. We look forward to your valuable contribution to our institution.\n\nWarm regards,\nSri Krishna College of Engineering and Technology").Wait();
+                            }
 
                             var qpSyllabusDocument = _context.QPTemplateDocuments.FirstOrDefault(qptd => qptd.QPDocumentTypeId == 1 && qptd.QPTemplateId == qpTemplate.QPTemplateId);
                             var userQPSyllabusDocument = new UserQPTemplateDocument()
@@ -1217,7 +1253,7 @@ namespace SKCE.Examination.Services.QPSettings
             return (string.Empty,true);
         }
 
-        private async Task<Tuple<string,bool>> UGQPValidationAsync(UserQPTemplate userQPTemplate, Document doc)
+        private async Task<(string,bool)> UGQPValidationAsync(UserQPTemplate userQPTemplate, Document doc)
         {
             List<string> validationResults = new List<string>();
             Dictionary<string, int> coMarks = new Dictionary<string, int>();
@@ -1303,10 +1339,10 @@ namespace SKCE.Examination.Services.QPSettings
                 htmlTable.Append($"<h3 style='color:red;'>Missing BTs: {string.Join(", ", missingBTs)}</h3>");
 
             var partBResults = ValidatePartB(doc);
-            return Tuple.Create($"{htmlTable.ToString()} \n\n {partBResults.Item1}", partBResults.Item2);
+            return ($"{htmlTable.ToString()} +\n\n {partBResults.Item1}", partBResults.Item2);
         }
 
-        public static Tuple<string,bool> ValidatePartB(Document doc)
+        public static (string,bool) ValidatePartB(Document doc)
         {
             StringBuilder htmlTable = new StringBuilder();
             htmlTable.Append("<h2>Part B: Question Validation</h2>");
@@ -1382,7 +1418,7 @@ namespace SKCE.Examination.Services.QPSettings
                 htmlTable.Append("<h3 style='color:green;'>✅ No validation errors found.</h3>");
             }
 
-            return Tuple.Create(htmlTable.ToString(), errors.Any());
+            return (htmlTable.ToString(), errors.Any());
         }
         private static string ExtractBookmarkText(Document doc, string bookmarkName)
         {

@@ -24,7 +24,7 @@ export default [
     },
     {
         path: 'chat',
-        loadComponent: () => import('./chat/chat.component').then(c => c.ChatComponent) 
+        loadComponent: () => import('./chat/chat.component').then(c => c.ChatComponent)
     },
     {
         path: 'user',
@@ -55,4 +55,9 @@ export default [
         loadComponent: () => import('./master/master.component').then(c => c.MasterComponent),
         canActivate:[authGuard]
     },
+    {
+      path: 'importhistory',
+      loadComponent: () => import('./import-history/import-history.component').then(c => c.ImportHistoryComponent),
+      canActivate:[authGuard]
+  },
 ] as Routes;

@@ -18,16 +18,17 @@ export class NavbarComponent implements OnInit {
 
   userObj: any = {
     "email": '',
-    "username":''
+    "username":'',
+    "mode":''
     // "createdDate":new Date().toJSON()
   }
-  
+
   constructor(private router: Router, private themeModeService: ThemeModeService) {}
 
   ngOnInit(): void {
 
     debugger;
-   
+
     const loggedData = localStorage.getItem('userData');
 
     if(loggedData)
@@ -36,6 +37,7 @@ export class NavbarComponent implements OnInit {
 
       this.userObj.email = userData.email;
       this.userObj.username = userData.name;
+      this.userObj.mode=userData.mode;
     }
 
     this.themeModeService.currentTheme.subscribe( (theme) => {
@@ -65,7 +67,7 @@ export class NavbarComponent implements OnInit {
   }
 
   /**
-   * Change the theme on #theme-switcher checkbox changes 
+   * Change the theme on #theme-switcher checkbox changes
    */
   onThemeCheckboxChange(e: Event) {
     const checkbox = e.target as HTMLInputElement;
@@ -93,7 +95,7 @@ export class NavbarComponent implements OnInit {
       this.router.navigate(['/dashboard/edit', loggedDataObject.userId]); // Redirect to Edit
     }
      return;
-    
+
   }
   /**
    * Logout

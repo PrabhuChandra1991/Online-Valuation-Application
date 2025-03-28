@@ -21,6 +21,10 @@ namespace SKCE.Examination.Services.ViewModels.QPSettings
         public string ExamType { get; set; }
         public long Semester { get; set; }
         public long StudentCount { get; set; }
+        public string Expert1Name { get; set; }
+        public string Expert1Status { get; set; }
+        public string Expert2Name { get; set; }
+        public string Expert2Status { get; set; }
         public List<QPTemplateDocumentVM> Documents { get; set; }
         public List<QPTemplateInstitutionVM> Institutions { get; set; }
         public List<QPDocumentVM> QPDocuments { get; set; } = new List<QPDocumentVM>();
@@ -39,7 +43,7 @@ namespace SKCE.Examination.Services.ViewModels.QPSettings
     {
         public long UserQPTemplateId { get; set; }
         public long UserId { get; set; }
-        public string  UserName { get; set; }
+        public string UserName { get; set; }
         public long StatusTypeId { get; set; }
         public string StatusTypeName { get; set; } = string.Empty;
         public bool IsQPOnly { get; set; }

@@ -671,6 +671,20 @@ namespace SKCE.Examination.Services.QPSettings
                 {
                     if (qPDocument.QPAssignedUsers.Count < 2)
                         qPDocument.QPAssignedUsers.Add(new QPDocumentUserVM { UserQPTemplateId = 0, IsQPOnly = false, StatusTypeId = 8, StatusTypeName = "", UserId = 0, UserName = string.Empty });
+                    
+                    foreach (var user in qPDocument.QPAssignedUsers)
+                    {
+                        if (user.UserId == qPDocument.QPAssignedUsers[0].UserId)
+                        {
+                            qPTemplate.Expert1Name = user.UserName;
+                            qPTemplate.Expert1Status = user.StatusTypeName;
+                        }
+                        else
+                        {
+                            qPTemplate.Expert2Name = user.UserName;
+                            qPTemplate.Expert2Status = user.StatusTypeName;
+                        }
+                    }
                 }
             }
             return qPTemplates;
@@ -952,6 +966,19 @@ namespace SKCE.Examination.Services.QPSettings
                     {
                         if(qPDocument.QPAssignedUsers.Count <2)
                             qPDocument.QPAssignedUsers.Add(new QPDocumentUserVM { UserQPTemplateId = 0, IsQPOnly = false, StatusTypeId = 8, StatusTypeName = "", UserId = 0, UserName = string.Empty });
+                        foreach (var user in qPDocument.QPAssignedUsers)
+                        {
+                            if(user.UserId == qPDocument.QPAssignedUsers[0].UserId)
+                            {
+                                qPTemplate.Expert1Name = user.UserName;
+                                qPTemplate.Expert1Status = user.StatusTypeName;
+                            }
+                            else
+                            {
+                                qPTemplate.Expert2Name = user.UserName;
+                                qPTemplate.Expert2Status = user.StatusTypeName;
+                            }
+                        }
                     }
                 }
                 return qPTemplates.FirstOrDefault();

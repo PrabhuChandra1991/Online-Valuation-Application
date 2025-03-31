@@ -1,7 +1,7 @@
 <div class="container">
   <div class="row mt-1">
     <!-- <div class="col-md-12">
-   
+
       <button class="btn btn-primary me-1" (click)="openCreateUserDialog()">Create User</button>
     </div> -->
     <div class="row mt-1">
@@ -14,7 +14,7 @@
           <div class="card">
             <div class="card-body">
               <h4 class="card-title ">Users</h4>
-  
+
               <div class="table-responsive">
                <!-- Search Input -->
                <mat-form-field appearance="outline">
@@ -77,13 +77,13 @@
             <!-- Table Header & Row Definitions -->
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-        
+
           </table>
-        
+
             <!-- Pagination -->
             <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
             </div>
-          
+
             </div>
 
           </div>

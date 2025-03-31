@@ -9,7 +9,7 @@ import { environment } from '../../../../environments/environment';
 export class TemplateManagementService {
 
    private apiUrl = environment.apiURL; // Update this with your actual API URL
- 
+
      private httpOptions = {
          headers: new HttpHeaders({
            'Content-Type': 'application/json'
@@ -38,11 +38,11 @@ export class TemplateManagementService {
     const encodedFileName = encodeURIComponent(fileName);
     return this.http.delete(`${this.apiUrl}/api/BlobStorage/delete/${fileName}`);
   }
-  
+
   saveQpTemplate(qpTemplateData: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/api/QpTemplate`, qpTemplateData);
   }
-  
+
    // Fetch templated from API
    getTemplates(institutionId:number): Observable<any> {
     return this.http.get(`${this.apiUrl}/api/QpTemplate/GetQPTemplates/${institutionId}`);
@@ -55,7 +55,7 @@ export class TemplateManagementService {
   getQpTemplateById(qpTemplateId: string): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/api/QpTemplate/${qpTemplateId}`);
   }
-  
+
   assignQpTemplateToUser(userId: any,templateId: any): Observable<any> {
     return this.http.get(`${this.apiUrl}/api/QpTemplate/AssignQPForGeneration/${userId}/${templateId}`);
   }
@@ -63,7 +63,7 @@ export class TemplateManagementService {
   getAssignedQpTemplateByUser(userId: any): Observable<any> {
     return this.http.get(`${this.apiUrl}/api/QpTemplate/GetUserQPTemplates/${userId}`);
   }
-  
+
   CreateQpTemplate(formData: FormData): Observable<any> {
     return this.http.post(`${this.apiUrl}/api/QpTemplate/CreateQpTemplate`,formData);
   }
@@ -71,4 +71,7 @@ export class TemplateManagementService {
     return this.http.get(`${this.apiUrl}/api/QpTemplate/GetExpertsForQPAssignment`);
   }
 
+  updateAssignment(qpTemplateId: any,formData: FormData): Observable<any> {
+    return this.http.put(`${this.apiUrl}/api/UpdateQpTemplate/${qpTemplateId}`, JSON.stringify(formData), this.httpOptions);
+  }
 }

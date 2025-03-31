@@ -274,8 +274,6 @@ getAssignmentForTemplateId(templateId: any){
     if(this.qpTemplateData)
     {
      //this.courseInput.nativeElement.value = this.qpTemplateData?.courseId;
-      console.log("courses", this.courses);
-      console.log("courseId",response.courseId);
       this.templateAssignmentForm.patchValue({
         courseId: response.courseId,
         degreeTypeName: response.degreeTypeName,

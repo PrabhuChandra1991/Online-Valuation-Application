@@ -7,7 +7,7 @@
           <label>Institution <span class="text-danger">*</span></label>
         </div>
         <div class="col-md-3" >
-          <select formControlName="institutionId" class="form-select" (change)="onInstituteChange($event)">
+          <select id="institutionId" class="form-select" (change)="onInstituteChange($event)">
             <option *ngFor="let inst of institutes" [value]="inst.institutionId">{{ inst.name }}</option>
           </select>
         </div>

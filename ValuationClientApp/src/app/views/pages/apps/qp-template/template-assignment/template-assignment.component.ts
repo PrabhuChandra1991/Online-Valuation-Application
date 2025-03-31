@@ -271,20 +271,11 @@ getAssignmentForTemplateId(templateId: any){
   this.templateService.getQpTemplateById(templateId).subscribe((response) => {
     this.qpTemplateData = response;
 
-    // this.resetForm();
-
-    //   this.loadCourses();
-
-    //   this.initializeForm();
-
-    //   this.loadExperts();
-
-    //   this.loadAllInstitues();
-
     if(this.qpTemplateData)
     {
-      this.courseInput.nativeElement.value = this.qpTemplateData?.courseId;
-
+     //this.courseInput.nativeElement.value = this.qpTemplateData?.courseId;
+      console.log("courses", this.courses);
+      console.log("courseId",response.courseId);
       this.templateAssignmentForm.patchValue({
         courseId: response.courseId,
         degreeTypeName: response.degreeTypeName,
@@ -304,12 +295,9 @@ getAssignmentForTemplateId(templateId: any){
        this.updateFormWithData();
 
        this.isEditMode = false;
-    //this.selectedAssignment = null;
-    this.modalRef = this.modalService.open(this.assignmentModal, { size: 'lg', backdrop: 'static' });
-
       console.log("qpTemplate",JSON.stringify(this.qpTemplateData));
     }
-    //console.log("qpTemplate",JSON.stringify(this.qpTemplateData)  );
+
   });
 
 }

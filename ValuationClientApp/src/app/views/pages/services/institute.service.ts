@@ -7,7 +7,7 @@ import { environment } from '../../../../environments/environment';
     providedIn: 'root'
 })
 
-export class DashboardService {
+export class InstituteService {
 
     private apiUrl = environment.apiURL; // Update this with your actual API URL
 
@@ -17,13 +17,9 @@ export class DashboardService {
         })
       };
 
-    constructor(private http: HttpClient) { }
+      constructor(private http: HttpClient) { }
 
-    getCourses(): Observable<any> {
-        return this.http.get(`${this.apiUrl}/api/Course`);
+    getInstitutions(): Observable<any> {
+        return this.http.get(`${this.apiUrl}/api/Institution`);
     }
-
-    getDepartments(): Observable<any> {
-        return this.http.get(`${this.apiUrl}/api/Department`);
-    }
-}
+  }

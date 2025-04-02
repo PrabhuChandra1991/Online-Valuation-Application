@@ -285,6 +285,8 @@ getAssignmentForTemplateId(templateId: any){
         semester: response.semester,
         institutionName: response?.institutions?response.institutions[0].institutionName : '',
         studentCount:  response?.institutions?response.institutions[0]?.studentCount :response.studentCount,
+        courseSyllabusDocumentName: response.courseSyllabusDocumentName,
+        courseSyllabusDocumentUrl: response.courseSyllabusDocumentUrl,
 
       });
 
@@ -315,7 +317,9 @@ getAssignmentForTemplateId(templateId: any){
          examType: response.examType,
          semester: response.semester,
          institutionName: '',
-         studentCount:  response.studentCount || ''
+         studentCount:  response.studentCount || '',
+         courseSyllabusDocumentName: response.courseSyllabusDocumentName,
+         courseSyllabusDocumentUrl: response.courseSyllabusDocumentUrl,
        });
 
         this.templates =this.qpTemplateData.qpDocuments;
@@ -391,6 +395,8 @@ updateIsQPOnly(docIndex: number, userIndex: number, isChecked: boolean) {
 
     this.templateAssignmentForm = this.fb.group({
       qpTemplateName: [''],
+      courseSyllabusDocumentName: [''],
+      courseSyllabusDocumentUrl: [''],
       degreeTypeName: [{ value: '', disabled: true }],
       regulationYear: [{ value: '', disabled: true }],
       batchYear: [{ value: '', disabled: true }],

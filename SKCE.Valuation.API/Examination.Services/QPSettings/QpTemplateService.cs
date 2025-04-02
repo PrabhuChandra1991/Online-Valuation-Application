@@ -109,7 +109,7 @@ namespace SKCE.Examination.Services.QPSettings
             }
             else
             {
-               await ProcessExcelAndGeneratePdfAsync(qPTemplate);
+                qPTemplate = await ProcessExcelAndGeneratePdfAsync(qPTemplate);
             }
             if (qpTemplateId > 0)
                 return await GetQPTemplateAsync(qpTemplateId);
@@ -143,7 +143,7 @@ namespace SKCE.Examination.Services.QPSettings
             return qPTemplate;
         }
 
-        public async Task ProcessExcelAndGeneratePdfAsync(QPTemplateVM qPTemplate)
+        public async Task<QPTemplateVM> ProcessExcelAndGeneratePdfAsync(QPTemplateVM qPTemplate)
         {
             var pdfFileName = qPTemplate.CourseCode + ".pdf";
 
@@ -192,6 +192,7 @@ namespace SKCE.Examination.Services.QPSettings
             qPTemplate.CourseSyllabusDocumentId = syllabusDocumentId;
             qPTemplate.CourseSyllabusDocumentName = documents.FirstOrDefault(di => di.DocumentId == syllabusDocumentId)?.Name ?? string.Empty;
             qPTemplate.CourseSyllabusDocumentUrl = documents.FirstOrDefault(di => di.DocumentId == syllabusDocumentId)?.Url ?? string.Empty;
+            return qPTemplate;
         }
 
         private async Task<byte[]> DownloadFileFromBlobAsync(string blobName)
@@ -254,6 +255,7 @@ namespace SKCE.Examination.Services.QPSettings
 
                             if (!string.IsNullOrEmpty(columnName) && !rowData.ContainsKey(columnName))
                             {
+                                columnName = columnName.Trim().Replace(" ","");
                                 rowData[columnName] = columnValue;
                             }
                         }
@@ -275,7 +277,39 @@ namespace SKCE.Examination.Services.QPSettings
             {
                 Spire.Doc.Documents.BookmarksNavigator navigator = new Spire.Doc.Documents.BookmarksNavigator(doc);
                 navigator.MoveToBookmark(bookmark.Name);
-                navigator.ReplaceBookmarkContent(rowData[bookmark.Name], true);
+                switch (bookmark.Name)
+                {
+                    case "CourseObjectives1":
+                    case "CourseObjectives2":
+                    case "CourseObjectives3":
+                    case "CourseObjectives4":
+                    case "CourseObjectives5":
+                    case "CourseObjectives6":
+                    case "CourseOutcomesHead1":
+                    case "CourseOutcomesHead2":
+                    case "CourseOutcomesHead3":
+                    case "CourseOutcomesHead4":
+                    case "CourseOutcomesHead5":
+                    case "CourseOutcomesHead6":
+                    case "CourseOutcomes1":
+                    case "CourseOutcomes2":
+                    case "CourseOutcomes3":
+                    case "CourseOutcomes4":
+                    case "CourseOutcomes5":
+                    case "CourseOutcomes6":
+                    case "RBT1":
+                    case "RBT2":
+                    case "RBT3":
+                    case "RBT4":
+                    case "RBT5":
+                    case "RBT6":
+                        navigator.ReplaceBookmarkContent(rowData[bookmark.Name.Remove(bookmark.Name.Length - 1, 1)].Split("[")[Convert.ToInt32(bookmark.Name.Substring(bookmark.Name.Length - 1))], true);
+                        break;
+                    default:
+                        navigator.ReplaceBookmarkContent(rowData[bookmark.Name], true);
+                        break;
+                }
+                
             }
 
             string updatedFilePath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), "UpdatedSyllabusDocument.docx");
@@ -580,6 +614,17 @@ namespace SKCE.Examination.Services.QPSettings
                                 QPDocumentId = u.QPDocumentId,
                                 IsQPOnly = u.IsQPOnly,
                             }).ToList();
+                    var syllabusDocument = _context.CourseSyllabusDocuments.FirstOrDefault(d => d.CourseId == qPTemplate.CourseId);
+                    if (syllabusDocument != null)
+                    {
+                        qPTemplate.CourseSyllabusDocumentId = syllabusDocument.DocumentId;
+                        qPTemplate.CourseSyllabusDocumentName = documents.FirstOrDefault(di => di.DocumentId == syllabusDocument.DocumentId)?.Name ?? string.Empty;
+                        qPTemplate.CourseSyllabusDocumentUrl = documents.FirstOrDefault(di => di.DocumentId == syllabusDocument.DocumentId)?.Url ?? string.Empty;
+                    }
+                    else
+                    {
+                        await ProcessExcelAndGeneratePdfAsync(qPTemplate);
+                    }
                     foreach (var userTemplate in userQPGenerateTemplates)
                     {
                         userTemplate.UserName = users.FirstOrDefault(us => us.UserId == userTemplate.UserId)?.Name ?? string.Empty;

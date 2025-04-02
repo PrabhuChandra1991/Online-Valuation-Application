@@ -303,7 +303,7 @@ namespace SKCE.Examination.Services.QPSettings
                     case "RBT4":
                     case "RBT5":
                     case "RBT6":
-                        navigator.ReplaceBookmarkContent(rowData[bookmark.Name.Remove(bookmark.Name.Length - 1, 1)].Split("[")[Convert.ToInt32(bookmark.Name.Substring(bookmark.Name.Length - 1))], true);
+                        navigator.ReplaceBookmarkContent(rowData[bookmark.Name.Remove(bookmark.Name.Length - 1, 1)].Split("[")[Convert.ToInt32(bookmark.Name.Substring(bookmark.Name.Length - 1))].Replace("]",""), true);
                         break;
                     default:
                         navigator.ReplaceBookmarkContent(rowData[bookmark.Name], true);

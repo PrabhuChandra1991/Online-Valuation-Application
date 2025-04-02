@@ -15,16 +15,16 @@ xmlns="http://www.w3.org/TR/REC-html40">
   <o:Author>Venkatesha KM</o:Author>
   <o:Template>Normal</o:Template>
   <o:LastAuthor>Venkatesha KM</o:LastAuthor>
-  <o:Revision>14</o:Revision>
-  <o:TotalTime>235</o:TotalTime>
+  <o:Revision>23</o:Revision>
+  <o:TotalTime>246</o:TotalTime>
   <o:Created>2025-04-02T14:04:00Z</o:Created>
-  <o:LastSaved>2025-04-02T20:54:00Z</o:LastSaved>
+  <o:LastSaved>2025-04-02T21:53:00Z</o:LastSaved>
   <o:Pages>2</o:Pages>
-  <o:Words>415</o:Words>
-  <o:Characters>2367</o:Characters>
-  <o:Lines>19</o:Lines>
-  <o:Paragraphs>5</o:Paragraphs>
-  <o:CharactersWithSpaces>2777</o:CharactersWithSpaces>
+  <o:Words>128</o:Words>
+  <o:Characters>730</o:Characters>
+  <o:Lines>6</o:Lines>
+  <o:Paragraphs>1</o:Paragraphs>
+  <o:CharactersWithSpaces>857</o:CharactersWithSpaces>
   <o:Version>16.00</o:Version>
  </o:DocumentProperties>
  <o:OfficeDocumentSettings>
@@ -683,9 +683,6 @@ p.msonormal0, li.msonormal0, div.msonormal0
 span.SpellE
 	{mso-style-name:"";
 	mso-spl-e:yes;}
-span.GramE
-	{mso-style-name:"";
-	mso-gram-e:yes;}
 .MsoChpDefault
 	{mso-style-type:export-only;
 	mso-default-props:yes;
@@ -737,15 +734,15 @@ div.WordSection1
  1184;mso-padding-alt:0in 5.4pt 0in 5.4pt'>
  <tr style='mso-yfti-irow:0;mso-yfti-firstrow:yes'>
   <td width="15%" style='width:15.0%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
-  <p class=MsoNormal><a name=CourseCode><span style='mso-fareast-font-family:
-  "Times New Roman"'><span style='mso-spacerun:yes'> </span></span></a><span
-  style='mso-fareast-font-family:"Times New Roman"'><o:p></o:p></span></p>
+  <p class=MsoNormal><b><span style='mso-fareast-font-family:"Times New Roman"'><span
+  style='mso-spacerun:yes'> </span><a name=CourseCode></a><span class=SpellE><span
+  style='mso-bookmark:CourseCode'>CourseCode</span></span><o:p></o:p></span></b></p>
   </td>
   <td width="70%" style='width:70.0%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
-  <p class=MsoNormal align=center style='text-align:center'><a name=CourseName><span
-  style='mso-fareast-font-family:"Times New Roman"'><span
-  style='mso-spacerun:yes'> </span></span></a><span style='mso-fareast-font-family:
-  "Times New Roman"'><o:p></o:p></span></p>
+  <p class=MsoNormal align=center style='text-align:center'><a name=CourseName></a><span
+  class=SpellE><span style='mso-bookmark:CourseName'><b><span style='mso-fareast-font-family:
+  "Times New Roman"'>CourseName</span></b></span></span><b><span
+  style='mso-fareast-font-family:"Times New Roman"'> <o:p></o:p></span></b></p>
   </td>
   <td width="15%" style='width:15.0%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'
   ">
@@ -756,9 +753,8 @@ div.WordSection1
  <tr style='mso-yfti-irow:1'>
   <td colspan=3 style='border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
   <p class=MsoNormal><b><span style='mso-fareast-font-family:"Times New Roman"'>Nature
-  of the Course:<a name=NatureoftheCourse> <span
-  style='mso-spacerun:yes'> </span></a></span></b><span style='mso-fareast-font-family:
-  "Times New Roman"'><o:p></o:p></span></p>
+  of the Course:<a name=NatureoftheCourse><span style='mso-spacerun:yes'> 
+  </span></a></span></b><span style='mso-fareast-font-family:"Times New Roman"'><o:p></o:p></span></p>
   </td>
  </tr>
  <tr style='mso-yfti-irow:2'>
@@ -944,24 +940,20 @@ display:none;mso-hide:all'><o:p>&nbsp;</o:p></span></p>
   padding:.75pt .75pt .75pt .75pt'>
   <p class=MsoNormal><b><span style='mso-fareast-font-family:"Times New Roman"'>Module
   1: </span></b><span style='mso-fareast-font-family:"Times New Roman"'><br>
-  Foundations of organizational <span class=SpellE>Behaviour</span> <o:p></o:p></span></p>
+  <a name=CourseModule1>CourseModule1</a><o:p></o:p></span></p>
   </td>
   <td width="20%" style='width:20.0%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
-  <p class=MsoNormal><b><span style='mso-fareast-font-family:"Times New Roman"'>9
-  <span class=SpellE>Hrs</span></span></b><span style='mso-fareast-font-family:
-  "Times New Roman"'><o:p></o:p></span></p>
+  <p class=MsoNormal><a name=CourseHours1><b><span style='mso-fareast-font-family:
+  "Times New Roman"'>CourseHours1</span></b></a><b><span style='mso-fareast-font-family:
+  "Times New Roman"'>Hrs</span></b><span style='mso-fareast-font-family:"Times New Roman"'><o:p></o:p></span></p>
   </td>
  </tr>
  <tr style='mso-yfti-irow:2'>
   <td width="100%" colspan=3 style='width:100.0%;border:solid black 1.5pt;
   padding:.75pt .75pt .75pt .75pt'>
-  <p class=MsoNormal><span class=SpellE><span style='mso-fareast-font-family:
-  "Times New Roman"'>Organisational</span></span><span style='mso-fareast-font-family:
-  "Times New Roman"'> <span class=SpellE>Behaviour</span>- OB Concept - Nature
-  and Theoretical frameworks - Disciplines contributing to the field of OB -
-  Historical Background- Hawthorne Studies - Psychological foundations - Models
-  of <span class=SpellE>Organisational</span> <span class=SpellE>Behaviour</span>
-  - Ethics and <span class=SpellE>Organisational</span> <span class=SpellE>Behaviour</span>.<o:p></o:p></span></p>
+  <p class=MsoNormal><a name=CourseContent1><span style='mso-fareast-font-family:
+  "Times New Roman"'>CourseContent1</span></a><span style='mso-fareast-font-family:
+  "Times New Roman"'><o:p></o:p></span></p>
   </td>
  </tr>
  <tr style='mso-yfti-irow:3'>
@@ -969,50 +961,43 @@ display:none;mso-hide:all'><o:p>&nbsp;</o:p></span></p>
   padding:.75pt .75pt .75pt .75pt'>
   <p class=MsoNormal><b><span style='mso-fareast-font-family:"Times New Roman"'>Module
   2: </span></b><span style='mso-fareast-font-family:"Times New Roman"'><br>
-  Individual <span class=SpellE>Behavioural</span> Concepts<o:p></o:p></span></p>
+  <a name=CourseModule2>CourseModule2</a><o:p></o:p></span></p>
   </td>
   <td width="20%" style='width:20.0%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
-  <p class=MsoNormal><b><span style='mso-fareast-font-family:"Times New Roman"'>8
-  <span class=SpellE>Hrs</span></span></b><span style='mso-fareast-font-family:
-  "Times New Roman"'><o:p></o:p></span></p>
+  <p class=MsoNormal><a name=CourseHours2><b><span style='mso-fareast-font-family:
+  "Times New Roman"'>CourseHours2</span></b></a><b><span style='mso-fareast-font-family:
+  "Times New Roman"'>Hrs</span></b><span style='mso-fareast-font-family:"Times New Roman"'><o:p></o:p></span></p>
   </td>
  </tr>
  <tr style='mso-yfti-irow:4'>
   <td width="100%" colspan=3 style='width:100.0%;border:solid black 1.5pt;
   padding:.75pt .75pt .75pt .75pt'>
-  <p class=MsoNormal><span style='mso-fareast-font-family:"Times New Roman"'>Personality-
-  Learning - Values and Attitudes â<span class=GramE>€“ Perception</span>-
-  Learning- <span class=SpellE>Behaviourist</span>- Cognitive and social
-  learning- Stress at work - <span class=SpellE>Managementâ</span>€™s
-  assumptions about people- <span class=SpellE>McGregorâ</span>€™s Theory X and
-  Theory Y; Chris Argyris <span class=SpellE>Behaviour</span> Patterns.
-  Motivation - <span class=SpellE>Maslowâ</span>€™s Need Hierarchy, <span
-  class=SpellE>Herzbergâ</span>€™s Two Factors Theory - Transactional Analysis <o:p></o:p></span></p>
+  <p class=MsoNormal><a name=CourseContent2><span style='mso-fareast-font-family:
+  "Times New Roman"'>CourseContent2</span></a><span style='mso-fareast-font-family:
+  "Times New Roman"'><o:p></o:p></span></p>
   </td>
  </tr>
  <tr style='mso-yfti-irow:5'>
   <td width="80%" colspan=2 style='width:80.0%;border:solid black 1.5pt;
   padding:.75pt .75pt .75pt .75pt'>
   <p class=MsoNormal><b><span style='mso-fareast-font-family:"Times New Roman"'>Module
-  3: </span></b><span style='mso-fareast-font-family:"Times New Roman"'><br>
-  Group Dynamics and Teams Management<o:p></o:p></span></p>
+  3: </span></b><a name=CourseModule3></a><span style='mso-fareast-font-family:
+  "Times New Roman"'><br>
+  CourseModule3<o:p></o:p></span></p>
   </td>
   <td width="20%" style='width:20.0%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
-  <p class=MsoNormal><b><span style='mso-fareast-font-family:"Times New Roman"'>9
-  <span class=SpellE>Hrs</span></span></b><span style='mso-fareast-font-family:
-  "Times New Roman"'><o:p></o:p></span></p>
+  <p class=MsoNormal><a name=CourseHours3><b><span style='mso-fareast-font-family:
+  "Times New Roman"'>CourseHours3 </span></b></a><span class=SpellE><b><span
+  style='mso-fareast-font-family:"Times New Roman"'>Hrs</span></b></span><span
+  style='mso-fareast-font-family:"Times New Roman"'><o:p></o:p></span></p>
   </td>
  </tr>
  <tr style='mso-yfti-irow:6'>
   <td width="100%" colspan=3 style='width:100.0%;border:solid black 1.5pt;
   padding:.75pt .75pt .75pt .75pt'>
-  <p class=MsoNormal><span style='mso-fareast-font-family:"Times New Roman"'>Organizational
-  Structure and Design - Strategic Organizational <span class=SpellE>Behaviour</span>
-  - Group Dynamics- Cohesiveness and Productivity- Management of Dysfunctional
-  groups- Group Decision Making- <span class=SpellE>Organisational</span> Politics-
-  Sources- Patterns- Levels and types of conflict-Traditional and modern
-  approaches to conflict - Functional and dysfunctional conflicts- Resolution
-  of conflict.<o:p></o:p></span></p>
+  <p class=MsoNormal><a name=CourseContent3><span style='mso-fareast-font-family:
+  "Times New Roman"'>CourseContent3</span></a><span style='mso-fareast-font-family:
+  "Times New Roman"'><o:p></o:p></span></p>
   </td>
  </tr>
  <tr style='mso-yfti-irow:7'>
@@ -1020,23 +1005,21 @@ display:none;mso-hide:all'><o:p>&nbsp;</o:p></span></p>
   padding:.75pt .75pt .75pt .75pt'>
   <p class=MsoNormal><b><span style='mso-fareast-font-family:"Times New Roman"'>Module
   4: </span></b><span style='mso-fareast-font-family:"Times New Roman"'><br>
-  Leadership and Culture<o:p></o:p></span></p>
+  <a name=CourseModule4>CourseModule4</a><o:p></o:p></span></p>
   </td>
   <td width="20%" style='width:20.0%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
-  <p class=MsoNormal><b><span style='mso-fareast-font-family:"Times New Roman"'>10
-  <span class=SpellE>Hrs</span></span></b><span style='mso-fareast-font-family:
-  "Times New Roman"'><o:p></o:p></span></p>
+  <p class=MsoNormal><a name=CourseHours4><b><span style='mso-fareast-font-family:
+  "Times New Roman"'>CourseHours4 </span></b></a><span class=SpellE><b><span
+  style='mso-fareast-font-family:"Times New Roman"'>Hrs</span></b></span><span
+  style='mso-fareast-font-family:"Times New Roman"'><o:p></o:p></span></p>
   </td>
  </tr>
  <tr style='mso-yfti-irow:8'>
   <td width="100%" colspan=3 style='width:100.0%;border:solid black 1.5pt;
   padding:.75pt .75pt .75pt .75pt'>
-  <p class=MsoNormal><span style='mso-fareast-font-family:"Times New Roman"'>Leadership-
-  Concept and Styles; <span class=SpellE>Fielderâ</span>€™s Contingency Model; <span
-  class=SpellE>Houseâ</span>€™s Path -Goal Theory; Leadership Effectiveness - <span
-  class=SpellE>Organisational</span> Climate- Concept - Determinants and
-  OCTAPACE model - <span class=SpellE>Organisation</span> Culture- Concept-
-  Forming - Sustaining and Changing a Culture<o:p></o:p></span></p>
+  <p class=MsoNormal><a name=CourseContent4><span style='mso-fareast-font-family:
+  "Times New Roman"'>CourseContent4</span></a><span style='mso-fareast-font-family:
+  "Times New Roman"'><o:p></o:p></span></p>
   </td>
  </tr>
  <tr style='mso-yfti-irow:9'>
@@ -1044,23 +1027,21 @@ display:none;mso-hide:all'><o:p>&nbsp;</o:p></span></p>
   padding:.75pt .75pt .75pt .75pt'>
   <p class=MsoNormal><b><span style='mso-fareast-font-family:"Times New Roman"'>Module
   5: </span></b><span style='mso-fareast-font-family:"Times New Roman"'><br>
-  <span class=SpellE>Organisational</span> Change and Development<o:p></o:p></span></p>
+  <a name=CourseModule5>CourseModule5</a><o:p></o:p></span></p>
   </td>
   <td width="20%" style='width:20.0%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
-  <p class=MsoNormal><b><span style='mso-fareast-font-family:"Times New Roman"'>9
-  <span class=SpellE>Hrs</span></span></b><span style='mso-fareast-font-family:
-  "Times New Roman"'><o:p></o:p></span></p>
+  <p class=MsoNormal><a name=CourseHours5><b><span style='mso-fareast-font-family:
+  "Times New Roman"'>CourseHours5</span></b></a><b><span style='mso-fareast-font-family:
+  "Times New Roman"'> <span class=SpellE>Hrs</span></span></b><span
+  style='mso-fareast-font-family:"Times New Roman"'><o:p></o:p></span></p>
   </td>
  </tr>
  <tr style='mso-yfti-irow:10'>
   <td width="100%" colspan=3 style='width:100.0%;border:solid black 1.5pt;
   padding:.75pt .75pt .75pt .75pt'>
-  <p class=MsoNormal><span style='mso-fareast-font-family:"Times New Roman"'>Nature
-  of Change â<span class=GramE>€“ Levels</span> of change â€“ Forces of Change
-  in organization -<span class=SpellE>Organisational</span> change- Resistance
-  and Management â€“ Organizational Development - Organizational Development
-  Interventions - Managerial Implications- Creativity and Innovation in
-  Organizations - Power and Politics in Organizations <o:p></o:p></span></p>
+  <p class=MsoNormal><a name=CourseContent5><span style='mso-fareast-font-family:
+  "Times New Roman"'>CourseContent5</span></a><span style='mso-fareast-font-family:
+  "Times New Roman"'><o:p></o:p></span></p>
   </td>
  </tr>
  <tr style='mso-yfti-irow:11'>
@@ -1092,9 +1073,9 @@ display:none;mso-hide:all'><o:p>&nbsp;</o:p></span></p>
   </td>
   <td width="90%" colspan=2 style='width:90.0%;border:solid black 1.5pt;
   padding:.75pt .75pt .75pt .75pt'>
-  <p class=MsoNormal><span style='mso-fareast-font-family:"Times New Roman"'>L.M
-  Prasad, Principles and Practice of Management,10th Edition, Sultan and
-  Chand,2020<o:p></o:p></span></p>
+  <p class=MsoNormal><a name=ReferenceBook1><span style='mso-fareast-font-family:
+  "Times New Roman"'>ReferenceBook1</span></a><span style='mso-fareast-font-family:
+  "Times New Roman"'><o:p></o:p></span></p>
   </td>
  </tr>
  <tr style='mso-yfti-irow:15'>
@@ -1103,10 +1084,9 @@ display:none;mso-hide:all'><o:p>&nbsp;</o:p></span></p>
   </td>
   <td width="90%" colspan=2 style='width:90.0%;border:solid black 1.5pt;
   padding:.75pt .75pt .75pt .75pt'>
-  <p class=MsoNormal><span style='mso-fareast-font-family:"Times New Roman"'>Luthans,
-  F., Luthans, B.C &amp; Luthans, K.W. Organizational <span class=SpellE>behaviour</span>:
-  An <span class=GramE>evidence based</span> approach. 13th Edition.
-  Information Age Publishing, Incorporated,2015<o:p></o:p></span></p>
+  <p class=MsoNormal><a name=ReferenceBook2><span style='mso-fareast-font-family:
+  "Times New Roman"'>ReferenceBook2</span></a><span style='mso-fareast-font-family:
+  "Times New Roman"'><o:p></o:p></span></p>
   </td>
  </tr>
  <tr style='mso-yfti-irow:16'>
@@ -1115,9 +1095,9 @@ display:none;mso-hide:all'><o:p>&nbsp;</o:p></span></p>
   </td>
   <td width="90%" colspan=2 style='width:90.0%;border:solid black 1.5pt;
   padding:.75pt .75pt .75pt .75pt'>
-  <p class=MsoNormal><span style='mso-fareast-font-family:"Times New Roman"'>Udai
-  Pareek. Understanding Organizational Behavior. (Revised and updated by Sushma
-  Khanna). Oxford University Press.2012<o:p></o:p></span></p>
+  <p class=MsoNormal><a name=ReferenceBook3><span style='mso-fareast-font-family:
+  "Times New Roman"'>ReferenceBook3</span></a><span style='mso-fareast-font-family:
+  "Times New Roman"'><o:p></o:p></span></p>
   </td>
  </tr>
  <tr style='mso-yfti-irow:17;mso-yfti-lastrow:yes'>
@@ -1126,16 +1106,16 @@ display:none;mso-hide:all'><o:p>&nbsp;</o:p></span></p>
   </td>
   <td width="90%" colspan=2 style='width:90.0%;border:solid black 1.5pt;
   padding:.75pt .75pt .75pt .75pt'>
-  <p class=MsoNormal><span style='mso-fareast-font-family:"Times New Roman"'>Angelo
-  Kinicki, Mel Fugate, Organizational Behavior: A Practical, Problem-solving
-  Approach,2nd Edition, McGraw-Hill College<o:p></o:p></span></p>
+  <p class=MsoNormal><a name=ReferenceBook4><span style='mso-fareast-font-family:
+  "Times New Roman"'>ReferenceBook4</span></a><span style='mso-fareast-font-family:
+  "Times New Roman"'><o:p></o:p></span></p>
   </td>
  </tr>
  <![if !supportMisalignedColumns]>
  <tr height=0>
-  <td width=58 style='border:none'></td>
-  <td width=383 style='border:none'></td>
-  <td width=112 style='border:none'></td>
+  <td width=46 style='border:none'></td>
+  <td width=372 style='border:none'></td>
+  <td width=134 style='border:none'></td>
  </tr>
  <![endif]>
 </table>

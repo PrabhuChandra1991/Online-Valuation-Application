@@ -244,49 +244,32 @@ public class QPDataImportHelper
     {
         var documentMissingCourses = "Syllabus documents are missing for total ";
         var courses = _dbContext.Courses.ToList();
-        var courseSyllabusDocuments = _dbContext.CourseSyllabusDocuments.ToList();
+        var courseSyllabusMasters = _dbContext.courseSyllabusMasters.ToList();
         List<string> missingCourses = new List<string>();
         files.ForEach(file =>
         {
-            var courseId = courses.FirstOrDefault(c => file.FileName.Contains(c.Code))?.CourseId;
-            if (courseId != null)
-            {
                 var documentId = _azureBlobStorageHelper.UploadFileAsync(file.OpenReadStream(), file.FileName, file.ContentType);
-                if (!courseSyllabusDocuments.Any(cs => cs.CourseId == courseId.Value))
+            if (!courseSyllabusMasters.Any())
+            {
+                var courseSyllabusMaster = new CourseSyllabusMaster
                 {
-                    var courseSyllabusDocument = new CourseSyllabusDocument
-                    {
-                        CourseId = courseId.Value,
-                        DocumentId = documentId.Result,
-                    };
-                    AuditHelper.SetAuditPropertiesForInsert(courseSyllabusDocument, 1);
-                    _dbContext.CourseSyllabusDocuments.AddAsync(courseSyllabusDocument);
-                }
-                else
-                {
-                    var existingCourseSyllabusDocument = _dbContext.CourseSyllabusDocuments.FirstOrDefault(cs => cs.CourseId == courseId.Value);
-                    if (existingCourseSyllabusDocument != null)
-                    {
-                        existingCourseSyllabusDocument.DocumentId = documentId.Result;
-                        AuditHelper.SetAuditPropertiesForUpdate(existingCourseSyllabusDocument, 1);
-                    }
-                }
+                    DocumentId = documentId.Result,
+                };
+                AuditHelper.SetAuditPropertiesForInsert(courseSyllabusMaster, 1);
+                _dbContext.courseSyllabusMasters.AddAsync(courseSyllabusMaster);
             }
             else
-                missingCourses.Add(file.FileName);
+            {
+                var existingCourseSyllabusDocument = _dbContext.courseSyllabusMasters.FirstOrDefault();
+                if (existingCourseSyllabusDocument != null)
+                {
+                    existingCourseSyllabusDocument.DocumentId = documentId.Result;
+                    AuditHelper.SetAuditPropertiesForUpdate(existingCourseSyllabusDocument, 1);
+                }
+            }
         });
         await _dbContext.SaveChangesAsync();
-       
-        List<string> courseCods = new List<string>();
-        _dbContext.Courses.ToList().ForEach(c =>
-         {
-             if (!_dbContext.CourseSyllabusDocuments.Any(cs => cs.CourseId == c.CourseId))
-             {
-                 courseCods.Add(c.Code);
-             }
-         });
-        if(missingCourses.Count > 0) return ($"Course is missing for uploaded files {string.Join(", ", missingCourses)} and Syllabus documents are missing for total {courseCods.Count} courses and course cods are {string.Join(", ", courseCods)}.");
-        return ($"Syllabus documents are missing for total {courseCods.Count} courses and course cods are {string.Join(", ", courseCods)}.");
+        return ("");
     }
     public async Task<bool> ImportQPDocuments(List<IFormFile> files, List<QPDocumentValidationVM> qPDocumentValidationVMs)
     {

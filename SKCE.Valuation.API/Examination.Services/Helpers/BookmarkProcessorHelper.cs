@@ -10,9 +10,9 @@ using Spire.Doc;
 using Document = Spire.Doc.Document;
 using Paragraph = Spire.Doc.Documents.Paragraph;
 using Syncfusion.DocIO.DLS;
-using Syncfusion.DocIO;
 using Spire.Doc.Collections;
 using Body = Spire.Doc.Body;
+using Syncfusion.DocIO;
 
 namespace SKCE.Examination.Services.Helpers
 {
@@ -134,7 +134,7 @@ namespace SKCE.Examination.Services.Helpers
         static void ConvertToPdfBySyncfusion(string docxPath, string pdfPath)
         {
             // Load the Word document
-            WordDocument document = new WordDocument(docxPath, FormatType.Docx);
+            Syncfusion.DocIO.DLS.WordDocument document = new Syncfusion.DocIO.DLS.WordDocument(docxPath, FormatType.Docx);
             //// Convert Word to PDF
             Syncfusion.Pdf.PdfDocument pdfDocument = new Syncfusion.Pdf.PdfDocument();
             Syncfusion.DocIORenderer.DocIORenderer renderer = new Syncfusion.DocIORenderer.DocIORenderer();

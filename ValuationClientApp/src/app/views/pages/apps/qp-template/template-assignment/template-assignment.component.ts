@@ -283,8 +283,8 @@ getAssignmentForTemplateId(templateId: any){
         examMonth:  response.examMonth,
         examType: response.examType,
         semester: response.semester,
-        institutionName: response.institutions[0]?.institutionName || '',
-        studentCount:  response.institutions[0]?.studentCount || '',
+        institutionName: response?.institutions?response.institutions[0].institutionName : '',
+        studentCount:  response?.institutions?response.institutions[0]?.studentCount :response.studentCount,
 
       });
 
@@ -484,6 +484,18 @@ isUserAlreadySelected(qpAssignedUsers: any[], userId: number, currentIndex: numb
       this.modalRef.close();
     }
   }
+
+  clearSelection(docIndex: number, userIndex: number) {
+    const qpAssignedUsers = this.templateAssignmentForm.get('qpDocuments') as FormArray;
+    const userControl = qpAssignedUsers.at(docIndex).get('qpAssignedUsers') as FormArray;
+  
+    // Reset userId dropdown & checkbox
+    userControl.at(userIndex).patchValue({
+      userId: '',
+      isQPOnly: false
+    });
+  }
+  
 
   handleFormSubmit(assignmentData: any) {
     if (this.isEditMode) {

@@ -234,7 +234,7 @@
             <div formArrayName="qpAssignedUsers">
               <div class="row" *ngFor="let assignedUser of qpDocument.qpAssignedUsers; let userIndex = index" [formGroupName]="userIndex">
                 <!-- Expert Selection -->
-                <div class="col-sm-8">
+                <div class="col-sm-6">
                   <div class="mb-4">
                     <label class="form-label">Expert - {{ userIndex + 1 }}</label>
                     <select class="form-select" formControlName="userId"
@@ -253,6 +253,11 @@
                   <mat-checkbox class="checkbox" formControlName="isQPOnly" (change)="updateIsQPOnly(docIndex, userIndex, $event.checked)">
                     Is only for QP?
                   </mat-checkbox>
+                </div>
+                <div class="col-sm-2 d-flex align-items-center">
+                  <button class="btn btn-sm btn-outline-danger" (click)="clearSelection(docIndex, userIndex)">
+                    Clear
+                  </button>
                 </div>
 
               </div>

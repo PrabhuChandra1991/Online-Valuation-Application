@@ -20,6 +20,8 @@ using System.Buffers;
 using Syncfusion.DocIO.DLS;
 using Syncfusion.DocIO;
 using DocumentFormat.OpenXml.Bibliography;
+using DocumentFormat.OpenXml.Presentation;
+using Text = DocumentFormat.OpenXml.Presentation.Text;
 namespace SKCE.Examination.Services.QPSettings
 {
     public class QpTemplateService 
@@ -300,6 +302,30 @@ namespace SKCE.Examination.Services.QPSettings
                     case "RBT4":
                     case "RBT5":
                     case "RBT6":
+                    case "CourseModule1":
+                    case "CourseModule2":
+                    case "CourseModule3":
+                    case "CourseModule4":
+                    case "CourseModule5":
+                    case "CourseModule6":
+                    case "CourseHours1":
+                    case "CourseHours2":
+                    case "CourseHours3":
+                    case "CourseHours4":
+                    case "CourseHours5":
+                    case "CourseHours6":
+                    case "CourseContent1":
+                    case "CourseContent2":
+                    case "CourseContent3":
+                    case "CourseContent4":
+                    case "CourseContent5":
+                    case "CourseContent6":
+                    case "ReferenceBook1":
+                    case "ReferenceBook2":
+                    case "ReferenceBook3":
+                    case "ReferenceBook4":
+                    case "ReferenceBook5":
+                    case "ReferenceBook6":
                         navigator.ReplaceBookmarkContent(rowData[bookmark.Name.Remove(bookmark.Name.Length - 1, 1)].Split("[")[Convert.ToInt32(bookmark.Name.Substring(bookmark.Name.Length - 1))].Replace("]",""), true);
                         break;
                     default:
@@ -326,7 +352,7 @@ namespace SKCE.Examination.Services.QPSettings
             {
                 var body = doc.MainDocumentPart.Document.Body;
 
-                foreach (var textElement in body.Descendants<Text>().ToList())
+                foreach (var textElement in body.Descendants<DocumentFormat.OpenXml.Wordprocessing.Text>().ToList())
                 {
                     if (textElement.Text.Contains(textToRemove))
                     {

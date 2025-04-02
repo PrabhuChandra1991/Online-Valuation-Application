@@ -15,16 +15,16 @@ xmlns="http://www.w3.org/TR/REC-html40">
   <o:Author>Venkatesha KM</o:Author>
   <o:Template>Normal</o:Template>
   <o:LastAuthor>Venkatesha KM</o:LastAuthor>
-  <o:Revision>23</o:Revision>
-  <o:TotalTime>246</o:TotalTime>
+  <o:Revision>27</o:Revision>
+  <o:TotalTime>247</o:TotalTime>
   <o:Created>2025-04-02T14:04:00Z</o:Created>
-  <o:LastSaved>2025-04-02T21:53:00Z</o:LastSaved>
+  <o:LastSaved>2025-04-02T22:11:00Z</o:LastSaved>
   <o:Pages>2</o:Pages>
-  <o:Words>128</o:Words>
-  <o:Characters>730</o:Characters>
-  <o:Lines>6</o:Lines>
+  <o:Words>125</o:Words>
+  <o:Characters>714</o:Characters>
+  <o:Lines>5</o:Lines>
   <o:Paragraphs>1</o:Paragraphs>
-  <o:CharactersWithSpaces>857</o:CharactersWithSpaces>
+  <o:CharactersWithSpaces>838</o:CharactersWithSpaces>
   <o:Version>16.00</o:Version>
  </o:DocumentProperties>
  <o:OfficeDocumentSettings>
@@ -735,14 +735,13 @@ div.WordSection1
  <tr style='mso-yfti-irow:0;mso-yfti-firstrow:yes'>
   <td width="15%" style='width:15.0%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
   <p class=MsoNormal><b><span style='mso-fareast-font-family:"Times New Roman"'><span
-  style='mso-spacerun:yes'> </span><a name=CourseCode></a><span class=SpellE><span
-  style='mso-bookmark:CourseCode'>CourseCode</span></span><o:p></o:p></span></b></p>
+  style='mso-spacerun:yes'>  </span><a name=CourseCode></a><o:p></o:p></span></b></p>
   </td>
   <td width="70%" style='width:70.0%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
-  <p class=MsoNormal align=center style='text-align:center'><a name=CourseName></a><span
-  class=SpellE><span style='mso-bookmark:CourseName'><b><span style='mso-fareast-font-family:
-  "Times New Roman"'>CourseName</span></b></span></span><b><span
-  style='mso-fareast-font-family:"Times New Roman"'> <o:p></o:p></span></b></p>
+  <p class=MsoNormal align=center style='text-align:center'><a name=CourseName><b><span
+  style='mso-fareast-font-family:"Times New Roman"'><span
+  style='mso-spacerun:yes'> </span></span></b></a><b><span style='mso-fareast-font-family:
+  "Times New Roman"'><o:p></o:p></span></b></p>
   </td>
   <td width="15%" style='width:15.0%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'
   ">

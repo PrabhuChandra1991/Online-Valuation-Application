@@ -1,17 +1,18 @@
-﻿using Aspose.Words;
-using System.Drawing.Printing;
+﻿using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Wordprocessing;
 using SKCE.Examination.Models.DbModels.QPSettings;
 using Microsoft.Extensions.Configuration;
 using SKCE.Examination.Models.DbModels.Common;
-using Document = Aspose.Words.Document;
 using System.Diagnostics;
 using System.Text;
-using MigraDoc.Rendering;
-using PdfSharp.Pdf.IO;
-using PdfSharp.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Words.Tables;
-using Aspose.Words.Drawing;
+using Syncfusion.Licensing;
+using Spire.Doc;
+using Document = Spire.Doc.Document;
+using Paragraph = Spire.Doc.Documents.Paragraph;
+using Syncfusion.DocIO.DLS;
+using Syncfusion.DocIO;
+using Spire.Doc.Collections;
+using Body = Spire.Doc.Body;
 
 namespace SKCE.Examination.Services.Helpers
 {
@@ -30,218 +31,160 @@ namespace SKCE.Examination.Services.Helpers
             printerName = configuration["Print:PrinterName"] ?? throw new ArgumentNullException(nameof(configuration), "PrinterName is not configured.");
         }
         // Processes bookmarks in a source document and prints the modified document
-        public async Task ProcessBookmarksAndPrint(QPTemplate qPTemplate, QPTemplateInstitution qPTemplateInstitution, string inputDocPath, string documentPathToPrint, bool isForPrint)
+        //public async Task ProcessBookmarksAndPrint(QPTemplate qPTemplate, QPTemplateInstitution qPTemplateInstitution, string inputDocPath, string documentPathToPrint, bool isForPrint)
+        //{
+        //    try
+        //    {
+        //        //Loading license
+        //        LoadLicense();
+
+        //        int numberOfCopies = 0; // Number of copies to print
+        //        // Load the source document that contains the bookmarks
+        //        Document sourceDoc = await _azureBlobStorageHelper.DownloadWordDocumentFromBlob(inputDocPath);
+
+        //        // Load the template document where bookmarks need to be replaced
+        //        Document templateDoc = await _azureBlobStorageHelper.DownloadWordDocumentFromBlob(documentPathToPrint);
+
+        //        // Iterate through all bookmarks in the source document
+        //        foreach (Spire.Doc.Bookmark bookmark in sourceDoc.Bookmarks)
+        //        {
+        //            string bookmarkName = bookmark.Name;
+        //            string bookmarkHtml = string.Empty;
+
+        //            if (bookmarkName == "PROGRAMME")
+        //            {
+        //                var departmentIds = _context.QPTemplateInstitutionDepartments.Where(q=> q.QPTemplateInstitutionId == qPTemplateInstitution.QPTemplateInstitutionId).Select(q=>q.DepartmentId).ToList();
+        //                if (departmentIds.Any() && departmentIds.Count > 2) { 
+        //                    bookmarkHtml = String.Join(", ", _context.Departments.Where(d => departmentIds.Contains(d.DepartmentId)).Select(d => d.ShortName).ToList());
+        //                }else
+        //                    bookmarkHtml = String.Join(", ", _context.Departments.Where(d => departmentIds.Contains(d.DepartmentId)).Select(d => d.Name).ToList());
+        //            } 
+        //            else if (bookmarkName == "CourseCode")
+        //            {
+        //                bookmarkHtml = _context.Courses.FirstOrDefault(c => c.CourseId == qPTemplate.CourseId)?.Code?? string.Empty;
+        //            }
+        //            else if( bookmarkName == "CourseTitle")
+        //            {
+        //                bookmarkHtml = _context.Courses.FirstOrDefault(c => c.CourseId == qPTemplate.CourseId)?.Name ?? string.Empty;
+        //            }
+        //            else if (bookmarkName == "Semester")
+        //            {
+        //                bookmarkHtml = _context.QPTemplates.FirstOrDefault(c => c.QPTemplateId == qPTemplate.QPTemplateId)?.Semester.ToString() ?? string.Empty;
+        //            }
+        //            else if (bookmarkName == "QPCODE")
+        //            {
+        //                bookmarkHtml = _context.QPTemplates.FirstOrDefault(c => c.QPTemplateId == qPTemplate.QPTemplateId)?.QPCode.ToString() ?? string.Empty;
+        //            }
+        //            else
+        //            {
+        //                // Create a temporary document
+        //                Document tempDoc = new Document();
+
+        //                // Find the same bookmark in the destination document
+        //                Spire.Doc.Bookmark destinationBookmark = templateDoc.Bookmarks.FindByName(bookmarkName);
+        //                if (destinationBookmark != null)
+        //                {
+        //                    Section section = tempDoc.AddSection();
+        //                    Body body = section.Body;
+
+        //                    // Copy content from the original document's bookmark
+        //                    foreach (DocumentObject obj in bookmark.BookmarkStart.OwnerParagraph.OwnerTextBody.ChildObjects)
+        //                    {
+        //                        body.ChildObjects.Add(obj.Clone());
+        //                    }
+
+        //                    // Save the extracted content as an HTML string
+        //                    using (MemoryStream ms = new MemoryStream())
+        //                    {
+        //                        tempDoc.SaveToStream(ms, FileFormat.Html);
+        //                        System.Text.Encoding.UTF8.GetString(ms.ToArray());
+        //                    }
+        //                }
+        //            }
+        //            // Replace bookmark content in the template document
+        //            //ReplaceBookmarkWithHtml(tempDoc, bookmarkName, bookmarkHtml);
+        //        }
+
+        //        var previewdocPath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}.docx", qPTemplate.QPTemplateName, DateTime.Now.ToString("ddMMyyyyhhmmss")));
+        //        templateDoc.SaveToFile(previewdocPath, FileFormat.Docx);
+
+        //        //// Remove evaluation watermark from the output document By OpenXML
+        //        RemoveTextFromDocx(previewdocPath, "Evaluation Warning: The document was created with Spire.Doc for .NET.");
+        //        Console.WriteLine("Bookmarks replaced successfully!");
+
+        //        // Save the modified document as PDF
+        //        var previewPdfPath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}.pdf", qPTemplate.QPTemplateName, DateTime.Now.ToString("ddMMyyyyhhmmss")));
+        //        ConvertToPdfBySyncfusion(previewdocPath, previewPdfPath);
+
+        //        OpenPdfInBrowser(previewPdfPath);
+
+        //        if(!isForPrint) return;
+        //        var documentId = _azureBlobStorageHelper.UploadFileToBlob(outputPdfPath,string.Format("{0}_{1}_{2}_{3}.pdf",qPTemplate.QPTemplateName,qPTemplate.QPCode,qPTemplate.ExamYear,DateTime.UtcNow.ToShortDateString()));
+        //        // Trigger printing
+        //        PrintPdf(outputPdfPath, printerName, numberOfCopies);
+
+        //        Console.WriteLine("Processing and printing completed successfully.");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine("Error: " + ex.Message);
+        //    }
+        //}
+
+        static void ConvertToPdfBySyncfusion(string docxPath, string pdfPath)
         {
-            try
+            // Load the Word document
+            WordDocument document = new WordDocument(docxPath, FormatType.Docx);
+            //// Convert Word to PDF
+            Syncfusion.Pdf.PdfDocument pdfDocument = new Syncfusion.Pdf.PdfDocument();
+            Syncfusion.DocIORenderer.DocIORenderer renderer = new Syncfusion.DocIORenderer.DocIORenderer();
+            pdfDocument = renderer.ConvertToPDF(document);
+            ApplyPdfSecurity(pdfDocument);
+            // Save the PDF file
+            pdfDocument.Save(pdfPath);
+            document.Close();
+            OpenPdfInBrowser(pdfPath);
+            System.Console.WriteLine("DOCX to PDF conversion By Syncfusion completed.");
+        }
+        static void ApplyPdfSecurity(Syncfusion.Pdf.PdfDocument pdfDocument)
+        {
+            // Create security settings
+            Syncfusion.Pdf.Security.PdfSecurity security = pdfDocument.Security;
+
+            //// Set an owner password (optional)
+            //security.OwnerPassword = "Owner@123";
+
+            //// Set a user password (optional, required to open the PDF)
+            //security.UserPassword = "User@123";
+
+            // Disable printing
+            security.Permissions = Syncfusion.Pdf.Security.PdfPermissionsFlags.Print;
+
+            // Disable copy, edit, and extract
+            security.Permissions &= ~(Syncfusion.Pdf.Security.PdfPermissionsFlags.CopyContent | Syncfusion.Pdf.Security.PdfPermissionsFlags.EditContent | Syncfusion.Pdf.Security.PdfPermissionsFlags.AccessibilityCopyContent);
+
+            Console.WriteLine("PDF security applied: No Print, Copy, Edit.");
+        }
+        private void RemoveTextFromDocx(string filePath, string textToRemove)
+        {
+            using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
             {
-                //Loading license
-                LoadLicense();
+                var body = doc.MainDocumentPart.Document.Body;
 
-                int numberOfCopies = 0; // Number of copies to print
-                // Load the source document that contains the bookmarks
-                Document sourceDoc = await _azureBlobStorageHelper.DownloadWordDocumentFromBlob(inputDocPath);
-
-                // Load the template document where bookmarks need to be replaced
-                Document templateDoc = await _azureBlobStorageHelper.DownloadWordDocumentFromBlob(documentPathToPrint);
-
-                // Iterate through all bookmarks in the source document
-                foreach (Aspose.Words.Bookmark bookmark in sourceDoc.Range.Bookmarks)
+                foreach (var textElement in body.Descendants<Text>().ToList())
                 {
-                    string bookmarkName = bookmark.Name;
-                    string bookmarkHtml = string.Empty;
-
-                    if (bookmarkName == "PROGRAMME")
+                    if (textElement.Text.Contains(textToRemove))
                     {
-                        var departmentIds = _context.QPTemplateInstitutionDepartments.Where(q=> q.QPTemplateInstitutionId == qPTemplateInstitution.QPTemplateInstitutionId).Select(q=>q.DepartmentId).ToList();
-                        if (departmentIds.Any() && departmentIds.Count > 2) { 
-                            bookmarkHtml = String.Join(", ", _context.Departments.Where(d => departmentIds.Contains(d.DepartmentId)).Select(d => d.ShortName).ToList());
-                        }else
-                            bookmarkHtml = String.Join(", ", _context.Departments.Where(d => departmentIds.Contains(d.DepartmentId)).Select(d => d.Name).ToList());
-                    } 
-                    else if (bookmarkName == "CourseCode")
-                    {
-                        bookmarkHtml = _context.Courses.FirstOrDefault(c => c.CourseId == qPTemplate.CourseId)?.Code?? string.Empty;
+                        textElement.Text = textElement.Text.Replace(textToRemove, ""); // Remove text
                     }
-                    else if( bookmarkName == "CourseTitle")
-                    {
-                        bookmarkHtml = _context.Courses.FirstOrDefault(c => c.CourseId == qPTemplate.CourseId)?.Name ?? string.Empty;
-                    }
-                    else if (bookmarkName == "Semester")
-                    {
-                        bookmarkHtml = _context.QPTemplates.FirstOrDefault(c => c.QPTemplateId == qPTemplate.QPTemplateId)?.Semester.ToString() ?? string.Empty;
-                    }
-                    else if (bookmarkName == "QPCODE")
-                    {
-                        bookmarkHtml = _context.QPTemplates.FirstOrDefault(c => c.QPTemplateId == qPTemplate.QPTemplateId)?.QPCode.ToString() ?? string.Empty;
-                    }
-                    else
-                    {
-                        Node bookmarkContent = bookmark.BookmarkStart.ParentNode;
-                        if (bookmarkContent != null)
-                        {
-                            //// Extract content inside the bookmark
-                            //Node[] extractedNodes = ExtractContent(bookmark.BookmarkStart, bookmark.BookmarkEnd);
-
-                            //if (extractedNodes != null && extractedNodes.Length > 0)
-                            //{
-                            //    // Convert extracted nodes to HTML string
-                            //    bookmarkHtml = ConvertNodesToHtml(extractedNodes);
-                            //}
-                            bookmarkHtml = ExtractBookmarkContentAsHtml(sourceDoc, bookmarkName);
-                            //bookmarkHtml = ConvertBookmarkRangeToHtml(bookmark.BookmarkStart, bookmark.BookmarkEnd);
-                        }
-                    }
-                    // Replace bookmark content in the template document
-                    ReplaceBookmarkWithHtml(templateDoc, bookmarkName, bookmarkHtml);
                 }
 
-                // Save the modified document as PDF
-                var previewPdfPath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}.pdf", qPTemplate.QPTemplateName, DateTime.Now.ToString("ddMMyyyyhhmmss")));
-                templateDoc.Save(previewPdfPath, SaveFormat.Pdf);
-
-                var securePdfPath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}_Secure.pdf", qPTemplate.QPTemplateName,DateTime.Now.ToString("ddMMyyyyhhmmss")));
-                SecurePdf(previewPdfPath, securePdfPath);
-                OpenPdfInBrowser(securePdfPath);
-
-                if(!isForPrint) return;
-                var documentId = _azureBlobStorageHelper.UploadFileToBlob(outputPdfPath,string.Format("{0}_{1}_{2}_{3}.pdf",qPTemplate.QPTemplateName,qPTemplate.QPCode,qPTemplate.ExamYear,DateTime.UtcNow.ToShortDateString()));
-                // Trigger printing
-                PrintPdf(outputPdfPath, printerName, numberOfCopies);
-
-                Console.WriteLine("Processing and printing completed successfully.");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error: " + ex.Message);
+                doc.MainDocumentPart.Document.Save(); // Save changes
             }
         }
-
         /// <summary>
         /// Extracts text, images, and tables inside a bookmark and converts it to an HTML string.
         /// </summary>
-        public static string ExtractBookmarkContentAsHtml(Document sourceDoc, string bookmarkName)
-        {
-            // Load the Word document
-            Document doc = sourceDoc;
-
-            // Check if the bookmark exists
-            Aspose.Words.Bookmark bookmark = doc.Range.Bookmarks[bookmarkName];
-            if (bookmark == null)
-                throw new Exception($"Bookmark '{bookmarkName}' not found in the document.");
-
-            // Create a new document to extract content
-            Document extractedDoc = new Document();
-            DocumentBuilder builder = new DocumentBuilder(extractedDoc);
-
-            StringBuilder htmlBuilder = new StringBuilder();
-
-            // Loop through all nodes inside the bookmark
-            Node currentNode = bookmark.BookmarkStart;
-            while (currentNode != null && currentNode != bookmark.BookmarkEnd)
-            {
-                Node importedNode = extractedDoc.ImportNode(currentNode, true, ImportFormatMode.KeepSourceFormatting);
-                if (currentNode is Run runtext)
-                {
-                    builder.InsertNode(importedNode);
-                }
-                else if (currentNode is Paragraph paragraph)
-                {
-                    htmlBuilder.Append("<p>");
-                    foreach (Run run in paragraph.Runs)
-                    {
-                        htmlBuilder.Append(run.Text); // Append text content
-                    }
-                    htmlBuilder.Append("</p>");
-                    builder.InsertHtml(htmlBuilder.ToString());
-                }
-                else if (currentNode is Table table)
-                {
-                    htmlBuilder.Append("<table border='1'>");
-                    foreach (Row row in table.Rows)
-                    {
-                        htmlBuilder.Append("<tr>");
-                        foreach (Cell cell in row.Cells)
-                        {
-                            htmlBuilder.Append("<td>").Append(cell.GetText().Trim()).Append("</td>");
-                        }
-                        htmlBuilder.Append("</tr>");
-                    }
-                    htmlBuilder.Append("</table>");
-                    builder.InsertHtml(htmlBuilder.ToString());
-                }
-                else if (currentNode is Shape shape && shape.HasImage)
-                {
-                    // Convert image to Base64 string
-                    MemoryStream imageStream = new MemoryStream();
-                    shape.ImageData.Save(imageStream);
-                    string base64Image = Convert.ToBase64String(imageStream.ToArray());
-
-                    // Generate HTML image tag
-                    string imgTag = $"<img src='data:image/png;base64,{base64Image}' />";
-                    htmlBuilder.Append(imgTag);
-                    builder.InsertHtml(htmlBuilder.ToString());
-                }
-
-                currentNode = currentNode.NextSibling; // Move to the next node
-            }
-
-            Aspose.Words.Saving.HtmlSaveOptions htmlSaveOptions = new Aspose.Words.Saving.HtmlSaveOptions();
-            htmlSaveOptions.ExportImagesAsBase64 = true;
-            htmlSaveOptions.ExportHeadersFootersMode = Aspose.Words.Saving.ExportHeadersFootersMode.PerSection;
-            htmlSaveOptions.SaveFormat = Aspose.Words.SaveFormat.Html;
-            htmlSaveOptions.PrettyFormat = true;
-
-            // Convert the document range to HTML
-            using (MemoryStream ms = new MemoryStream())
-            {
-                extractedDoc.Save(ms, htmlSaveOptions);
-                return Encoding.UTF8.GetString(ms.ToArray());
-            }
-           // return htmlBuilder.ToString();
-        }
-        private static string ConvertBookmarkRangeToHtml(Node startNode, Node endNode)
-        {
-            // Create a temporary document with just the bookmark range
-            Document tempDoc = new Document();
-            DocumentBuilder builder = new DocumentBuilder(tempDoc);
-
-            //Node currentNode = startNode;
-            Node currentNode = startNode.NextSibling;
-            while (currentNode != null && currentNode != endNode)
-            {
-                Node importedNode = tempDoc.ImportNode(currentNode, true, ImportFormatMode.KeepSourceFormatting);
-                if (importedNode != null)
-                {
-                    if (importedNode is Paragraph || importedNode is Table || importedNode is Shape)
-                    {
-                        tempDoc.FirstSection.Body.AppendChild(importedNode);
-                    }else
-                    {
-                        builder.InsertNode(importedNode);
-                        //tempDoc.FirstSection.Body.AppendChild(importedNode);
-                    }
-                }
-                
-                currentNode = currentNode.NextSibling;
-            }
-            Aspose.Words.Saving.HtmlSaveOptions htmlSaveOptions = new Aspose.Words.Saving.HtmlSaveOptions();
-            htmlSaveOptions.ExportImagesAsBase64 = true;
-            htmlSaveOptions.ExportHeadersFootersMode = Aspose.Words.Saving.ExportHeadersFootersMode.PerSection;
-            htmlSaveOptions.SaveFormat = Aspose.Words.SaveFormat.Html;
-            htmlSaveOptions.PrettyFormat = true;
-
-            // Convert the document range to HTML
-            using (MemoryStream ms = new MemoryStream())
-            {
-                tempDoc.Save(ms, htmlSaveOptions);
-                return Encoding.UTF8.GetString(ms.ToArray());
-            }
-        }
-
-        /// <summary>
-        /// Opens the generated PDF in the default web browser.
-        /// </summary>
-        /// <param name="pdfPath">Path to the generated PDF.</param>
         public static void OpenPdfInBrowser(string pdfPath)
         {
             try
@@ -257,80 +200,6 @@ namespace SKCE.Examination.Services.Helpers
                 Console.WriteLine("Error opening PDF: " + ex.Message);
             }
         }
-
-
-        /// <summary>
-        /// Applies security settings to disable printing and saving.
-        /// </summary>
-        public static void SecurePdf(string inputPdfPath, string outputPdfPath)
-        {
-            // Load the PDF document
-            Aspose.Pdf.Document pdfDocument = new (inputPdfPath);
-
-            // Set security privileges
-            DocumentPrivilege privileges = DocumentPrivilege.ForbidAll; // Deny all permissions
-            //privileges.AllowScreenReaders = true; // Allow screen readers if needed
-
-            // Apply security settings
-            PdfFileSecurity fileSecurity = new PdfFileSecurity(pdfDocument);
-            fileSecurity.SetPrivilege(privileges);
-
-            // Save the secured PDF
-            pdfDocument.Save(outputPdfPath);
-
-            Console.WriteLine("Secured PDF created successfully!");
-        }
-
-
-        // Extracts content between bookmark start and end
-        private static Node[] ExtractContent(Node startNode, Node endNode)
-        {
-            var extractedNodes = new System.Collections.Generic.List<Node>();
-            Node currentNode = startNode;
-
-            while (currentNode != null && currentNode != endNode)
-            {
-                extractedNodes.Add(currentNode.Clone(true)); // Clone to preserve formatting
-                currentNode = currentNode.NextSibling;
-            }
-
-            return extractedNodes.ToArray();
-        }
-
-        // Converts extracted nodes to an HTML string
-        private static string ConvertNodesToHtml(Node[] nodes)
-        {
-            if (nodes == null || nodes.Length == 0) return string.Empty;
-
-            // Create a temporary document
-            Document tempDoc = new Document();
-            DocumentBuilder builder = new DocumentBuilder(tempDoc);
-
-            foreach (Node node in nodes)
-            {
-                builder.InsertNode(node.Clone(true));
-            }
-
-            // Convert to HTML
-            using (MemoryStream htmlStream = new MemoryStream())
-            {
-                tempDoc.Save(htmlStream, SaveFormat.Html);
-                return System.Text.Encoding.UTF8.GetString(htmlStream.ToArray());
-            }
-        }
-
-        // Replaces the bookmark content with an HTML string
-        private static void ReplaceBookmarkWithHtml(Document doc, string bookmarkName, string htmlContent)
-        {
-            if (doc.Range.Bookmarks[bookmarkName] != null)
-            {
-                DocumentBuilder builder = new DocumentBuilder(doc);
-                builder.MoveToBookmark(bookmarkName, true, true);
-                builder.InsertHtml(htmlContent);
-            }
-        }
-
-        // Prints the PDF with a specified number of copies
         private static void PrintPdf(string pdfPath, string printerName, int copies)
         {
             try
@@ -375,24 +244,20 @@ namespace SKCE.Examination.Services.Helpers
                 Console.WriteLine("Printing failed: " + ex.Message);
             }
         }
-
         private void LoadLicense() {
-            // For complete examples and data files, please go to https://github.com/aspose-words/Aspose.Words-for-.NET.git.
-            License license = new License();
-
             // This line attempts to set a license from several locations relative to the executable and Aspose.Words.dll.
             // You can also use the additional overload to load a license from a stream, this is useful,
             // for instance, when the license is stored as an embedded resource.
             try
             {
-
-                license.SetLicense(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, asposeLicenseFileName));
+                // Apply Syncfusion License
+                SyncfusionLicenseProvider.RegisterLicense("YOUR_LICENSE_KEY_HERE");
                 Console.WriteLine("License set successfully.");
             }
             catch (Exception e)
             {
                 // We do not ship any license with this example,
-                // visit the Aspose site to obtain either a temporary or permanent license. 
+                // visit the Syn fusion site to obtain either a temporary or permanent license. 
                 Console.WriteLine("\nThere was an error setting the license: " + e.Message);
             }
         }

@@ -21,12 +21,13 @@ namespace SKCE.Examination.Services.ViewModels.QPSettings
         public string ExamType { get; set; }
         public long Semester { get; set; }
         public long StudentCount { get; set; }
-        public string Expert1Name { get; set; }
-        public string Expert1Status { get; set; }
-        public string Expert2Name { get; set; }
-        public string Expert2Status { get; set; }
-        public List<QPTemplateDocumentVM> Documents { get; set; }
-        public List<QPTemplateInstitutionVM> Institutions { get; set; }
+        public long? CourseSyllabusDocumentId { get; set; }
+        public string? CourseSyllabusDocumentName { get; set; }
+        public string? CourseSyllabusDocumentUrl { get; set; }
+        public string? Expert1Name { get; set; }
+        public string? Expert1Status { get; set; }
+        public string? Expert2Name { get; set; }
+        public string? Expert2Status { get; set; }
         public List<QPDocumentVM> QPDocuments { get; set; } = new List<QPDocumentVM>();
     }
     public class QPDocumentVM
@@ -47,7 +48,9 @@ namespace SKCE.Examination.Services.ViewModels.QPSettings
         public long StatusTypeId { get; set; }
         public string StatusTypeName { get; set; } = string.Empty;
         public bool IsQPOnly { get; set; }
-
+        public long InstitutionId { get; set; }
+        public long QPTemplateId { get; set; }
+        public long SubmittedQPDocumentId { get; set; }
     }
     public class QPTemplateDocumentVM : AuditModel
     {
@@ -108,7 +111,14 @@ namespace SKCE.Examination.Services.ViewModels.QPSettings
         public string QPTemplateStatusTypeName { get; set; } = string.Empty;
         public long QPDocumentId { get; set; }
         public bool IsQPOnly { get; set; }
-        public List<QPTemplateDocumentVM> UserDocuments { get; set; } = new List<QPTemplateDocumentVM>();
+        public long QPTemplateId { get; set; }
+        public long InstitutionId { get; set; }
+        public string QPDocumentTypeName { get; set; }
+        public string QPDocumentName { get; set; }
+        public string QPDocumentUrl { get; set; }
+        public long CourseSyllabusDocumentId { get; set; }
+        public string CourseSyllabusDocumentName { get; set; }
+        public string CourseSyllabusDocumentUrl { get; set; }
     }
     public class QPDocumentValidationVM
     {

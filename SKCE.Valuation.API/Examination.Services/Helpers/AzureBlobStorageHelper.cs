@@ -2,6 +2,8 @@
 using Azure.Storage.Blobs.Models;
 using Microsoft.Extensions.Configuration;
 using SKCE.Examination.Models.DbModels.Common;
+using Spire.Doc;
+using Document = SKCE.Examination.Models.DbModels.Common.Document;
 
 namespace SKCE.Examination.Services.Helpers
 {
@@ -67,7 +69,7 @@ namespace SKCE.Examination.Services.Helpers
         }
 
         // Download Word document from Azure Blob
-        public async Task<Aspose.Words.Document> DownloadWordDocumentFromBlob(string blobName)
+        public async Task<Spire.Doc.Document> DownloadWordDocumentFromBlob(string blobName)
         {
             BlobContainerClient containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
             BlobClient blobClient = containerClient.GetBlobClient(blobName);
@@ -76,7 +78,7 @@ namespace SKCE.Examination.Services.Helpers
             {
                 using MemoryStream stream = new MemoryStream();
                 await blobClient.DownloadToAsync(stream);
-                return new Aspose.Words.Document(new MemoryStream(stream.ToArray()));
+                return new Spire.Doc.Document(new MemoryStream(stream.ToArray()));
             }
             else
             {

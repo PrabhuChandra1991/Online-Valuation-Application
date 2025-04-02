@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Aspose.Words;
-using DocumentFormat.OpenXml.Office2010.Word;
+﻿using System.Text;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Http;
@@ -14,7 +7,10 @@ using SKCE.Examination.Models.DbModels.Common;
 using SKCE.Examination.Models.DbModels.QPSettings;
 using SKCE.Examination.Services.Helpers;
 using SKCE.Examination.Services.ViewModels.QPSettings;
-using Document = Aspose.Words.Document;
+using Spire.Doc;
+using Spire.Doc.Documents;
+using Syncfusion.DocIO.DLS;
+using Document = Spire.Doc.Document;
 
 public class QPDataImportHelper
 {
@@ -25,12 +21,11 @@ public class QPDataImportHelper
         _dbContext = dbContext;
         _azureBlobStorageHelper = azureBlobStorageHelper;
     }
-
     public async Task<string> ImportQPDataByExcel(Stream excelStream, IFormFile file)
     {
         try
         {
-            if(_dbContext.CourseDepartments.Any(cd=>cd.IsActive)) return "There are active pending courses to complete QP generation for previous examination.";
+            if(_dbContext.Examinations.Any(cd=>!cd.IsQPPrinted)) return "There are active pending courses to complete QP generation for previous examination.";
 
             using var spreadsheet = SpreadsheetDocument.Open(excelStream, false);
             var workbookPart = spreadsheet.WorkbookPart;
@@ -123,7 +118,7 @@ public class QPDataImportHelper
             var updatedCourses = _dbContext.Courses.ToList();
             var degreeTypes = _dbContext.DegreeTypes.ToList();
             var examMonths = _dbContext.ExamMonths.ToList();
-            var courseDepartMents = new HashSet<CourseDepartment>();
+            var courseDepartMents = new HashSet<Examination>();
             // Process Institution, Course, Department, StudentCount, DegreeType, Semester, Batch, Regulation, ExamMonth
             foreach (var row in rows)
             {
@@ -146,7 +141,7 @@ public class QPDataImportHelper
                 var degreeType = degreeTypes.FirstOrDefault(d => d.Name == degreeTypeName);
 
 
-                courseDepartMents.Add(new CourseDepartment()
+                courseDepartMents.Add(new Examination()
                 {
                     InstitutionId = (institution != null) ? institution.InstitutionId : 1,
                     RegulationYear = regulation,
@@ -164,10 +159,13 @@ public class QPDataImportHelper
                     ModifiedById = 1,
                     ModifiedDate = DateTime.UtcNow,
                     IsActive = true,
+                    IsQPPrinted = false,
+                    QPPrintedById= null,
+                    QPPrintedDate = null,
                 });
             }
-            var existingCourseDepartments = _dbContext.CourseDepartments.ToList();
-            var newCourseDepartments = new HashSet<CourseDepartment>();
+            var existingCourseDepartments = _dbContext.Examinations.ToList();
+            var newCourseDepartments = new HashSet<Examination>();
             foreach (var courseDepartment in courseDepartMents)
             {
                 if (!existingCourseDepartments.Any(x => x.InstitutionId == courseDepartment.InstitutionId && x.RegulationYear == courseDepartment.RegulationYear && x.BatchYear == courseDepartment.BatchYear && x.DegreeTypeId == courseDepartment.DegreeTypeId && x.DepartmentId == courseDepartment.DepartmentId && x.ExamType == courseDepartment.ExamType && x.Semester == courseDepartment.Semester && x.ExamMonth == courseDepartment.ExamMonth && x.ExamYear == courseDepartment.ExamYear && x.CourseId == courseDepartment.CourseId))
@@ -176,7 +174,7 @@ public class QPDataImportHelper
                     newCourseDepartments.Add(courseDepartment);
                 }
             }
-            await _dbContext.CourseDepartments.AddRangeAsync(newCourseDepartments);
+            await _dbContext.Examinations.AddRangeAsync(newCourseDepartments);
             await _dbContext.SaveChangesAsync();
             long? documentId = await _azureBlobStorageHelper.UploadFileAsync(excelStream, file.FileName, file.ContentType);
 
@@ -206,8 +204,6 @@ public class QPDataImportHelper
             excelStream.Close();
         }
     }
-
-
     private static string GetCellValue(WorkbookPart workbookPart, Cell cell)
     {
         if (cell.CellValue == null) return string.Empty;
@@ -217,7 +213,6 @@ public class QPDataImportHelper
             ? workbookPart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(int.Parse(value)).InnerText
             : value;
     }
-
     public async Task<List<ImportHistoryVM>> GetImportHistories()
     {
         var documents = await _dbContext.Documents.ToListAsync();
@@ -245,7 +240,6 @@ public class QPDataImportHelper
         }
         return importHistories;
     }
-
     public async Task<string> ImportSyllabusDocuments(List<IFormFile> files)
     {
         var documentMissingCourses = "Syllabus documents are missing for total ";
@@ -294,10 +288,9 @@ public class QPDataImportHelper
         if(missingCourses.Count > 0) return ($"Course is missing for uploaded files {string.Join(", ", missingCourses)} and Syllabus documents are missing for total {courseCods.Count} courses and course cods are {string.Join(", ", courseCods)}.");
         return ($"Syllabus documents are missing for total {courseCods.Count} courses and course cods are {string.Join(", ", courseCods)}.");
     }
-
     public async Task<bool> ImportQPDocuments(List<IFormFile> files, List<QPDocumentValidationVM> qPDocumentValidationVMs)
     {
-        var courseDepartments = _dbContext.CourseDepartments.ToList();
+        var courseDepartments = _dbContext.Examinations.ToList();
         var institutions = _dbContext.Institutions.ToList();
         var qpDocuments = _dbContext.QPDocuments.ToList();
         var missingInstitutions = new List<string>();
@@ -340,11 +333,10 @@ public class QPDataImportHelper
                 missingInstitutions.Add(file.FileName);
         });
         await _dbContext.SaveChangesAsync();
-        //await ExtractBookMarks();
+        //await SaveBookmarksToDatabase();
         return true;
     }
-
-    private async Task ExtractBookMarks()
+    public void SaveBookmarksToDatabase(string filePath)
     {
         var qPDocuments = _dbContext.QPDocuments.ToList();
         foreach (var qpDocument in qPDocuments)
@@ -355,59 +347,62 @@ public class QPDataImportHelper
                 var qpSelectedDocument = _dbContext.Documents.FirstOrDefault(d => d.DocumentId == qpDocument.DocumentId);
                 if (qpSelectedDocument != null)
                 {
-                    Aspose.Words.Document sourceDoc = _azureBlobStorageHelper.DownloadWordDocumentFromBlob(qpSelectedDocument.Name).Result;
+                    Document sourceDoc = _azureBlobStorageHelper.DownloadWordDocumentFromBlob(qpSelectedDocument.Name).Result;
                     // Iterate through all bookmarks in the source document
-                    var bookmarkNames = sourceDoc.Range.Bookmarks.Select(b => b.Name).ToList();
+
                     var qpDocumentBookMarks = new List<QPDocumentBookMark>();
-                    foreach (Aspose.Words.Bookmark bookmark in sourceDoc.Range.Bookmarks)
+                    foreach (Spire.Doc.Bookmark bookmark in sourceDoc.Bookmarks)
                     {
-                        var qPDocumentBookMark = new QPDocumentBookMark
+                        string bookmarkHtmlBase64 = ConvertBookmarkToHtmlBase64(sourceDoc, bookmark);
+
+                        if (!string.IsNullOrEmpty(bookmarkHtmlBase64))
                         {
-                            QPDocumentId = qpDocument.QPDocumentId,
-                            BookMarkName = bookmark.Name,
-                            BookMarkText = ConvertToBase64(ConvertBookmarkRangeToHtml(bookmark.BookmarkStart, bookmark.BookmarkEnd))
-                        };
-                        AuditHelper.SetAuditPropertiesForInsert(qPDocumentBookMark, 1);
-                        qpDocumentBookMarks.Add(qPDocumentBookMark);
+                            var qPDocumentBookMark = new QPDocumentBookMark
+                            {
+                                QPDocumentId = qpDocument.QPDocumentId,
+                                BookMarkName = bookmark.Name,
+                                BookMarkText = bookmarkHtmlBase64
+                            };
+                            AuditHelper.SetAuditPropertiesForInsert(qPDocumentBookMark, 1);
+                            qpDocumentBookMarks.Add(qPDocumentBookMark);
+                        }
                     }
                     _dbContext.QPDocumentBookMarks.AddRange(qpDocumentBookMarks);
                 }
             }
         }
-        await _dbContext.SaveChangesAsync();
+         _dbContext.SaveChangesAsync();
     }
-
-    private static string ConvertToBase64(string text)
+    private static string ConvertBookmarkToHtmlBase64(Document doc, Spire.Doc.Bookmark bookmark)
     {
-        byte[] textBytes = Encoding.UTF8.GetBytes(text);
-        return Convert.ToBase64String(textBytes);
-    }
-    private static string ConvertBookmarkRangeToHtml(Node startNode, Node endNode)
-    {
-        // Create a temporary document with just the bookmark range
-        Document tempDoc = new Document();
-        DocumentBuilder builder = new DocumentBuilder(tempDoc);
+        Spire.Doc.BookmarkStart bookmarkStart = bookmark.BookmarkStart;
+        Spire.Doc.BookmarkEnd bookmarkEnd = bookmark.BookmarkEnd;
 
-        //Node currentNode = startNode;
-        Node currentNode = startNode.NextSibling;
-        while (currentNode != null && currentNode != endNode)
+        if (bookmarkStart == null || bookmarkEnd == null) return null;
+
+        Document extractedDoc = new Document();
+        Section section = extractedDoc.AddSection();
+
+        bool isInsideBookmark = false;
+        foreach (DocumentObject obj in doc.Sections[0].Body.ChildObjects)
         {
-            Node importedNode = tempDoc.ImportNode(currentNode, true, ImportFormatMode.KeepSourceFormatting);
-            builder.InsertNode(importedNode);
-            //tempDoc.FirstSection.Body.AppendChild(importedNode);
-            currentNode = currentNode.NextSibling;
-        }
-        Aspose.Words.Saving.HtmlSaveOptions htmlSaveOptions = new Aspose.Words.Saving.HtmlSaveOptions();
-        htmlSaveOptions.ExportImagesAsBase64 = true;
-        htmlSaveOptions.ExportHeadersFootersMode = Aspose.Words.Saving.ExportHeadersFootersMode.PerSection;
-        htmlSaveOptions.SaveFormat = Aspose.Words.SaveFormat.Html;
-        htmlSaveOptions.PrettyFormat = true;
+            if (obj == bookmarkStart) isInsideBookmark = true;
 
-        // Convert the document range to HTML
+            if (isInsideBookmark)
+            {
+                section.Body.ChildObjects.Add(obj.Clone());
+            }
+
+            if (obj == bookmarkEnd) break;
+        }
+
         using (MemoryStream ms = new MemoryStream())
         {
-            tempDoc.Save(ms, htmlSaveOptions);
-            return Encoding.UTF8.GetString(ms.ToArray());
+            extractedDoc.SaveToStream(ms, FileFormat.Html);
+            string html = Encoding.UTF8.GetString(ms.ToArray());
+
+            byte[] htmlBytes = Encoding.UTF8.GetBytes(html);
+            return Convert.ToBase64String(htmlBytes);
         }
     }
 }

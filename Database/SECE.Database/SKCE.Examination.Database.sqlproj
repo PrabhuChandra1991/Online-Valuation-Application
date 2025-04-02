@@ -77,14 +77,9 @@
     <Build Include="Tables\QPTemplateStatusType.sql" />
     <Build Include="Tables\UserCourse.sql" />
     <Build Include="Tables\UserAreaOfSpecialization.sql" />
-    <Build Include="Tables\CourseDepartment.sql" />
+    <Build Include="Tables\Examination.sql" />
     <Build Include="Tables\UserQualification.sql" />
     <Build Include="Tables\UserDesignation.sql" />
-    <Build Include="Tables\QPTemplateDocument.sql" />
-    <Build Include="Tables\QPTemplateInstitution.sql" />
-    <Build Include="Tables\QPTemplateInstitutionDocument.sql" />
-    <Build Include="Tables\UserQPTemplateDocument.sql" />
-    <Build Include="Tables\QPTemplateInstitutionDepartment.sql" />
     <Build Include="Tables\ImportHistory.sql" />
     <Build Include="Tables\CourseSyllabusDocument.sql" />
     <Build Include="Tables\QPDocument.sql" />

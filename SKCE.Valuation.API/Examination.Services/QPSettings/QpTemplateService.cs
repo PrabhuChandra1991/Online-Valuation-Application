@@ -156,10 +156,7 @@ namespace SKCE.Examination.Services.QPSettings
             // 🔹 Step 2: Read Specific Row Data from Excel
             var rowData = ReadSpecificRowFromExcel(excelData, qPTemplate.CourseCode);
 
-            if (rowData.Count == 0)
-            {
-                throw new Exception($"No row found with value '{qPTemplate.CourseCode}' in the second column.");
-            }
+            if (rowData.Count == 0) return qPTemplate;
 
             // 3. Replace bookmarks in Word document
             string updatedPdfPath = ReplaceBookmarks(rowData);

@@ -16,13 +16,13 @@ namespace SKCE.Examination.Models.DbModels.QPSettings
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long UserQPTemplateId { get; set; }
         public long UserId { get; set; }
-        [ForeignKey("QPTemplateInstitution")]
-        public long QPTemplateInstitutionId { get; set; }
         public long QPTemplateStatusTypeId { get; set; }
         [ForeignKey("QPDocument")]
         public long QPDocumentId { get; set; }
         public bool IsQPOnly { get; set; }
-        public virtual ICollection<UserQPTemplateDocument> Documents { get; set; } = new List<UserQPTemplateDocument>();
+        public long InstitutionId { get; set; }
+        public long QPTemplateId { get; set; }
+        public long SubmittedQPDocumentId { get; set; }
 
     }
 }

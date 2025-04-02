@@ -47,12 +47,12 @@
 
                 <ng-container matColumnDef="documentName">
                   <th mat-header-cell *matHeaderCellDef mat-sort-header> Course Syllabus Document </th>
-                  <td mat-cell *matCellDef="let element"><a mat-button href={{element.userDocuments[0].documentUrl}} target="_blank">{{ element.userDocuments[0].documentName }} </a>   </td>
+                  <td mat-cell *matCellDef="let element"><a mat-button href={{element.courseSyllabusDocumentUrl}} target="_blank">{{ element.courseSyllabusDocumentName }} </a>   </td>
                 </ng-container>
 
                 <ng-container matColumnDef="qpeneration">
                   <th mat-header-cell *matHeaderCellDef mat-sort-header> QP Generation </th>
-                  <td mat-cell *matCellDef="let element"><a mat-button href={{element.userDocuments[1].documentUrl}} target="_blank">{{ element.userDocuments[1].documentName }} </a>   </td>
+                  <td mat-cell *matCellDef="let element"><a mat-button href={{element.qpDocumentUrl}} target="_blank">{{ element.qpDocumentName }} </a>   </td>
                 </ng-container>
 
                 <ng-container matColumnDef="expert-1">

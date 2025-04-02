@@ -22,20 +22,15 @@ namespace SKCE.Examination.Services.Common
             var qpTemplates = _context.QPTemplates.ToList();
             foreach (var course in courses)
             {
-                if (!_context.CourseSyllabusDocuments.Any(c => c.CourseId == course.CourseId)) continue;
                 var qpTemplate = qpTemplates.FirstOrDefault(qpt => qpt.CourseId == course.CourseId);
                 if (qpTemplate != null)
                 {
-                    var qpTemplateInstitutions = _context.QPTemplateInstitutions.Where(qpti => qpti.QPTemplateId == qpTemplate.QPTemplateId).ToList();
-                    foreach (var qpTemplateInstitution in qpTemplateInstitutions)
+                    var userQPTemplates = _context.UserQPTemplates.Where(uqpt => uqpt.QPTemplateId == qpTemplate.QPTemplateId && uqpt.IsActive).ToList();
+                    if (userQPTemplates.Count < 2)
                     {
-                        var userQPTemplates = _context.UserQPTemplates.Where(uqpt => uqpt.QPTemplateInstitutionId == qpTemplateInstitution.QPTemplateInstitutionId && uqpt.IsActive).ToList();
-                        if (userQPTemplates.Count < 2)
-                        {
-                            if (!finalCourseList.Contains(course))
-                                finalCourseList.Add(course);
-                            continue;
-                        }
+                        if (!finalCourseList.Contains(course))
+                            finalCourseList.Add(course);
+                        continue;
                     }
                 }
                 else
@@ -43,7 +38,7 @@ namespace SKCE.Examination.Services.Common
                     finalCourseList.Add(course);
                 }
             }
-            return finalCourseList;
+            return courses;
         }
         public async Task<Course?> GetCourseByIdAsync(long id)
         {

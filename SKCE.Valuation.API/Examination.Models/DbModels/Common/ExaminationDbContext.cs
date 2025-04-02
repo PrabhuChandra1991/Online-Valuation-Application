@@ -21,16 +21,11 @@ namespace SKCE.Examination.Models.DbModels.Common
         public DbSet<QPDocument> QPDocuments { get; set; }
         public DbSet<Course> Courses { get; set; }
         public DbSet<CourseSyllabusDocument> CourseSyllabusDocuments { get; set; }
-        public DbSet<CourseDepartment> CourseDepartments { get; set; }
+        public DbSet<Examination> Examinations { get; set; }
         public DbSet<QPTag> QPTags { get; set; }
         public DbSet<QPTemplateStatusType> QPTemplateStatusTypes { get; set; }
         public DbSet<QPTemplate> QPTemplates { get; set; }
-        public DbSet<QPTemplateDocument> QPTemplateDocuments { get; set; }
-        public DbSet<QPTemplateInstitution> QPTemplateInstitutions { get; set; }
-        public DbSet<QPTemplateInstitutionDocument> QPTemplateInstitutionDocuments { get; set; }
-        public DbSet<QPTemplateInstitutionDepartment> QPTemplateInstitutionDepartments { get; set; }
         public DbSet<UserQPTemplate> UserQPTemplates { get; set; }
-        public DbSet<UserQPTemplateDocument> UserQPTemplateDocuments { get; set; }
         public DbSet<Document> Documents { get; set; }
         public DbSet<DegreeType> DegreeTypes { get; set; }
         public DbSet<ExamMonth> ExamMonths { get; set; }

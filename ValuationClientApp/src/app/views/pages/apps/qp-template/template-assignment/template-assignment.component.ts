@@ -215,8 +215,8 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
          examMonth:  response.examMonth,
          examType: response.examType,
          semester: response.semester,
-         institutionName: response.institutions[0]?.institutionName || '',
-         studentCount:  response.institutions[0]?.studentCount || ''
+         institutionName: '',
+         studentCount:  response.studentCount || ''
        });
 
         this.templates =this.qpTemplateData.qpDocuments;

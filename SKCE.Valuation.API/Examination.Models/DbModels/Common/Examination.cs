@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace SKCE.Examination.Models.DbModels.Common
 {
-    [Table("CourseDepartment", Schema = "dbo")]
-    public class CourseDepartment: AuditModel
+    [Table("Examination", Schema = "dbo")]
+    public class Examination : AuditModel
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long CourseDepartmentId { get; set; }
+        public long ExaminationId { get; set; }
         public required long InstitutionId { get; set; }
         public required long CourseId { get; set; }
         public required long DepartmentId { get; set; }
@@ -25,5 +25,9 @@ namespace SKCE.Examination.Models.DbModels.Common
         public required string ExamMonth { get; set; }
         public required string ExamYear { get; set; }
         public required long StudentCount { get; set; }
+        public bool IsQPPrinted { get; set; }
+        public long? QPPrintedById { get; set; }
+        public DateTime? QPPrintedDate { get; set; }
+
     }
 }

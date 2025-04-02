@@ -1,6 +1,6 @@
-﻿CREATE TABLE [dbo].[CourseDepartment]
+﻿CREATE TABLE [dbo].[Examination]
 (
-	[CourseDepartmentId] BIGINT NOT NULL PRIMARY KEY IDENTITY(1,1),
+	[ExaminationId] BIGINT NOT NULL PRIMARY KEY IDENTITY(1,1),
 	[InstitutionId] BIGINT NOT NULL,
 	[CourseId] BIGINT NOT NULL,
 	[DepartmentId] BIGINT NOT NULL,
@@ -12,6 +12,9 @@
 	[ExamMonth] NVARCHAR(50) NOT NULL,
 	[ExamYear] NVARCHAR(50) NOT NULL,
 	[StudentCount] BIGINT  NULL,
+	[IsQPPrinted] BIT DEFAULT 0,
+	[QPPrintedDate] DATETIME NULL,
+	[QPPrintedById] BIGINT NULL,
 	[IsActive] BIT DEFAULT 1,
 	CreatedDate DATETIME DEFAULT GETDATE(),
 	CreatedById BIGINT NOT NULL,

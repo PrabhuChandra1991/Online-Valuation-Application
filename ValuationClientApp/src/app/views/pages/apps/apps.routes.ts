@@ -65,4 +65,9 @@ export default [
       loadComponent: () => import('./import-history/import-history.component').then(c => c.ImportHistoryComponent),
       canActivate:[authGuard]
   },
+  {
+    path: 'valuation',
+    loadComponent: () => import('./valuation/answer-valuation/answer-valuation.component').then(c => c.AnswerValuationComponent),
+    canActivate:[authGuard]
+},
 ] as Routes;

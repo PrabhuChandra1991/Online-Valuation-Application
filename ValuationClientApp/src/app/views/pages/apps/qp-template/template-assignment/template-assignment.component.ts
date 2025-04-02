@@ -93,8 +93,6 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
 
       this.initializeForm();
 
-     // this.loadTemplates();
-
       this.loadExperts();
 
       this.loadAllInstitues();
@@ -416,9 +414,12 @@ console.log('templateForm',this.templateAssignmentForm);
   const selectedUserId = user.target?.value;
   const selectedUser = this.users.find(user => user.userId == selectedUserId);
 
+  //docIndex = docIndex -1;
+
   if (selectedUser) {
     this.qpTemplateData.qpDocuments[docIndex].qpAssignedUsers[userIndex].userId = selectedUser.userId;
     this.qpTemplateData.qpDocuments[docIndex].qpAssignedUsers[userIndex].userName = selectedUser.userName;
+
   } else {
     this.qpTemplateData.qpDocuments[docIndex].qpAssignedUsers[userIndex].userId = null;
     this.qpTemplateData.qpDocuments[docIndex].qpAssignedUsers[userIndex].userName = '';
@@ -435,6 +436,11 @@ isUserAlreadySelected(qpAssignedUsers: any[], userId: number, currentIndex: numb
 
       this.spinnerService.toggleSpinnerState(true);
       const formData = this.qpTemplateData;
+      formData.expert1Name = "";
+      formData.expert2Name = "";
+      formData.expert1Status = "";
+      formData.expert2Status = "";
+
      console.log('final form data',JSON.stringify(formData));
 
       this.templateService.CreateQpTemplate(formData).subscribe({
@@ -499,6 +505,16 @@ isUserAlreadySelected(qpAssignedUsers: any[], userId: number, currentIndex: numb
 
   }
 
+  close() {
+    //this.resetForm();
+
+    this.modalService.dismissAll();
+  }
+
+  download(documentId: number)
+  {
+
+  }
 }
 
 

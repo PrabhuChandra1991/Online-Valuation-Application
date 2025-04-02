@@ -1,0 +1,74 @@
+<div class="container">
+  <div class="row mt-5">
+
+    <div class="col-lg-6 grid-margin stretch-card">
+      <div class="card ">
+        <div class="card-body px-0 pb-0">
+          <h4 class="card-title">Questions</h4>
+
+          <ngx-extended-pdf-viewer
+          [src]="'assets/sample.pdf'"
+          [showSidebarButton]="false"
+          [showFindButton]="false"
+          [showPagingButtons]="true"
+          [showZoomButtons]="true"
+          [showPresentationModeButton]="false"
+          [showPrintButton]="false"
+          [showDownloadButton]="false"
+          [showOpenFileButton]="false"
+          [showSecondaryToolbarButton]="false"
+          [showRotateButton]="false"
+          [showSpreadButton]="false"
+          [showPropertiesButton]="false"
+          [height]="'auto'">
+            useBrowserLocale="true">
+          </ngx-extended-pdf-viewer>
+
+            <!-- <div class="navigation mt-2 text-center">
+              <button (click)="prevPage()" class="btn btn-primary  btn-sm me-2 " [disabled]="currentPage <= 1">Previous</button>
+              <span>Page {{ currentPage }} / {{ totalPages }}</span>
+              <button (click)="nextPage()"  class="btn btn-primary ms-2 btn-sm " [disabled]="currentPage >= totalPages">Next</button>
+            </div> -->
+
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">Answer Section</h4>
+
+          <form class="forms-sample">
+            <div class="mb-3">
+              <label for="exampleFormControlSelect1"
+                class="form-label">Select Questions</label>
+              <select class="form-select" id="exampleFormControlSelect1">
+                <option selected disabled>Select Questions</option>
+                <option>Questions 1</option>
+                <option>Questions 2</option>
+                <option>Questions 3</option>
+                <option>Questions 4</option>
+                <option>Questions 5</option>
+                <option>Questions 6</option>
+
+              </select>
+            </div>
+
+
+                <quill-editor [(ngModel)]="htmlText"
+                  placeholder="Enter Text"
+                  [modules]="quillConfig"
+                  (onSelectionChanged)="onSelectionChanged($event)"
+                  (onContentChanged)="onContentChanged($event)" style="height: 300px;font-size:10px">
+                </quill-editor>
+
+            <button type="submit" class="btn btn-primary me-2">Submit</button>
+            <button class="btn btn-secondary">Cancel</button>
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

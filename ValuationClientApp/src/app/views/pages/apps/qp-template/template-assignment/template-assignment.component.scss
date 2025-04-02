@@ -5,3 +5,6 @@ input[type=text], input[type=number],input[type=text], input[type=date]
 select{
     border: .25px solid #004da3;
 }
+tr.no-hover:hover {
+  background-color: #FFFFFF !important;
+}

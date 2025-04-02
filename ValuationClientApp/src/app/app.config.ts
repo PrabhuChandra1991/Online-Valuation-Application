@@ -31,6 +31,7 @@ export const appConfig: ApplicationConfig = {
       preventDuplicates: true,
     }), // Toastr providers
     importProvidersFrom([SweetAlert2Module.forRoot()]), // ngx-sweetalert2: https://github.com/sweetalert2/ngx-sweetalert2
-    provideHighlightOptions(highlightOptions), provideAnimationsAsync(), provideAnimationsAsync(), // ngx-highlightjs: https://github.com/murhafsousli/ngx-highlightjs
+    provideHighlightOptions(highlightOptions), provideAnimationsAsync(), provideAnimationsAsync() // ngx-highlightjs: https://github.com/murhafsousli/ngx-highlightjs
+    
   ],
 };

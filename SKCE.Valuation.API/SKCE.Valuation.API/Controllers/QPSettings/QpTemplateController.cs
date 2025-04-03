@@ -116,8 +116,8 @@ namespace SKCE.Examination.API.Controllers.QPSettings
             return Ok(await _qpTemplateService.GetExpertsForQPAssignmentAsync());
         }
 
-        [HttpPost("ValidateGeneratedQPAndPreview/{userId}/{QPTemplateInstitutionId}")]
-        public async Task<IActionResult> ValidateGeneratedQPAndPreview(long userId, long QPTemplateInstitutionId, IFormFile file)
+        [HttpPost("ValidateGeneratedQP/{userQPTemplateId}")]
+        public async Task<IActionResult> ValidateGeneratedQPAndPreview(long userQPTemplateId, IFormFile file)
         {
             if (file == null || file.Length == 0)
                 return BadRequest("Invalid file. Please upload a valid Word document.");
@@ -132,7 +132,7 @@ namespace SKCE.Examination.API.Controllers.QPSettings
                 // Load Word document from stream
                 Spire.Doc.Document doc = new Spire.Doc.Document(stream);
                 // Get and validate bookmarks
-               var validationResult = await _qpTemplateService.ValidateGeneratedQPAndPreview(userId, QPTemplateInstitutionId, doc);
+               var validationResult = await _qpTemplateService.ValidateGeneratedQPAndPreview(userQPTemplateId, doc);
 
                 return Ok(new ResultModel() { Message = validationResult.message, InValid= validationResult.inValidForSubmission });
             }
@@ -142,8 +142,8 @@ namespace SKCE.Examination.API.Controllers.QPSettings
             }
         }
 
-        [HttpPost("GeneratedQPPreview/{userId}/{QPTemplateInstitutionId}")]
-        public async Task<IActionResult> GeneratedQPPreview(long userId, long QPTemplateInstitutionId, IFormFile file)
+        [HttpPost("GeneratedQPPreview/{userQPTemplateId}")]
+        public async Task<IActionResult> GeneratedQPPreview(long userQPTemplateId, IFormFile file)
         {
             if (file == null || file.Length == 0)
                 return BadRequest("Invalid file. Please upload a valid Word document.");
@@ -157,7 +157,7 @@ namespace SKCE.Examination.API.Controllers.QPSettings
                 // Load Word document from stream
                 var documentId = _azureBlobStorageHelper.UploadFileAsync(stream, file.FileName, file.ContentType).Result;
                 // Get and validate bookmarks
-                var validationResult = await _qpTemplateService.PreviewGeneratedQP(userId, QPTemplateInstitutionId, documentId);
+                var validationResult = await _qpTemplateService.PreviewGeneratedQP(userQPTemplateId, documentId);
 
                 return Ok();
             }

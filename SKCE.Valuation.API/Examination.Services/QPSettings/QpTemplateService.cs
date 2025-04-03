@@ -725,8 +725,8 @@ namespace SKCE.Examination.Services.QPSettings
              _context.SaveChanges();
             return true;
         }
-        public async Task<(string message, bool inValidForSubmission)> ValidateGeneratedQPAndPreview(long userId, long institutionId, Document doc) {
-            var userQPTemplate = await _context.UserQPTemplates.FirstOrDefaultAsync(uqp => uqp.UserId == userId && uqp.InstitutionId == institutionId);
+        public async Task<(string message, bool inValidForSubmission)> ValidateGeneratedQPAndPreview(long userQPTemplateId, Document doc) {
+            var userQPTemplate = await _context.UserQPTemplates.FirstOrDefaultAsync(uqp => uqp.UserQPTemplateId == userQPTemplateId);
             if (userQPTemplate == null)
             {
                 return ("User QP assignment is missing.", true);
@@ -748,7 +748,7 @@ namespace SKCE.Examination.Services.QPSettings
             }
             return (string.Empty,true);
         }
-        public async Task<bool> PreviewGeneratedQP(long userId, long InstitutionId, long generatedDocumentId)
+        public async Task<bool> PreviewGeneratedQP(long userQPTemplateId, long generatedDocumentId)
         {
             //var qpTemplate = _context.QPTemplates.FirstOrDefault(qp => qp.QPTemplateId == qpTemplateInstitution.QPTemplateId);
             //if (qpTemplate == null) return false;

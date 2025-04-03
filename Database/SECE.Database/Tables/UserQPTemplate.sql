@@ -8,6 +8,7 @@
 	[IsQPOnly] BIT NOT NULL DEFAULT 0,
 	[QPDocumentId] BIGINT NOT NULL,
 	[SubmittedQPDocumentId] BIGINT NULL,
+	[ParentUserQPTemplateId] BIGINT NULL,
 	[IsActive] BIT NOT NULL,
 	[CreatedDate] DATETIME NOT NULL,
 	[CreatedById] BIGINT NOT NULL,

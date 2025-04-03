@@ -51,6 +51,7 @@ namespace SKCE.Examination.Services.ViewModels.QPSettings
         public long InstitutionId { get; set; }
         public long QPTemplateId { get; set; }
         public long SubmittedQPDocumentId { get; set; }
+        public long? ParentUserQPTemplateId { get; set; }
     }
     public class QPTemplateDocumentVM : AuditModel
     {

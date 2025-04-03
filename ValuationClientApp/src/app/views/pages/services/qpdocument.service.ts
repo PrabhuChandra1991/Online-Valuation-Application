@@ -7,20 +7,20 @@ import { Observable } from 'rxjs/internal/Observable';
 @Injectable({
   providedIn: 'root'
 })
-export class ImportService {
+export class QPDocumentService {
 
    private apiUrl = environment.apiURL; // Update this with your actual API URL
-  
+
       private httpOptions = {
           headers: new HttpHeaders({
             'Content-Type': 'application/json'
           })
         };
-  
+
         constructor(private http: HttpClient) { }
-      
-      importData(formData: FormData): Observable<any> {
-          return this.http.post(`${this.apiUrl}/api/QPDataImport/importQPDataByExcel`, formData);
+
+      downloadQPFile(documentId: number): Observable<any> {
+          return this.http.get(`${this.apiUrl}/api/BlobStorage/download/${documentId}`);
         }
         importSyllabusDocuments(formData: FormData): Observable<any> {
           return this.http.post(`${this.apiUrl}/api/QPDataImport/importSyllabusDocuments`, formData);
@@ -28,5 +28,5 @@ export class ImportService {
         importQPDocuments(formData: FormData): Observable<any> {
           return this.http.post(`${this.apiUrl}/api/QPDataImport/ImportQPDocuments`, formData);
         }
-  
+
 }

@@ -24,6 +24,7 @@ using DocumentFormat.OpenXml.Presentation;
 using Text = DocumentFormat.OpenXml.Presentation.Text;
 using Microsoft.AspNetCore.Http;
 using DocumentFormat.OpenXml.Office.SpreadSheetML.Y2023.MsForms;
+using DocumentFormat.OpenXml.Office2010.Word;
 namespace SKCE.Examination.Services.QPSettings
 {
     public class QpTemplateService 
@@ -1508,30 +1509,23 @@ namespace SKCE.Examination.Services.QPSettings
             }
             return 0; // Default to 0 if marks not found
         }
-        public async Task<bool?> SubmitGeneratedQPAsync(long userQPTemplateId, IFormFile file, QPSubmissionVM qPSubmissionVM)
+        public async Task<bool?> SubmitGeneratedQPAsync(long userQPTemplateId, long documentId, QPSubmissionVM qPSubmissionVM)
         {
-            //var qpTemplateInstitution = await _context.QPTemplateInstitutions.FirstOrDefaultAsync(qpti => qpti.QPTemplateInstitutionId == QPTemplateInstitutionId);
-            //if (qpTemplateInstitution == null) return null;
-            //var qpTemplate = await _context.QPTemplates.FirstOrDefaultAsync(qp => qp.QPTemplateId == qpTemplateInstitution.QPTemplateId);
-            
-            //if (qpTemplate == null) return null;
-            //qpTemplate.QPTemplateStatusTypeId = 3; //QP Pending for Scrutiny
-            //AuditHelper.SetAuditPropertiesForUpdate(qpTemplate, 1);
-
-            //var userQPTemplate = await _context.UserQPTemplates.FirstOrDefaultAsync(uqp => uqp.UserId == userId && uqp.QPTemplateInstitutionId == qpTemplateInstitution.QPTemplateInstitutionId);
-            
-            //if (userQPTemplate == null) return null;
-            //userQPTemplate.QPTemplateStatusTypeId = 9;
-
-            //var generatedQpDocument = await _context.UserQPTemplateDocuments.FirstOrDefaultAsync(qptd => qptd.QPDocumentTypeId == 7 && qptd.UserQPTemplateId == userQPTemplate.UserQPTemplateId);
-            //if (generatedQpDocument != null)
-            //{
-            //    generatedQpDocument.DocumentId = documentId;
-            //    AuditHelper.SetAuditPropertiesForUpdate(generatedQpDocument, 1);
-            //}
-
-            //AuditHelper.SetAuditPropertiesForUpdate(userQPTemplate, 1);
-            //await _context.SaveChangesAsync();
+            var userQPTemplate = await _context.UserQPTemplates.FirstOrDefaultAsync(qpti => qpti.UserQPTemplateId == userQPTemplateId);
+            if (userQPTemplate == null) return null;
+            var qpTemplate = await _context.QPTemplates.FirstOrDefaultAsync(qp => qp.QPTemplateId == userQPTemplate.QPTemplateId);
+            if (qpTemplate == null) return null;
+            qpTemplate.QPTemplateStatusTypeId = 3; //QP Pending for Scrutiny
+            AuditHelper.SetAuditPropertiesForUpdate(qpTemplate, 1);
+            if (userQPTemplate == null) return null;
+            userQPTemplate.QPTemplateStatusTypeId = 9;
+            userQPTemplate.IsTablesAllowed = qPSubmissionVM.IsTablesAllowed;
+            userQPTemplate.TableName = qPSubmissionVM.TableName;
+            userQPTemplate.IsGraphsRequired = qPSubmissionVM.IsGraphsRequired;
+            userQPTemplate.GraphName = qPSubmissionVM.GraphName;
+            userQPTemplate.SubmittedQPDocumentId = documentId;
+            AuditHelper.SetAuditPropertiesForUpdate(userQPTemplate, 1);
+            await _context.SaveChangesAsync();
             return true;
         }
         public async Task<bool?> AssignTemplateForQPScrutinyAsync(long userId, long userQPTemplateId)

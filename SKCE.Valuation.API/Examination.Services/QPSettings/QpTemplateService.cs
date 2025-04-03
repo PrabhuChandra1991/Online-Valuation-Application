@@ -725,7 +725,7 @@ namespace SKCE.Examination.Services.QPSettings
              _context.SaveChanges();
             return true;
         }
-        public async Task<(string message, bool inValidForSubmission)> ValidateGeneratedQPAndPreview(long userQPTemplateId, Document doc) {
+        public async Task<(string message, bool inValidForSubmission)> ValidateGeneratedQPAsync(long userQPTemplateId, Document doc) {
             var userQPTemplate = await _context.UserQPTemplates.FirstOrDefaultAsync(uqp => uqp.UserQPTemplateId == userQPTemplateId);
             if (userQPTemplate == null)
             {

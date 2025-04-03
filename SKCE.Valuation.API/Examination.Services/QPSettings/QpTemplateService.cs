@@ -147,7 +147,6 @@ namespace SKCE.Examination.Services.QPSettings
 
             return qPTemplate;
         }
-
         public async Task<QPTemplateVM> ProcessExcelAndGeneratePdfAsync(QPTemplateVM qPTemplate)
         {
             var pdfFileName = qPTemplate.CourseCode + ".pdf";
@@ -196,7 +195,6 @@ namespace SKCE.Examination.Services.QPSettings
             qPTemplate.CourseSyllabusDocumentUrl = documents.FirstOrDefault(di => di.DocumentId == syllabusDocumentId)?.Url ?? string.Empty;
             return qPTemplate;
         }
-
         private async Task<byte[]> DownloadFileFromBlobAsync(string blobName)
         {
             BlobServiceClient blobServiceClient = new BlobServiceClient(_azureBlobStorageHelper._connectionString);
@@ -209,7 +207,6 @@ namespace SKCE.Examination.Services.QPSettings
                 return memoryStream.ToArray();
             }
         }
-
         private async Task<long> UploadFileToBlobAsync(string blobName,string filePath)
         {
             BlobServiceClient blobServiceClient = new BlobServiceClient(_azureBlobStorageHelper._connectionString);
@@ -230,7 +227,6 @@ namespace SKCE.Examination.Services.QPSettings
 
             return document.DocumentId; // Return the generated Document ID
         }
-
         private Dictionary<string, string> ReadSpecificRowFromExcel(byte[] excelData, string searchValue)
         {
             Dictionary<string, string> rowData = new Dictionary<string, string>();
@@ -784,10 +780,16 @@ namespace SKCE.Examination.Services.QPSettings
             HashSet<string> validCOs = new() { "CO1", "CO2", "CO3", "CO4", "CO5", "CO6" };
             HashSet<int> validMarks = new() { 2 };
 
+            // Sample marks allocation for each CO-BT combination
+            Dictionary<(string CO, string BT), int> marksDistribution = new Dictionary<(string, string), int>();
+            Dictionary<string, int> coTotals = new Dictionary<string, int>(); // Total per CO
+            Dictionary<string, int> btTotals = new Dictionary<string, int>(); // Total per BT
+            int grandTotal = 0; // Total of all marks
+
             StringBuilder htmlTable = new StringBuilder();
             htmlTable.Append("<h2>Part A: Question Validation</h2>");
-            htmlTable.Append("<table border='1' cellpadding='5' cellspacing='0' style='border-collapse: collapse;'>");
-            htmlTable.Append("<tr><th>Question</th><th>CO</th><th>BT</th><th>Marks</th></tr>");
+            //htmlTable.Append("<table border='1' cellpadding='5' cellspacing='0' style='border-collapse: collapse;'>");
+            //htmlTable.Append("<tr><th>Question</th><th>CO</th><th>BT</th><th>Marks</th></tr>");
 
             for (int qNo = 1; qNo <= 10; qNo++)
             {
@@ -802,8 +804,18 @@ namespace SKCE.Examination.Services.QPSettings
 
                 totalMarks += marks;
 
+                var key = (co, bt);
+                if (marksDistribution.ContainsKey(key))
+                {
+                    marksDistribution[key] += marks;
+                }
+                else
+                {
+                    marksDistribution[key] = marks;
+                }
+
                 // Add row to HTML table
-                htmlTable.Append($"<tr><td>Q{qNo}</td><td>{co}</td><td>{bt}</td><td>{marks}</td></tr>");
+               // htmlTable.Append($"<tr><td>Q{qNo}</td><td>{co}</td><td>{bt}</td><td>{marks}</td></tr>");
 
                 if (!string.IsNullOrEmpty(co) && allCOs.Contains(co))
                 {
@@ -821,14 +833,72 @@ namespace SKCE.Examination.Services.QPSettings
                 if (string.IsNullOrEmpty(bt) || !validBTs.Contains(bt)) errors.Add($"❌ Q{qNo}  BT is invalid.");
                 if (!validMarks.Contains(marks)) errors.Add($"❌ Q{qNo} Marks should be 2.");
 
-                if (totalMarks != 2) errors.Add($"❌ Q{qNo} Total Marks = {totalMarks} (should be 2).");
+                if (marks != 2) errors.Add($"❌ Q{qNo} Total Marks = {marks} (should be 2).");
+                // Update row-wise (CO) totals
+                if (coTotals.ContainsKey(co))
+                    coTotals[co] += marks;
+                else
+                    coTotals[co] = marks;
 
+                // Update column-wise (BT) totals
+                if (btTotals.ContainsKey(bt))
+                    btTotals[bt] += marks;
+                else
+                    btTotals[bt] = marks;
+
+                // Update grand total
+                grandTotal += marks;
                 if (qNo == 10)
                 {
                     // Add Total row to HTML table
-                    htmlTable.Append($"<tr><td></td><td></td><td>Total</td><td>{totalMarks}</td></tr>");
+                    //htmlTable.Append($"<tr><td></td><td></td><td>Total</td><td>{totalMarks}</td></tr>");
                 }
             }
+
+            htmlTable.Append("</table>");
+            htmlTable.Append("<table border='1' cellpadding='5' cellspacing='0' style='border-collapse: collapse;'>");
+
+            // Header row
+            htmlTable.Append("<tr style='background-color:#f2f2f2; font-weight:bold;'>");
+            htmlTable.Append("<th>CO</th>");
+            foreach (var bt in allBTs)
+            {
+                htmlTable.Append($"<th>{bt}</th>");
+            }
+            htmlTable.Append("<th>Total</th></tr>"); // Add total column
+
+            // Populate table rows
+            foreach (var co in allCOs)
+            {
+                htmlTable.Append("<tr>");
+                htmlTable.Append($"<td><b>{co}</b></td>");
+                int coTotal = 0;
+
+                foreach (var bt in allBTs)
+                {
+                    int marks = marksDistribution.ContainsKey((co, bt)) ? marksDistribution[(co, bt)] : 0;
+                    coTotal += marks;
+                    htmlTable.Append($"<td>{marks}</td>");
+                }
+
+                // Append row total
+                htmlTable.Append($"<td><b>{coTotal}</b></td>");
+                htmlTable.Append("</tr>");
+            }
+
+            // Add totals row
+            htmlTable.Append("<tr style='background-color:#f2f2f2; font-weight:bold;'>");
+            htmlTable.Append("<td>Total</td>");
+
+            foreach (var bt in allBTs)
+            {
+                int btTotal = btTotals.ContainsKey(bt) ? btTotals[bt] : 0;
+                htmlTable.Append($"<td>{btTotal}</td>");
+            }
+
+            // Append grand total
+            htmlTable.Append($"<td><b>{grandTotal}</b></td>");
+            htmlTable.Append("</tr>");
 
             htmlTable.Append("</table>");
 
@@ -856,42 +926,34 @@ namespace SKCE.Examination.Services.QPSettings
             {
                 htmlTable.Append("<h3 style='color:green;'>✅ No validation errors found.</h3>");
             }
-            // CO Marks Distribution
-            htmlTable.Append("<h2>CO Marks Distribution</h2><table border='1' cellpadding='5' cellspacing='0' style='border-collapse: collapse;'><tr><th>CO</th><th>Marks</th></tr>");
-            foreach (var kvp in coMarks)
-            {
-                htmlTable.Append($"<tr><td>{kvp.Key}</td><td>{kvp.Value}</td></tr>");
-            }
-            htmlTable.Append("</table>");
-
-            // BT Marks Distribution
-            htmlTable.Append("<h2>BT Marks Distribution</h2><table border='1' cellpadding='5' cellspacing='0' style='border-collapse: collapse;'><tr><th>BT</th><th>Marks</th></tr>");
-            foreach (var kvp in btMarks)
-            {
-                htmlTable.Append($"<tr><td>{kvp.Key}</td><td>{kvp.Value}</td></tr>");
-            }
-            htmlTable.Append("</table>");
 
             // Missing COs & BTs
-            if (missingCOs.Count > 0)
-                htmlTable.Append($"<h3 style='color:red;'>Missing COs: {string.Join(", ", missingCOs)}</h3>");
-            if (missingBTs.Count > 0)
-                htmlTable.Append($"<h3 style='color:red;'>Missing BTs: {string.Join(", ", missingBTs)}</h3>");
+            //if (missingCOs.Count > 0)
+            //    htmlTable.Append($"<h3 style='color:red;'>Missing COs: {string.Join(", ", missingCOs)}</h3>");
+            //if (missingBTs.Count > 0)
+            //    htmlTable.Append($"<h3 style='color:red;'>Missing BTs: {string.Join(", ", missingBTs)}</h3>");
 
             var partBResults = ValidateUGPartB(doc);
-            return ($"{htmlTable.ToString()} +\n\n {partBResults.Item1}", partBResults.Item2);
+            return ($"{htmlTable.ToString()} + {partBResults.Item1}", partBResults.Item2);
         }
         public static (string,bool) ValidateUGPartB(Document doc)
         {
             StringBuilder htmlTable = new StringBuilder();
             htmlTable.Append("<h2>Part B: Question Validation</h2>");
-            htmlTable.Append("<table border='1' cellpadding='5' cellspacing='0' style='border-collapse: collapse;'>");
-            htmlTable.Append("<tr><th>Question</th><th>SubQ1 Text</th><th>SubQ1 CO</th><th>SubQ1 BT</th><th>SubQ1 Marks</th><th>SubQ2 Text</th><th>SubQ2 CO</th><th>SubQ2 BT</th><th>SubQ2 Marks</th><th>Total Marks</th></tr>");
+            //htmlTable.Append("<table border='1' cellpadding='5' cellspacing='0' style='border-collapse: collapse;'>");
+            //htmlTable.Append("<tr><th>Question</th><th>SubQ1 Text</th><th>SubQ1 CO</th><th>SubQ1 BT</th><th>SubQ1 Marks</th><th>SubQ2 Text</th><th>SubQ2 CO</th><th>SubQ2 BT</th><th>SubQ2 Marks</th><th>Total Marks</th></tr>");
 
             List<string> errors = new List<string>();
             HashSet<string> validBTs = new() { "U", "AP", "AN" };
             HashSet<string> validCOs = new() { "CO1", "CO2", "CO3", "CO4", "CO5", "CO6" };
             HashSet<int> validMarks = new() { 6, 8, 10 };
+
+            // Sample marks allocation for each CO-BT combination
+            Dictionary<(string CO, string BT), int> marksDistribution = new Dictionary<(string, string), int>();
+            Dictionary<string, int> coTotals = new Dictionary<string, int>(); // Total per CO
+            Dictionary<string, int> btTotals = new Dictionary<string, int>(); // Total per BT
+            int grandTotal = 0; // Total of all marks
+
 
             int totalPartBMarks = 0;
             int expectedPartBMarks = 160;
@@ -902,11 +964,57 @@ namespace SKCE.Examination.Services.QPSettings
                 string subQ1CO = ExtractBookmarkText(doc, $"Q{qNo}ICO");
                 string subQ1BT = ExtractBookmarkText(doc, $"Q{qNo}IBT");
                 int subQ1Marks = ExtractMarksFromBookmark(doc, $"Q{qNo}IMarks");
+                var key = (subQ1CO, subQ1BT);
+                if (marksDistribution.ContainsKey(key))
+                {
+                    marksDistribution[key] += subQ1Marks;
+                }
+                else
+                {
+                    marksDistribution[key] = subQ1Marks;
+                }
+                // Update row-wise (CO) totals
+                if (coTotals.ContainsKey(subQ1CO))
+                    coTotals[subQ1CO] += subQ1Marks;
+                else
+                    coTotals[subQ1CO] = subQ1Marks;
+
+                // Update column-wise (BT) totals
+                if (btTotals.ContainsKey(subQ1BT))
+                    btTotals[subQ1BT] += subQ1Marks;
+                else
+                    btTotals[subQ1BT] = subQ1Marks;
+
+                // Update grand total
+                grandTotal += subQ1Marks;
 
                 string subQ2Text = ExtractBookmarkText(doc, $"Q{qNo}II");
                 string subQ2CO = ExtractBookmarkText(doc, $"Q{qNo}IICO");
                 string subQ2BT = ExtractBookmarkText(doc, $"Q{qNo}IIBT");
                 int subQ2Marks = ExtractMarksFromBookmark(doc, $"Q{qNo}IIMarks");
+                var key2 = (subQ2CO, subQ2BT);
+                if (marksDistribution.ContainsKey(key2))
+                {
+                    marksDistribution[key2] += subQ2Marks;
+                }
+                else
+                {
+                    marksDistribution[key2] = subQ2Marks;
+                }
+                // Update row-wise (CO) totals
+                if (coTotals.ContainsKey(subQ2CO))
+                    coTotals[subQ2CO] += subQ2Marks;
+                else
+                    coTotals[subQ2CO] = subQ2Marks;
+
+                // Update column-wise (BT) totals
+                if (btTotals.ContainsKey(subQ2BT))
+                    btTotals[subQ2BT] += subQ2Marks;
+                else
+                    btTotals[subQ2BT] = subQ2Marks;
+
+                // Update grand total
+                grandTotal += subQ2Marks;
 
                 string qpakAssigned = ExtractBookmarkText(doc, $"Q{qNo}QPAK");
                 string subQ2AnswerKey = ExtractBookmarkText(doc, $"Q{qNo}SubQ2AnswerKey");
@@ -930,8 +1038,53 @@ namespace SKCE.Examination.Services.QPSettings
                 if (totalMarks != 16) errors.Add($"❌ Q{qNo} Total Marks = {totalMarks} (should be 16).");
 
                 // Add to table
-                htmlTable.Append($"<tr><td>Q{qNo}</td><td>{subQ1Text}</td><td>{subQ1CO}</td><td>{subQ1BT}</td><td>{subQ1Marks}</td><td>{subQ2Text}</td><td>{subQ2CO}</td><td>{subQ2BT}</td><td>{subQ2Marks}</td><td>{totalMarks}</td></tr>");
+                //htmlTable.Append($"<tr><td>Q{qNo}</td><td>{subQ1Text}</td><td>{subQ1CO}</td><td>{subQ1BT}</td><td>{subQ1Marks}</td><td>{subQ2Text}</td><td>{subQ2CO}</td><td>{subQ2BT}</td><td>{subQ2Marks}</td><td>{totalMarks}</td></tr>");
             }
+
+            //htmlTable.Append("</table>");
+            htmlTable.Append("<table border='1' cellpadding='5' cellspacing='0' style='border-collapse: collapse;'>");
+
+            // Header row
+            htmlTable.Append("<tr style='background-color:#f2f2f2; font-weight:bold;'>");
+            htmlTable.Append("<th>CO</th>");
+            foreach (var bt in validBTs)
+            {
+                htmlTable.Append($"<th>{bt}</th>");
+            }
+            htmlTable.Append("<th>Total</th></tr>"); // Add total column
+
+            // Populate table rows
+            foreach (var co in validCOs)
+            {
+                htmlTable.Append("<tr>");
+                htmlTable.Append($"<td><b>{co}</b></td>");
+                int coTotal = 0;
+
+                foreach (var bt in validBTs)
+                {
+                    int marks = marksDistribution.ContainsKey((co, bt)) ? marksDistribution[(co, bt)] : 0;
+                    coTotal += marks;
+                    htmlTable.Append($"<td>{marks}</td>");
+                }
+
+                // Append row total
+                htmlTable.Append($"<td><b>{coTotal}</b></td>");
+                htmlTable.Append("</tr>");
+            }
+
+            // Add totals row
+            htmlTable.Append("<tr style='background-color:#f2f2f2; font-weight:bold;'>");
+            htmlTable.Append("<td>Total</td>");
+
+            foreach (var bt in validBTs)
+            {
+                int btTotal = btTotals.ContainsKey(bt) ? btTotals[bt] : 0;
+                htmlTable.Append($"<td>{btTotal}</td>");
+            }
+
+            // Append grand total
+            htmlTable.Append($"<td><b>{grandTotal}</b></td>");
+            htmlTable.Append("</tr>");
 
             htmlTable.Append("</table>");
 

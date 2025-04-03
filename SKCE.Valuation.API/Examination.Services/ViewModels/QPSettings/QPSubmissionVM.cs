@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,5 +13,6 @@ namespace SKCE.Examination.Services.ViewModels.QPSettings
         public string? GraphName { get; set; }
         public bool? IsTablesAllowed { get; set; }
         public string? TableName { get; set; }
+        public IFormFile file { get; set; }
     }
 }

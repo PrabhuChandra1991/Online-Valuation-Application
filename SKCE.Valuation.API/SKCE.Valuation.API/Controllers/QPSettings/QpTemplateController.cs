@@ -153,10 +153,17 @@ namespace SKCE.Examination.API.Controllers.QPSettings
             }
         }
 
-        [HttpGet("SubmitGeneratedQP/{userQPTemplateId}")]
-        public async Task<ActionResult<bool>> SubmitGeneratedQP(long userQPTemplateId, IFormFile file, QPSubmissionVM qPSubmissionVM)
+        [HttpPost("SubmitGeneratedQP/{userQPTemplateId}")]
+        public async Task<ActionResult<bool>> SubmitGeneratedQP(long userQPTemplateId, QPSubmissionVM qPSubmissionVM)
         {
-            var userQPTemplate = await _qpTemplateService.SubmitGeneratedQPAsync(userQPTemplateId, file, qPSubmissionVM);
+            // Save uploaded file to MemoryStream
+            using var stream = new MemoryStream();
+            await qPSubmissionVM.file.CopyToAsync(stream);
+            stream.Position = 0;
+            // Load Word document from stream
+            var documentId = _azureBlobStorageHelper.UploadFileAsync(stream, qPSubmissionVM.file.FileName, qPSubmissionVM.file.ContentType).Result;
+
+            var userQPTemplate = await _qpTemplateService.SubmitGeneratedQPAsync(userQPTemplateId, documentId, qPSubmissionVM);
             if (userQPTemplate == null) return NotFound();
             return Ok(userQPTemplate);
         }

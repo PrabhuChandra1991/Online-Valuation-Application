@@ -55,6 +55,7 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
     templates: any[] = [];
 
     isCourseSyllabusDocuploaded: boolean = false;
+    isQPPendingForScrutiny: boolean = false;
 
     selectedCourseId: any | null = null;
     selectedInstituteId: any | null = null;
@@ -75,6 +76,15 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
     @ViewChild('course') courseInput!: ElementRef;
 
 
+    qpDocDataForm = new FormGroup({
+      name: new FormControl('', [Validators.required, Validators.minLength(3)]),
+      file: new FormControl('', [Validators.required]),
+      fileSource: new FormControl('', [Validators.required])
+    });
+
+    isQPDocUploaded : boolean = false;
+    isQPDocValidated : boolean = false;
+    isInvalidDoc: boolean = false
 
     constructor(private modalService: NgbModal,
       private templateService: TemplateManagementService,
@@ -112,7 +122,7 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
 
         if(this.isAdmin)
         {
-          console.log('selected institute',this.selectedInstituteId);
+          // console.log('selected institute',this.selectedInstituteId);
 
           this.loadTemplateaForInstitute(this.selectedInstituteId);
 
@@ -153,24 +163,16 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
       }).catch((res) => {});
     }
 
-    downloadQP(documentId: any) {
-      debugger;
-      // this.qpDocumentService.downloadQPFile(2).subscribe({
-      //   next: () => {
-      //     this.toastr.success('File Downloaded successfully!');
-      //     // this.loadAssignedTemplates();
-      //     // this.modalRef.close();
-      //   },
-      //   error: (res) => {
-      //     this.toastr.error(res['error']['message']);
-      //     this.spinnerService.toggleSpinnerState(false);
-      //   },
-      //   complete: () => {
-      //    // this.isSubmitting = false;
-      //     this.spinnerService.toggleSpinnerState(false);
-      //   }
-      // });
-    }
+    openDocUploadModal(content: TemplateRef<any>) {
+      // this.isEditMode = false;
+      // this.selectedAssignment = null;
+      // this.modalRef = this.modalService.open(this.assignmentModal, { size: 'lg', backdrop: 'static' });
+        this.modalService.open(content, {size: 'lg'}).result.then((result) => {
+          console.log("Modal closed" + result);
+        }).catch((res) => {});
+      }
+
+
 
     editAssignment(content: TemplateRef<any>,documentId: any) {
       debugger
@@ -305,6 +307,7 @@ getAssignmentForTemplateId(templateId: any){
   this.templateService.getQpTemplateById(templateId).subscribe((response) => {
     this.qpTemplateData = response;
 
+    console.log('assigned template for sel template ',response);
     if(this.qpTemplateData)
     {
      //this.courseInput.nativeElement.value = this.qpTemplateData?.courseId;
@@ -317,8 +320,10 @@ getAssignmentForTemplateId(templateId: any){
         examMonth:  response.examMonth,
         examType: response.examType,
         semester: response.semester,
-        institutionName: response.institutions[0]?.institutionName || '',
-        studentCount:  response.institutions[0]?.studentCount || '',
+        //institutionName: response.institutions[0]?.institutionName || '',
+        studentCount:  response?.studentCount || '',
+        courseSyllabusDocumentName: response.courseSyllabusDocumentName,
+        courseSyllabusDocumentUrl: response.courseSyllabusDocumentUrl
 
       });
 
@@ -326,7 +331,12 @@ getAssignmentForTemplateId(templateId: any){
 
        this.updateFormWithData();
 
+       this.isCourseSyllabusDocuploaded = this.qpTemplateData.courseSyllabusDocumentId > 0;
+
+       this.isQPPendingForScrutiny = this.qpTemplateData.qpTemplateStatusTypeId == 3; // scrutiny assignment is pending
+
        this.isEditMode = false;
+
       console.log("qpTemplate",JSON.stringify(this.qpTemplateData));
     }
 
@@ -361,6 +371,7 @@ getAssignmentForTemplateId(templateId: any){
        this.isCourseSyllabusDocuploaded = this.qpTemplateData.courseSyllabusDocumentId > 0;
 
        console.log(response.courseSyllabusDocumentName);
+
         this.updateFormWithData();
 
        console.log("qpTemplate",JSON.stringify(this.qpTemplateData));
@@ -444,6 +455,7 @@ updateIsQPOnly(docIndex: number, userIndex: number, isChecked: boolean) {
       courseId: ['', Validators.required],
       templateId: [''],
       userId: [''],
+      scrutinyUserId: [''],
       courseSyllabusDocumentName: [''],
       courseSyllabusDocumentUrl: [''],
       qpDocuments: this.fb.array([
@@ -473,14 +485,36 @@ console.log('templateForm',this.templateAssignmentForm);
 
 }
 
+updateScrutinyUserDetails(docIndex: number, userIndex: number, user:any){
+  console.log('templateForm',this.templateAssignmentForm);
+  const selectedScrutinyUserId = user.target?.value;
+  const selectedUser = this.users.find(user => user.userId == selectedScrutinyUserId);
+
+  //docIndex = docIndex -1;
+
+  if (selectedUser) {
+    this.qpTemplateData.qpDocuments[docIndex].qpScrutinityUsers[userIndex].userId = selectedUser.userId;
+    this.qpTemplateData.qpDocuments[docIndex].qpScrutinityUsers[userIndex].userName = selectedUser.userName;
+
+  } else {
+    this.qpTemplateData.qpDocuments[docIndex].qpScrutinityUsers[userIndex].userId = null;
+    this.qpTemplateData.qpDocuments[docIndex].qpScrutinityUsers[userIndex].userName = '';
+  }
+}
+
 isUserAlreadySelected(qpAssignedUsers: any[], userId: number, currentIndex: number): boolean {
   return qpAssignedUsers.some((user, index) => index !== currentIndex && user.userId === userId);
 }
 
   onSave() {
+    debugger;
     if (this.templateAssignmentForm.valid) {
 
-      this.spinnerService.toggleSpinnerState(true);
+      if(this.isEditMode){
+        this.updateAssignment(this.qpTemplateData);
+      }
+      else{
+        this.spinnerService.toggleSpinnerState(true);
       const formData = this.qpTemplateData;
       formData.expert1Name = "";
       formData.expert2Name = "";
@@ -504,6 +538,8 @@ isUserAlreadySelected(qpAssignedUsers: any[], userId: number, currentIndex: numb
           this.spinnerService.toggleSpinnerState(false);
         }
       });
+      }
+
     } else {
       this.toasterService.warning('Please fill in all required fields.');
     }
@@ -537,6 +573,17 @@ isUserAlreadySelected(qpAssignedUsers: any[], userId: number, currentIndex: numb
     }
   }
 
+  clearSelection(docIndex: number, userIndex: number) {
+    const qpAssignedUsers = this.templateAssignmentForm.get('qpDocuments') as FormArray;
+    const userControl = qpAssignedUsers.at(docIndex).get('qpAssignedUsers') as FormArray;
+
+    // Reset userId dropdown & checkbox
+    userControl.at(userIndex).patchValue({
+      userId: '',
+      isQPOnly: false
+    });
+  }
+
   handleFormSubmit(assignmentData: any) {
     if (this.isEditMode) {
       // Update logic
@@ -555,6 +602,48 @@ isUserAlreadySelected(qpAssignedUsers: any[], userId: number, currentIndex: numb
     //this.resetForm();
 
     this.modalService.dismissAll();
+  }
+
+  onQPDocDataFileChange(event:any) {
+    if (event.target.files.length > 0) {
+      this.isQPDocUploaded = true;
+      const file = event.target.files[0];
+      this.qpDocDataForm.patchValue({
+        fileSource: file
+      });
+    }
+  }
+
+  validate(){
+    this.spinnerService.toggleSpinnerState(true);
+    const formData = new FormData();
+
+    const fileSourceValue = this.qpDocDataForm.get('fileSource')?.value;
+
+    if (fileSourceValue !== null && fileSourceValue !== undefined) {
+        formData.append('file', fileSourceValue);
+    }
+
+    this.isQPDocValidated = true;
+
+    this.spinnerService.toggleSpinnerState(false);
+
+    // this.ImportService.importData(formData)
+    // .subscribe({
+    //   next: (response) => {
+    //     this.duplicateImportAlert = response.message;
+    //     this.toastr.success(response.message);
+    //     this.f['file'].setValue('');
+    //   },
+    //   error: () => {
+    //     this.toastr.error('Failed to import data. Please try again.');
+    //     this.spinnerService.toggleSpinnerState(false);
+    //   },
+    //   complete: () => {
+    //     this.spinnerService.toggleSpinnerState(false);
+    //    }
+    // });
+
   }
 
 

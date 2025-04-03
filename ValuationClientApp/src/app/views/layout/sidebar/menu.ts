@@ -41,12 +41,12 @@ export const MENU: MenuItem[] = [
     link: '/apps/assigntemplate',
     role: [2]
   },
-  {
-    label: 'Valuation',
-    icon: 'list',
-    link: '/apps/valuation',
-    role: [2]
-  }
+  // {
+  //   label: 'Valuation',
+  //   icon: 'list',
+  //   link: '/apps/valuation',
+  //   role: [2]
+  // }
 
   // {
   //   label: 'Calendar',

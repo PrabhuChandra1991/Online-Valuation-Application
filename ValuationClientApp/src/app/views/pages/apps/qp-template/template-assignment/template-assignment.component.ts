@@ -85,6 +85,8 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
     isQPDocUploaded : boolean = false;
     isQPDocValidated : boolean = false;
     isInvalidDoc: boolean = false
+    qpTemplateId: number;
+    qpValidationMessage: any;
 
     constructor(private modalService: NgbModal,
       private templateService: TemplateManagementService,
@@ -95,7 +97,8 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
       private router: Router,
       private instituteService: InstituteService,
       private toastr: ToastrService,
-      private route: ActivatedRoute    ) {
+      private route: ActivatedRoute,
+    private qpDocumentService: QPDocumentService    ) {
 
 
     }
@@ -163,16 +166,15 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
       }).catch((res) => {});
     }
 
-    openDocUploadModal(content: TemplateRef<any>) {
-      // this.isEditMode = false;
-      // this.selectedAssignment = null;
-      // this.modalRef = this.modalService.open(this.assignmentModal, { size: 'lg', backdrop: 'static' });
+    openDocUploadModal(content: TemplateRef<any>, qpTemplateId: number) {
+
+      this.qpTemplateId = qpTemplateId;
+
         this.modalService.open(content, {size: 'lg'}).result.then((result) => {
           console.log("Modal closed" + result);
         }).catch((res) => {});
+
       }
-
-
 
     editAssignment(content: TemplateRef<any>,documentId: any) {
       debugger
@@ -183,16 +185,7 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
         console.log("Modal closed" + result);
       }).catch((res) => {});
 
-
-
-      //this.router.navigate(['/dashboard/edit', documentId]);
-
-
     }
-  // Back to the chat-list on tablet and mobile devices
-  // backToChatList() {
-  //   document.querySelector('.chat-content')!.classList.toggle('show');
-  // }
 
   loadExperts(): void {
     this.templateService.getExpertsForQPAssignment().subscribe({
@@ -614,39 +607,50 @@ isUserAlreadySelected(qpAssignedUsers: any[], userId: number, currentIndex: numb
     }
   }
 
-  validate(){
+  validate(qpDocumentId:number){
     this.spinnerService.toggleSpinnerState(true);
     const formData = new FormData();
-
+debugger
     const fileSourceValue = this.qpDocDataForm.get('fileSource')?.value;
 
     if (fileSourceValue !== null && fileSourceValue !== undefined) {
         formData.append('file', fileSourceValue);
     }
 
-    this.isQPDocValidated = true;
 
-    this.spinnerService.toggleSpinnerState(false);
+    this.qpDocumentService.validateQPFile(formData,qpDocumentId)
+    .subscribe({
+      next: (response) => {
+        if(response.inValid)
+          {
+            this.qpValidationMessage = response.message;
 
-    // this.ImportService.importData(formData)
-    // .subscribe({
-    //   next: (response) => {
-    //     this.duplicateImportAlert = response.message;
-    //     this.toastr.success(response.message);
-    //     this.f['file'].setValue('');
-    //   },
-    //   error: () => {
-    //     this.toastr.error('Failed to import data. Please try again.');
-    //     this.spinnerService.toggleSpinnerState(false);
-    //   },
-    //   complete: () => {
-    //     this.spinnerService.toggleSpinnerState(false);
-    //    }
-    // });
+            this.isQPDocValidated = false;
+          }else{
+            this.toastr.success('Data validated successfully!');
+            this.qpDocDataFormF['file'].setValue([]);
+            this.isQPDocValidated = true;
+
+          }
+
+      },
+      error: (response) => {
+        console.log(response);
+        if(response.inValid)
+          {
+            this.qpValidationMessage = response.message;
+
+            this.isQPDocValidated = false;
+          }
+        this.toastr.error('Invalid data. Please try again.');
+        this.spinnerService.toggleSpinnerState(false);
+      },
+      complete: () => {
+        this.spinnerService.toggleSpinnerState(false);
+       }
+    });
 
   }
-
-
 
 }
 

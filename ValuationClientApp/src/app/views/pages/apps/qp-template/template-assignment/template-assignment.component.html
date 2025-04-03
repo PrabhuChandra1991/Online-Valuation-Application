@@ -121,7 +121,7 @@
                       <a href="{{element.qpDocumentUrl}}">
                         <mat-icon>download</mat-icon>
                       </a>
-                      <a (click)="openDocUploadModal(lgDocModal)">
+                      <a (click)="openDocUploadModal(lgDocModal,element.qpTemplateId)">
                         <mat-icon>upload</mat-icon>
                       </a>
 
@@ -342,9 +342,7 @@
       <div class="row" *ngIf="isInvalidDoc">
         <div class="col-sm-8">
           <div class="mb-3">
-            <table>
-              <thead></thead>
-            </table>
+            {{qpValidationMessage}}
           </div>
           </div><!-- Col -->
       </div><!-- Row -->
@@ -353,7 +351,7 @@
   <div class="modal-footer">
     <button type="button" class="btn btn-secondary" (click)="close()">Close</button>
     <div >
-      <button type="button" class="btn btn-primary" *ngIf="!isQPDocValidated" [disabled]="!isQPDocUploaded" (click)="validate()">Validate</button>
+      <button type="button" class="btn btn-primary" *ngIf="!isQPDocValidated" [disabled]="!isQPDocUploaded" (click)="validate(qpTemplateId)">Validate</button>
     </div>
 
     <button type="button" class="btn btn-primary" *ngIf="isQPDocValidated">Submit</button>

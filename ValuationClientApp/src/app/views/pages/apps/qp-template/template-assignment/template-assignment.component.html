@@ -234,6 +234,15 @@
               <input type="text" class="form-control" formControlName = "studentCount">
           </div>
         </div><!-- Col -->
+        <div class="col-sm-4">
+          <div class="mb-3">
+            <label for="courseSyllabusDocumentName"
+              class="form-label">Syllabus Document</label>
+              <!-- <a class="form-control" formControlName = "courseSyllabusDocumentName">
+                {{ templateAssignmentForm.get('courseSyllabusDocumentName').value }}
+              </a>    -->
+          </div>
+        </div><!-- Col -->
       </div><!-- Row -->
       <div *ngIf="qpTemplateData" >
 
@@ -249,7 +258,7 @@
             <div formArrayName="qpAssignedUsers">
               <div class="row" *ngFor="let assignedUser of qpDocument.qpAssignedUsers; let userIndex = index" [formGroupName]="userIndex">
                 <!-- Expert Selection -->
-                <div class="col-sm-8">
+                <div class="col-sm-6">
                   <div class="mb-4">
                     <label class="form-label">Expert - {{ userIndex + 1 }}</label>
                     <select class="form-select" formControlName="userId"
@@ -268,6 +277,11 @@
                   <mat-checkbox class="checkbox" formControlName="isQPOnly" (change)="updateIsQPOnly(docIndex, userIndex, $event.checked)">
                     Is only for QP?
                   </mat-checkbox>
+                </div>
+                <div class="col-sm-2 d-flex align-items-center">
+                  <button class="btn btn-sm btn-outline-danger" (click)="clearSelection(docIndex, userIndex)">
+                    Clear
+                  </button>
                 </div>
 
               </div>

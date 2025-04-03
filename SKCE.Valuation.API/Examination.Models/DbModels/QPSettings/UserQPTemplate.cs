@@ -23,6 +23,7 @@ namespace SKCE.Examination.Models.DbModels.QPSettings
         public long InstitutionId { get; set; }
         public long QPTemplateId { get; set; }
         public long SubmittedQPDocumentId { get; set; }
+        public long? ParentUserQPTemplateId { get; set; }
 
     }
 }

@@ -12,6 +12,16 @@ using Document = Spire.Doc.Document;
 using Spire.Doc.Documents;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Linq;
+using Azure.Storage.Blobs;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Spreadsheet;
+using Syncfusion.Pdf;
+using System.Buffers;
+using Syncfusion.DocIO.DLS;
+using Syncfusion.DocIO;
+using DocumentFormat.OpenXml.Bibliography;
+using DocumentFormat.OpenXml.Presentation;
+using Text = DocumentFormat.OpenXml.Presentation.Text;
 namespace SKCE.Examination.Services.QPSettings
 {
     public class QpTemplateService 
@@ -22,6 +32,8 @@ namespace SKCE.Examination.Services.QPSettings
         private readonly IConfiguration _configuration;
         private readonly BookmarkProcessor _bookmarkProcessor;
         private readonly AzureBlobStorageHelper _azureBlobStorageHelper;
+        private readonly BlobServiceClient _blobServiceClient;
+        private readonly string _containerName;
         private static readonly Dictionary<long, string> QPDocumentTypeDictionary = new Dictionary<long, string>
         {
             { 1, "Course syllabus document" },
@@ -36,6 +48,9 @@ namespace SKCE.Examination.Services.QPSettings
         };
         public QpTemplateService(ExaminationDbContext context, IMapper mapper, IConfiguration configuration, BookmarkProcessor bookmarkProcessor, AzureBlobStorageHelper azureBlobStorageHelper, EmailService emailService)
         {
+            var connectionString = configuration["AzureBlobStorage:ConnectionString"];
+            _containerName = configuration["AzureBlobStorage:ContainerName"];
+            _blobServiceClient = new BlobServiceClient(connectionString);
             _bookmarkProcessor = bookmarkProcessor;
             _context = context;
             _mapper = mapper;
@@ -85,8 +100,7 @@ namespace SKCE.Examination.Services.QPSettings
                             && qp.ExamMonth == qPTemplate.ExamMonth
                             && qp.ExamType == qPTemplate.ExamType
                             && qp.DegreeTypeId == qPTemplate.DegreeTypeId)?.QPTemplateId ?? 0;
-            if (qpTemplateId > 0)
-                return await GetQPTemplateAsync(qpTemplateId);
+            
 
             var syllabusDocument = _context.CourseSyllabusDocuments.FirstOrDefault(d => d.CourseId == qPTemplate.CourseId);
             if (syllabusDocument != null)
@@ -95,6 +109,12 @@ namespace SKCE.Examination.Services.QPSettings
                 qPTemplate.CourseSyllabusDocumentName = documents.FirstOrDefault(di => di.DocumentId == syllabusDocument.DocumentId)?.Name ?? string.Empty;
                 qPTemplate.CourseSyllabusDocumentUrl = documents.FirstOrDefault(di => di.DocumentId == syllabusDocument.DocumentId)?.Url ?? string.Empty;
             }
+            else
+            {
+                qPTemplate = await ProcessExcelAndGeneratePdfAsync(qPTemplate);
+            }
+            if (qpTemplateId > 0)
+                return await GetQPTemplateAsync(qpTemplateId);
             List<long> institutionIds = courseDepartments.Select(cd => cd.InstitutionId).Distinct().ToList();
             var institutions = _context.Institutions.ToList();
             var departments = _context.Departments.ToList();
@@ -123,6 +143,192 @@ namespace SKCE.Examination.Services.QPSettings
             }
 
             return qPTemplate;
+        }
+
+        public async Task<QPTemplateVM> ProcessExcelAndGeneratePdfAsync(QPTemplateVM qPTemplate)
+        {
+            var pdfFileName = qPTemplate.CourseCode + ".pdf";
+
+            var documentId = _context.courseSyllabusMasters.FirstOrDefault()?.DocumentId;
+            var syllabusDocumentMaster = _context.Documents.FirstOrDefault(d => d.DocumentId == documentId);
+
+            // 🔹 Step 1: Download Excel from Azure Blob Storage
+            byte[] excelData = await DownloadFileFromBlobAsync(syllabusDocumentMaster.Name);
+
+            // 🔹 Step 2: Read Specific Row Data from Excel
+            var rowData = ReadSpecificRowFromExcel(excelData, qPTemplate.CourseCode);
+
+            if (rowData.Count == 0) return qPTemplate;
+
+            // 3. Replace bookmarks in Word document
+            string updatedPdfPath = ReplaceBookmarks(rowData);
+
+            // 🔹 Step 5: Upload PDF to Azure Blob Storage
+            long syllabusDocumentId =  await UploadFileToBlobAsync(pdfFileName, updatedPdfPath);
+
+            var courseSyllabusDocuments = _context.CourseSyllabusDocuments.ToList();
+            if (!courseSyllabusDocuments.Any(cs => cs.CourseId == qPTemplate.CourseId))
+            {
+                var courseSyllabusDocument = new CourseSyllabusDocument
+                {
+                    CourseId = qPTemplate.CourseId,
+                    DocumentId = syllabusDocumentId,
+                };
+                AuditHelper.SetAuditPropertiesForInsert(courseSyllabusDocument, 1);
+               await _context.CourseSyllabusDocuments.AddAsync(courseSyllabusDocument);
+            }
+            else
+            {
+                var existingCourseSyllabusDocument = _context.CourseSyllabusDocuments.FirstOrDefault(cs => cs.CourseId == qPTemplate.CourseId);
+                if (existingCourseSyllabusDocument != null)
+                {
+                    existingCourseSyllabusDocument.DocumentId = syllabusDocumentId;
+                    AuditHelper.SetAuditPropertiesForUpdate(existingCourseSyllabusDocument, 1);
+                }
+            }
+            await _context.SaveChangesAsync();
+            var documents = _context.Documents.Where(d => d.DocumentId == syllabusDocumentId);
+            qPTemplate.CourseSyllabusDocumentId = syllabusDocumentId;
+            qPTemplate.CourseSyllabusDocumentName = documents.FirstOrDefault(di => di.DocumentId == syllabusDocumentId)?.Name ?? string.Empty;
+            qPTemplate.CourseSyllabusDocumentUrl = documents.FirstOrDefault(di => di.DocumentId == syllabusDocumentId)?.Url ?? string.Empty;
+            return qPTemplate;
+        }
+
+        private async Task<byte[]> DownloadFileFromBlobAsync(string blobName)
+        {
+            BlobServiceClient blobServiceClient = new BlobServiceClient(_azureBlobStorageHelper._connectionString);
+            BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(_azureBlobStorageHelper._containerName);
+            BlobClient blobClient = containerClient.GetBlobClient(blobName);
+
+            using (var memoryStream = new MemoryStream())
+            {
+                await blobClient.DownloadToAsync(memoryStream);
+                return memoryStream.ToArray();
+            }
+        }
+
+        private async Task<long> UploadFileToBlobAsync(string blobName,string filePath)
+        {
+            BlobServiceClient blobServiceClient = new BlobServiceClient(_azureBlobStorageHelper._connectionString);
+            BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(_azureBlobStorageHelper._containerName);
+            BlobClient blobClient = containerClient.GetBlobClient(blobName);
+            using FileStream fileStream = File.OpenRead(filePath);
+            
+            await blobClient.UploadAsync(fileStream, overwrite: true);
+            // Save file metadata in the database
+            var document = new SKCE.Examination.Models.DbModels.Common.Document
+            {
+                Name = blobClient.Name,
+                Url = blobClient.Uri.ToString()
+            };
+            AuditHelper.SetAuditPropertiesForInsert(document, 1);
+            _context.Documents.Add(document);
+            await _context.SaveChangesAsync();
+
+            return document.DocumentId; // Return the generated Document ID
+        }
+
+        private Dictionary<string, string> ReadSpecificRowFromExcel(byte[] excelData, string searchValue)
+        {
+            Dictionary<string, string> rowData = new Dictionary<string, string>();
+
+            using (var memoryStream = new MemoryStream(excelData))
+            {
+               Spire.Xls.Workbook workbook = new Spire.Xls.Workbook();
+                workbook.LoadFromStream(memoryStream);
+
+                Spire.Xls.Worksheet sheet = workbook.Worksheets[0]; // Read from first sheet
+                int rowCount = sheet.Rows.Length;
+                int columnCount = sheet.Columns.Length;
+
+                for (int i = 1; i <= rowCount; i++) // Assuming first row is header
+                {
+                    string secondColumnValue = sheet.Range[i, 2].Text; // Column 2 = Search Column
+
+                    if (secondColumnValue.Equals(searchValue, StringComparison.OrdinalIgnoreCase))
+                    {
+                        for (int j = 1; j <= columnCount; j++)
+                        {
+                            string columnName = sheet.Range[1, j].Text; // Assuming first row is column names
+                            string columnValue = sheet.Range[i, j].Text;
+
+                            if (!string.IsNullOrEmpty(columnName) && !rowData.ContainsKey(columnName))
+                            {
+                                columnName = columnName.Trim().Replace(" ","");
+                                rowData[columnName] = columnValue;
+                            }
+                        }
+                        break; // Stop searching after finding the first match
+                    }
+                }
+            }
+
+            return rowData;
+        }
+        private string ReplaceBookmarks(Dictionary<string, string> rowData)
+        {
+           Spire.Doc.Document doc = new Spire.Doc.Document();
+            var wordTemplatePath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), "SyllabusDocumentTemplate\\Syllabus_sample template.doc");
+            doc.LoadFromFile(wordTemplatePath);
+           foreach (Spire.Doc.Bookmark bookmark in doc.Bookmarks)
+            {
+                Spire.Doc.Documents.BookmarksNavigator navigator = new Spire.Doc.Documents.BookmarksNavigator(doc);
+                navigator.MoveToBookmark(bookmark.Name);
+                if(bookmark.Name.Contains("CourseObjectives") || bookmark.Name.Contains("CourseOutcomesHead") 
+                || bookmark.Name.Contains("CourseOutcomes") || bookmark.Name.Contains("RBT")
+                || bookmark.Name.Contains("CourseModule") || bookmark.Name.Contains("CourseHours")
+                || bookmark.Name.Contains("CourseContent") || bookmark.Name.Contains("ReferenceBook"))
+                {
+                    navigator.ReplaceBookmarkContent(rowData[bookmark.Name.Remove(bookmark.Name.Length - 1, 1)].Split("[")[Convert.ToInt32(bookmark.Name.Substring(bookmark.Name.Length - 1))].Replace("]", ""), true);
+                }
+                else
+                {
+                    navigator.ReplaceBookmarkContent(rowData[bookmark.Name], true);
+                }
+            }
+
+            string updatedFilePath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), "UpdatedSyllabusDocument.docx");
+            doc.SaveToFile(updatedFilePath, FileFormat.Docx);
+            //// Remove evaluation watermark from the output document By OpenXML
+            RemoveTextFromDocx(updatedFilePath, "Evaluation Warning: The document was created with Spire.Doc for .NET.");
+
+            // Convert DOCX to PDF for preview By Syncfusion
+            string outputPdfPathBySyncfusion = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), "UpdatedSyllabusDocument.pdf");
+            ConvertToPdfBySyncfusion(updatedFilePath, outputPdfPathBySyncfusion);
+
+            return outputPdfPathBySyncfusion;
+        }
+        private void RemoveTextFromDocx(string filePath, string textToRemove)
+        {
+            using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
+            {
+                var body = doc.MainDocumentPart.Document.Body;
+
+                foreach (var textElement in body.Descendants<DocumentFormat.OpenXml.Wordprocessing.Text>().ToList())
+                {
+                    if (textElement.Text.Contains(textToRemove))
+                    {
+                        textElement.Text = textElement.Text.Replace(textToRemove, ""); // Remove text
+                    }
+                }
+
+                doc.MainDocumentPart.Document.Save(); // Save changes
+            }
+        }
+        static void ConvertToPdfBySyncfusion(string docxPath, string pdfPath)
+        {
+            // Load the Word document
+            WordDocument document = new WordDocument(docxPath, FormatType.Docx);
+            //// Convert Word to PDF
+            Syncfusion.Pdf.PdfDocument pdfDocument = new Syncfusion.Pdf.PdfDocument();
+            Syncfusion.DocIORenderer.DocIORenderer renderer = new Syncfusion.DocIORenderer.DocIORenderer();
+            pdfDocument = renderer.ConvertToPDF(document);
+            //ApplyPdfSecurity(pdfDocument);
+            // Save the PDF file
+            pdfDocument.Save(pdfPath);
+            document.Close();
+            //OpenPdfInBrowser(pdfPath);
+            //System.Console.WriteLine("DOCX to PDF conversion By Syncfusion completed.");
         }
         public async Task<QPTemplate> CreateQpTemplateAsync(QPTemplateVM qPTemplateVM)
         {
@@ -262,6 +468,58 @@ namespace SKCE.Examination.Services.QPSettings
                 qPTemplate.QPTemplateStatusTypeName = qpTemplateStatuss.FirstOrDefault(qps => qps.QPTemplateStatusTypeId == qPTemplate.QPTemplateStatusTypeId)?.Name ?? string.Empty;
                 qPTemplate.CourseCode = courses.FirstOrDefault(c => c.CourseId == qPTemplate.CourseId)?.Code ?? string.Empty;
                 qPTemplate.CourseName = courses.FirstOrDefault(c => c.CourseId == qPTemplate.CourseId)?.Name ?? string.Empty;
+                var userQPGenerateTemplates = _context.UserQPTemplates.Where(u => u.QPTemplateId == qPTemplate.QPTemplateId && (u.QPTemplateStatusTypeId == 8 || u.QPTemplateStatusTypeId == 9) && u.IsActive)
+                    .Select(u => new UserQPTemplateVM
+                    {
+                        UserQPTemplateId = u.UserQPTemplateId,
+                        UserId = u.UserId,
+                        InstitutionId = u.InstitutionId,
+                        QPTemplateCourseCode = qPTemplate.CourseCode,
+                        QPTemplateCourseName = qPTemplate.CourseName,
+                        QPTemplateExamMonth = qPTemplate.ExamMonth,
+                        QPTemplateExamYear = qPTemplate.ExamYear,
+                        QPTemplateStatusTypeId = u.QPTemplateStatusTypeId,
+                        QPTemplateName = qPTemplate.QPTemplateName,
+                        QPDocumentId = u.QPDocumentId,
+                        IsQPOnly = u.IsQPOnly,
+                    }).ToList();
+                foreach (var userTemplate in userQPGenerateTemplates)
+                {
+                    userTemplate.UserName = users.FirstOrDefault(us => us.UserId == userTemplate.UserId)?.Name ?? string.Empty;
+                    userTemplate.QPTemplateStatusTypeName = qpTemplateStatuss.FirstOrDefault(qps => qps.QPTemplateStatusTypeId == userTemplate.QPTemplateStatusTypeId)?.Name ?? string.Empty;
+                    if (!qPTemplate.QPDocuments.Any(qpd => qpd.QPDocumentId == userTemplate.QPDocumentId))
+                    {
+                        var qpGenerationDocument = _context.QPDocuments.FirstOrDefault(qpd => qpd.QPDocumentId == userTemplate.QPDocumentId);
+                        if (qpGenerationDocument != null)
+                        {
+                            var qpOnlyGenerationDocument = _context.QPDocuments.FirstOrDefault(qpd =>
+                                                              qpd.InstitutionId == qpGenerationDocument.InstitutionId
+                                                           && qpd.RegulationYear == qpGenerationDocument.RegulationYear
+                                                           && qpd.DegreeTypeName == qpGenerationDocument.DegreeTypeName
+                                                           && qpd.ExamType == qpGenerationDocument.ExamType
+                                                           && qpd.DocumentTypeId == 2);
+                            qPTemplate.QPDocuments.Add(new QPDocumentVM
+                            {
+                                QPDocumentId = qpGenerationDocument.QPDocumentId,
+                                InstitutionId = qpGenerationDocument.InstitutionId,
+                                QPDocumentName = qpGenerationDocument.QPDocumentName,
+                                QPOnlyDocumentId = qpOnlyGenerationDocument?.QPDocumentId ?? 0
+                            });
+                        }
+                    }
+                    qPTemplate.QPDocuments.FirstOrDefault(qpd => qpd.QPDocumentId == userTemplate.QPDocumentId)?.QPAssignedUsers.Add(
+                        new QPDocumentUserVM
+                        {
+                            UserQPTemplateId = userTemplate.UserQPTemplateId,
+                            IsQPOnly = userTemplate.IsQPOnly,
+                            UserId = userTemplate.UserId,
+                            UserName = userTemplate.UserName,
+                            StatusTypeId = userTemplate.QPTemplateStatusTypeId,
+                            StatusTypeName = userTemplate.QPTemplateStatusTypeName,
+                            InstitutionId = userTemplate.InstitutionId
+                        });
+                }
+
                 foreach (var qPDocument in qPTemplate.QPDocuments)
                 {
                     if (qPDocument.QPAssignedUsers.Count < 2)
@@ -316,6 +574,68 @@ namespace SKCE.Examination.Services.QPSettings
                 {
                     qPTemplate.DegreeTypeName = degreeTypes.FirstOrDefault(dt => dt.DegreeTypeId == qPTemplate.DegreeTypeId)?.Name ?? string.Empty;
                     qPTemplate.QPTemplateStatusTypeName = qpTemplateStatuss.FirstOrDefault(qps => qps.QPTemplateStatusTypeId == qPTemplate.QPTemplateStatusTypeId)?.Name ?? string.Empty;
+                     var userQPGenerateTemplates = _context.UserQPTemplates.Where(u => u.QPTemplateId == qPTemplate.QPTemplateId &&(u.QPTemplateStatusTypeId == 8 || u.QPTemplateStatusTypeId == 9) && u.IsActive)
+                    .Select(u => new UserQPTemplateVM
+                    {
+                        UserQPTemplateId = u.UserQPTemplateId,
+                                UserId = u.UserId,
+                                InstitutionId = u.InstitutionId,
+                                QPTemplateCourseCode = qPTemplate.CourseCode,
+                                QPTemplateCourseName = qPTemplate.CourseName,
+                                QPTemplateExamMonth = qPTemplate.ExamMonth,
+                                QPTemplateExamYear = qPTemplate.ExamYear,
+                                QPTemplateStatusTypeId = u.QPTemplateStatusTypeId,
+                                QPTemplateName = qPTemplate.QPTemplateName,
+                                QPDocumentId = u.QPDocumentId,
+                                IsQPOnly = u.IsQPOnly,
+                            }).ToList();
+                    var syllabusDocument = _context.CourseSyllabusDocuments.FirstOrDefault(d => d.CourseId == qPTemplate.CourseId);
+                    if (syllabusDocument != null)
+                    {
+                        qPTemplate.CourseSyllabusDocumentId = syllabusDocument.DocumentId;
+                        qPTemplate.CourseSyllabusDocumentName = documents.FirstOrDefault(di => di.DocumentId == syllabusDocument.DocumentId)?.Name ?? string.Empty;
+                        qPTemplate.CourseSyllabusDocumentUrl = documents.FirstOrDefault(di => di.DocumentId == syllabusDocument.DocumentId)?.Url ?? string.Empty;
+                    }
+                    else
+                    {
+                        await ProcessExcelAndGeneratePdfAsync(qPTemplate);
+                    }
+                    foreach (var userTemplate in userQPGenerateTemplates)
+                    {
+                        userTemplate.UserName = users.FirstOrDefault(us => us.UserId == userTemplate.UserId)?.Name ?? string.Empty;
+                        userTemplate.QPTemplateStatusTypeName = qpTemplateStatuss.FirstOrDefault(qps => qps.QPTemplateStatusTypeId == userTemplate.QPTemplateStatusTypeId)?.Name ?? string.Empty;
+                        if (!qPTemplate.QPDocuments.Any(qpd => qpd.QPDocumentId == userTemplate.QPDocumentId))
+                        {
+                            var qpGenerationDocument = _context.QPDocuments.FirstOrDefault(qpd => qpd.QPDocumentId == userTemplate.QPDocumentId);
+                            if (qpGenerationDocument != null)
+                            {
+                                var qpOnlyGenerationDocument = _context.QPDocuments.FirstOrDefault(qpd =>
+                                                                  qpd.InstitutionId == qpGenerationDocument.InstitutionId
+                                                               && qpd.RegulationYear == qpGenerationDocument.RegulationYear
+                                                               && qpd.DegreeTypeName == qpGenerationDocument.DegreeTypeName
+                                                               && qpd.ExamType == qpGenerationDocument.ExamType
+                                                               && qpd.DocumentTypeId == 2);
+                                qPTemplate.QPDocuments.Add(new QPDocumentVM
+                                {
+                                    QPDocumentId = qpGenerationDocument.QPDocumentId,
+                                    InstitutionId = qpGenerationDocument.InstitutionId,
+                                    QPDocumentName = qpGenerationDocument.QPDocumentName,
+                                    QPOnlyDocumentId = qpOnlyGenerationDocument?.QPDocumentId ?? 0
+                                });
+                            }
+                        }
+                        qPTemplate.QPDocuments.FirstOrDefault(qpd => qpd.QPDocumentId == userTemplate.QPDocumentId)?.QPAssignedUsers.Add(
+                            new QPDocumentUserVM
+                            {
+                                UserQPTemplateId = userTemplate.UserQPTemplateId,
+                                IsQPOnly = userTemplate.IsQPOnly,
+                                UserId = userTemplate.UserId,
+                                UserName = userTemplate.UserName,
+                                StatusTypeId = userTemplate.QPTemplateStatusTypeId,
+                                StatusTypeName = userTemplate.QPTemplateStatusTypeName,
+                                InstitutionId = userTemplate.InstitutionId
+                            });
+                    }
                     foreach (var qPDocument  in qPTemplate.QPDocuments)
                     {
                         if(qPDocument.QPAssignedUsers.Count <2)
@@ -405,8 +725,8 @@ namespace SKCE.Examination.Services.QPSettings
              _context.SaveChanges();
             return true;
         }
-        public async Task<(string message, bool inValidForSubmission)> ValidateGeneratedQPAndPreview(long userId, long institutionId, Document doc) {
-            var userQPTemplate = await _context.UserQPTemplates.FirstOrDefaultAsync(uqp => uqp.UserId == userId && uqp.InstitutionId == institutionId);
+        public async Task<(string message, bool inValidForSubmission)> ValidateGeneratedQPAsync(long userQPTemplateId, Document doc) {
+            var userQPTemplate = await _context.UserQPTemplates.FirstOrDefaultAsync(uqp => uqp.UserQPTemplateId == userQPTemplateId);
             if (userQPTemplate == null)
             {
                 return ("User QP assignment is missing.", true);
@@ -428,7 +748,7 @@ namespace SKCE.Examination.Services.QPSettings
             }
             return (string.Empty,true);
         }
-        public async Task<bool> PreviewGeneratedQP(long userId, long InstitutionId, long generatedDocumentId)
+        public async Task<bool> PreviewGeneratedQP(long userQPTemplateId, long generatedDocumentId)
         {
             //var qpTemplate = _context.QPTemplates.FirstOrDefault(qp => qp.QPTemplateId == qpTemplateInstitution.QPTemplateId);
             //if (qpTemplate == null) return false;
@@ -904,10 +1224,10 @@ namespace SKCE.Examination.Services.QPSettings
         }
         private static string ExtractBookmarkText(Document doc, string bookmarkName)
         {
-            Bookmark bookmark = doc.Bookmarks[bookmarkName];
+            Spire.Doc.Bookmark bookmark = doc.Bookmarks[bookmarkName];
             if(bookmark == null) return "Unknown";
-            BookmarkStart bookmarkStart = bookmark.BookmarkStart;
-            BookmarkEnd bookmarkEnd = bookmark.BookmarkEnd;
+            Spire.Doc.BookmarkStart bookmarkStart = bookmark.BookmarkStart;
+            Spire.Doc.BookmarkEnd bookmarkEnd = bookmark.BookmarkEnd;
 
             if (bookmarkStart == null || bookmarkEnd == null)
                 return "Unknown";
@@ -927,7 +1247,7 @@ namespace SKCE.Examination.Services.QPSettings
         }
         private static int ExtractMarksFromBookmark(Document doc, string bookmarkName)
         {
-            Bookmark bookmark = doc.Bookmarks[bookmarkName];
+            Spire.Doc.Bookmark bookmark = doc.Bookmarks[bookmarkName];
             if (bookmark != null && int.TryParse(ExtractBookmarkText(doc, bookmarkName), out int marks))
             {
                 return marks;

@@ -9,15 +9,16 @@ namespace SKCE.Examination.Services.Helpers
 {
     public class AzureBlobStorageHelper
     {
-        private readonly BlobServiceClient _blobServiceClient;
-        private readonly string _containerName;
+        public readonly BlobServiceClient _blobServiceClient;
+        public readonly string _containerName;
+        public readonly string _connectionString;
         private readonly ExaminationDbContext _context;
         public AzureBlobStorageHelper(IConfiguration configuration, ExaminationDbContext context)
         {
-            var connectionString = configuration["AzureBlobStorage:ConnectionString"];
+             _connectionString = configuration["AzureBlobStorage:ConnectionString"];
             _containerName = configuration["AzureBlobStorage:ContainerName"];
 
-            _blobServiceClient = new BlobServiceClient(connectionString);
+            _blobServiceClient = new BlobServiceClient(_connectionString);
             _context = context;
         }
 

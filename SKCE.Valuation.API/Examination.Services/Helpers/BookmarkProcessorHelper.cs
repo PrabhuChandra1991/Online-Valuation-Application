@@ -9,6 +9,7 @@ using Syncfusion.Licensing;
 using Spire.Doc;
 using Document = Spire.Doc.Document;
 using Paragraph = Spire.Doc.Documents.Paragraph;
+using Spire.Doc.Documents;
 using Syncfusion.DocIO.DLS;
 using Spire.Doc.Collections;
 using Body = Spire.Doc.Body;
@@ -16,6 +17,8 @@ using Syncfusion.DocIO;
 using SKCE.Examination.Services.ViewModels.QPSettings;
 using DocumentFormat.OpenXml.Vml.Office;
 using DocumentFormat.OpenXml.Math;
+using Spire.Doc.Fields;
+using Amazon.Runtime.Internal.Transform;
 
 namespace SKCE.Examination.Services.Helpers
 {
@@ -34,7 +37,7 @@ namespace SKCE.Examination.Services.Helpers
             printerName = configuration["Print:PrinterName"] ?? throw new ArgumentNullException(nameof(configuration), "PrinterName is not configured.");
         }
         // Processes bookmarks in a source document and prints the modified document
-        public async Task ProcessBookmarksAndPrint(QPTemplate qPTemplate,UserQPTemplate userQPTemplate, string inputDocPath, string documentPathToPrint, bool isForPrint)
+        public async Task ProcessBookmarksAndPrint(QPTemplate qPTemplate, UserQPTemplate userQPTemplate, string inputDocPath, string documentPathToPrint, bool isForPrint)
         {
             try
             {
@@ -54,26 +57,36 @@ namespace SKCE.Examination.Services.Helpers
                 Dictionary<string, string> bookmarkUpdates = new Dictionary<string, string>
                 {
                     { "QPCODE", "" },
-                    { "PROGRAMME", "" },
+                    { "EXAMMONTH", "" },
+                    { "EXAMYEAR", "" },
+                    { "EXAMTYPE", "" },
+                    { "REGULATIONYEAR", "" },
+                    { "PROGRAMME","" },
+                    { "SEMESTER", "" },
                     { "COURSECODE", "" },
                     { "COURSETITLE", "" },
-                    { "SEMESTER", "" },
+                    { "SUPPORTCATALOGS", "" }
                 };
 
-               
+                var courseSyllabusDocument = _context.CourseSyllabusDocuments.FirstOrDefault(c => c.CourseId == qPTemplate.CourseId);
+                
+                var courseSyllabusWordDocument = _context.Documents.FirstOrDefault(d => d.DocumentId == courseSyllabusDocument.WordDocumentId);
+                // Load the template document where bookmarks need to be replaced
+                Document SyllabusWordDoc = await _azureBlobStorageHelper.DownloadWordDocumentFromBlob(courseSyllabusWordDocument.Name);
+                
                 // Iterate through all bookmarks in the source document
                 foreach (var bookmark in bookmarkUpdates)
                 {
                     string bookmarkName = bookmark.Key;
                     string bookmarkHtml = string.Empty;
-
                     if (bookmarkName == "PROGRAMME")
                     {
                         var examinations = _context.Examinations.Where(cd => cd.CourseId == qPTemplate.CourseId).ToList();
                         var departments = _context.Departments.ToList();
-                        var departmentVMs = examinations.Join(departments, cd => cd.DepartmentId, d => d.DepartmentId, (cd, d) => new { cd, d })
+                        var departmentVMs = examinations.Join(departments, cd => cd.DepartmentId, d => d.DepartmentId,
+                            (cd, d) => new { cd, d })
                         .Where(cd => cd.cd.InstitutionId == userQPTemplate.InstitutionId)
-                        .Select(cd => new 
+                        .Select(cd => new
                         {
                             DepartmentId = cd.d.DepartmentId,
                             DepartmentName = cd.d.Name,
@@ -81,30 +94,60 @@ namespace SKCE.Examination.Services.Helpers
                         }).ToList();
 
                         var departmentIds = departmentVMs.Select(q => q.DepartmentId).ToList();
+
                         if (departmentIds.Any() && departmentIds.Count > 2)
                         {
                             bookmarkHtml = String.Join(", ", _context.Departments.Where(d => departmentIds.Contains(d.DepartmentId)).Select(d => d.ShortName).ToList());
                         }
                         else
                             bookmarkHtml = String.Join(", ", _context.Departments.Where(d => departmentIds.Contains(d.DepartmentId)).Select(d => d.Name).ToList());
-                        bookmarkUpdates[bookmark.Key] = bookmarkHtml;
                     }
                     else if (bookmarkName == "COURSECODE")
                     {
-                        bookmarkHtml = _context.Courses.FirstOrDefault(c => c.CourseId == qPTemplate.CourseId)?.Code ?? string.Empty;
+                        bookmarkHtml = _context.Courses.FirstOrDefault(c =>
+                        c.CourseId == qPTemplate.CourseId)?.Code ?? string.Empty;
                     }
                     else if (bookmarkName == "COURSETITLE")
                     {
-                        bookmarkHtml = _context.Courses.FirstOrDefault(c => c.CourseId == qPTemplate.CourseId)?.Name ?? string.Empty;
+                        bookmarkHtml = _context.Courses.FirstOrDefault(c =>
+                        c.CourseId == qPTemplate.CourseId)?.Name ?? string.Empty;
                     }
                     else if (bookmarkName == "SEMESTER")
                     {
-                        bookmarkHtml = _context.QPTemplates.FirstOrDefault(c => c.QPTemplateId == qPTemplate.QPTemplateId)?.Semester.ToString() ?? string.Empty;
+                        bookmarkHtml = _context.QPTemplates.FirstOrDefault(c =>
+                        c.QPTemplateId == qPTemplate.QPTemplateId)?.Semester.ToString() ?? string.Empty;
                     }
                     else if (bookmarkName == "QPCODE")
                     {
-                        bookmarkHtml = _context.QPTemplates.FirstOrDefault(c => c.QPTemplateId == qPTemplate.QPTemplateId)?.QPCode.ToString() ?? string.Empty;
+                        bookmarkHtml = _context.QPTemplates.FirstOrDefault(c =>
+                        c.QPTemplateId == qPTemplate.QPTemplateId)?.QPCode.ToString() ?? string.Empty;
                     }
+                    else if (bookmarkName == "EXAMMONTH")
+                    {
+                        bookmarkHtml = _context.QPTemplates.FirstOrDefault(c =>
+                        c.QPTemplateId == qPTemplate.QPTemplateId)?.ExamMonth.ToString() ?? string.Empty;
+                    }
+                    else if (bookmarkName == "EXAMYEAR")
+                    {
+                        bookmarkHtml = _context.QPTemplates.FirstOrDefault(c =>
+                        c.QPTemplateId == qPTemplate.QPTemplateId)?.ExamYear.ToString() ?? string.Empty;
+                    }
+                    else if (bookmarkName == "EXAMTYPE")
+                    {
+                        bookmarkHtml = _context.QPTemplates.FirstOrDefault(c =>
+                        c.QPTemplateId == qPTemplate.QPTemplateId)?.ExamType.ToString() ?? string.Empty;
+                    }
+                    else if (bookmarkName == "REGULATIONYEAR")
+                    {
+                        bookmarkHtml = _context.QPTemplates.FirstOrDefault(c =>
+                        c.QPTemplateId == qPTemplate.QPTemplateId)?.RegulationYear.ToString() ?? string.Empty;
+                    }
+                    else if (bookmarkName == "SUPPORTCATALOGS")
+                    {
+                        bookmarkHtml = string.Empty;
+                    }
+
+                    bookmarkUpdates[bookmark.Key] = bookmarkHtml;
                     // Replace bookmark content in the template document
                     //ReplaceBookmarkWithHtml(tempDoc, bookmarkName, bookmarkHtml);
                 }
@@ -113,8 +156,21 @@ namespace SKCE.Examination.Services.Helpers
                 foreach (var bookmark in bookmarkUpdates)
                 {
                     Spire.Doc.Bookmark bookMark = sourceDoc.Bookmarks[bookmark.Key];
-                    if(bookMark != null)
-                    bookMark.BookmarkStart.OwnerParagraph.Text = bookmark.Value;
+                    if (bookMark != null)
+                    {
+                        if (bookMark.BookmarkStart.OwnerParagraph.Items.Count > 0)
+                        {
+                            foreach (var item in bookMark.BookmarkStart.OwnerParagraph.Items)
+                            {
+                                if (item is TextRange textRange)
+                                {
+                                    // Replace the text in the bookmark with the new value
+                                    textRange.Text = bookmark.Value;
+                                    break;
+                                }
+                            }
+                        }
+                    }
                 }
 
                 sourceDoc.SaveToFile(updatedSourcePath, FileFormat.Docx);
@@ -123,15 +179,15 @@ namespace SKCE.Examination.Services.Helpers
                 updatedSourcedoc.LoadFromFile(updatedSourcePath);
 
                 // Iterate through all bookmarks in the source document
-                foreach (Spire.Doc.Bookmark bookmark in updatedSourcedoc.Bookmarks)
+                foreach (Spire.Doc.Bookmark bookmark2 in SyllabusWordDoc.Bookmarks)
                 {
-                    string bookmarkName = bookmark.Name;
+                    string bookmarkName = bookmark2.Name;
                     // Find the same bookmark in the destination document
                     Spire.Doc.Bookmark destinationBookmark = templateDoc.Bookmarks.FindByName(bookmarkName);
                     if (destinationBookmark != null)
                     {
                         // Extract content from the source bookmark (including images)
-                        DocumentObjectCollection sourceContent = bookmark.BookmarkStart.OwnerParagraph.ChildObjects;
+                        DocumentObjectCollection sourceContent = bookmark2.BookmarkStart.OwnerParagraph.ChildObjects;
 
                         // Clear existing content in destination bookmark
                         Paragraph destParagraph = destinationBookmark.BookmarkStart.OwnerParagraph;
@@ -144,6 +200,30 @@ namespace SKCE.Examination.Services.Helpers
                         }
                     }
                 }
+
+                // Iterate through all bookmarks in the source document
+                foreach (Spire.Doc.Bookmark bookmark1 in updatedSourcedoc.Bookmarks)
+                {
+                    string bookmarkName = bookmark1.Name;
+                    // Find the same bookmark in the destination document
+                    Spire.Doc.Bookmark destinationBookmark = templateDoc.Bookmarks.FindByName(bookmarkName);
+                    if (destinationBookmark != null)
+                    {
+                        // Extract content from the source bookmark (including images)
+                        DocumentObjectCollection sourceContent = bookmark1.BookmarkStart.OwnerParagraph.ChildObjects;
+
+                        // Clear existing content in destination bookmark
+                        Paragraph destParagraph = destinationBookmark.BookmarkStart.OwnerParagraph;
+                        destParagraph.ChildObjects.Clear();
+
+                        // Copy content to the destination bookmark
+                        foreach (DocumentObject obj in sourceContent)
+                        {
+                            destParagraph.ChildObjects.Add(obj.Clone());
+                        }
+                    }
+                }
+
                 var previewdocPath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}.docx", qPTemplate.QPTemplateName, DateTime.Now.ToString("ddMMyyyyhhmmss")));
                 templateDoc.SaveToFile(previewdocPath, FileFormat.Docx);
 
@@ -244,7 +324,7 @@ namespace SKCE.Examination.Services.Helpers
             try
             {
                 // Load the PDF into Aspose.Words.Document
-                Document pdfDoc = new (pdfPath);
+                Document pdfDoc = new(pdfPath);
 
                 //PrinterSettings printerSettings = new PrinterSettings
                 //{
@@ -283,7 +363,8 @@ namespace SKCE.Examination.Services.Helpers
                 Console.WriteLine("Printing failed: " + ex.Message);
             }
         }
-        private void LoadLicense() {
+        private void LoadLicense()
+        {
             // This line attempts to set a license from several locations relative to the executable and Aspose.Words.dll.
             // You can also use the additional overload to load a license from a stream, this is useful,
             // for instance, when the license is stored as an embedded resource.

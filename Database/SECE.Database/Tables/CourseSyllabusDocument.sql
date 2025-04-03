@@ -3,6 +3,7 @@
 	[CourseSyllabusDocumentId] BIGINT NOT NULL PRIMARY KEY IDENTITY(1,1),
 	[CourseId] BIGINT NOT NULL,
 	[DocumentId] BIGINT NOT NULL,
+	[WordDocumentId] BIGINT NULL,
 	[IsActive] BIT DEFAULT 1,
 	CreatedDate DATETIME DEFAULT GETDATE(),
 	CreatedById BIGINT NOT NULL,

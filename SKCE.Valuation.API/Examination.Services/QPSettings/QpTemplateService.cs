@@ -108,7 +108,7 @@ namespace SKCE.Examination.Services.QPSettings
             var syllabusDocument = _context.CourseSyllabusDocuments.FirstOrDefault(d => d.CourseId == qPTemplate.CourseId);
             if (syllabusDocument != null)
             {
-                qPTemplate.CourseSyllabusDocumentId = syllabusDocument.DocumentId;
+                qPTemplate.CourseSyllabusDocumentId = syllabusDocument.CourseSyllabusDocumentId;
                 qPTemplate.CourseSyllabusDocumentName = documents.FirstOrDefault(di => di.DocumentId == syllabusDocument.DocumentId)?.Name ?? string.Empty;
                 qPTemplate.CourseSyllabusDocumentUrl = documents.FirstOrDefault(di => di.DocumentId == syllabusDocument.DocumentId)?.Url ?? string.Empty;
             }
@@ -150,6 +150,7 @@ namespace SKCE.Examination.Services.QPSettings
         public async Task<QPTemplateVM> ProcessExcelAndGeneratePdfAsync(QPTemplateVM qPTemplate)
         {
             var pdfFileName = qPTemplate.CourseCode + ".pdf";
+            var docFileName = qPTemplate.CourseCode + ".docx";
 
             var documentId = _context.courseSyllabusMasters.FirstOrDefault()?.DocumentId;
             var syllabusDocumentMaster = _context.Documents.FirstOrDefault(d => d.DocumentId == documentId);
@@ -163,10 +164,13 @@ namespace SKCE.Examination.Services.QPSettings
             if (rowData.Count == 0) return qPTemplate;
 
             // 3. Replace bookmarks in Word document
-            string updatedPdfPath = ReplaceBookmarks(rowData);
+           var (updatedPdfPath, updatedwordPath) = ReplaceBookmarks(rowData);
 
             // 🔹 Step 5: Upload PDF to Azure Blob Storage
-            long syllabusDocumentId =  await UploadFileToBlobAsync(pdfFileName, updatedPdfPath);
+            long syllabuspdfDocumentId =  await UploadFileToBlobAsync(pdfFileName, updatedPdfPath);
+            
+            // 🔹 Step 6: Upload PDF to Azure Blob Storage
+            long syllabusDocumentId = await UploadFileToBlobAsync(docFileName, updatedwordPath);
 
             var courseSyllabusDocuments = _context.CourseSyllabusDocuments.ToList();
             if (!courseSyllabusDocuments.Any(cs => cs.CourseId == qPTemplate.CourseId))
@@ -174,25 +178,28 @@ namespace SKCE.Examination.Services.QPSettings
                 var courseSyllabusDocument = new CourseSyllabusDocument
                 {
                     CourseId = qPTemplate.CourseId,
-                    DocumentId = syllabusDocumentId,
+                    DocumentId = syllabuspdfDocumentId,
+                    WordDocumentId = syllabusDocumentId
                 };
                 AuditHelper.SetAuditPropertiesForInsert(courseSyllabusDocument, 1);
                await _context.CourseSyllabusDocuments.AddAsync(courseSyllabusDocument);
+                await _context.SaveChangesAsync();
+                qPTemplate.CourseSyllabusDocumentId = courseSyllabusDocument.CourseSyllabusDocumentId;
             }
             else
             {
                 var existingCourseSyllabusDocument = _context.CourseSyllabusDocuments.FirstOrDefault(cs => cs.CourseId == qPTemplate.CourseId);
                 if (existingCourseSyllabusDocument != null)
                 {
-                    existingCourseSyllabusDocument.DocumentId = syllabusDocumentId;
+                    existingCourseSyllabusDocument.DocumentId = syllabuspdfDocumentId;
+                    existingCourseSyllabusDocument.WordDocumentId = syllabusDocumentId;
                     AuditHelper.SetAuditPropertiesForUpdate(existingCourseSyllabusDocument, 1);
                 }
+                await _context.SaveChangesAsync();
             }
-            await _context.SaveChangesAsync();
-            var documents = _context.Documents.Where(d => d.DocumentId == syllabusDocumentId);
-            qPTemplate.CourseSyllabusDocumentId = syllabusDocumentId;
-            qPTemplate.CourseSyllabusDocumentName = documents.FirstOrDefault(di => di.DocumentId == syllabusDocumentId)?.Name ?? string.Empty;
-            qPTemplate.CourseSyllabusDocumentUrl = documents.FirstOrDefault(di => di.DocumentId == syllabusDocumentId)?.Url ?? string.Empty;
+            var documents = _context.Documents.Where(d => d.DocumentId == syllabuspdfDocumentId);
+            qPTemplate.CourseSyllabusDocumentName = documents.FirstOrDefault(di => di.DocumentId == syllabuspdfDocumentId)?.Name ?? string.Empty;
+            qPTemplate.CourseSyllabusDocumentUrl = documents.FirstOrDefault(di => di.DocumentId == syllabuspdfDocumentId)?.Url ?? string.Empty;
             return qPTemplate;
         }
         private async Task<byte[]> DownloadFileFromBlobAsync(string blobName)
@@ -264,7 +271,7 @@ namespace SKCE.Examination.Services.QPSettings
 
             return rowData;
         }
-        private string ReplaceBookmarks(Dictionary<string, string> rowData)
+        private (string, string) ReplaceBookmarks(Dictionary<string, string> rowData)
         {
            Spire.Doc.Document doc = new Spire.Doc.Document();
             var wordTemplatePath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), "SyllabusDocumentTemplate\\Syllabus_sample template.doc");
@@ -295,7 +302,7 @@ namespace SKCE.Examination.Services.QPSettings
             string outputPdfPathBySyncfusion = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), "UpdatedSyllabusDocument.pdf");
             ConvertToPdfBySyncfusion(updatedFilePath, outputPdfPathBySyncfusion);
 
-            return outputPdfPathBySyncfusion;
+            return (outputPdfPathBySyncfusion, updatedFilePath);
         }
         private void RemoveTextFromDocx(string filePath, string textToRemove)
         {
@@ -346,7 +353,8 @@ namespace SKCE.Examination.Services.QPSettings
                 ExamMonth = qPTemplateVM.ExamMonth,
                 ExamType = qPTemplateVM.ExamType,
                 Semester = qPTemplateVM.Semester,
-                StudentCount = qPTemplateVM.StudentCount
+                StudentCount = qPTemplateVM.StudentCount,
+                CourseSyllabusDocumentId= qPTemplateVM.CourseSyllabusDocumentId.Value
             };
             var courseDetails = _context.Courses.FirstOrDefault(c => c.CourseId == qPTemplateVM.CourseId);
             var degreeType = _context.DegreeTypes.FirstOrDefault(c => c.DegreeTypeId == qPTemplateVM.DegreeTypeId);
@@ -591,7 +599,7 @@ namespace SKCE.Examination.Services.QPSettings
                     var syllabusDocument = _context.CourseSyllabusDocuments.FirstOrDefault(d => d.CourseId == qPTemplate.CourseId);
                     if (syllabusDocument != null)
                     {
-                        qPTemplate.CourseSyllabusDocumentId = syllabusDocument.DocumentId;
+                        qPTemplate.CourseSyllabusDocumentId = syllabusDocument.CourseSyllabusDocumentId;
                         qPTemplate.CourseSyllabusDocumentName = documents.FirstOrDefault(di => di.DocumentId == syllabusDocument.DocumentId)?.Name ?? string.Empty;
                         qPTemplate.CourseSyllabusDocumentUrl = documents.FirstOrDefault(di => di.DocumentId == syllabusDocument.DocumentId)?.Url ?? string.Empty;
                     }

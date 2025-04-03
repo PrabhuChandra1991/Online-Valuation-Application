@@ -17,5 +17,6 @@ namespace SKCE.Examination.Models.DbModels.QPSettings
         public long CourseSyllabusDocumentId { get; set; }
         public long CourseId { get; set; }
         public long DocumentId { get; set; }
+        public long? WordDocumentId { get; set; }
     }
 }

@@ -17,6 +17,7 @@ import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import { InstituteService } from '../../../services/institute.service';
 import { MatButtonModule } from '@angular/material/button';
+import { QPDocumentService } from '../../../services/qpdocument.service';
 
 
 @Component({
@@ -39,6 +40,7 @@ import { MatButtonModule } from '@angular/material/button';
   styleUrl: './template-assignment.component.scss'
 })
 export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
+[x: string]: any;
 
   isAdmin: Boolean ;
   isEditMode: Boolean;
@@ -51,6 +53,8 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
     basicModalCloseResult: string = '';
     users: any[] = [];
     templates: any[] = [];
+
+    isCourseSyllabusDocuploaded: boolean = false;
 
     selectedCourseId: any | null = null;
     selectedInstituteId: any | null = null;
@@ -70,6 +74,8 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
     @ViewChild('assignmentModal') assignmentModal: any;
     @ViewChild('course') courseInput!: ElementRef;
 
+
+
     constructor(private modalService: NgbModal,
       private templateService: TemplateManagementService,
       private userService: UserService,
@@ -79,8 +85,7 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
       private router: Router,
       private instituteService: InstituteService,
       private toastr: ToastrService,
-      private route: ActivatedRoute,
-    ) {
+      private route: ActivatedRoute    ) {
 
 
     }
@@ -97,8 +102,6 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
 
       this.loadAllInstitues();
 
-      this.loadAssignedTemplates();
-
       const loggedInUser = localStorage.getItem('userData');
 
       if(loggedInUser)
@@ -106,6 +109,17 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
         const userData = JSON.parse(loggedInUser);
 
         this.isAdmin = userData.roleId == 1;
+
+        if(this.isAdmin)
+        {
+          console.log('selected institute',this.selectedInstituteId);
+
+          this.loadTemplateaForInstitute(this.selectedInstituteId);
+
+        }
+
+        else
+          this.loadAssignedTemplates();
       }
 
     }
@@ -139,7 +153,24 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
       }).catch((res) => {});
     }
 
-
+    downloadQP(documentId: any) {
+      debugger;
+      // this.qpDocumentService.downloadQPFile(2).subscribe({
+      //   next: () => {
+      //     this.toastr.success('File Downloaded successfully!');
+      //     // this.loadAssignedTemplates();
+      //     // this.modalRef.close();
+      //   },
+      //   error: (res) => {
+      //     this.toastr.error(res['error']['message']);
+      //     this.spinnerService.toggleSpinnerState(false);
+      //   },
+      //   complete: () => {
+      //    // this.isSubmitting = false;
+      //     this.spinnerService.toggleSpinnerState(false);
+      //   }
+      // });
+    }
 
     editAssignment(content: TemplateRef<any>,documentId: any) {
       debugger
@@ -178,6 +209,11 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
     this.instituteService.getInstitutions().subscribe({
       next: (data) => {
         this.institutes = data;
+
+        console.log('All Institutes loaded:', data[0]?.institutionId);
+
+
+        this.selectedInstituteId = data[0]?.institutionId;
 
         console.log('Institutes loaded:', this.institutes);
       },
@@ -281,10 +317,8 @@ getAssignmentForTemplateId(templateId: any){
         examMonth:  response.examMonth,
         examType: response.examType,
         semester: response.semester,
-        institutionName: response?.institutions?response.institutions[0].institutionName : '',
-        studentCount:  response?.institutions?response.institutions[0]?.studentCount :response.studentCount,
-        courseSyllabusDocumentName: response.courseSyllabusDocumentName,
-        courseSyllabusDocumentUrl: response.courseSyllabusDocumentUrl,
+        institutionName: response.institutions[0]?.institutionName || '',
+        studentCount:  response.institutions[0]?.studentCount || '',
 
       });
 
@@ -304,6 +338,8 @@ getAssignmentForTemplateId(templateId: any){
    this.templateService.getQPTemplateByCourseId(courseId).subscribe((response) => {
      this.qpTemplateData = response;
 
+   console.log(response);
+
      if(this.qpTemplateData)
      {
        this.templateAssignmentForm.patchValue({
@@ -314,14 +350,17 @@ getAssignmentForTemplateId(templateId: any){
          examMonth:  response.examMonth,
          examType: response.examType,
          semester: response.semester,
-         institutionName: '',
-         studentCount:  response.studentCount || '',
+        //  institutionName: response.institutions[0]?.institutionName || '',
+           studentCount:  response?.studentCount || '',
          courseSyllabusDocumentName: response.courseSyllabusDocumentName,
-         courseSyllabusDocumentUrl: response.courseSyllabusDocumentUrl,
+         courseSyllabusDocumentUrl: response.courseSyllabusDocumentUrl
        });
 
         this.templates =this.qpTemplateData.qpDocuments;
 
+       this.isCourseSyllabusDocuploaded = this.qpTemplateData.courseSyllabusDocumentId > 0;
+
+       console.log(response.courseSyllabusDocumentName);
         this.updateFormWithData();
 
        console.log("qpTemplate",JSON.stringify(this.qpTemplateData));
@@ -393,8 +432,6 @@ updateIsQPOnly(docIndex: number, userIndex: number, isChecked: boolean) {
 
     this.templateAssignmentForm = this.fb.group({
       qpTemplateName: [''],
-      courseSyllabusDocumentName: [''],
-      courseSyllabusDocumentUrl: [''],
       degreeTypeName: [{ value: '', disabled: true }],
       regulationYear: [{ value: '', disabled: true }],
       batchYear: [{ value: '', disabled: true }],
@@ -407,10 +444,13 @@ updateIsQPOnly(docIndex: number, userIndex: number, isChecked: boolean) {
       courseId: ['', Validators.required],
       templateId: [''],
       userId: [''],
+      courseSyllabusDocumentName: [''],
+      courseSyllabusDocumentUrl: [''],
       qpDocuments: this.fb.array([
         this.fb.group({
           qpAssignedUsers: this.fb.array([]) // Ensure this array exists
-        })
+        }),
+
       ])
     });
   }
@@ -497,18 +537,6 @@ isUserAlreadySelected(qpAssignedUsers: any[], userId: number, currentIndex: numb
     }
   }
 
-  clearSelection(docIndex: number, userIndex: number) {
-    const qpAssignedUsers = this.templateAssignmentForm.get('qpDocuments') as FormArray;
-    const userControl = qpAssignedUsers.at(docIndex).get('qpAssignedUsers') as FormArray;
-  
-    // Reset userId dropdown & checkbox
-    userControl.at(userIndex).patchValue({
-      userId: '',
-      isQPOnly: false
-    });
-  }
-  
-
   handleFormSubmit(assignmentData: any) {
     if (this.isEditMode) {
       // Update logic
@@ -529,10 +557,8 @@ isUserAlreadySelected(qpAssignedUsers: any[], userId: number, currentIndex: numb
     this.modalService.dismissAll();
   }
 
-  download(documentId: number)
-  {
 
-  }
+
 }
 
 

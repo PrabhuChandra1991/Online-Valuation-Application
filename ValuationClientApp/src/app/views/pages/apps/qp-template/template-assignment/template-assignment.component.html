@@ -117,7 +117,7 @@
                   }
                   @else{
                     <td mat-cell *matCellDef="let element">
-                      <button mat-icon-button color="primary" (click)="downloadQP(element.qpTemplateId)">
+                      <button mat-icon-button color="primary" >  <!--(click)="downloadQP(element.qpTemplateId)" -->
                         <mat-icon>download</mat-icon>
                       </button><button mat-icon-button color="primary" >
                         <mat-icon>upload</mat-icon>
@@ -234,13 +234,12 @@
               <input type="text" class="form-control" formControlName = "studentCount">
           </div>
         </div><!-- Col -->
-        <div class="col-sm-4">
+        <div class="col-sm-4" *ngIf="isCourseSyllabusDocuploaded">
           <div class="mb-3">
             <label for="courseSyllabusDocumentName"
-              class="form-label">Syllabus Document</label>
-              <!-- <a class="form-control" formControlName = "courseSyllabusDocumentName">
-                {{ templateAssignmentForm.get('courseSyllabusDocumentName').value }}
-              </a>    -->
+              class="form-label">Syllabus Document</label><br/>
+            <a href="{{templateAssignmentForm.controls['courseSyllabusDocumentUrl'].value}}">{{templateAssignmentForm.controls['courseSyllabusDocumentName'].value}}</a>
+
           </div>
         </div><!-- Col -->
       </div><!-- Row -->
@@ -279,7 +278,7 @@
                   </mat-checkbox>
                 </div>
                 <div class="col-sm-2 d-flex align-items-center">
-                  <button class="btn btn-sm btn-outline-danger" (click)="clearSelection(docIndex, userIndex)">
+                  <button class="btn btn-sm btn-outline-danger" >
                     Clear
                   </button>
                 </div>
@@ -294,7 +293,7 @@
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-secondary" (click)="close()">Close</button>
-    <button type="button" class="btn btn-primary" (click)="onSave()">Save changes</button>
+    <button type="button" class="btn btn-primary" (click)="onSave()" [disabled]="!isCourseSyllabusDocuploaded">Save changes</button>
   </div>
 </ng-template>
 

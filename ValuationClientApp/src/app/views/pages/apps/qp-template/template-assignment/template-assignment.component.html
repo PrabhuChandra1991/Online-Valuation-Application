@@ -3,15 +3,16 @@
         <div class="col-md-3" *ngIf="isAdmin">
           <button class="btn btn-primary " (click)="openAssignModal(lgModal)">Assign Template</button>
         </div>
-        <div class="col-md-2 mt-2 px-3" >
-          <label>Institution <span class="text-danger">*</span></label>
+        <div class="institute" *ngIf="isAdmin">
+          <div class="col-md-2 mt-2 px-3" >
+            <label>Institution <span class="text-danger">*</span></label>
+          </div>
+          <div class="col-md-3" >
+            <select id="institutionId" class="form-select" (change)="onInstituteChange($event)">
+              <option *ngFor="let inst of institutes" [value]="inst.institutionId">{{ inst.name }}</option>
+            </select>
+          </div>
         </div>
-        <div class="col-md-3" >
-          <select id="institutionId" class="form-select" (change)="onInstituteChange($event)">
-            <option *ngFor="let inst of institutes" [value]="inst.institutionId">{{ inst.name }}</option>
-          </select>
-        </div>
-
       </div>
     <div class="row mt-2">
     <!-- <div class="col-md-8" *ngIf="isAdmin">
@@ -92,22 +93,38 @@
                   <th mat-header-cell *matHeaderCellDef mat-sort-header> Expert - 1 Status</th>
                   <td mat-cell *matCellDef="let element">{{ element.expert1Status }} </td>
                 </ng-container>
-                <ng-container matColumnDef="expert2Name">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Expert -2 Name </th>
-                  <td mat-cell *matCellDef="let element"> {{ element.expert2Name }} </td>
-                </ng-container>
-                <ng-container matColumnDef="expert2Status">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Expert - 2 Status </th>
-                  <td mat-cell *matCellDef="let element"> {{ element.expert2Status }} </td>
-                </ng-container>
 
-                <ng-container matColumnDef="actions">
+
+
+                  <ng-container matColumnDef="expert2Name" >
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header> Expert -2 Name </th>
+                    <td mat-cell *matCellDef="let element"> {{ element.expert2Name }} </td>
+                  </ng-container>
+                  <ng-container matColumnDef="expert2Status">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header> Expert - 2 Status </th>
+                    <td mat-cell *matCellDef="let element"> {{ element.expert2Status }} </td>
+                  </ng-container>
+
+                <ng-container matColumnDef="actions" >
                   <th mat-header-cell *matHeaderCellDef> Actions </th>
-                  <td mat-cell *matCellDef="let element">
-                    <button mat-icon-button color="primary" (click)="editAssignment(lgModal,element.qpTemplateId)">
-                      <mat-icon>edit</mat-icon>
-                    </button>
-                  </td>
+                  @if(isAdmin)
+                  {
+                    <td mat-cell *matCellDef="let element">
+                      <button mat-icon-button color="primary" (click)="editAssignment(lgModal,element.qpTemplateId)" *ngIf="isAdmin">
+                        <mat-icon>edit</mat-icon>
+                      </button>
+                    </td>
+                  }
+                  @else{
+                    <td mat-cell *matCellDef="let element">
+                      <button mat-icon-button color="primary" >  <!--(click)="downloadQP(element.qpTemplateId)" -->
+                        <mat-icon>download</mat-icon>
+                      </button><button mat-icon-button color="primary" >
+                        <mat-icon>upload</mat-icon>
+                      </button>
+                    </td>
+                  }
+
                 </ng-container>
 
             <!-- Table Header & Row Definitions -->
@@ -119,13 +136,11 @@
             <!-- Pagination -->
             <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
             </div>
-
           </div>
         </div>
       </div>
       </div>
     </div>
-
 </div>
 
 <!-- Lg Modal -->
@@ -219,13 +234,12 @@
               <input type="text" class="form-control" formControlName = "studentCount">
           </div>
         </div><!-- Col -->
-        <div class="col-sm-4">
+        <div class="col-sm-4" *ngIf="isCourseSyllabusDocuploaded">
           <div class="mb-3">
             <label for="courseSyllabusDocumentName"
-              class="form-label">Syllabus Document</label>
-              <!-- <a class="form-control" formControlName = "courseSyllabusDocumentName">
-                {{ templateAssignmentForm.get('courseSyllabusDocumentName').value }}
-              </a>    -->
+              class="form-label">Syllabus Document</label><br/>
+            <a href="{{templateAssignmentForm.controls['courseSyllabusDocumentUrl'].value}}">{{templateAssignmentForm.controls['courseSyllabusDocumentName'].value}}</a>
+
           </div>
         </div><!-- Col -->
       </div><!-- Row -->
@@ -264,7 +278,7 @@
                   </mat-checkbox>
                 </div>
                 <div class="col-sm-2 d-flex align-items-center">
-                  <button class="btn btn-sm btn-outline-danger" (click)="clearSelection(docIndex, userIndex)">
+                  <button class="btn btn-sm btn-outline-danger" >
                     Clear
                   </button>
                 </div>
@@ -278,8 +292,8 @@
     </form>
   </div>
   <div class="modal-footer">
-    <button type="button" class="btn btn-secondary" (click)="modal.close('by: close button')">Close</button>
-    <button type="button" class="btn btn-primary" (click)="onSave()">Save changes</button>
+    <button type="button" class="btn btn-secondary" (click)="close()">Close</button>
+    <button type="button" class="btn btn-primary" (click)="onSave()" [disabled]="!isCourseSyllabusDocuploaded">Save changes</button>
   </div>
 </ng-template>
 

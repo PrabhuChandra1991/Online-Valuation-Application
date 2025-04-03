@@ -752,14 +752,19 @@ namespace SKCE.Examination.Services.QPSettings
         }
         public async Task<bool> PreviewGeneratedQP(long userQPTemplateId, long generatedDocumentId)
         {
-            //var qpTemplate = _context.QPTemplates.FirstOrDefault(qp => qp.QPTemplateId == qpTemplateInstitution.QPTemplateId);
-            //if (qpTemplate == null) return false;
-            //var institution = _context.Institutions.FirstOrDefault(i => i.InstitutionId == qpTemplateInstitution.InstitutionId);
-            //var documentToPrint = await _context.QPTemplateInstitutionDocuments.FirstOrDefaultAsync(qptd => qptd.QPDocumentTypeId == 2 && qptd.QPTemplateInstitutionId == QPTemplateInstitutionId);
-            //var qpSelectedDocument = await _context.Documents.FirstOrDefaultAsync(d => d.DocumentId == generatedDocumentId);
-            //var qpToPrintDocument = await _context.Documents.FirstOrDefaultAsync(d => d.DocumentId == documentToPrint.DocumentId);
-            //if (qpSelectedDocument == null || qpToPrintDocument == null) return false;
-            //await _bookmarkProcessor.ProcessBookmarksAndPrint(qpTemplate, qpTemplateInstitution, qpSelectedDocument.Name, qpToPrintDocument.Name, false);
+            var userQPtemplate = _context.UserQPTemplates.FirstOrDefault(u => u.UserQPTemplateId == userQPTemplateId);
+            if (userQPtemplate == null) return false;
+
+            var qPtemplate = _context.QPTemplates.FirstOrDefault(u => u.QPTemplateId == userQPtemplate.QPTemplateId);
+            if (qPtemplate == null) return false;
+
+            var userQPDocument = _context.QPDocuments.FirstOrDefault(u => u.QPDocumentId == userQPtemplate.QPDocumentId);
+            if (userQPDocument == null) return false;
+
+            var qpSelectedDocument = await _context.Documents.FirstOrDefaultAsync(d => d.DocumentId == generatedDocumentId);
+            var qpToPrintDocument = await _context.Documents.FirstOrDefaultAsync(d => d.DocumentId == userQPDocument.DocumentId);
+            if (qpSelectedDocument == null || qpToPrintDocument == null) return false;
+            await _bookmarkProcessor.ProcessBookmarksAndPrint(qPtemplate, userQPtemplate, qpSelectedDocument.Name, qpToPrintDocument.Name, false);
             return true;
         }
         private async Task<(string,bool)> UGQPValidationAsync(UserQPTemplate userQPTemplate, Document doc)

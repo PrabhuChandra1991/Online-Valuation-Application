@@ -9,6 +9,7 @@
           </div>
           <div class="col-md-3" >
             <select id="institutionId" class="form-select" (change)="onInstituteChange($event)">
+              <option [value]="">Select Institution</option>
               <option *ngFor="let inst of institutes" [value]="inst.institutionId">{{ inst.name }}</option>
             </select>
           </div>
@@ -117,11 +118,18 @@
                   }
                   @else{
                     <td mat-cell *matCellDef="let element">
-                      <button mat-icon-button color="primary" >  <!--(click)="downloadQP(element.qpTemplateId)" -->
+                      <a href="{{element.qpDocumentUrl}}">
+                        <mat-icon>download</mat-icon>
+                      </a>
+                      <a (click)="openDocUploadModal(lgDocModal,element.qpTemplateId)">
+                        <mat-icon>upload</mat-icon>
+                      </a>
+
+                      <!-- <button mat-icon-button color="primary" >
                         <mat-icon>download</mat-icon>
                       </button><button mat-icon-button color="primary" >
                         <mat-icon>upload</mat-icon>
-                      </button>
+                      </button> -->
                     </td>
                   }
 
@@ -261,7 +269,7 @@
                   <div class="mb-4">
                     <label class="form-label">Expert - {{ userIndex + 1 }}</label>
                     <select class="form-select" formControlName="userId"
-                            (change)="updateUserDetails(docIndex, userIndex,$event)">
+                            (change)="updateUserDetails(docIndex, userIndex,$event)" >
                       <option value="">Select Expert</option>
                       <option *ngFor="let user of users" [value]="user.userId"
                               [disabled]="isUserAlreadySelected(qpDocument.qpAssignedUsers, user.userId, userIndex)">
@@ -278,14 +286,30 @@
                   </mat-checkbox>
                 </div>
                 <div class="col-sm-2 d-flex align-items-center">
-                  <button class="btn btn-sm btn-outline-danger" >
+                  <button class="btn btn-sm btn-outline-danger" (click)="clearSelection(docIndex, userIndex)">
                     Clear
                   </button>
                 </div>
+                <!-- add scrutiny -->
+            <div >
+              <div class="row" *ngFor="let assignedScrutinyUser of qpDocument.qpScrutinityUsers; let userIndex = index" [formGroupName]="userIndex">
 
+                <!--<div class="row" *ngIf="isQPPendingForScrutiny" >   Expert Selection -->
+                <div class="col-sm-6">
+                  <div class="mb-4">
+                    <label class="form-label">Scrutiny </label>
+                    <select class="form-select" formControlName="scrutinyUserId" (change)="updateScrutinyUserDetails(docIndex, userIndex,$event)" >
+                      <option value="">Select Scrutiny </option>
+                      <option *ngFor="let user of users" [value]="user.userId">
+                        {{ user.userName }}
+                      </option>
+                    </select>
+                  </div>
+                </div>
               </div>
             </div>
-
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -293,7 +317,44 @@
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-secondary" (click)="close()">Close</button>
-    <button type="button" class="btn btn-primary" (click)="onSave()" [disabled]="!isCourseSyllabusDocuploaded">Save changes</button>
+
+    <button type="button" class="btn btn-primary"  (click)="onSave()" [disabled]="!isCourseSyllabusDocuploaded">Save changes</button>
+  </div>
+</ng-template>
+
+<!--Upload QP Document-->
+<ng-template #lgDocModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title" id="exampleModalLabel">Upload Document</h5>
+    <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="qpDocDataForm">
+      <div class="row">
+        <div class="col-sm-6">
+          <div class="mb-3">
+            <label class="form-label" for="filename">Upload QP / QP Answer Key document <span class="text-danger"> *</span> </label>
+            <input class="form-control " multiple value="qpDocumentsformf['file']" type="file" id="masterfile" formControlName="file" (change)="onQPDocDataFileChange($event)">
+          </div>
+          </div><!-- Col -->
+      </div><!-- Row -->
+
+      <div class="row" *ngIf="isInvalidDoc">
+        <div class="col-sm-8">
+          <div class="mb-3">
+            {{qpValidationMessage}}
+          </div>
+          </div><!-- Col -->
+      </div><!-- Row -->
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="close()">Close</button>
+    <div >
+      <button type="button" class="btn btn-primary" *ngIf="!isQPDocValidated" [disabled]="!isQPDocUploaded" (click)="validate(qpTemplateId)">Validate</button>
+    </div>
+
+    <button type="button" class="btn btn-primary" *ngIf="isQPDocValidated">Submit</button>
   </div>
 </ng-template>
 

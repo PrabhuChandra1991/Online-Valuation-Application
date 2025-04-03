@@ -270,69 +270,21 @@ namespace SKCE.Examination.Services.QPSettings
            Spire.Doc.Document doc = new Spire.Doc.Document();
             var wordTemplatePath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), "SyllabusDocumentTemplate\\Syllabus_sample template.doc");
             doc.LoadFromFile(wordTemplatePath);
-           
-
-            foreach (Spire.Doc.Bookmark bookmark in doc.Bookmarks)
+           foreach (Spire.Doc.Bookmark bookmark in doc.Bookmarks)
             {
                 Spire.Doc.Documents.BookmarksNavigator navigator = new Spire.Doc.Documents.BookmarksNavigator(doc);
                 navigator.MoveToBookmark(bookmark.Name);
-                switch (bookmark.Name)
+                if(bookmark.Name.Contains("CourseObjectives") || bookmark.Name.Contains("CourseOutcomesHead") 
+                || bookmark.Name.Contains("CourseOutcomes") || bookmark.Name.Contains("RBT")
+                || bookmark.Name.Contains("CourseModule") || bookmark.Name.Contains("CourseHours")
+                || bookmark.Name.Contains("CourseContent") || bookmark.Name.Contains("ReferenceBook"))
                 {
-                    case "CourseObjectives1":
-                    case "CourseObjectives2":
-                    case "CourseObjectives3":
-                    case "CourseObjectives4":
-                    case "CourseObjectives5":
-                    case "CourseObjectives6":
-                    case "CourseOutcomesHead1":
-                    case "CourseOutcomesHead2":
-                    case "CourseOutcomesHead3":
-                    case "CourseOutcomesHead4":
-                    case "CourseOutcomesHead5":
-                    case "CourseOutcomesHead6":
-                    case "CourseOutcomes1":
-                    case "CourseOutcomes2":
-                    case "CourseOutcomes3":
-                    case "CourseOutcomes4":
-                    case "CourseOutcomes5":
-                    case "CourseOutcomes6":
-                    case "RBT1":
-                    case "RBT2":
-                    case "RBT3":
-                    case "RBT4":
-                    case "RBT5":
-                    case "RBT6":
-                    case "CourseModule1":
-                    case "CourseModule2":
-                    case "CourseModule3":
-                    case "CourseModule4":
-                    case "CourseModule5":
-                    case "CourseModule6":
-                    case "CourseHours1":
-                    case "CourseHours2":
-                    case "CourseHours3":
-                    case "CourseHours4":
-                    case "CourseHours5":
-                    case "CourseHours6":
-                    case "CourseContent1":
-                    case "CourseContent2":
-                    case "CourseContent3":
-                    case "CourseContent4":
-                    case "CourseContent5":
-                    case "CourseContent6":
-                    case "ReferenceBook1":
-                    case "ReferenceBook2":
-                    case "ReferenceBook3":
-                    case "ReferenceBook4":
-                    case "ReferenceBook5":
-                    case "ReferenceBook6":
-                        navigator.ReplaceBookmarkContent(rowData[bookmark.Name.Remove(bookmark.Name.Length - 1, 1)].Split("[")[Convert.ToInt32(bookmark.Name.Substring(bookmark.Name.Length - 1))].Replace("]",""), true);
-                        break;
-                    default:
-                        navigator.ReplaceBookmarkContent(rowData[bookmark.Name], true);
-                        break;
+                    navigator.ReplaceBookmarkContent(rowData[bookmark.Name.Remove(bookmark.Name.Length - 1, 1)].Split("[")[Convert.ToInt32(bookmark.Name.Substring(bookmark.Name.Length - 1))].Replace("]", ""), true);
                 }
-                
+                else
+                {
+                    navigator.ReplaceBookmarkContent(rowData[bookmark.Name], true);
+                }
             }
 
             string updatedFilePath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), "UpdatedSyllabusDocument.docx");

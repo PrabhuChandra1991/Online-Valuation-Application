@@ -22,6 +22,7 @@ using Syncfusion.DocIO;
 using DocumentFormat.OpenXml.Bibliography;
 using DocumentFormat.OpenXml.Presentation;
 using Text = DocumentFormat.OpenXml.Presentation.Text;
+using Microsoft.AspNetCore.Http;
 namespace SKCE.Examination.Services.QPSettings
 {
     public class QpTemplateService 
@@ -1254,7 +1255,7 @@ namespace SKCE.Examination.Services.QPSettings
             }
             return 0; // Default to 0 if marks not found
         }
-        public async Task<bool?> SubmitGeneratedQPAsync(long userId, long InstitutionId, long documentId)
+        public async Task<bool?> SubmitGeneratedQPAsync(long userQPTemplateId, IFormFile file, QPSubmissionVM qPSubmissionVM)
         {
             //var qpTemplateInstitution = await _context.QPTemplateInstitutions.FirstOrDefaultAsync(qpti => qpti.QPTemplateInstitutionId == QPTemplateInstitutionId);
             //if (qpTemplateInstitution == null) return null;
@@ -1280,8 +1281,8 @@ namespace SKCE.Examination.Services.QPSettings
             //await _context.SaveChangesAsync();
             return true;
         }
-        //public async Task<bool?> AssignTemplateForQPScrutinyAsync(long userId, long QPTemplateInstitutionId)
-        //{
+        public async Task<bool?> AssignTemplateForQPScrutinyAsync(long userId, long userQPTemplateId)
+       {
         //    var qpTemplateInstitution = await _context.QPTemplateInstitutions.FirstOrDefaultAsync(qpti => qpti.QPTemplateInstitutionId == QPTemplateInstitutionId);
         //    if (qpTemplateInstitution == null) return null;
         //    var qpTemplate = await _context.QPTemplates.FirstOrDefaultAsync(qp => qp.QPTemplateId == qpTemplateInstitution.QPTemplateId);
@@ -1333,8 +1334,8 @@ namespace SKCE.Examination.Services.QPSettings
         //    _context.UserQPTemplateDocuments.Add(scrutinizedQPDocument);
 
         //    await _context.SaveChangesAsync();
-        //    return true;
-        ////}
+         return true;
+       }
         //public async Task<bool?> SubmitScrutinizedQPAsync(long userId, long QPTemplateInstitutionId, long documentId)
         //{
         //    var qpTemplateInstitution = await _context.QPTemplateInstitutions.FirstOrDefaultAsync(qpti => qpti.QPTemplateInstitutionId == QPTemplateInstitutionId);

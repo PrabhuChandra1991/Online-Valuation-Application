@@ -74,27 +74,13 @@ namespace SKCE.Examination.API.Controllers.QPSettings
         {
             return Ok(await _qpTemplateService.GetQPTemplatesByUserIdAsync(userId));
         }
-        //[HttpGet("AssignQPForGeneration/{userId}/{qpTemplateId}")]
-        //public ActionResult<bool> AssignQPForGeneration(long userId, long qpTemplateId)
-        //{
-        //    var userQPTemplate =  _qpTemplateService.AssignTemplateForQPGenerationAsync(userId, qpTemplateId);
-        //    if (userQPTemplate == null) return NotFound();
-        //    return Ok(userQPTemplate);
-        //}
-        [HttpGet("SubmitGeneratedQP/{userId}/{qpTemplateId}/{documentId}")]
-        public async Task<ActionResult<bool>> SubmitGeneratedQP(long userId, long qpTemplateId, long documentId)
+        [HttpGet("AssignQPForScrutinity/{userId}/{userQPTemplateId}")]
+        public async Task<ActionResult<bool>> AssignQPForScrutinity(long userId, long userQPTemplateId)
         {
-            var userQPTemplate = await _qpTemplateService.SubmitGeneratedQPAsync(userId, qpTemplateId, documentId);
+            var userQPTemplate = await _qpTemplateService.AssignTemplateForQPScrutinyAsync(userId, userQPTemplateId);
             if (userQPTemplate == null) return NotFound();
             return Ok(userQPTemplate);
         }
-        //[HttpGet("AssignQPForScrutinity/{userId}/{qpTemplateId}")]
-        //public async Task<ActionResult<bool>> AssignQPForScrutinity(long userId, long qpTemplateId)
-        //{
-        //    var userQPTemplate = await _qpTemplateService.AssignTemplateForQPScrutinyAsync(userId, qpTemplateId);
-        //    if (userQPTemplate == null) return NotFound();
-        //    return Ok(userQPTemplate);
-        //}
         //[HttpGet("SubmitScrutinizedQP/{userId}/{qpTemplateId}/{documentId}")]
         //public async Task<ActionResult<bool>> SubmitScrutinizedQP(long userId, long qpTemplateId, long documentId)
         //{
@@ -165,6 +151,14 @@ namespace SKCE.Examination.API.Controllers.QPSettings
             {
                 return StatusCode(500, $"Error processing document: {ex.Message}");
             }
+        }
+
+        [HttpGet("SubmitGeneratedQP/{userQPTemplateId}")]
+        public async Task<ActionResult<bool>> SubmitGeneratedQP(long userQPTemplateId, IFormFile file, QPSubmissionVM qPSubmissionVM)
+        {
+            var userQPTemplate = await _qpTemplateService.SubmitGeneratedQPAsync(userQPTemplateId, file, qPSubmissionVM);
+            if (userQPTemplate == null) return NotFound();
+            return Ok(userQPTemplate);
         }
     }
 }

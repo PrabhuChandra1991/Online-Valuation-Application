@@ -22,11 +22,9 @@ export class QPDocumentService {
       downloadQPFile(documentId: number): Observable<any> {
           return this.http.get(`${this.apiUrl}/api/BlobStorage/download/${documentId}`);
         }
-        importSyllabusDocuments(formData: FormData): Observable<any> {
-          return this.http.post(`${this.apiUrl}/api/QPDataImport/importSyllabusDocuments`, formData);
-        }
-        importQPDocuments(formData: FormData): Observable<any> {
-          return this.http.post(`${this.apiUrl}/api/QPDataImport/ImportQPDocuments`, formData);
+      validateQPFile(formData: FormData, documentId:number): Observable<any> {
+          return this.http.post(`${this.apiUrl}/api/QpTemplate/ValidateGeneratedQP/${documentId}`,formData);
+
         }
 
 }

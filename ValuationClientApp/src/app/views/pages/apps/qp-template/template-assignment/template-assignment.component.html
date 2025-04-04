@@ -95,8 +95,6 @@
                   <td mat-cell *matCellDef="let element">{{ element.expert1Status }} </td>
                 </ng-container>
 
-
-
                   <ng-container matColumnDef="expert2Name" >
                     <th mat-header-cell *matHeaderCellDef mat-sort-header> Expert -2 Name </th>
                     <td mat-cell *matCellDef="let element"> {{ element.expert2Name }} </td>
@@ -121,7 +119,8 @@
                       <a href="{{element.qpDocumentUrl}}">
                         <mat-icon>download</mat-icon>
                       </a>
-                      <a (click)="openDocUploadModal(lgDocModal,element.qpDocumentId)">
+                      <a [ngClass]="{'disabled': element.qpTemplateStatusTypeId === 9 || element.qpTemplateStatusTypeId === 11}" 
+                        (click)="openDocUploadModal(lgDocModal,element.qpDocumentId)">
                         <mat-icon>upload</mat-icon>
                       </a>
 
@@ -328,33 +327,61 @@
     <h5 class="modal-title" id="exampleModalLabel">Upload Document</h5>
     <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
   </div>
+
   <div class="modal-body">
     <form [formGroup]="qpDocDataForm">
       <div class="row">
         <div class="col-sm-6">
           <div class="mb-3">
             <label class="form-label" for="filename">Upload QP / QP Answer Key document <span class="text-danger"> *</span> </label>
-            <input class="form-control " multiple value="qpDocumentsformf['file']" type="file" id="masterfile" formControlName="file" (change)="onQPDocDataFileChange($event)">
+            <input class="form-control" multiple value="qpDocumentsformf['file']" type="file" id="masterfile" formControlName="file" (change)="onQPDocDataFileChange($event)">
           </div>
-          </div><!-- Col -->
+        </div><!-- Col -->
+        <div class="col-sm-6 text-end">
+          <div class="mt-4">
+            <button type="button" class="btn btn-primary" *ngIf="isQPDocValidated">Preview</button>
+          </div>
+        </div><!-- Col -->
       </div><!-- Row -->
 
       <div class="row" *ngIf="qpValidationMessage">
-        <div class="col-sm-8">
+        <div class="col-sm-12">
           <div class="mb-3">
             <div [innerHTML]="qpValidationMessage"></div>
           </div>
           </div><!-- Col -->
       </div><!-- Row -->
+
+      <div class="row" *ngIf="isQPDocValidated">
+        <div class="col-lg-4">
+          <label class="form-check-label">
+            Is Graphs Required
+          </label>
+          <input type="checkbox" class="form-check-input mx-1 mb-2" name="graph" (change)="showTextBox($event)">
+          <mat-form-field appearance="outline" *ngIf="isGraphsRequired">
+            <mat-label>Enter Graph Name</mat-label>
+            <input matInput name="graphName" placeholder="Graph Name" required  #graphName>
+          </mat-form-field>
+        </div>
+        <div class="col-lg-4">
+          <label class="form-check-label">
+            Is Tables Allowed
+          </label>
+          <input type="checkbox" class="form-check-input mx-1 mb-2" name="table" (change)="showTextBox($event)">
+          <mat-form-field appearance="outline" *ngIf="isTablesAllowed">
+            <mat-label>Enter Table Name</mat-label>
+            <input matInput name="tableName" placeholder="Table Name" required  #tableName>
+          </mat-form-field>
+        </div>
+      </div><!-- Row -->
     </form>
   </div>
+
   <div class="modal-footer">
     <button type="button" class="btn btn-secondary" (click)="close()">Close</button>
-    <div >
+    <div>
       <button type="button" class="btn btn-primary" *ngIf="!isQPDocValidated" [disabled]="!isQPDocUploaded" (click)="validate(qpTemplateId)">Validate</button>
     </div>
-
-    <button type="button" class="btn btn-primary" *ngIf="isQPDocValidated">Submit</button>
+    <button type="button" class="btn btn-primary" *ngIf="isQPDocValidated" (click)="submit(qpTemplateId)">Submit</button>
   </div>
 </ng-template>
-

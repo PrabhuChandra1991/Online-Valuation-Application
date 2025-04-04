@@ -22,9 +22,14 @@ export class QPDocumentService {
       downloadQPFile(documentId: number): Observable<any> {
           return this.http.get(`${this.apiUrl}/api/BlobStorage/download/${documentId}`);
         }
-      validateQPFile(formData: FormData, documentId:number): Observable<any> {
-          return this.http.post(`${this.apiUrl}/api/QpTemplate/ValidateGeneratedQP/${documentId}`,formData);
-
+      validateQPFile(formData: any, documentId: number): Observable<any> {
+        let resp = this.http.post(`${this.apiUrl}/api/QpTemplate/ValidateGeneratedQP/${documentId}`, formData);
+        return resp;
         }
+
+  submitGeneratedQP(formData: any, documentId: number, isGraphsRequired: boolean, graphName: string, isTablesAllowed: boolean, tableName: string): Observable<any> {
+    let resp = this.http.post(`${this.apiUrl}/api/QpTemplate/SubmitGeneratedQP/${documentId}?IsGraphsRequired=${isGraphsRequired}&GraphName=${graphName}&isTablesAllowed=${isTablesAllowed}&tableName=${tableName}`, formData);
+    return resp;
+  }
 
 }

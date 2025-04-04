@@ -13,6 +13,7 @@
 	[IsTablesAllowed] BIT NULL DEFAULT 0,
 	[GraphName] NVARCHAR(255)  NULL,
 	[TableName] NVARCHAR(255)  NULL,
+	[QPCode] NVARCHAR(255)  NULL,
 	[IsActive] BIT NOT NULL,
 	[CreatedDate] DATETIME NOT NULL,
 	[CreatedById] BIGINT NOT NULL,

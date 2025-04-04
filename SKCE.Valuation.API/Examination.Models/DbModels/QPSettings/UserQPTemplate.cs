@@ -1,11 +1,6 @@
 ﻿using SKCE.Examination.Models.DbModels.Common;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SKCE.Examination.Models.DbModels.QPSettings
 {
@@ -28,5 +23,6 @@ namespace SKCE.Examination.Models.DbModels.QPSettings
         public bool? IsTablesAllowed { get; set; }
         public string? GraphName { get; set; }
         public string? TableName { get; set; }
+        public string? QPCode { get; set; }
     }
 }

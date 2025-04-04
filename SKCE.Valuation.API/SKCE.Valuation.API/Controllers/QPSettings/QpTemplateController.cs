@@ -175,12 +175,12 @@ namespace SKCE.Examination.API.Controllers.QPSettings
             return Ok(userQPTemplate);
         }
 
-        //[HttpGet("PrintSelectedQP/{qpTemplateId}/{qpCode}/{isForPrint}")]
-        //public async Task<ActionResult<bool>> PrintSelectedQP(long qpTemplateId, string qpCode, bool isForPrint)
-        //{
-        //    var result = await _qpTemplateService.PrintSelectedQPAsync(qpTemplateId, qpCode, isForPrint);
-        //    return Ok(result);
-        //}
+        [HttpGet("PrintSelectedQP/{qpTemplateId}/{qpCode}/{isForPrint}")]
+        public async Task<ActionResult<bool>> PrintSelectedQP(long userqpTemplateId, string qpCode, bool isForPrint)
+        {
+            var result = await _qpTemplateService.PrintSelectedQPAsync(userqpTemplateId, qpCode, isForPrint);
+            return Ok(result);
+        }
 
     }
 }

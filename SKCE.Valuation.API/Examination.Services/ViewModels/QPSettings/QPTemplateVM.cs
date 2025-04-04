@@ -51,6 +51,8 @@ namespace SKCE.Examination.Services.ViewModels.QPSettings
         public long InstitutionId { get; set; }
         public long QPTemplateId { get; set; }
         public long SubmittedQPDocumentId { get; set; }
+        public string? SubmittedQPDocumentName { get; set; }
+        public string? SubmittedQPDocumentUrl { get; set; }
         public long? ParentUserQPTemplateId { get; set; }
     }
     public class QPTemplateDocumentVM : AuditModel
@@ -120,6 +122,10 @@ namespace SKCE.Examination.Services.ViewModels.QPSettings
         public long CourseSyllabusDocumentId { get; set; }
         public string CourseSyllabusDocumentName { get; set; }
         public string CourseSyllabusDocumentUrl { get; set; }
+        public long  SubmittedQPDocumentId { get; set; }
+        public string SubmittedQPDocumentName { get; set; }
+        public string SubmittedQPDocumentUrl { get; set; }
+        public  long? ParentUserQPTemplateId { get; set; }
     }
     public class QPDocumentValidationVM
     {

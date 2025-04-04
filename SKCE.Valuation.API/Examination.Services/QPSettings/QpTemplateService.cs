@@ -1691,116 +1691,78 @@ namespace SKCE.Examination.Services.QPSettings
         }
         public async Task<bool?> AssignTemplateForQPScrutinyAsync(long userId, long userQPTemplateId)
        {
-        //    var qpTemplateInstitution = await _context.QPTemplateInstitutions.FirstOrDefaultAsync(qpti => qpti.QPTemplateInstitutionId == QPTemplateInstitutionId);
-        //    if (qpTemplateInstitution == null) return null;
-        //    var qpTemplate = await _context.QPTemplates.FirstOrDefaultAsync(qp => qp.QPTemplateId == qpTemplateInstitution.QPTemplateId);
-        //    if (qpTemplate == null) return null;
-        //    qpTemplate.QPTemplateStatusTypeId = 4; //QP Scrutiny Allocated
+            var qpUserTemplate = await _context.UserQPTemplates.FirstOrDefaultAsync(qp => qp.UserQPTemplateId == userQPTemplateId && qp.QPTemplateStatusTypeId == 9);
+                if (qpUserTemplate == null) return null;
+                var qpTemplate = await _context.QPTemplates.FirstOrDefaultAsync(qp => qp.QPTemplateId == qpUserTemplate.QPTemplateId);
 
-        //    var qpUserTemplate = await _context.UserQPTemplates.FirstOrDefaultAsync(qp => qp.QPTemplateInstitutionId == QPTemplateInstitutionId && qp.QPTemplateStatusTypeId==9);
-            
-        //    if (qpUserTemplate == null) return null;
-
-        //    var userQPTemplate = new UserQPTemplate()
-        //    {
-        //        QPTemplateInstitutionId = qpUserTemplate.QPTemplateInstitutionId,
-        //        UserId = userId,
-        //        QPTemplateStatusTypeId = 10,//Scrutinize QP InProgress
-        //        QPDocumentId = qpUserTemplate.QPDocumentId
-        //    };
-        //    AuditHelper.SetAuditPropertiesForInsert(userQPTemplate, 1);
-        //    _context.UserQPTemplates.Add(userQPTemplate);
-        //    await _context.SaveChangesAsync();
-
-        //    var qpSyllabusDocument = await _context.UserQPTemplateDocuments.FirstOrDefaultAsync(qptd => qptd.QPDocumentTypeId == 1 && qptd.UserQPTemplateId == qpUserTemplate.UserQPTemplateId);
-        //    var userQPSyllabusDocument = new UserQPTemplateDocument()
-        //    {
-        //        QPDocumentTypeId = 1,
-        //        UserQPTemplateId = userQPTemplate.UserQPTemplateId,
-        //        DocumentId = qpSyllabusDocument?.DocumentId ?? 0
-        //    };
-        //    AuditHelper.SetAuditPropertiesForInsert(userQPSyllabusDocument, 1);
-        //    _context.UserQPTemplateDocuments.Add(userQPSyllabusDocument);
-
-        //    var qpGenerationDocument = await _context.UserQPTemplateDocuments.FirstOrDefaultAsync(qptd => qptd.QPDocumentTypeId == 7 && qptd.UserQPTemplateId == qpUserTemplate.UserQPTemplateId);
-        //    var userQPDocument = new UserQPTemplateDocument()
-        //    {
-        //        QPDocumentTypeId = 6,
-        //        UserQPTemplateId = userQPTemplate.UserQPTemplateId,
-        //        DocumentId = qpGenerationDocument?.DocumentId ?? 0
-        //    };
-        //    AuditHelper.SetAuditPropertiesForInsert(userQPDocument, 1);
-        //    _context.UserQPTemplateDocuments.Add(userQPDocument);
-
-        //    var scrutinizedQPDocument = new UserQPTemplateDocument()
-        //    {
-        //        QPDocumentTypeId = 7,
-        //        UserQPTemplateId = userQPTemplate.UserQPTemplateId,
-        //        DocumentId = 0
-        //    };
-        //    AuditHelper.SetAuditPropertiesForInsert(scrutinizedQPDocument, 1);
-        //    _context.UserQPTemplateDocuments.Add(scrutinizedQPDocument);
-
-        //    await _context.SaveChangesAsync();
-         return true;
+                if (qpTemplate == null) return null;
+                qpTemplate.QPTemplateStatusTypeId = 4; //QP Scrutiny Allocated
+                var userQPTemplate = new UserQPTemplate()
+                {
+                    InstitutionId = qpUserTemplate.InstitutionId,
+                    UserId = userId,
+                    QPTemplateStatusTypeId = 10,//Scrutinize QP InProgress
+                    QPDocumentId = qpUserTemplate.QPDocumentId,
+                    IsQPOnly = qpUserTemplate.IsQPOnly,
+                    IsTablesAllowed = qpUserTemplate.IsTablesAllowed,
+                    TableName = qpUserTemplate.TableName,
+                    IsGraphsRequired = qpUserTemplate.IsGraphsRequired,
+                    ParentUserQPTemplateId = qpUserTemplate.UserQPTemplateId,
+                    GraphName = qpUserTemplate.GraphName,
+                    QPTemplateId = qpUserTemplate.QPTemplateId,
+                    SubmittedQPDocumentId = qpUserTemplate.SubmittedQPDocumentId,
+                };
+                AuditHelper.SetAuditPropertiesForInsert(userQPTemplate, 1);
+                _context.UserQPTemplates.Add(userQPTemplate);
+                await _context.SaveChangesAsync();
+            var courseDetails = _context.Courses.FirstOrDefault(c => c.CourseId == qpTemplate.CourseId);
+            var degreeType = _context.DegreeTypes.FirstOrDefault(c => c.DegreeTypeId == qpTemplate.DegreeTypeId);
+            var emailUser = _context.Users.FirstOrDefault(us => us.UserId == userId);
+            //send email
+            if (emailUser != null)
+            {
+                _emailService.SendEmailAsync(emailUser.Email, "Question Paper Assignment Scrutinization Notification – Sri Krishna Institutions, Coimbatore",
+                  $"Dear {emailUser.Name}," +
+                  $"\n\nYou have been assigned for Scrutinization for a Question Paper for the following course:" +
+                  $"\n\n Course:{courseDetails.Code} - {courseDetails.Name} \n Degree Type: {degreeType.Name}" +
+                  $"\n\nPlease review the assigned question paper and submit it before the due date." +
+                  $"\n To View Assignment please click here {_configuration["LoginUrl"]}" +
+                  $"\n\nContact Details:\nName:\nContact Number:\n\nThank you for your cooperation. We look forward to your valuable contribution to our institution.\n\nWarm regards,\nSri Krishna College of Engineering and Technology").Wait();
+            }
+            return true;
        }
-        //public async Task<bool?> SubmitScrutinizedQPAsync(long userId, long QPTemplateInstitutionId, long documentId)
-        //{
-        //    var qpTemplateInstitution = await _context.QPTemplateInstitutions.FirstOrDefaultAsync(qpti => qpti.QPTemplateInstitutionId == QPTemplateInstitutionId);
-        //    if (qpTemplateInstitution == null) return null;
-        //    var qpTemplate = await _context.QPTemplates.FirstOrDefaultAsync(qp => qp.QPTemplateId == qpTemplateInstitution.QPTemplateId);
+        public async Task<bool?> SubmitScrutinizedQPAsync(long userQPTemplateId, long documentId, QPSubmissionVM qPSubmissionVM)
+        {
 
-        //    if (qpTemplate == null) return null;
-        //    qpTemplate.QPTemplateStatusTypeId = 5; //QP Pending for Selection
-        //    AuditHelper.SetAuditPropertiesForUpdate(qpTemplate, 1);
+            var userQPTemplate = await _context.UserQPTemplates.FirstOrDefaultAsync(qpti => qpti.UserQPTemplateId == userQPTemplateId);
+            if (userQPTemplate == null) return null;
+            var qpTemplate = await _context.QPTemplates.FirstOrDefaultAsync(qp => qp.QPTemplateId == userQPTemplate.QPTemplateId);
+            if (qpTemplate == null) return null;
+            qpTemplate.QPTemplateStatusTypeId = 5; //QP Pending for Selection
+            AuditHelper.SetAuditPropertiesForUpdate(qpTemplate, 1);
 
-        //    var qpScrutinizedUserTemplate = await _context.UserQPTemplates.FirstOrDefaultAsync(uqp => uqp.UserId == userId && uqp.QPTemplateInstitutionId == QPTemplateInstitutionId && uqp.QPTemplateStatusTypeId == 10);
+            userQPTemplate.QPTemplateStatusTypeId = 11;//Scrutinized QP Submitted
+            userQPTemplate.SubmittedQPDocumentId = (documentId == 0) ? userQPTemplate.SubmittedQPDocumentId : documentId;
+            AuditHelper.SetAuditPropertiesForUpdate(userQPTemplate, 1);
 
-        //    if (qpScrutinizedUserTemplate == null) return null;
-        //    qpScrutinizedUserTemplate.QPTemplateStatusTypeId = 11;//Scrutinized QP Submitted
-        //    AuditHelper.SetAuditPropertiesForUpdate(qpScrutinizedUserTemplate, 1);
-           
-
-        //    var userQPTemplateForSelection = new UserQPTemplate()
-        //    {
-        //        QPTemplateInstitutionId = qpScrutinizedUserTemplate.QPTemplateInstitutionId,
-        //        UserId = 1,
-        //        QPTemplateStatusTypeId = 12,//Selection QP InProgress
-        //        QPDocumentId = qpScrutinizedUserTemplate.QPDocumentId
-        //    };
-        //    AuditHelper.SetAuditPropertiesForInsert(userQPTemplateForSelection, 1);
-        //    _context.UserQPTemplates.Add(userQPTemplateForSelection);
-        //    await _context.SaveChangesAsync();
-
-        //    var scrutinizedQPDocument = await _context.UserQPTemplateDocuments.FirstOrDefaultAsync(qptd => qptd.QPDocumentTypeId == 9 && qptd.UserQPTemplateId == qpScrutinizedUserTemplate.UserQPTemplateId);
-        //    if(scrutinizedQPDocument != null)
-        //    {
-        //        scrutinizedQPDocument.DocumentId = documentId;
-        //        AuditHelper.SetAuditPropertiesForUpdate(scrutinizedQPDocument, 1);
-        //    }
-        //    await _context.SaveChangesAsync();
-
-        //    var userQPDocument = new UserQPTemplateDocument()
-        //    {
-        //        QPDocumentTypeId = 8,//For QP Selection
-        //        UserQPTemplateId = userQPTemplateForSelection.UserQPTemplateId,
-        //        DocumentId = documentId
-        //    };
-        //    AuditHelper.SetAuditPropertiesForInsert(userQPDocument, 1);
-        //    _context.UserQPTemplateDocuments.Add(userQPDocument);
-
-        //    var selectedQPDocument = new UserQPTemplateDocument()
-        //    {
-        //        QPDocumentTypeId = 9,
-        //        UserQPTemplateId = userQPTemplateForSelection.UserQPTemplateId,
-        //        DocumentId = documentId
-        //    };
-        //    AuditHelper.SetAuditPropertiesForInsert(selectedQPDocument, 1);
-        //    _context.UserQPTemplateDocuments.Add(selectedQPDocument);
-
-        //    await _context.SaveChangesAsync();
-        //    return true;
-        //}
+            var userQPTemplateForSelection = new UserQPTemplate()
+            {
+                InstitutionId = userQPTemplate.InstitutionId,
+                UserId = 1,
+                QPTemplateStatusTypeId = 12,//Selection QP InProgress
+                IsTablesAllowed = userQPTemplate.IsTablesAllowed,
+                TableName = userQPTemplate.TableName,
+                IsGraphsRequired = userQPTemplate.IsGraphsRequired,
+                GraphName = userQPTemplate.GraphName,
+                QPTemplateId = userQPTemplate.QPTemplateId,
+                QPDocumentId= userQPTemplate.QPDocumentId,
+                SubmittedQPDocumentId = userQPTemplate.SubmittedQPDocumentId
+            };
+            AuditHelper.SetAuditPropertiesForInsert(userQPTemplateForSelection, 1);
+            _context.UserQPTemplates.Add(userQPTemplateForSelection);
+            await _context.SaveChangesAsync();
+            return true;
+        }
         //public async Task<bool?> SubmitSelectedQPAsync(long userId, long QPTemplateInstitutionId, long documentId)
         //{
         //    var qpTemplateInstitution = await _context.QPTemplateInstitutions.FirstOrDefaultAsync(qpti => qpti.QPTemplateInstitutionId == QPTemplateInstitutionId);

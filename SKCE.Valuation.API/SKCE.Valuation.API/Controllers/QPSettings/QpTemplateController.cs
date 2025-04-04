@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.Office2010.Word;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Mvc;
 using SKCE.Examination.Models.DbModels.Common;
 using SKCE.Examination.Services.Helpers;
@@ -75,27 +77,7 @@ namespace SKCE.Examination.API.Controllers.QPSettings
             return Ok(await _qpTemplateService.GetQPTemplatesByUserIdAsync(userId));
         }
         [HttpGet("AssignQPForScrutinity/{userId}/{userQPTemplateId}")]
-        public async Task<ActionResult<bool>> AssignQPForScrutinity(long userId, long userQPTemplateId)
-        {
-            var userQPTemplate = await _qpTemplateService.AssignTemplateForQPScrutinyAsync(userId, userQPTemplateId);
-            if (userQPTemplate == null) return NotFound();
-            return Ok(userQPTemplate);
-        }
-        //[HttpGet("SubmitScrutinizedQP/{userId}/{qpTemplateId}/{documentId}")]
-        //public async Task<ActionResult<bool>> SubmitScrutinizedQP(long userId, long qpTemplateId, long documentId)
-        //{
-        //    var userQPTemplate = await _qpTemplateService.SubmitScrutinizedQPAsync(userId, qpTemplateId, documentId);
-        //    if (userQPTemplate == null) return NotFound();
-        //    return Ok(userQPTemplate);
-        //}
-
-        //[HttpGet("PrintSelectedQP/{qpTemplateId}/{qpCode}/{isForPrint}")]
-        //public async Task<ActionResult<bool>> PrintSelectedQP(long qpTemplateId, string qpCode, bool isForPrint)
-        //{
-        //    var result = await _qpTemplateService.PrintSelectedQPAsync(qpTemplateId, qpCode, isForPrint);
-        //    return Ok(result);
-        //}
-
+        
         [HttpGet("GetExpertsForQPAssignment")]
         public async Task<ActionResult<IEnumerable<QPAssignmentExpertVM>>> GetExpertsForQPAssignment()
         {
@@ -167,5 +149,37 @@ namespace SKCE.Examination.API.Controllers.QPSettings
             if (userQPTemplate == null) return NotFound();
             return Ok(userQPTemplate);
         }
+
+        public async Task<ActionResult<bool>> AssignQPForScrutinity(long userId, long userQPTemplateId)
+        {
+            var userQPTemplate = await _qpTemplateService.AssignTemplateForQPScrutinyAsync(userId, userQPTemplateId);
+            if (userQPTemplate == null) return NotFound();
+            return Ok(userQPTemplate);
+        }
+        [HttpGet("SubmitScrutinizedQP/{userQPTemplateId}")]
+        public async Task<ActionResult<bool>> SubmitScrutinizedQP(long userQPTemplateId, QPSubmissionVM qPSubmissionVM)
+        {
+            long documentId = 0;
+            if (qPSubmissionVM.file != null)
+            {
+                // Save uploaded file to MemoryStream
+                using var stream = new MemoryStream();
+                await qPSubmissionVM.file.CopyToAsync(stream);
+                stream.Position = 0;
+                // Load Word document from stream
+                documentId = _azureBlobStorageHelper.UploadFileAsync(stream, qPSubmissionVM.file.FileName, qPSubmissionVM.file.ContentType).Result;
+            }
+            var userQPTemplate = await _qpTemplateService.SubmitScrutinizedQPAsync(userQPTemplateId, documentId, qPSubmissionVM);
+            if (userQPTemplate == null) return NotFound();
+            return Ok(userQPTemplate);
+        }
+
+        //[HttpGet("PrintSelectedQP/{qpTemplateId}/{qpCode}/{isForPrint}")]
+        //public async Task<ActionResult<bool>> PrintSelectedQP(long qpTemplateId, string qpCode, bool isForPrint)
+        //{
+        //    var result = await _qpTemplateService.PrintSelectedQPAsync(qpTemplateId, qpCode, isForPrint);
+        //    return Ok(result);
+        //}
+
     }
 }

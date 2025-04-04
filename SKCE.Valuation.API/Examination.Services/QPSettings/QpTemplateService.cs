@@ -1805,6 +1805,7 @@ namespace SKCE.Examination.Services.QPSettings
             userQPTemplates.ForEach(userQPTemplate =>
             {
                 var qpTemplate = qpTemplates.FirstOrDefault(p => p.QPTemplateId == userQPTemplate.QPTemplateId);
+                var qpDocument = _context.QPDocuments.FirstOrDefault(qp => qp.QPDocumentId == userQPTemplate.QPDocumentId);
                 userQPTemplateVMs.Add(new UserQPTemplateVM() {
                     UserQPTemplateId = userQPTemplate.UserQPTemplateId,
                     InstitutionId = userQPTemplate.InstitutionId,
@@ -1814,8 +1815,8 @@ namespace SKCE.Examination.Services.QPSettings
                     QPTemplateStatusTypeId = userQPTemplate.QPTemplateStatusTypeId, 
                     QPTemplateStatusTypeName = qpTemplateStatuss.FirstOrDefault(qps => qps.QPTemplateStatusTypeId == userQPTemplate.QPTemplateStatusTypeId)?.Name ?? string.Empty,
                     QPDocumentId = userQPTemplate.QPDocumentId,
-                    QPDocumentName = documents.FirstOrDefault(d => d.DocumentId == userQPTemplate.QPDocumentId)?.Name ?? string.Empty,
-                    QPDocumentUrl = documents.FirstOrDefault(d => d.DocumentId == userQPTemplate.QPDocumentId)?.Url ?? string.Empty,
+                    QPDocumentName = documents.FirstOrDefault(d => d.DocumentId == qpDocument.DocumentId)?.Name ?? string.Empty,
+                    QPDocumentUrl = documents.FirstOrDefault(d => d.DocumentId == qpDocument.DocumentId)?.Url ?? string.Empty,
                     CourseSyllabusDocumentId = qpTemplate.CourseSyllabusDocumentId,
                     CourseSyllabusDocumentName = documents.FirstOrDefault(d => d.DocumentId == qpTemplate.CourseSyllabusDocumentId)?.Name ?? string.Empty,
                     CourseSyllabusDocumentUrl = documents.FirstOrDefault(d => d.DocumentId == qpTemplate.CourseSyllabusDocumentId)?.Url ?? string.Empty

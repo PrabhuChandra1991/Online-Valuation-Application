@@ -76,7 +76,7 @@ namespace SKCE.Examination.API.Controllers.QPSettings
         {
             return Ok(await _qpTemplateService.GetQPTemplatesByUserIdAsync(userId));
         }
-        [HttpGet("AssignQPForScrutinity/{userId}/{userQPTemplateId}")]
+        
         
         [HttpGet("GetExpertsForQPAssignment")]
         public async Task<ActionResult<IEnumerable<QPAssignmentExpertVM>>> GetExpertsForQPAssignment()
@@ -150,6 +150,7 @@ namespace SKCE.Examination.API.Controllers.QPSettings
             return Ok(userQPTemplate);
         }
 
+        [HttpGet("AssignQPForScrutinity/{userId}/{userQPTemplateId}")]
         public async Task<ActionResult<bool>> AssignQPForScrutinity(long userId, long userQPTemplateId)
         {
             var userQPTemplate = await _qpTemplateService.AssignTemplateForQPScrutinyAsync(userId, userQPTemplateId);

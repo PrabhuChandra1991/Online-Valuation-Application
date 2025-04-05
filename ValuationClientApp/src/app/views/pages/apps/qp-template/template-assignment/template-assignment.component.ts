@@ -314,6 +314,7 @@ getAssignmentForTemplateId(templateId: any){
           
           if (selItems.length ===0){
             qpDocument.qpScrutinityUsers.push({
+              userQPTemplateId:0,
               institutionId:qpAssignedUser.institutionId,
               isQPOnly:qpAssignedUser.isQPOnly,
               parentUserQPTemplateId:qpAssignedUser.userQPTemplateId,
@@ -614,10 +615,10 @@ isUserAlreadySelected(qpAssignedUsers: any[], userId: number, currentIndex: numb
     this.templateService.printQPTemplate(userqpTemplateId);
   }
 
-  assignScrutinity(assignedScrutinyUser:any, userqpTemplateId:number ){
+  assignScrutinity(assignedScrutinyUser:any){
      
 
-    this.templateService.assignScrutinity(assignedScrutinyUser.userId, userqpTemplateId).subscribe({
+    this.templateService.assignScrutinity(assignedScrutinyUser.userId, assignedScrutinyUser.parentUserQPTemplateId).subscribe({
       next: () => {
         this.toastr.success('updated successfully!');      },
       error: (res) => {

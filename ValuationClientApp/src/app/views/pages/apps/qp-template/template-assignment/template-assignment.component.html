@@ -301,42 +301,34 @@
                           *ngIf="assignedUser.statusTypeId === 9">
                     Print
                   </button>
-                </div>
-
-
-                <div class="row" *ngFor="let assignedScrutinyUser of qpDocument.qpScrutinityUsers; let userIndex = index"
-                     [formGroupName]="userIndex">
-
-                  <div class="row" *ngIf="assignedUser.userQPTemplateId === assignedScrutinyUser.parentUserQPTemplateId && assignedUser.statusTypeId === 9">
-
-                    <div class="col-sm-6">
-                      <div class="mb-4">
-                        <label class="form-label">Scrutiny </label>
-                        <select class="form-select" formControlName="scrutinyUserId"
-                                (change)="updateScrutinyUserDetails(docIndex, userIndex,$event)">
-                          <option value="">Select Scrutiny </option>
-                          <option *ngFor="let user of users" [value]="user.userId">
-                            {{ user.userName }}
-                          </option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <div class="col-sm-3 d-flex align-items-center">
-                      <button class="btn btn-sm btn-outline-danger"
-                              (click)="assignScrutinity(assignedScrutinyUser, assignedUser.userQPTemplateId)">
-                        Assign Scrutinity
-                      </button>
-                    </div>
-
-                  </div>
-
-
-                </div>
-
+                </div>               
               </div>
-
             </div>
+
+            <div formArrayName="qpScrutinityUsers">
+              <div class="row" *ngFor="let assignedScrutinyUser of qpDocument.qpScrutinityUsers; let userIndex = index" [formGroupName]="userIndex">
+                  <div class="col-sm-6">
+                    <div class="mb-4">
+                      <label class="form-label">Scrutiny </label>
+                      <select class="form-select" formControlName="userId" [disabled]="assignedScrutinyUser.userQPTemplateId !== 0"
+                        (change)="updateScrutinyUserDetails(docIndex, userIndex,$event)">
+                        <option value="">Select Scrutiny </option>
+                        <option *ngFor="let user of users" [value]="user.userId">
+                          {{ user.userName }}
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-sm-3 d-flex align-items-center">                     
+                    <button class="btn btn-sm btn-outline-danger" [disabled]="assignedScrutinyUser.userQPTemplateId !== 0"
+                      (click)="assignScrutinity(assignedScrutinyUser)">
+                      Assign Scrutinity
+                    </button>
+                  </div>
+              </div>
+            </div>
+            
+
           </div>
         </div>
       </div>
@@ -345,7 +337,11 @@
   <div class="modal-footer">
     <button type="button" class="btn btn-secondary" (click)="close()">Close</button>
 
-    <button type="button" class="btn btn-primary" (click)="onSave()" [disabled]="!isCourseSyllabusDocuploaded">Save changes</button>
+    <button type="button" class="btn btn-primary" *ngIf="!qpTemplateData.qpTemplateId"  
+     (click)="onSave()" [disabled]="!isCourseSyllabusDocuploaded">
+     Save changes
+    </button>
+
   </div>
 </ng-template>
 

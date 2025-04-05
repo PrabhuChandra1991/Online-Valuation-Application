@@ -312,7 +312,7 @@ getAssignmentForTemplateId(templateId: any){
           const selItems = 
           qpDocument.qpScrutinityUsers.filter((x:any)=> x.parentUserQPTemplateId ==qpAssignedUser.userQPTemplateId);
           
-          if (selItems.length ===0){
+          if (selItems.length ===0 && qpAssignedUser.statusTypeId == 9){
             qpDocument.qpScrutinityUsers.push({
               userQPTemplateId:0,
               institutionId:qpAssignedUser.institutionId,
@@ -628,17 +628,19 @@ isUserAlreadySelected(qpAssignedUsers: any[], userId: number, currentIndex: numb
   }
 
   assignScrutinity(assignedScrutinyUser:any){         
+    this.spinnerService.toggleSpinnerState(true);
     this.templateService.assignScrutinity(assignedScrutinyUser.userId, assignedScrutinyUser.parentUserQPTemplateId).subscribe({
       next: () => {
-        //this.toastr.success('updated successfully!'); 
+        this.close();
+        this.spinnerService.toggleSpinnerState(false);
       },
       error: (res) => {
-        this.toastr.error(res['error']['message']);
+        this.close();
         this.spinnerService.toggleSpinnerState(false);
       },
       complete: () => {
-       // this.isSubmitting = false;
-        this.spinnerService.toggleSpinnerState(false);
+       this.close();
+       this.spinnerService.toggleSpinnerState(false);
       }
     });
 

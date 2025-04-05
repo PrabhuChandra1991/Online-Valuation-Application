@@ -309,7 +309,7 @@
               <div class="row" *ngFor="let assignedScrutinyUser of qpDocument.qpScrutinityUsers; let userIndex = index" [formGroupName]="userIndex">
                   <div class="col-sm-6">
                     <div class="mb-4">
-                      <label class="form-label">Scrutiny </label>
+                      <label class="form-label">Scrutiny - {{ userIndex + 1 }}</label>
                       <select class="form-select" formControlName="userId" [disabled]="assignedScrutinyUser.userQPTemplateId !== 0"
                         (change)="updateScrutinyUserDetails(docIndex, userIndex,$event)">
                         <option value="">Select Scrutiny </option>

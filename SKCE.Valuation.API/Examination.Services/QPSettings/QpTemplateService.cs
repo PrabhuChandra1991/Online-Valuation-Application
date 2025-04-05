@@ -1907,8 +1907,8 @@ namespace SKCE.Examination.Services.QPSettings
             if (userQPTemplate != null)
             {
                 var qpDocument = _context.QPDocuments.FirstOrDefault(u => u.QPDocumentId == userQPTemplate.QPDocumentId);
-                var qpSelectedDocument = await _context.Documents.FirstOrDefaultAsync(d => d.DocumentId == qpDocument.DocumentId);
-                var qpToPrintDocument = await _context.Documents.FirstOrDefaultAsync(d => d.DocumentId == userQPTemplate.SubmittedQPDocumentId);
+                var qpSelectedDocument = await _context.Documents.FirstOrDefaultAsync(d => d.DocumentId == userQPTemplate.SubmittedQPDocumentId);
+                var qpToPrintDocument = await _context.Documents.FirstOrDefaultAsync(d => d.DocumentId == qpDocument.DocumentId );
                 if (qpSelectedDocument == null || qpToPrintDocument == null) return false;
                 await _bookmarkProcessor.ProcessBookmarksAndPrint(qpTemplate, userQPTemplate, qpSelectedDocument.Name, qpToPrintDocument.Name, isForPrint);
                 if(isForPrint)
@@ -1946,15 +1946,24 @@ namespace SKCE.Examination.Services.QPSettings
 
                 if (!string.IsNullOrEmpty(bookmarkHtmlBase64))
                 {
-                    var qPDocumentBookMark = new UserQPDocumentBookMark
+                    var existingQpBookMark = _context.UserQPDocumentBookMarks.FirstOrDefault(qpb => qpb.UserQPTemplateId == userqpTemplateId && qpb.BookMarkName == bookmark.Name && qpb.DocumentId == documentId);
+                    if (existingQpBookMark == null)
                     {
-                        UserQPTemplateId = userqpTemplateId,
-                        BookMarkName = bookmark.Name,
-                        DocumentId = documentId,
-                        BookMarkText = bookmarkHtmlBase64
-                    };
-                    AuditHelper.SetAuditPropertiesForInsert(qPDocumentBookMark, 1);
-                    qpDocumentBookMarks.Add(qPDocumentBookMark);
+                        var qPDocumentBookMark = new UserQPDocumentBookMark
+                        {
+                            UserQPTemplateId = userqpTemplateId,
+                            BookMarkName = bookmark.Name,
+                            DocumentId = documentId,
+                            BookMarkText = bookmarkHtmlBase64
+                        };
+                        AuditHelper.SetAuditPropertiesForInsert(qPDocumentBookMark, 1);
+                        qpDocumentBookMarks.Add(qPDocumentBookMark);
+                    }
+                    else
+                    {
+                        existingQpBookMark.BookMarkText = bookmarkHtmlBase64;
+                        AuditHelper.SetAuditPropertiesForUpdate(existingQpBookMark, 1);
+                    }
                 }
             }
             _context.UserQPDocumentBookMarks.AddRange(qpDocumentBookMarks);

@@ -313,7 +313,7 @@
                       <select class="form-select" formControlName="userId" [disabled]="assignedScrutinyUser.userQPTemplateId !== 0"
                         (change)="updateScrutinyUserDetails(docIndex, userIndex,$event)">
                         <option value="">Select Scrutiny </option>
-                        <option *ngFor="let user of users" [value]="user.userId">
+                        <option *ngFor="let user of getScrutinyUsers(assignedScrutinyUser)" [value]="user.userId">
                           {{ user.userName }}
                         </option>
                       </select>

@@ -84,7 +84,7 @@
     <Build Include="Tables\CourseSyllabusDocument.sql" />
     <Build Include="Tables\QPDocument.sql" />
     <Build Include="Tables\QPDocumentBookMark.sql" />
-    <Build Include="Tables\UserQDocumentBookMark.sql" />
+    <Build Include="Tables\UserQPDocumentBookMark.sql" />
     <Build Include="Tables\CourseSyllabusMaster.sql" />
   </ItemGroup>
   <ItemGroup>

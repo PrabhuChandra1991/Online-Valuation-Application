@@ -19,6 +19,7 @@ using DocumentFormat.OpenXml.Vml.Office;
 using DocumentFormat.OpenXml.Math;
 using Spire.Doc.Fields;
 using Amazon.Runtime.Internal.Transform;
+using Microsoft.EntityFrameworkCore;
 
 namespace SKCE.Examination.Services.Helpers
 {
@@ -145,6 +146,16 @@ namespace SKCE.Examination.Services.Helpers
                     else if (bookmarkName == "SUPPORTCATALOGS")
                     {
                         bookmarkHtml = string.Empty;
+                        var GraphName = string.Empty;
+                        var TableName = string.Empty;
+                        if (userQPTemplate.IsGraphsRequired.Value)
+                        {
+                            bookmarkHtml = $"Graph Sheet required - {userQPTemplate.GraphName}";
+                        }
+                        if (userQPTemplate.IsTablesAllowed.Value)
+                        {
+                            bookmarkHtml = bookmarkHtml + $"Tables are allowed - {userQPTemplate.TableName}";
+                        }
                     }
 
                     bookmarkUpdates[bookmark.Key] = bookmarkHtml;
@@ -155,18 +166,37 @@ namespace SKCE.Examination.Services.Helpers
                 // Loop through each bookmark and update text
                 foreach (var bookmark in bookmarkUpdates)
                 {
-                    Spire.Doc.Bookmark bookMark = sourceDoc.Bookmarks[bookmark.Key];
-                    if (bookMark != null)
+                    Spire.Doc.Bookmark sbookMark = sourceDoc.Bookmarks[bookmark.Key];
+                    if (sbookMark != null)
                     {
-                        if (bookMark.BookmarkStart.OwnerParagraph.Items.Count > 0)
+                        if (sbookMark.BookmarkStart.OwnerParagraph.Items.Count > 0)
                         {
-                            foreach (var item in bookMark.BookmarkStart.OwnerParagraph.Items)
+                            foreach (var item in sbookMark.BookmarkStart.OwnerParagraph.Items)
                             {
                                 if (item is TextRange textRange)
                                 {
-                                    // Replace the text in the bookmark with the new value
-                                    textRange.Text = bookmark.Value;
-                                    break;
+                                    if (textRange.Text == sbookMark.Name)
+                                    {
+                                        // Replace the text in the bookmark with the new value
+                                        textRange.Text = bookmark.Value;
+                                    }
+                                }
+                                if (item is Spire.Doc.BookmarkEnd bookmarkEnd)
+                                {
+                                    if (bookmarkEnd.OwnerParagraph.Text == sbookMark.Name)
+                                    {
+                                        foreach (var bookowner in sbookMark.BookmarkStart.OwnerParagraph.Items)
+                                        {
+                                            if (item is TextRange textRange1)
+                                            {
+                                                if (textRange1.Text == sbookMark.Name)
+                                                {
+                                                    // Replace the text in the bookmark with the new value
+                                                    textRange1.Text = bookmark.Value;
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -239,8 +269,16 @@ namespace SKCE.Examination.Services.Helpers
 
                 if (!isForPrint) return;
                 var documentId = _azureBlobStorageHelper.UploadFileToBlob(outputPdfPath, string.Format("{0}_{1}_{2}_{3}.pdf", qPTemplate.QPTemplateName, qPTemplate.QPCode, qPTemplate.ExamYear, DateTime.UtcNow.ToShortDateString()));
+                
+                SaveBookmarksToDatabaseByFilePath(documentPathToPrint, qPTemplate.QPTemplateId,userQPTemplate.SubmittedQPDocumentId);
+
+                var selectedQPTemplate = _context.QPTemplates.Where(qp => qp.QPTemplateId == qPTemplate.QPTemplateId);
+                if (selectedQPTemplate != null)
+                {
+                    //selectedQPTemplate.Selected
+                }
                 // Trigger printing
-                PrintPdf(outputPdfPath, printerName, numberOfCopies);
+                //PrintPdf(outputPdfPath, printerName, numberOfCopies);
 
                 Console.WriteLine("Processing and printing completed successfully.");
             }
@@ -318,6 +356,75 @@ namespace SKCE.Examination.Services.Helpers
             {
                 Console.WriteLine("Error opening PDF: " + ex.Message);
             }
+        }
+        public void SaveBookmarksToDatabaseByFilePath(string fileName, long qPtemplateId,long documentId)
+        {
+            Document sourceDoc = _azureBlobStorageHelper.DownloadWordDocumentFromBlob(fileName).Result;
+            // Iterate through all bookmarks in the source document
+
+            var qpDocumentBookMarks = new List<QPDocumentBookMark>();
+            foreach (Spire.Doc.Bookmark bookmark in sourceDoc.Bookmarks)
+            {
+                string bookmarkHtmlBase64 = ConvertBookmarkToHtmlBase64(sourceDoc, bookmark);
+
+                if (!string.IsNullOrEmpty(bookmarkHtmlBase64))
+                {
+                    var qPDocumentBookMark = new QPDocumentBookMark
+                    {
+                        QPTemplateId = qPtemplateId,
+                        BookMarkName = bookmark.Name,
+                        DocumentId = documentId,
+                        BookMarkText = bookmarkHtmlBase64
+                    };
+                    AuditHelper.SetAuditPropertiesForInsert(qPDocumentBookMark, 1);
+                    qpDocumentBookMarks.Add(qPDocumentBookMark);
+                }
+            }
+            _context.QPDocumentBookMarks.AddRange(qpDocumentBookMarks);
+            _context.SaveChanges();
+        }
+        private static string ConvertBookmarkToHtmlBase64(Document doc, Spire.Doc.Bookmark bookmark)
+        {
+            Spire.Doc.BookmarkStart bookmarkStart = bookmark.BookmarkStart;
+            Spire.Doc.BookmarkEnd bookmarkEnd = bookmark.BookmarkEnd;
+
+            if (bookmarkStart == null || bookmarkEnd == null) return null;
+
+            Document extractedDoc = new Document();
+            Section section = extractedDoc.AddSection();
+
+            bool isInsideBookmark = false;
+            foreach (DocumentObject obj in doc.Sections[0].Body.ChildObjects)
+            {
+                if (obj == bookmarkStart) isInsideBookmark = true;
+
+                if (isInsideBookmark)
+                {
+                    section.Body.ChildObjects.Add(obj.Clone());
+                }
+
+                if (obj == bookmarkEnd) break;
+            }
+
+            // Set export options with image embedding
+            HtmlExportOptions options = new HtmlExportOptions
+            {
+                CssStyleSheetType = Spire.Doc.CssStyleSheetType.Internal, // Or Embedded
+                ImageEmbedded = true                            // 🔥 Embed images as base64
+            };
+
+            // Export to HTML file (optional: use temp file if needed)
+            string tempHtmlPath = Path.Combine(Path.GetTempPath(), "output.html");
+            extractedDoc.SaveToFile(tempHtmlPath, FileFormat.Html);
+
+            // Read HTML content
+            string htmlContent = File.ReadAllText(tempHtmlPath);
+
+            // Optional: Delete temp file
+              File.Delete(tempHtmlPath);
+
+            return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(htmlContent));
+
         }
         private static void PrintPdf(string pdfPath, string printerName, int copies)
         {

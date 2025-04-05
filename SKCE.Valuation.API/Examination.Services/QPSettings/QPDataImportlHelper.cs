@@ -132,8 +132,8 @@ public class QPDataImportHelper
                 string semester = GetCellValue(workbookPart, cells[7]).Trim();
                 string courseCode = GetCellValue(workbookPart, cells[8]).Trim();
                 string studentCount = GetCellValue(workbookPart, cells[10]).Trim();
-                string examMonth = GetCellValue(workbookPart, cells[11]).Trim();
-                string examYear = GetCellValue(workbookPart, cells[12]).Trim();
+                string examYear = GetCellValue(workbookPart, cells[11]).Trim();
+                string examMonth = GetCellValue(workbookPart, cells[12]).Trim();
 
                 var institution = updatedInstitutions.FirstOrDefault(d => d.Code == institutionCode);
                 var course = updatedCourses.FirstOrDefault(d => d.Code == courseCode);
@@ -319,73 +319,42 @@ public class QPDataImportHelper
         //await SaveBookmarksToDatabase();
         return true;
     }
-    public void SaveBookmarksToDatabase(string filePath)
-    {
-        var qPDocuments = _dbContext.QPDocuments.ToList();
-        foreach (var qpDocument in qPDocuments)
-        {
-            if (qpDocument.DocumentTypeId != 3) continue;
-            if (!_dbContext.QPDocumentBookMarks.Any(qpb => qpb.QPDocumentId == qpDocument.QPDocumentId))
-            {
-                var qpSelectedDocument = _dbContext.Documents.FirstOrDefault(d => d.DocumentId == qpDocument.DocumentId);
-                if (qpSelectedDocument != null)
-                {
-                    Document sourceDoc = _azureBlobStorageHelper.DownloadWordDocumentFromBlob(qpSelectedDocument.Name).Result;
-                    // Iterate through all bookmarks in the source document
+    //public void SaveBookmarksToDatabase(string filePath)
+    //{
+    //    var qPDocuments = _dbContext.QPDocuments.ToList();
+    //    foreach (var qpDocument in qPDocuments)
+    //    {
+    //        if (qpDocument.DocumentTypeId != 3) continue;
+    //        //if (!_dbContext.QPDocumentBookMarks.Any(qpb => qpb.QPDocumentId == qpDocument.QP))
+    //        //{
+    //            var qpSelectedDocument = _dbContext.Documents.FirstOrDefault(d => d.DocumentId == qpDocument.DocumentId);
+    //            if (qpSelectedDocument != null)
+    //            {
+    //                Document sourceDoc = _azureBlobStorageHelper.DownloadWordDocumentFromBlob(qpSelectedDocument.Name).Result;
+    //                // Iterate through all bookmarks in the source document
 
-                    var qpDocumentBookMarks = new List<QPDocumentBookMark>();
-                    foreach (Spire.Doc.Bookmark bookmark in sourceDoc.Bookmarks)
-                    {
-                        string bookmarkHtmlBase64 = ConvertBookmarkToHtmlBase64(sourceDoc, bookmark);
+    //                var qpDocumentBookMarks = new List<QPDocumentBookMark>();
+    //                foreach (Spire.Doc.Bookmark bookmark in sourceDoc.Bookmarks)
+    //                {
+    //                    string bookmarkHtmlBase64 = ConvertBookmarkToHtmlBase64(sourceDoc, bookmark);
 
-                        if (!string.IsNullOrEmpty(bookmarkHtmlBase64))
-                        {
-                            var qPDocumentBookMark = new QPDocumentBookMark
-                            {
-                                QPDocumentId = qpDocument.QPDocumentId,
-                                BookMarkName = bookmark.Name,
-                                BookMarkText = bookmarkHtmlBase64
-                            };
-                            AuditHelper.SetAuditPropertiesForInsert(qPDocumentBookMark, 1);
-                            qpDocumentBookMarks.Add(qPDocumentBookMark);
-                        }
-                    }
-                    _dbContext.QPDocumentBookMarks.AddRange(qpDocumentBookMarks);
-                }
-            }
-        }
-         _dbContext.SaveChangesAsync();
-    }
-    private static string ConvertBookmarkToHtmlBase64(Document doc, Spire.Doc.Bookmark bookmark)
-    {
-        Spire.Doc.BookmarkStart bookmarkStart = bookmark.BookmarkStart;
-        Spire.Doc.BookmarkEnd bookmarkEnd = bookmark.BookmarkEnd;
-
-        if (bookmarkStart == null || bookmarkEnd == null) return null;
-
-        Document extractedDoc = new Document();
-        Section section = extractedDoc.AddSection();
-
-        bool isInsideBookmark = false;
-        foreach (DocumentObject obj in doc.Sections[0].Body.ChildObjects)
-        {
-            if (obj == bookmarkStart) isInsideBookmark = true;
-
-            if (isInsideBookmark)
-            {
-                section.Body.ChildObjects.Add(obj.Clone());
-            }
-
-            if (obj == bookmarkEnd) break;
-        }
-
-        using (MemoryStream ms = new MemoryStream())
-        {
-            extractedDoc.SaveToStream(ms, FileFormat.Html);
-            string html = Encoding.UTF8.GetString(ms.ToArray());
-
-            byte[] htmlBytes = Encoding.UTF8.GetBytes(html);
-            return Convert.ToBase64String(htmlBytes);
-        }
-    }
+    //                    if (!string.IsNullOrEmpty(bookmarkHtmlBase64))
+    //                    {
+    //                        var qPDocumentBookMark = new QPDocumentBookMark
+    //                        {
+    //                            QPTemplateId = 1,
+    //                            BookMarkName = bookmark.Name,
+    //                            BookMarkText = bookmarkHtmlBase64
+    //                        };
+    //                        AuditHelper.SetAuditPropertiesForInsert(qPDocumentBookMark, 1);
+    //                        qpDocumentBookMarks.Add(qPDocumentBookMark);
+    //                    }
+    //                }
+    //                _dbContext.QPDocumentBookMarks.AddRange(qpDocumentBookMarks);
+    //            }
+    //        //}
+    //    }
+    //     _dbContext.SaveChangesAsync();
+    //}
+    
 }

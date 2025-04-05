@@ -32,18 +32,22 @@
 
               <ng-container matColumnDef="importedBy">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>Imported By</th>
-                <td mat-cell *matCellDef="let element">{{ element.importedBy }} </td>
+                <td mat-cell *matCellDef="let element">{{ element.userName }} </td>
               </ng-container>
 
               <!-- Mobile Number Column -->
               <ng-container matColumnDef="totalRecordsImported">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header> Total Records Imported </th>
-                <td mat-cell *matCellDef="let element"> {{ element.totalRecordsImported }} </td>
+                <td mat-cell *matCellDef="let element"> {{ element.totalCount }} </td>
               </ng-container>
 
               <ng-container matColumnDef="totalCourseCount">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header> Total Course Count </th>
-                <td mat-cell *matCellDef="let element">{{ element.totalCourseCount }} </td>
+                <td mat-cell *matCellDef="let element">{{ element.coursesCount }} </td>
+              </ng-container>
+              <ng-container matColumnDef="courses">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> courses </th>
+                <td mat-cell *matCellDef="let element">{{ element.courses }} </td>
               </ng-container>
               <ng-container matColumnDef="institutionsCount">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header> Institutions Count </th>

@@ -268,7 +268,7 @@
                 <div class="col-sm-6">
                   <div class="mb-4">
                     <label class="form-label">Expert - {{ userIndex + 1 }}</label>
-                    <select class="form-select" formControlName="userId"
+                    <select [attr.disabled]="!true? 'disabled' : null" class="form-select" formControlName="userId"
                             (change)="updateUserDetails(docIndex, userIndex,$event)" >
                       <option value="">Select Expert</option>
                       <option *ngFor="let user of users" [value]="user.userId"
@@ -298,7 +298,7 @@
                 <div class="col-sm-6">
                   <div class="mb-4">
                     <label class="form-label">Scrutiny </label>
-                    <select class="form-select" formControlName="scrutinyUserId" (change)="updateScrutinyUserDetails(docIndex, userIndex,$event)" >
+                    <select  class="form-select" formControlName="scrutinyUserId" (change)="updateScrutinyUserDetails(docIndex, userIndex,$event)" >
                       <option value="">Select Scrutiny </option>
                       <option *ngFor="let user of users" [value]="user.userId">
                         {{ user.userName }}

@@ -296,10 +296,6 @@
                 </div>
 
                 <div class="col-sm-2">
-                  <button class="btn btn-sm btn-outline-danger" (click)="clearSelection(docIndex, userIndex)"
-                          *ngIf="assignedUser.statusTypeId === 8">
-                    Clear
-                  </button>
                   <button class="btn btn-sm btn-outline-danger"
                           (click)="printQPDocument(assignedUser.userQPTemplateId)"
                           *ngIf="assignedUser.statusTypeId === 9">
@@ -341,9 +337,9 @@
   <div class="modal-footer">
     <button type="button" class="btn btn-secondary" (click)="close()">Close</button>
 
-    <button type="button" class="btn btn-primary" *ngIf="!(qpTemplateData && qpTemplateData.qpTemplateId !== null)"  
-     (click)="onSave()" [disabled]="!isCourseSyllabusDocuploaded">
-     Save changes
+    <button type="button" class="btn btn-primary" *ngIf="(qpTemplateId == 0)"
+            (click)="onSave()" [disabled]="!isCourseSyllabusDocuploaded">
+      Save changes
     </button>
 
   </div>

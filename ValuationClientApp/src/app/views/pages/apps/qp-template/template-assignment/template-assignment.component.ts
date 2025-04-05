@@ -84,7 +84,7 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
     isQPDocUploaded : boolean = false;
     isQPDocValidated : boolean = false;
     isInvalidDoc: boolean = false
-    qpTemplateId: number;
+    qpTemplateId: number=0;
     qpValidationMessage: any;
     isGraphsRequired : boolean = false;
     isTablesAllowed : boolean = false;
@@ -299,7 +299,7 @@ getAssignmentForTemplateId(templateId: any){
 
   this.templateService.getQpTemplateById(templateId).subscribe((response) => {
     this.qpTemplateData = response;
-
+    this.qpTemplateId = this.qpTemplateData.qpTemplateId;    ;
     console.log('assigned template for sel template ',response);
     if(this.qpTemplateData)
     {

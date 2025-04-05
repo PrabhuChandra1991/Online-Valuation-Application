@@ -40,19 +40,15 @@
                 <th mat-header-cell *matHeaderCellDef mat-sort-header> Total Records Imported </th>
                 <td mat-cell *matCellDef="let element"> {{ element.totalCount }} </td>
               </ng-container>
-
-              <ng-container matColumnDef="totalCourseCount">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> Total Course Count </th>
-                <td mat-cell *matCellDef="let element">{{ element.coursesCount }} </td>
-              </ng-container>
-              <ng-container matColumnDef="courses">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> courses </th>
-                <td mat-cell *matCellDef="let element">{{ element.courses }} </td>
-              </ng-container>
               <ng-container matColumnDef="institutionsCount">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header> Institutions Count </th>
                 <td mat-cell *matCellDef="let element"> {{ element.institutionsCount }} </td>
               </ng-container>
+              <ng-container matColumnDef="totalCourseCount">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Total Course Count </th>
+                <td mat-cell *matCellDef="let element">{{ element.coursesCount }} </td>
+              </ng-container>
+             
               <ng-container matColumnDef="departmentsCount">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header> Departments Count </th>
                 <td mat-cell *matCellDef="let element"> {{ element.departmentsCount }} </td>

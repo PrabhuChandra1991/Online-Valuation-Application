@@ -35,8 +35,8 @@ export class ImportHistoryComponent implements OnInit{
 
   importHistories: any[] = [];
 
-  displayedColumns: string[] = ['documentId', 'documentName','documentUrl' ,'importedBy','totalRecordsImported','totalCourseCount'
-                              ,'institutionsCount','departmentsCount'];
+  displayedColumns: string[] = ['documentId', 'documentName','documentUrl' ,'importedBy','totalRecordsImported','institutionsCount','totalCourseCount'
+                              ,'departmentsCount'];
 
   dataSource = new MatTableDataSource<any>([]);
 

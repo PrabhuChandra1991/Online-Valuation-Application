@@ -379,7 +379,7 @@
 <ng-template #lgDocModal let-modal>
   <div class="modal-header">
     <h5 class="modal-title" id="exampleModalLabel">Upload Document</h5>
-    <button type="button" class="btn-close" (click)="modal.close('by: close icon')" (click)="printQPDocument(qpTemplateId)" aria-label="Close"></button>
+    <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
   </div>
 
   <div class="modal-body">
@@ -393,7 +393,7 @@
         </div><!-- Col -->
         <div class="col-sm-6 text-end">
           <div class="mt-4">
-            <button type="button" class="btn btn-primary" *ngIf="isQPDocValidated">Preview</button>
+            <button type="button" class="btn btn-primary" (click)="printQPDocument(qpTemplateId)" *ngIf="isQPDocValidated">Preview</button>
           </div>
         </div><!-- Col -->
       </div><!-- Row -->

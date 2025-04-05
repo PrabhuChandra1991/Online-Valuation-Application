@@ -28,6 +28,7 @@ namespace SKCE.Examination.Models.DbModels.QPSettings
         public required long Semester { get; set; }
         public required long StudentCount { get; set; }
         public  long CourseSyllabusDocumentId { get; set; }
+        public long? PrintedDocumentId {  get; set; }
 
     }
 }

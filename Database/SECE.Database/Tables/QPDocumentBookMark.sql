@@ -1,7 +1,8 @@
 ﻿CREATE TABLE [dbo].[QPDocumentBookMark]
 (
 	[QPDocumentBookMarkId] BIGINT NOT NULL PRIMARY KEY IDENTITY(1,1),
-	[QPDocumentId] BIGINT NOT NULL FOREIGN KEY (QPDocumentId) REFERENCES [QPDocument](QPDocumentId),
+	[QPTemplateId] BIGINT NOT NULL FOREIGN KEY (QPTemplateId) REFERENCES [QPTemplate](QPTemplateId),
+	[DocumentId] BIGINT NOT NULL FOREIGN KEY (DocumentId) REFERENCES [Document](DocumentId),
 	[BookMarkName] NVARCHAR(50) NOT NULL,
 	[BookMarkText] NVARCHAR(MAX) NOT NULL,
 	[IsActive] BIT DEFAULT 1,

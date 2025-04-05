@@ -106,8 +106,8 @@ namespace SKCE.Examination.Services.ViewModels.QPSettings
         public string UserName { get; set; } = string.Empty;
         public long QPTemplateInstitutionId { get; set; }
         public string QPTemplateName { get; set; } = string.Empty;
-        public string QPTemplateCourseName { get; set; } = string.Empty;
-        public string QPTemplateCourseCode { get; set; } = string.Empty;
+        public string CourseName { get; set; } = string.Empty;
+        public string CourseCode { get; set; } = string.Empty;
         public string QPTemplateExamYear { get; set; } = string.Empty;
         public string QPTemplateExamMonth { get; set; } = string.Empty;
         public long QPTemplateStatusTypeId { get; set; }    

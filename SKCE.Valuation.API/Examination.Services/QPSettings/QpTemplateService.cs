@@ -482,8 +482,8 @@ namespace SKCE.Examination.Services.QPSettings
                         UserQPTemplateId = u.UserQPTemplateId,
                         UserId = u.UserId,
                         InstitutionId = u.InstitutionId,
-                        QPTemplateCourseCode = qPTemplate.CourseCode,
-                        QPTemplateCourseName = qPTemplate.CourseName,
+                        CourseCode = qPTemplate.CourseCode,
+                        CourseName = qPTemplate.CourseName,
                         QPTemplateExamMonth = qPTemplate.ExamMonth,
                         QPTemplateExamYear = qPTemplate.ExamYear,
                         QPTemplateStatusTypeId = u.QPTemplateStatusTypeId,
@@ -541,8 +541,8 @@ namespace SKCE.Examination.Services.QPSettings
                         UserQPTemplateId = u.UserQPTemplateId,
                         UserId = u.UserId,
                         InstitutionId = u.InstitutionId,
-                        QPTemplateCourseCode = qPTemplate.CourseCode,
-                        QPTemplateCourseName = qPTemplate.CourseName,
+                        CourseCode = qPTemplate.CourseCode,
+                        CourseName = qPTemplate.CourseName,
                         QPTemplateExamMonth = qPTemplate.ExamMonth,
                         QPTemplateExamYear = qPTemplate.ExamYear,
                         QPTemplateStatusTypeId = u.QPTemplateStatusTypeId,
@@ -648,8 +648,8 @@ namespace SKCE.Examination.Services.QPSettings
                         UserQPTemplateId = u.UserQPTemplateId,
                         UserId = u.UserId,
                         InstitutionId = u.InstitutionId,
-                        QPTemplateCourseCode = qPTemplate.CourseCode,
-                        QPTemplateCourseName = qPTemplate.CourseName,
+                        CourseCode = qPTemplate.CourseCode,
+                        CourseName = qPTemplate.CourseName,
                         QPTemplateExamMonth = qPTemplate.ExamMonth,
                         QPTemplateExamYear = qPTemplate.ExamYear,
                         QPTemplateStatusTypeId = u.QPTemplateStatusTypeId,
@@ -707,8 +707,8 @@ namespace SKCE.Examination.Services.QPSettings
                             UserQPTemplateId = u.UserQPTemplateId,
                             UserId = u.UserId,
                             InstitutionId = u.InstitutionId,
-                            QPTemplateCourseCode = qPTemplate.CourseCode,
-                            QPTemplateCourseName = qPTemplate.CourseName,
+                            CourseCode = qPTemplate.CourseCode,
+                            CourseName = qPTemplate.CourseName,
                             QPTemplateExamMonth = qPTemplate.ExamMonth,
                             QPTemplateExamYear = qPTemplate.ExamYear,
                             QPTemplateStatusTypeId = u.QPTemplateStatusTypeId,
@@ -1787,6 +1787,8 @@ namespace SKCE.Examination.Services.QPSettings
             userQPTemplate.SubmittedQPDocumentId = documentId;
             AuditHelper.SetAuditPropertiesForUpdate(userQPTemplate, 1);
             await _context.SaveChangesAsync();
+            var document = _context.Documents.FirstOrDefault(d => d.DocumentId == documentId);
+            SaveBookmarksToDatabaseByFilePath(document?.Name, userQPTemplateId, documentId);
             return true;
         }
         public async Task<bool?> AssignTemplateForQPScrutinyAsync(long userId, long userQPTemplateId)
@@ -1859,13 +1861,17 @@ namespace SKCE.Examination.Services.QPSettings
             var qpTemplates = await _context.QPTemplates.Where(qp => qpTemplateIds.Contains(qp.QPTemplateId)).ToListAsync();
             userQPTemplates.ForEach(userQPTemplate =>
             {
+                
                 var qpTemplate = qpTemplates.FirstOrDefault(p => p.QPTemplateId == userQPTemplate.QPTemplateId);
                 var qpDocument = _context.QPDocuments.FirstOrDefault(qp => qp.QPDocumentId == userQPTemplate.QPDocumentId);
+                var course = courses.FirstOrDefault(c => c.CourseId == qpTemplate.CourseId);
                 userQPTemplateVMs.Add(new UserQPTemplateVM() {
                     UserQPTemplateId = userQPTemplate.UserQPTemplateId,
                     InstitutionId = userQPTemplate.InstitutionId,
                     UserId = userQPTemplate.UserId,
                     QPTemplateName= qpTemplate.QPTemplateName,
+                    CourseCode = course.Code,
+                    CourseName = course.Name,
                     UserName = users.FirstOrDefault(u => u.UserId == userQPTemplate.UserId)?.Name ?? string.Empty,
                     QPTemplateStatusTypeId = userQPTemplate.QPTemplateStatusTypeId, 
                     QPTemplateStatusTypeName = qpTemplateStatuss.FirstOrDefault(qps => qps.QPTemplateStatusTypeId == userQPTemplate.QPTemplateStatusTypeId)?.Name ?? string.Empty,
@@ -1886,6 +1892,10 @@ namespace SKCE.Examination.Services.QPSettings
         }
         public async Task<bool?> PrintSelectedQPAsync(long userqpTemplateId, string qpCode, bool isForPrint)
         {
+            //TODO which we need to pass from UI
+            Random random = new Random();
+            int randomNumber = random.Next(1000, 10000);
+            qpCode = randomNumber.ToString();
             var userQPTemplate = await _context.UserQPTemplates.FirstOrDefaultAsync(uqp => uqp.UserQPTemplateId == userqpTemplateId);
             if (userQPTemplate == null) return null;
             var qpTemplate = await _context.QPTemplates.FirstOrDefaultAsync(qp => qp.QPTemplateId == userQPTemplate.QPTemplateId);
@@ -1901,6 +1911,9 @@ namespace SKCE.Examination.Services.QPSettings
                 var qpToPrintDocument = await _context.Documents.FirstOrDefaultAsync(d => d.DocumentId == userQPTemplate.SubmittedQPDocumentId);
                 if (qpSelectedDocument == null || qpToPrintDocument == null) return false;
                 await _bookmarkProcessor.ProcessBookmarksAndPrint(qpTemplate, userQPTemplate, qpSelectedDocument.Name, qpToPrintDocument.Name, isForPrint);
+                if(isForPrint)
+                qpTemplate.PrintedDocumentId = userQPTemplate.SubmittedQPDocumentId;
+                await _context.SaveChangesAsync();
                 return true;
             }
             return true;
@@ -1920,6 +1933,75 @@ namespace SKCE.Examination.Services.QPSettings
                 });
             }
             return qpAssignmentExperts;
+        }
+        public void SaveBookmarksToDatabaseByFilePath(string fileName, long userqpTemplateId, long documentId)
+        {
+            Document sourceDoc = _azureBlobStorageHelper.DownloadWordDocumentFromBlob(fileName).Result;
+            // Iterate through all bookmarks in the source document
+
+            var qpDocumentBookMarks = new List<UserQPDocumentBookMark>();
+            foreach (Spire.Doc.Bookmark bookmark in sourceDoc.Bookmarks)
+            {
+                string bookmarkHtmlBase64 = ConvertBookmarkToHtmlBase64(sourceDoc, bookmark);
+
+                if (!string.IsNullOrEmpty(bookmarkHtmlBase64))
+                {
+                    var qPDocumentBookMark = new UserQPDocumentBookMark
+                    {
+                        UserQPTemplateId = userqpTemplateId,
+                        BookMarkName = bookmark.Name,
+                        DocumentId = documentId,
+                        BookMarkText = bookmarkHtmlBase64
+                    };
+                    AuditHelper.SetAuditPropertiesForInsert(qPDocumentBookMark, 1);
+                    qpDocumentBookMarks.Add(qPDocumentBookMark);
+                }
+            }
+            _context.UserQPDocumentBookMarks.AddRange(qpDocumentBookMarks);
+            _context.SaveChanges();
+        }
+        private static string ConvertBookmarkToHtmlBase64(Document doc, Spire.Doc.Bookmark bookmark)
+        {
+            Spire.Doc.BookmarkStart bookmarkStart = bookmark.BookmarkStart;
+            Spire.Doc.BookmarkEnd bookmarkEnd = bookmark.BookmarkEnd;
+
+            if (bookmarkStart == null || bookmarkEnd == null) return null;
+
+            Document extractedDoc = new Document();
+            Section section = extractedDoc.AddSection();
+
+            bool isInsideBookmark = false;
+            foreach (DocumentObject obj in doc.Sections[0].Body.ChildObjects)
+            {
+                if (obj == bookmarkStart) isInsideBookmark = true;
+
+                if (isInsideBookmark)
+                {
+                    section.Body.ChildObjects.Add(obj.Clone());
+                }
+
+                if (obj == bookmarkEnd) break;
+            }
+
+            // Set export options with image embedding
+            HtmlExportOptions options = new HtmlExportOptions
+            {
+                CssStyleSheetType = Spire.Doc.CssStyleSheetType.Internal, // Or Embedded
+                ImageEmbedded = true                            // 🔥 Embed images as base64
+            };
+
+            // Export to HTML file (optional: use temp file if needed)
+            string tempHtmlPath = Path.Combine(Path.GetTempPath(), "output.html");
+            extractedDoc.SaveToFile(tempHtmlPath, FileFormat.Html);
+
+            // Read HTML content
+            string htmlContent = File.ReadAllText(tempHtmlPath);
+
+            // Optional: Delete temp file
+            File.Delete(tempHtmlPath);
+
+            return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(htmlContent));
+
         }
     }
 }

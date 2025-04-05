@@ -15,7 +15,8 @@ namespace SKCE.Examination.Models.DbModels.QPSettings
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long QPDocumentBookMarkId { get; set; }
-        public long QPDocumentId { get; set; }
+        public long QPTemplateId { get; set; }
+        public long DocumentId { get; set; }
         public string BookMarkName { get; set; }
         public string BookMarkText { get; set; }
     }

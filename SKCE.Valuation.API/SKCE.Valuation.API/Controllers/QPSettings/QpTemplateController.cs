@@ -157,6 +157,7 @@ namespace SKCE.Examination.API.Controllers.QPSettings
             if (userQPTemplate == null) return NotFound();
             return Ok(userQPTemplate);
         }
+
         [HttpGet("SubmitScrutinizedQP/{userQPTemplateId}")]
         public async Task<ActionResult<bool>> SubmitScrutinizedQP(long userQPTemplateId, QPSubmissionVM qPSubmissionVM)
         {

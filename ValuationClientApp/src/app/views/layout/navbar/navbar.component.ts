@@ -26,9 +26,7 @@ export class NavbarComponent implements OnInit {
   constructor(private router: Router, private themeModeService: ThemeModeService) {}
 
   ngOnInit(): void {
-
-    debugger;
-
+ 
     const loggedData = localStorage.getItem('userData');
 
     if(loggedData)

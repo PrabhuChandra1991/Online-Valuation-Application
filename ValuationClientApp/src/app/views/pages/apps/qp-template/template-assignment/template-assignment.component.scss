@@ -8,3 +8,8 @@ select{
 tr.no-hover:hover {
   background-color: #FFFFFF !important;
 }
+
+a.disabled {
+    pointer-events: none;
+    cursor: not-allowed; 
+ }

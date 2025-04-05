@@ -74,4 +74,15 @@ export class TemplateManagementService {
   updateAssignment(qpTemplateId: any,formData: FormData): Observable<any> {
     return this.http.put(`${this.apiUrl}/api/UpdateQpTemplate/${qpTemplateId}`, JSON.stringify(formData), this.httpOptions);
   }
+
+  
+  printQPTemplate(userqpTemplateId : number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/api/QpTemplate/PrintSelectedQP/${userqpTemplateId}/'12345'/true`);
+  }
+
+  assignScrutinity(userId:number, userQPTemplateId:number): Observable<any> {
+    // return this.http.get(this.apiUrl+'/api/QpTemplate/AssignQPForScrutinity/1/1'); 
+    return this.http.get(`${this.apiUrl}/api/QpTemplate/AssignQPForScrutinity/${userId}/${userQPTemplateId}`);
+  }
+
 }

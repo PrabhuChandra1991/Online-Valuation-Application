@@ -64,9 +64,7 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
     courses: any[] = [];
     institutes: any[] = [];
     institutionId:number;
-    displayedColumns: string[] = ['qpTemplateName', 'courseCode','courseName' ,'qpTemplateStatusTypeName',
-      'expert1Name','expert1Status','expert2Name','expert2Status','actions'
-    ];
+    displayedColumns: string[] = ['qpTemplateName','courseCode','courseName','qpTemplateStatusTypeName','actions'];
     dataSource = new MatTableDataSource<any>([]);
       @ViewChild(MatPaginator) paginator: MatPaginator;
         @ViewChild(MatSort) sort: MatSort;
@@ -74,7 +72,8 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
     modalRef!: NgbModalRef;
     @ViewChild('assignmentModal') assignmentModal: any;
     @ViewChild('course') courseInput!: ElementRef;
-
+    @ViewChild('graphName') graphName:ElementRef;
+    @ViewChild('tableName') tableName:ElementRef;
 
     qpDocDataForm = new FormGroup({
       name: new FormControl('', [Validators.required, Validators.minLength(3)]),
@@ -87,6 +86,8 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
     isInvalidDoc: boolean = false
     qpTemplateId: number;
     qpValidationMessage: any;
+    isGraphsRequired : boolean = false;
+    isTablesAllowed : boolean = false;
 
     constructor(private modalService: NgbModal,
       private templateService: TemplateManagementService,
@@ -167,7 +168,6 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
     }
 
     openDocUploadModal(content: TemplateRef<any>, qpTemplateId: number) {
-
       this.qpTemplateId = qpTemplateId;
 
         this.modalService.open(content, {size: 'lg'}).result.then((result) => {
@@ -177,7 +177,7 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
       }
 
     editAssignment(content: TemplateRef<any>,documentId: any) {
-      debugger
+       
       this.isEditMode = true; // Set edit mode
        this.getAssignmentForTemplateId(documentId);
 
@@ -303,6 +303,31 @@ getAssignmentForTemplateId(templateId: any){
     console.log('assigned template for sel template ',response);
     if(this.qpTemplateData)
     {
+
+      for (let index = 0; index < this.qpTemplateData.qpDocuments.length; index++) {
+        const qpDocument =this.qpTemplateData.qpDocuments[index];
+        for (let qpAIndex = 0; qpAIndex <  qpDocument.qpAssignedUsers.length; qpAIndex++) {
+          const qpAssignedUser =qpDocument.qpAssignedUsers[qpAIndex];
+          
+          const selItems = 
+          qpDocument.qpScrutinityUsers.filter((x:any)=> x.parentUserQPTemplateId ==qpAssignedUser.userQPTemplateId);
+          
+          if (selItems.length ===0){
+            qpDocument.qpScrutinityUsers.push({
+              institutionId:qpAssignedUser.institutionId,
+              isQPOnly:qpAssignedUser.isQPOnly,
+              parentUserQPTemplateId:qpAssignedUser.userQPTemplateId,
+              qpTemplateId:0,
+              statusTypeId:0,
+              statusTypeName:"",
+              submittedQPDocumentId:0,              
+              submittedQPDocumentName:"",
+              submittedQPDocumentUrl:"",
+            });
+          }          
+        }
+      }
+      
      //this.courseInput.nativeElement.value = this.qpTemplateData?.courseId;
       this.templateAssignmentForm.patchValue({
         courseId: response.courseId,
@@ -383,21 +408,40 @@ getAssignmentForTemplateId(templateId: any){
   });
 }
 
-createDocumentFormGroup(qpDoc: any): FormGroup {
+createDocumentFormGroup(qpDoc: any): FormGroup { 
+ 
   return this.fb.group({
     qpDocumentId: [qpDoc.qpDocumentId],
     qpDocumentName: [qpDoc.qpDocumentName],
-    qpAssignedUsers: this.fb.array(qpDoc.qpAssignedUsers.map((user:any) => this.createAssignedUserGroup(user)))
+    qpAssignedUsers: this.fb.array(qpDoc.qpAssignedUsers.map((user:any) => this.createAssignedUserGroup(user))),
+    qpScrutinityUsers: this.fb.array(qpDoc.qpScrutinityUsers.map((user:any) => this.createScrutinityUserGroup(user))),
   });
 }
 
 createAssignedUserGroup(user: any): FormGroup {
   return this.fb.group({
+    userQPTemplateId:[user.userQPTemplateId || 0],
     userId: [user.userId || ''],
     userName: [user.userName || ''],
-    isQPOnly: [user.isQPOnly || false]
+    isQPOnly: [user.isQPOnly || false],
+    statusTypeId: [user.statusTypeId || 0],
+    statusTypeName:  [user.statusTypeName || ''],
+    parentUserQPTemplateId: null
   });
 }
+
+createScrutinityUserGroup(user: any): FormGroup {
+  return this.fb.group({
+    userQPTemplateId:[user.userQPTemplateId || 0],
+    userId: [user.userId || ''],
+    userName: [user.userName || ''] ,
+    isQPOnly: [user.isQPOnly || false],
+    statusTypeId: [user.statusTypeId || 0],
+    statusTypeName:  [user.statusTypeName || ''],
+    parentUserQPTemplateId: [user.parentUserQPTemplateId || '']
+  });
+}
+
 
 updateIsQPOnly(docIndex: number, userIndex: number, isChecked: boolean) {
   this.qpTemplateData.qpDocuments[docIndex].qpAssignedUsers[userIndex].isQPOnly = isChecked;
@@ -509,10 +553,10 @@ isUserAlreadySelected(qpAssignedUsers: any[], userId: number, currentIndex: numb
       else{
         this.spinnerService.toggleSpinnerState(true);
       const formData = this.qpTemplateData;
-      formData.expert1Name = "";
-      formData.expert2Name = "";
-      formData.expert1Status = "";
-      formData.expert2Status = "";
+      // formData.expert1Name = "";
+      // formData.expert2Name = "";
+      // formData.expert1Status = "";
+      // formData.expert2Status = "";
 
      console.log('final form data',JSON.stringify(formData));
 
@@ -566,6 +610,28 @@ isUserAlreadySelected(qpAssignedUsers: any[], userId: number, currentIndex: numb
     }
   }
 
+  printQPDocument(userqpTemplateId:number){
+    this.templateService.printQPTemplate(userqpTemplateId);
+  }
+
+  assignScrutinity(assignedScrutinyUser:any, userqpTemplateId:number ){
+     
+
+    this.templateService.assignScrutinity(assignedScrutinyUser.userId, userqpTemplateId).subscribe({
+      next: () => {
+        this.toastr.success('updated successfully!');      },
+      error: (res) => {
+        this.toastr.error(res['error']['message']);
+        this.spinnerService.toggleSpinnerState(false);
+      },
+      complete: () => {
+       // this.isSubmitting = false;
+        this.spinnerService.toggleSpinnerState(false);
+      }
+    });
+
+  }
+
   clearSelection(docIndex: number, userIndex: number) {
     const qpAssignedUsers = this.templateAssignmentForm.get('qpDocuments') as FormArray;
     const userControl = qpAssignedUsers.at(docIndex).get('qpAssignedUsers') as FormArray;
@@ -593,53 +659,44 @@ isUserAlreadySelected(qpAssignedUsers: any[], userId: number, currentIndex: numb
 
   close() {
     //this.resetForm();
-
     this.modalService.dismissAll();
   }
 
   onQPDocDataFileChange(event:any) {
     if (event.target.files.length > 0) {
       this.isQPDocUploaded = true;
-      const file = event.target.files[0];
       this.qpDocDataForm.patchValue({
-        fileSource: file
-      });
+        fileSource: event.target.files[0],
+      })
     }
   }
 
-  validate(qpDocumentId:number){
+  validate(qpDocumentId:number) {
     this.spinnerService.toggleSpinnerState(true);
     const formData = new FormData();
-debugger
     const fileSourceValue = this.qpDocDataForm.get('fileSource')?.value;
 
     if (fileSourceValue !== null && fileSourceValue !== undefined) {
         formData.append('file', fileSourceValue);
     }
 
-
-    this.qpDocumentService.validateQPFile(formData,qpDocumentId)
+    this.qpDocumentService.validateQPFile(formData, qpDocumentId)
     .subscribe({
       next: (response) => {
-        if(response.inValid)
-          {
+        if(response.inValid) {
             this.qpValidationMessage = response.message;
-
             this.isQPDocValidated = false;
-          }else{
+          } else {
             this.toastr.success('Data validated successfully!');
-            this.qpDocDataFormF['file'].setValue([]);
-            this.isQPDocValidated = true;
-
+            //this.qpDocDataFormF['file'].setValue([]);
+            this.qpValidationMessage = response.message;
+            this.isQPDocValidated = true;            
           }
-
       },
       error: (response) => {
         console.log(response);
-        if(response.inValid)
-          {
+        if(response.inValid) {
             this.qpValidationMessage = response.message;
-
             this.isQPDocValidated = false;
           }
         this.toastr.error('Invalid data. Please try again.');
@@ -649,7 +706,57 @@ debugger
         this.spinnerService.toggleSpinnerState(false);
        }
     });
+  }
 
+  showTextBox(event: any) {
+    if(event.srcElement.name == 'graph') {
+      this.isGraphsRequired = event.target['checked'];
+    }
+    else if(event.srcElement.name == 'table') {
+      this.isTablesAllowed = event.target['checked'];
+    }
+  }
+
+  submit(qpDocumentId:number) {
+    this.spinnerService.toggleSpinnerState(true);
+    const formData = new FormData();
+    const fileSourceValue = this.qpDocDataForm.get('fileSource')?.value;
+
+    if (fileSourceValue !== null && fileSourceValue !== undefined) {
+        formData.append('file', fileSourceValue);
+    }
+
+    let graphName = '';
+    let tableName = '';
+    if (this.isGraphsRequired || this.isTablesAllowed) {
+      if (this.graphName) {
+        graphName = this.graphName.nativeElement.value;
+      }
+      if (this.tableName) {
+        tableName = this.tableName.nativeElement.value;
+      }      
+    }  
+    //console.log('submitted...');
+    //console.log(this.isGraphsRequired + ': ' + graphName);
+    //console.log(this.isTablesAllowed + ': ' + tableName);
+    this.qpDocumentService.submitGeneratedQP(formData, qpDocumentId, this.isGraphsRequired, graphName, this.isTablesAllowed, tableName)
+    .subscribe({
+      next: (response) => {
+        //console.log(response)
+        if(response) {
+          this.toastr.success('Data submitted successfully!');
+          this.close();          
+        }
+      },
+      error: (response) => {
+        //console.log(response);
+        this.toastr.error('Invalid data. Please try again.');
+        this.spinnerService.toggleSpinnerState(false);
+      },
+      complete: () => {
+        this.spinnerService.toggleSpinnerState(false);
+       }
+    });  
   }
 
 }

@@ -1,37 +1,35 @@
 <div class="container">
-      <div class="row col-8">
-        <div class="col-md-3" *ngIf="isAdmin">
-          <button class="btn btn-primary " (click)="openAssignModal(lgModal)">Assign Template</button>
-        </div>
-        <div class="institute" *ngIf="isAdmin">
-          <div class="col-md-2 mt-2 px-3" >
-            <label>Institution <span class="text-danger">*</span></label>
-          </div>
-          <div class="col-md-3" >
-            <select id="institutionId" class="form-select" (change)="onInstituteChange($event)">
-              <option [value]="">Select Institution</option>
-              <option *ngFor="let inst of institutes" [value]="inst.institutionId">{{ inst.name }}</option>
-            </select>
-          </div>
-        </div>
+  <div class="row col-8">
+    <div class="col-md-3" *ngIf="isAdmin">
+      <button class="btn btn-primary " (click)="openAssignModal(lgModal)">Assign Template</button>
+    </div>
+    <div class="institute" *ngIf="isAdmin">
+      <div class="col-md-2 mt-2 px-3">
+        <label>Institution <span class="text-danger">*</span></label>
       </div>
-    <div class="row mt-2">
+      <div class="col-md-3">
+        <select id="institutionId" class="form-select" (change)="onInstituteChange($event)">
+          <option [value]="">Select Institution</option>
+          <option *ngFor="let inst of institutes" [value]="inst.institutionId">{{ inst.name }}</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="row mt-2">
     <!-- <div class="col-md-8" *ngIf="isAdmin">
       <button class="btn btn-primary me-1" (click)="openAssignModal(lgModal)">Assign Template</button>
     </div> -->
+    <!-- <div class="col-md-2" *ngIf="isAdmin">
 
-      <!-- <div class="col-md-2" *ngIf="isAdmin">
-
-        <button class="btn btn-primary me-1" (click)="openAssignModal(lgModal)">Assign Template</button>
-      </div> -->
-
-      <!-- <div class="col-md-2 ">
-        <label>Institution <span class="text-danger">*</span></label>
-        <select formControlName="institutionId" class="form-select" >
-          <option *ngFor="let inst of institutes" [value]="inst.institutionId">{{ inst.name }}</option>
-        </select>
-      </div> -->
-      <div class="row mt-5">
+      <button class="btn btn-primary me-1" (click)="openAssignModal(lgModal)">Assign Template</button>
+    </div> -->
+    <!-- <div class="col-md-2 ">
+      <label>Institution <span class="text-danger">*</span></label>
+      <select formControlName="institutionId" class="form-select" >
+        <option *ngFor="let inst of institutes" [value]="inst.institutionId">{{ inst.name }}</option>
+      </select>
+    </div> -->
+    <div class="row mt-5">
       <div class="col-lg-12 grid-margin stretch-card">
         <div class="card">
           <div class="card-body">
@@ -69,7 +67,7 @@
                   <td mat-cell *matCellDef="let element"> {{ element.qpTemplateName }} </td>
                 </ng-container>
 
-               <ng-container matColumnDef="courseCode">
+                <ng-container matColumnDef="courseCode">
                   <th mat-header-cell *matHeaderCellDef mat-sort-header> Course Code </th>
                   <td mat-cell *matCellDef="let element">{{ element.courseCode}} </td>
                 </ng-container>
@@ -104,15 +102,15 @@
                     <td mat-cell *matCellDef="let element"> {{ element.expert2Status }} </td>
                   </ng-container>
 
-                <ng-container matColumnDef="actions" >
+                <ng-container matColumnDef="actions">
                   <th mat-header-cell *matHeaderCellDef> Actions </th>
                   @if(isAdmin)
                   {
-                    <td mat-cell *matCellDef="let element">
-                      <button mat-icon-button color="primary" (click)="editAssignment(lgModal,element.qpTemplateId)" *ngIf="isAdmin">
-                        <mat-icon>edit</mat-icon>
-                      </button>
-                    </td>
+                  <td mat-cell *matCellDef="let element">
+                    <button mat-icon-button color="primary" (click)="editAssignment(lgModal,element.qpTemplateId)" *ngIf="isAdmin">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                  </td>
                   }
                   @else{
                     <td mat-cell *matCellDef="let element">
@@ -124,30 +122,30 @@
                         <mat-icon>upload</mat-icon>
                       </a>
 
-                      <!-- <button mat-icon-button color="primary" >
-                        <mat-icon>download</mat-icon>
-                      </button><button mat-icon-button color="primary" >
-                        <mat-icon>upload</mat-icon>
-                      </button> -->
-                    </td>
+                    <!-- <button mat-icon-button color="primary" >
+                      <mat-icon>download</mat-icon>
+                    </button><button mat-icon-button color="primary" >
+                      <mat-icon>upload</mat-icon>
+                    </button> -->
+                  </td>
                   }
 
                 </ng-container>
 
-            <!-- Table Header & Row Definitions -->
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                <!-- Table Header & Row Definitions -->
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 
-          </table>
+              </table>
 
-            <!-- Pagination -->
-            <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+              <!-- Pagination -->
+              <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
             </div>
           </div>
         </div>
       </div>
-      </div>
     </div>
+  </div>
 </div>
 
 <!-- Lg Modal -->
@@ -159,14 +157,15 @@
   </div>
   <div class="modal-body">
     <form [formGroup]="templateAssignmentForm">
+
       <div class="row">
         <div class="col-md-6">
           <div class="mb-3">
             <label for="template"
-              class="form-label">Course</label>
+                   class="form-label">Course</label>
             <select class="form-select" #course formControlName="courseId" id="course" (change)="onCourseChange($event)">
               <option selected disabled>Select Course</option>
-              <option *ngFor="let course of courses" [value]="course.courseId" >
+              <option *ngFor="let course of courses" [value]="course.courseId">
                 {{course.code}} - {{ course.name }}
               </option>
             </select>
@@ -181,23 +180,24 @@
         <div class="col-sm-4">
           <div class="mb-3">
             <label for="degreeTypeName"
-              class="form-label">Degree Type</label>
-              <input type="text" class="form-control" formControlName="degreeTypeName">
+                   class="form-label">Degree Type</label>
+            <input type="text" class="form-control" formControlName="degreeTypeName">
           </div>
         </div><!-- Col -->
         <div class="col-sm-4">
           <div class="mb-3">
             <label for="regulationYear"
-              class="form-label">Requlation Year</label>
-              <input type="text" class="form-control" formControlName = "regulationYear" placeholder="Enter Regulation Year">
+                   class="form-label">Requlation Year</label>
+            <input type="text" class="form-control" formControlName="regulationYear" placeholder="Enter Regulation Year">
 
           </div>
         </div><!-- Col -->
         <div class="col-sm-4">
           <div class="mb-3">
-            <label for="batchYear" class="form-label">Batch Year
+            <label for="batchYear" class="form-label">
+              Batch Year
             </label>
-            <input type="text" class="form-control" formControlName = "batchYear" placeholder="Enter Batch Year">
+            <input type="text" class="form-control" formControlName="batchYear" placeholder="Enter Batch Year">
           </div>
         </div><!-- Col -->
       </div><!-- Row -->
@@ -206,22 +206,23 @@
         <div class="col-sm-4">
           <div class="mb-3">
             <label for="examYear"
-              class="form-label">Exam Year</label>
-              <input type="text" class="form-control" formControlName = "examYear"/>
+                   class="form-label">Exam Year</label>
+            <input type="text" class="form-control" formControlName="examYear" />
           </div>
         </div><!-- Col -->
         <div class="col-sm-4">
           <div class="mb-3">
             <label for="examMonth"
-              class="form-label">Exam Month</label>
-              <input type="text" class="form-control" formControlName = "examMonth"  placeholder="Enter Exam Month">
+                   class="form-label">Exam Month</label>
+            <input type="text" class="form-control" formControlName="examMonth" placeholder="Enter Exam Month">
           </div>
         </div><!-- Col -->
         <div class="col-sm-4">
           <div class="mb-3">
-            <label for="examType" class="form-label">Exam Type
+            <label for="examType" class="form-label">
+              Exam Type
             </label>
-            <input type="text" class="form-control" formControlName = "examType" placeholder="">
+            <input type="text" class="form-control" formControlName="examType" placeholder="">
           </div>
         </div><!-- Col -->
       </div><!-- Row -->
@@ -230,27 +231,28 @@
         <div class="col-sm-4">
           <div class="mb-3">
             <label for="semester"
-              class="form-label">Semester</label>
-              <input type="text" class="form-control" formControlName = "semester"/>
+                   class="form-label">Semester</label>
+            <input type="text" class="form-control" formControlName="semester" />
           </div>
         </div><!-- Col -->
         <div class="col-sm-4">
           <div class="mb-3">
             <label for="studentCount"
-              class="form-label">Students Count</label>
-              <input type="text" class="form-control" formControlName = "studentCount">
+                   class="form-label">Students Count</label>
+            <input type="text" class="form-control" formControlName="studentCount">
           </div>
         </div><!-- Col -->
         <div class="col-sm-4" *ngIf="isCourseSyllabusDocuploaded">
           <div class="mb-3">
             <label for="courseSyllabusDocumentName"
-              class="form-label">Syllabus Document</label><br/>
+                   class="form-label">Syllabus Document</label><br />
             <a target="_blank" href="{{templateAssignmentForm.controls['courseSyllabusDocumentUrl'].value}}">{{templateAssignmentForm.controls['courseSyllabusDocumentName'].value}}</a>
 
           </div>
         </div><!-- Col -->
       </div><!-- Row -->
-      <div *ngIf="qpTemplateData" >
+
+      <div *ngIf="qpTemplateData">
 
         <div formArrayName="qpDocuments">
           <div class="row" *ngFor="let qpDocument of qpTemplateData.qpDocuments; let docIndex = index" [formGroupName]="docIndex">
@@ -263,12 +265,14 @@
             <!-- Loop through assigned users -->
             <div formArrayName="qpAssignedUsers">
               <div class="row" *ngFor="let assignedUser of qpDocument.qpAssignedUsers; let userIndex = index" [formGroupName]="userIndex">
+
                 <!-- Expert Selection -->
                 <div class="col-sm-6">
                   <div class="mb-4">
                     <label class="form-label">Expert - {{ userIndex + 1 }}</label>
                     <select class="form-select" formControlName="userId"
-                            (change)="updateUserDetails(docIndex, userIndex,$event)" >
+                            [attr.disabled]="assignedUser.statusTypeId === 9"
+                            (change)="updateUserDetails(docIndex, userIndex,$event)">
                       <option value="">Select Expert</option>
                       <option *ngFor="let user of users" [value]="user.userId"
                               [disabled]="isUserAlreadySelected(qpDocument.qpAssignedUsers, user.userId, userIndex)">
@@ -280,34 +284,58 @@
 
                 <!-- Is QP Only Checkbox -->
                 <div class="col-sm-4 d-flex align-items-center">
-                  <mat-checkbox class="checkbox" formControlName="isQPOnly" (change)="updateIsQPOnly(docIndex, userIndex, $event.checked)">
+                  <mat-checkbox formControlName="isQPOnly"
+                                [attr.disabled]="assignedUser.statusTypeId === 9"
+                                (change)="updateIsQPOnly(docIndex, userIndex, $event.checked)">
                     Is only for QP?
                   </mat-checkbox>
                 </div>
+
                 <div class="col-sm-2 d-flex align-items-center">
-                  <button class="btn btn-sm btn-outline-danger" (click)="clearSelection(docIndex, userIndex)">
+                  <button class="btn btn-sm btn-outline-danger" (click)="clearSelection(docIndex, userIndex)"
+                          *ngIf="assignedUser.statusTypeId === 8">
                     Clear
                   </button>
+                  <button class="btn btn-sm btn-outline-danger"
+                          (click)="printQPDocument(assignedUser.userQPTemplateId)"
+                          *ngIf="assignedUser.statusTypeId === 9">
+                    Print
+                  </button>
                 </div>
-                <!-- add scrutiny -->
-            <div >
-              <div class="row" *ngFor="let assignedScrutinyUser of qpDocument.qpScrutinityUsers; let userIndex = index" [formGroupName]="userIndex">
 
-                <!--<div class="row" *ngIf="isQPPendingForScrutiny" >   Expert Selection -->
-                <div class="col-sm-6">
-                  <div class="mb-4">
-                    <label class="form-label">Scrutiny </label>
-                    <select class="form-select" formControlName="scrutinyUserId" (change)="updateScrutinyUserDetails(docIndex, userIndex,$event)" >
-                      <option value="">Select Scrutiny </option>
-                      <option *ngFor="let user of users" [value]="user.userId">
-                        {{ user.userName }}
-                      </option>
-                    </select>
+
+                <div class="row" *ngFor="let assignedScrutinyUser of qpDocument.qpScrutinityUsers; let userIndex = index"
+                     [formGroupName]="userIndex">
+
+                  <div class="row" *ngIf="assignedUser.userQPTemplateId === assignedScrutinyUser.parentUserQPTemplateId && assignedUser.statusTypeId === 9">
+
+                    <div class="col-sm-6">
+                      <div class="mb-4">
+                        <label class="form-label">Scrutiny </label>
+                        <select class="form-select" formControlName="scrutinyUserId"
+                                (change)="updateScrutinyUserDetails(docIndex, userIndex,$event)">
+                          <option value="">Select Scrutiny </option>
+                          <option *ngFor="let user of users" [value]="user.userId">
+                            {{ user.userName }}
+                          </option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="col-sm-3 d-flex align-items-center">
+                      <button class="btn btn-sm btn-outline-danger"
+                              (click)="assignScrutinity(assignedScrutinyUser, assignedUser.userQPTemplateId)">
+                        Assign Scrutinity
+                      </button>
+                    </div>
+
                   </div>
+
+
                 </div>
+
               </div>
-            </div>
-              </div>
+
             </div>
           </div>
         </div>
@@ -317,7 +345,7 @@
   <div class="modal-footer">
     <button type="button" class="btn btn-secondary" (click)="close()">Close</button>
 
-    <button type="button" class="btn btn-primary"  (click)="onSave()" [disabled]="!isCourseSyllabusDocuploaded">Save changes</button>
+    <button type="button" class="btn btn-primary" (click)="onSave()" [disabled]="!isCourseSyllabusDocuploaded">Save changes</button>
   </div>
 </ng-template>
 
@@ -349,7 +377,7 @@
           <div class="mb-3">
             <div [innerHTML]="qpValidationMessage"></div>
           </div>
-          </div><!-- Col -->
+        </div><!-- Col -->
       </div><!-- Row -->
 
       <div class="row" *ngIf="isQPDocValidated">

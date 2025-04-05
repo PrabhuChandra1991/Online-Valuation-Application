@@ -56,7 +56,7 @@ export class SidebarComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    debugger;
+    
       this.masterMenu = MENU;
 
     const loggedData = localStorage.getItem('userData');

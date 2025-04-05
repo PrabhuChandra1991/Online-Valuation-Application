@@ -6,9 +6,7 @@ export const authGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
 
   const localData = localStorage.getItem('isLoggedin');
-
-  debugger;
-
+ 
   if(localData != null)
   {
     return true;

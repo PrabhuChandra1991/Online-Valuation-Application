@@ -157,6 +157,7 @@ namespace SKCE.Examination.API.Controllers.QPSettings
             if (userQPTemplate == null) return NotFound();
             return Ok(userQPTemplate);
         }
+
         [HttpGet("SubmitScrutinizedQP/{userQPTemplateId}")]
         public async Task<ActionResult<bool>> SubmitScrutinizedQP(long userQPTemplateId, QPSubmissionVM qPSubmissionVM)
         {
@@ -175,7 +176,7 @@ namespace SKCE.Examination.API.Controllers.QPSettings
             return Ok(userQPTemplate);
         }
 
-        [HttpGet("PrintSelectedQP/{qpTemplateId}/{qpCode}/{isForPrint}")]
+        [HttpGet("PrintSelectedQP/{userqpTemplateId}/{qpCode}/{isForPrint}")]
         public async Task<ActionResult<bool>> PrintSelectedQP(long userqpTemplateId, string qpCode, bool isForPrint)
         {
             var result = await _qpTemplateService.PrintSelectedQPAsync(userqpTemplateId, qpCode, isForPrint);

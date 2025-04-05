@@ -177,7 +177,7 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
       }
 
     editAssignment(content: TemplateRef<any>,documentId: any) {
-      debugger
+       
       this.isEditMode = true; // Set edit mode
        this.getAssignmentForTemplateId(documentId);
 
@@ -303,6 +303,31 @@ getAssignmentForTemplateId(templateId: any){
     console.log('assigned template for sel template ',response);
     if(this.qpTemplateData)
     {
+
+      for (let index = 0; index < this.qpTemplateData.qpDocuments.length; index++) {
+        const qpDocument =this.qpTemplateData.qpDocuments[index];
+        for (let qpAIndex = 0; qpAIndex <  qpDocument.qpAssignedUsers.length; qpAIndex++) {
+          const qpAssignedUser =qpDocument.qpAssignedUsers[qpAIndex];
+          
+          const selItems = 
+          qpDocument.qpScrutinityUsers.filter((x:any)=> x.parentUserQPTemplateId ==qpAssignedUser.userQPTemplateId);
+          
+          if (selItems.length ===0){
+            qpDocument.qpScrutinityUsers.push({
+              institutionId:qpAssignedUser.institutionId,
+              isQPOnly:qpAssignedUser.isQPOnly,
+              parentUserQPTemplateId:qpAssignedUser.userQPTemplateId,
+              qpTemplateId:0,
+              statusTypeId:0,
+              statusTypeName:"",
+              submittedQPDocumentId:0,              
+              submittedQPDocumentName:"",
+              submittedQPDocumentUrl:"",
+            });
+          }          
+        }
+      }
+      
      //this.courseInput.nativeElement.value = this.qpTemplateData?.courseId;
       this.templateAssignmentForm.patchValue({
         courseId: response.courseId,
@@ -383,21 +408,40 @@ getAssignmentForTemplateId(templateId: any){
   });
 }
 
-createDocumentFormGroup(qpDoc: any): FormGroup {
+createDocumentFormGroup(qpDoc: any): FormGroup { 
+ 
   return this.fb.group({
     qpDocumentId: [qpDoc.qpDocumentId],
     qpDocumentName: [qpDoc.qpDocumentName],
-    qpAssignedUsers: this.fb.array(qpDoc.qpAssignedUsers.map((user:any) => this.createAssignedUserGroup(user)))
+    qpAssignedUsers: this.fb.array(qpDoc.qpAssignedUsers.map((user:any) => this.createAssignedUserGroup(user))),
+    qpScrutinityUsers: this.fb.array(qpDoc.qpScrutinityUsers.map((user:any) => this.createScrutinityUserGroup(user))),
   });
 }
 
 createAssignedUserGroup(user: any): FormGroup {
   return this.fb.group({
+    userQPTemplateId:[user.userQPTemplateId || 0],
     userId: [user.userId || ''],
     userName: [user.userName || ''],
-    isQPOnly: [user.isQPOnly || false]
+    isQPOnly: [user.isQPOnly || false],
+    statusTypeId: [user.statusTypeId || 0],
+    statusTypeName:  [user.statusTypeName || ''],
+    parentUserQPTemplateId: null
   });
 }
+
+createScrutinityUserGroup(user: any): FormGroup {
+  return this.fb.group({
+    userQPTemplateId:[user.userQPTemplateId || 0],
+    userId: [user.userId || ''],
+    userName: [user.userName || ''] ,
+    isQPOnly: [user.isQPOnly || false],
+    statusTypeId: [user.statusTypeId || 0],
+    statusTypeName:  [user.statusTypeName || ''],
+    parentUserQPTemplateId: [user.parentUserQPTemplateId || '']
+  });
+}
+
 
 updateIsQPOnly(docIndex: number, userIndex: number, isChecked: boolean) {
   this.qpTemplateData.qpDocuments[docIndex].qpAssignedUsers[userIndex].isQPOnly = isChecked;
@@ -564,6 +608,28 @@ isUserAlreadySelected(qpAssignedUsers: any[], userId: number, currentIndex: numb
     if (this.modalRef) {
       this.modalRef.close();
     }
+  }
+
+  printQPDocument(userqpTemplateId:number){
+    this.templateService.printQPTemplate(userqpTemplateId);
+  }
+
+  assignScrutinity(assignedScrutinyUser:any, userqpTemplateId:number ){
+     
+
+    this.templateService.assignScrutinity(assignedScrutinyUser.userId, userqpTemplateId).subscribe({
+      next: () => {
+        this.toastr.success('updated successfully!');      },
+      error: (res) => {
+        this.toastr.error(res['error']['message']);
+        this.spinnerService.toggleSpinnerState(false);
+      },
+      complete: () => {
+       // this.isSubmitting = false;
+        this.spinnerService.toggleSpinnerState(false);
+      }
+    });
+
   }
 
   clearSelection(docIndex: number, userIndex: number) {

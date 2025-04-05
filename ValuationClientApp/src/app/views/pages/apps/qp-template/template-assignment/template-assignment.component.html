@@ -295,15 +295,17 @@
                 <div class="col-sm-2">
                     
                 </div>
+                <br>
               </div>
-              <div class="row" *ngIf="assignedUser.statusTypeId === 9">
+              <br>
+              <div class="row" >
                 <div class="col-sm-4">
                   {{assignedUser.statusTypeName}}
                 </div>
-                <div class="col-sm-4">
+                <div class="col-sm-4" *ngIf="assignedUser.statusTypeId === 9">
                   <a target="_blank" href="{{assignedUser.submittedQPDocumentUrl}}">{{assignedUser.submittedQPDocumentName}}</a>
                 </div>
-                <div class="col-sm-4">
+                <div class="col-sm-4" *ngIf="assignedUser.statusTypeId === 9">
                   <button class="btn btn-sm btn-primary"
                           (click)="printQPDocument(assignedUser.userQPTemplateId)"
                           *ngIf="assignedUser.statusTypeId === 9">
@@ -315,26 +317,43 @@
                 <br>          
               </div>
             </div>
-
+<br>
             <div formArrayName="qpScrutinityUsers">
               <div class="row" *ngFor="let assignedScrutinyUser of qpDocument.qpScrutinityUsers; let userIndex = index" [formGroupName]="userIndex">
-                  <div class="col-sm-6">
-                    <div class="mb-4">
-                      <label class="form-label">Scrutiny - {{ userIndex + 1 }}</label>
-                      <select class="form-select" formControlName="userId" [disabled]="assignedScrutinyUser.userQPTemplateId !== 0"
-                        (change)="updateScrutinyUserDetails(docIndex, userIndex,$event)">
-                        <option value="">Select Scrutiny </option>
-                        <option *ngFor="let user of users" [value]="user.userId">
-                          {{ user.userName }}
-                        </option>
-                      </select>
+                  <div class="row">
+                    <div class="col-sm-6">
+                      <div class="mb-4">
+                        <label class="form-label">Scrutiny - {{ userIndex + 1 }}</label>
+                        <select class="form-select" formControlName="userId" [disabled]="assignedScrutinyUser.userQPTemplateId !== 0"
+                          (change)="updateScrutinyUserDetails(docIndex, userIndex,$event)">
+                          <option value="">Select Scrutiny </option>
+                          <option *ngFor="let user of users" [value]="user.userId">
+                            {{ user.userName }}
+                          </option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-sm-3 d-flex align-items-center">                     
+                      <button class="btn btn-sm btn-primary" [disabled]="assignedScrutinyUser.userQPTemplateId !== 0"
+                        (click)="assignScrutinity(assignedScrutinyUser)">
+                        Assign Scrutinity
+                      </button>
                     </div>
                   </div>
-                  <div class="col-sm-3 d-flex align-items-center">                     
-                    <button class="btn btn-sm btn-primary" [disabled]="assignedScrutinyUser.userQPTemplateId !== 0"
-                      (click)="assignScrutinity(assignedScrutinyUser)">
-                      Assign Scrutinity
-                    </button>
+                  <div class="row" >
+                    <div class="col-sm-4">
+                      {{assignedScrutinyUser.statusTypeName}}
+                    </div>
+                    <div class="col-sm-4" *ngIf="assignedScrutinyUser.statusTypeId === 11">
+                      <a target="_blank" href="{{assignedScrutinyUser.submittedQPDocumentUrl}}">{{assignedScrutinyUser.submittedQPDocumentName}}</a>
+                    </div>
+                    <div class="col-sm-4" *ngIf="assignedScrutinyUser.statusTypeId === 11">
+                      <button class="btn btn-sm btn-primary"
+                              (click)="printQPDocument(assignedScrutinyUser.userQPTemplateId)">
+                        Print
+                      </button>
+                    </div> 
+                    <br> 
                   </div>
               </div>
             </div>
@@ -360,7 +379,7 @@
 <ng-template #lgDocModal let-modal>
   <div class="modal-header">
     <h5 class="modal-title" id="exampleModalLabel">Upload Document</h5>
-    <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
+    <button type="button" class="btn-close" (click)="modal.close('by: close icon')" (click)="printQPDocument(qpTemplateId)" aria-label="Close"></button>
   </div>
 
   <div class="modal-body">

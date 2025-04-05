@@ -183,11 +183,11 @@ namespace SKCE.Examination.Services.Helpers
                                 }
                                 if (item is Spire.Doc.BookmarkEnd bookmarkEnd)
                                 {
-                                    if (bookmarkEnd.OwnerParagraph.Text == sbookMark.Name)
+                                    if (bookmarkEnd.OwnerParagraph.Text.TrimStart() == sbookMark.Name)
                                     {
                                         foreach (var bookowner in sbookMark.BookmarkStart.OwnerParagraph.Items)
                                         {
-                                            if (item is TextRange textRange1)
+                                            if (bookowner is TextRange textRange1)
                                             {
                                                 if (textRange1.Text == sbookMark.Name)
                                                 {

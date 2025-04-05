@@ -1774,22 +1774,29 @@ namespace SKCE.Examination.Services.QPSettings
         {
             var userQPTemplate = await _context.UserQPTemplates.FirstOrDefaultAsync(qpti => qpti.UserQPTemplateId == userQPTemplateId);
             if (userQPTemplate == null) return null;
-            var qpTemplate = await _context.QPTemplates.FirstOrDefaultAsync(qp => qp.QPTemplateId == userQPTemplate.QPTemplateId);
-            if (qpTemplate == null) return null;
-            qpTemplate.QPTemplateStatusTypeId = 3; //QP Pending for Scrutiny
-            AuditHelper.SetAuditPropertiesForUpdate(qpTemplate, 1);
-            if (userQPTemplate == null) return null;
-            userQPTemplate.QPTemplateStatusTypeId = 9;
-            userQPTemplate.IsTablesAllowed = qPSubmissionVM.IsTablesAllowed;
-            userQPTemplate.TableName = qPSubmissionVM.TableName;
-            userQPTemplate.IsGraphsRequired = qPSubmissionVM.IsGraphsRequired;
-            userQPTemplate.GraphName = qPSubmissionVM.GraphName;
-            userQPTemplate.SubmittedQPDocumentId = documentId;
-            AuditHelper.SetAuditPropertiesForUpdate(userQPTemplate, 1);
-            await _context.SaveChangesAsync();
-            var document = _context.Documents.FirstOrDefault(d => d.DocumentId == documentId);
-            SaveBookmarksToDatabaseByFilePath(document?.Name, userQPTemplateId, documentId);
-            return true;
+            if(userQPTemplate.QPTemplateStatusTypeId == 10)
+            {
+                return await SubmitScrutinizedQPAsync(userQPTemplateId, documentId, qPSubmissionVM);
+            }
+            else
+            {
+                var qpTemplate = await _context.QPTemplates.FirstOrDefaultAsync(qp => qp.QPTemplateId == userQPTemplate.QPTemplateId);
+                if (qpTemplate == null) return null;
+                qpTemplate.QPTemplateStatusTypeId = 3; //QP Pending for Scrutiny
+                AuditHelper.SetAuditPropertiesForUpdate(qpTemplate, 1);
+                if (userQPTemplate == null) return null;
+                userQPTemplate.QPTemplateStatusTypeId = 9;
+                userQPTemplate.IsTablesAllowed = qPSubmissionVM.IsTablesAllowed;
+                userQPTemplate.TableName = qPSubmissionVM.TableName;
+                userQPTemplate.IsGraphsRequired = qPSubmissionVM.IsGraphsRequired;
+                userQPTemplate.GraphName = qPSubmissionVM.GraphName;
+                userQPTemplate.SubmittedQPDocumentId = documentId;
+                AuditHelper.SetAuditPropertiesForUpdate(userQPTemplate, 1);
+                await _context.SaveChangesAsync();
+                var document = _context.Documents.FirstOrDefault(d => d.DocumentId == documentId);
+                SaveBookmarksToDatabaseByFilePath(document?.Name, userQPTemplateId, documentId);
+                return true;
+            }
         }
         public async Task<bool?> AssignTemplateForQPScrutinyAsync(long userId, long userQPTemplateId)
        {

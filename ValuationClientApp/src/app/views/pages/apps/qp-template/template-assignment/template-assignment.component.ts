@@ -324,6 +324,7 @@ getAssignmentForTemplateId(templateId: any){
               submittedQPDocumentId:0,              
               submittedQPDocumentName:"",
               submittedQPDocumentUrl:"",
+              expertUsertId:qpAssignedUser.userId
             });
           }          
         }
@@ -538,6 +539,10 @@ updateScrutinyUserDetails(docIndex: number, userIndex: number, user:any){
     this.qpTemplateData.qpDocuments[docIndex].qpScrutinityUsers[userIndex].userId = null;
     this.qpTemplateData.qpDocuments[docIndex].qpScrutinityUsers[userIndex].userName = '';
   }
+}
+
+getScrutinyUsers(assignedScrutinyUser:any) {
+  return this.users.filter((user: any) => user.userId != assignedScrutinyUser.expertUsertId);
 }
 
 isUserAlreadySelected(qpAssignedUsers: any[], userId: number, currentIndex: number): boolean {

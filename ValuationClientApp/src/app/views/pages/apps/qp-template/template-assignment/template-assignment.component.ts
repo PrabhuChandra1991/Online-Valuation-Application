@@ -231,23 +231,23 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
     });
   }
 
-  loadTemplateaForInstitute(institutionId:number): void {
+  loadTemplateaForInstitute(institutionId:number): void {     
     //let institutionId = 2;
-    this.spinnerService.toggleSpinnerState(true);
-    this.templateService.getTemplates(institutionId).subscribe({
-      next: (data: any[]) => {
+        this.spinnerService.toggleSpinnerState(true);
+        this.templateService.getTemplates(institutionId).subscribe({
+          next: (data: any[]) => {
 
-        this.dataSource.data = data;
-        this.dataSource.paginator = this.paginator;
-       this.dataSource.sort = this.sort;
-        console.log('qp templated loaded:', JSON.stringify(data));
-      },
-      error: (error) => {
-        console.error('Error loading qp templated:', error);
-      }
+            this.dataSource.data = data;
+            this.dataSource.paginator = this.paginator;
+          this.dataSource.sort = this.sort;
+            console.log('qp templated loaded:', JSON.stringify(data));
+          },
+          error: (error) => {
+            console.error('Error loading qp templated:', error);
+          }
 
-    });
-    this.spinnerService.toggleSpinnerState(false);
+        });
+        this.spinnerService.toggleSpinnerState(false);   
   }
 
   loadCourses(): void {
@@ -612,15 +612,26 @@ isUserAlreadySelected(qpAssignedUsers: any[], userId: number, currentIndex: numb
   }
 
   printQPDocument(userqpTemplateId:number){
-    this.templateService.printQPTemplate(userqpTemplateId);
+    this.templateService.printQPTemplate(userqpTemplateId).subscribe({
+      next: () => {
+        //this.toastr.success('updated successfully!'); 
+      },
+      error: (res) => {
+        this.toastr.error(res['error']['message']);
+        this.spinnerService.toggleSpinnerState(false);
+      },
+      complete: () => {
+       // this.isSubmitting = false;
+        this.spinnerService.toggleSpinnerState(false);
+      }
+    });
   }
 
-  assignScrutinity(assignedScrutinyUser:any){
-     
-
+  assignScrutinity(assignedScrutinyUser:any){         
     this.templateService.assignScrutinity(assignedScrutinyUser.userId, assignedScrutinyUser.parentUserQPTemplateId).subscribe({
       next: () => {
-        this.toastr.success('updated successfully!');      },
+        //this.toastr.success('updated successfully!'); 
+      },
       error: (res) => {
         this.toastr.error(res['error']['message']);
         this.spinnerService.toggleSpinnerState(false);

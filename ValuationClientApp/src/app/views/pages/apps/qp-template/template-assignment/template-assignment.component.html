@@ -283,7 +283,7 @@
                 </div>
 
                 <!-- Is QP Only Checkbox -->
-                <div class="col-sm-4 d-flex align-items-center">
+                <div class="col-sm-2">
                   <mat-checkbox formControlName="isQPOnly"
                                 [attr.disabled]="assignedUser.statusTypeId === 9"
                                 (change)="updateIsQPOnly(docIndex, userIndex, $event.checked)">
@@ -291,7 +291,11 @@
                   </mat-checkbox>
                 </div>
 
-                <div class="col-sm-2 d-flex align-items-center">
+                <div class="col-sm-2">
+                    <a target="_blank" href="{{assignedUser.submittedQPDocumentUrl}}">{{assignedUser.submittedQPDocumentName}}</a>
+                </div>
+
+                <div class="col-sm-2">
                   <button class="btn btn-sm btn-outline-danger" (click)="clearSelection(docIndex, userIndex)"
                           *ngIf="assignedUser.statusTypeId === 8">
                     Clear

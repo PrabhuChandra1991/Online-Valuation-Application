@@ -8,8 +8,15 @@ select{
 tr.no-hover:hover {
   background-color: #FFFFFF !important;
 }
+ 
+ a.disabled,
+ select.disabled,
+ .checkbox.disabled,
+ .mat-mdc-checkbox.disabled {
+     pointer-events: none;
+     cursor: not-allowed;
+ }
 
-a.disabled {
-    pointer-events: none;
-    cursor: not-allowed; 
+ select.disabled {
+     background-color: #e9ecef;
  }

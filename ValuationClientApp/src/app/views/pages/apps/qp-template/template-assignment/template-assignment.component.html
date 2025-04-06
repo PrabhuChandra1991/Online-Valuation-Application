@@ -270,8 +270,7 @@
                 <div class="col-sm-6">
                   <div class="mb-4">
                     <label class="form-label">Expert - {{ userIndex + 1 }}</label>
-                    <select class="form-select" formControlName="userId"
-                            [attr.disabled]="assignedUser.statusTypeId === 9"
+                    <select class="form-select" formControlName="userId" [ngClass]="assignedUser.statusTypeId === 9 ? 'disabled' : ''"
                             (change)="updateUserDetails(docIndex, userIndex,$event)">
                       <option value="">Select Expert</option>
                       <option *ngFor="let user of users" [value]="user.userId"
@@ -283,22 +282,14 @@
                 </div>
 
                 <!-- Is QP Only Checkbox -->
-                <div class="col-sm-2">
-                 
+                <div class="col-sm-4">                 
                   <br>
-                  <mat-checkbox formControlName="isQPOnly"
-                                [attr.disabled]="assignedUser.statusTypeId === 9"
+                  <mat-checkbox formControlName="isQPOnly" [ngClass]="assignedUser.statusTypeId === 9 ? 'disabled' : ''"                                 
                                 (change)="updateIsQPOnly(docIndex, userIndex, $event.checked)">Is QP Only
                   </mat-checkbox>
-                </div>
-
-                <div class="col-sm-2">
-                    
-                </div>
-                <br>
+                </div> 
               </div>
-              <br>
-              <div class="row" >
+              <div class="row" *ngIf="assignedUser.statusTypeId === 9">
                 <div class="col-sm-4">
                   {{assignedUser.statusTypeName}}
                 </div>
@@ -317,7 +308,7 @@
                 <br>          
               </div>
             </div>
-<br>
+            <br>
             <div formArrayName="qpScrutinityUsers">
               <div class="row" *ngFor="let assignedScrutinyUser of qpDocument.qpScrutinityUsers; let userIndex = index" [formGroupName]="userIndex">
                   <div class="row">
@@ -325,6 +316,7 @@
                       <div class="mb-4">
                         <label class="form-label">Scrutiny - {{ userIndex + 1 }}</label>
                         <select class="form-select" formControlName="userId" [disabled]="assignedScrutinyUser.userQPTemplateId !== 0"
+                          [ngClass]="assignedScrutinyUser.statusTypeId === 11 ? 'disabled' : ''"
                           (change)="updateScrutinyUserDetails(docIndex, userIndex,$event)">
                           <option value="">Select Scrutiny </option>
                           <option *ngFor="let user of users" [value]="user.userId">

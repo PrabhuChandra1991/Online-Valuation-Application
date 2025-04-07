@@ -47,11 +47,9 @@ export class RegisterComponent {
 
   onRegister() {
     //e.preventDefault();
-    
-    debugger;
-    //
+     
     this.RegisterService.createUser(this.userObj).subscribe((result:any)=>{
-      debugger;
+      
       // if(result['id'] > 0)
       // {
         this.toastr.success('User created!');

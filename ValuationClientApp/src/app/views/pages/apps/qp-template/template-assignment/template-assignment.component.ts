@@ -265,7 +265,7 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
 
   loadAssignedTemplates(): void {
     const loggedData = localStorage.getItem('userData');
-    debugger;
+    
     if (loggedData) {
       const userData = JSON.parse(loggedData);
 
@@ -550,7 +550,7 @@ isUserAlreadySelected(qpAssignedUsers: any[], userId: number, currentIndex: numb
 }
 
   onSave() {
-    debugger;
+    
     if (this.templateAssignmentForm.valid) {
 
       if(this.isEditMode){

@@ -80,9 +80,7 @@ export class LoginComponent implements OnInit {
   }
 
   login() {
-
-    debugger;
-    //
+ 
     this.spinnerService.toggleSpinnerState(true);
     this.LoginService.login(this.userObj)
     .subscribe({
@@ -111,7 +109,7 @@ export class LoginComponent implements OnInit {
        }
     })
     // .subscribe((result:any)=>{
-    //   debugger;
+    //   
     //   localStorage.setItem('isLoggedin', 'true');
     //   localStorage.setItem('userData',JSON.stringify(result));
 

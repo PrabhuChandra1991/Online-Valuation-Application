@@ -286,7 +286,10 @@ namespace SKCE.Examination.Services.QPSettings
                 || bookmark.Name.Contains("CourseModule") || bookmark.Name.Contains("CourseHours")
                 || bookmark.Name.Contains("CourseContent") || bookmark.Name.Contains("ReferenceBook"))
                 {
+                    if(rowData[bookmark.Name.Remove(bookmark.Name.Length - 1, 1)].Split("[").Length > Convert.ToInt32(bookmark.Name.Substring(bookmark.Name.Length - 1)))
                     navigator.ReplaceBookmarkContent(rowData[bookmark.Name.Remove(bookmark.Name.Length - 1, 1)].Split("[")[Convert.ToInt32(bookmark.Name.Substring(bookmark.Name.Length - 1))].Replace("]", ""), true);
+                    else
+                        navigator.ReplaceBookmarkContent(string.Empty, true);
                 }
                 else
                 {

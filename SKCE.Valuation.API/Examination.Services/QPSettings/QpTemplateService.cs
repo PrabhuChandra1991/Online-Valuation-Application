@@ -185,7 +185,7 @@ namespace SKCE.Examination.Services.QPSettings
                 AuditHelper.SetAuditPropertiesForInsert(courseSyllabusDocument, 1);
                await _context.CourseSyllabusDocuments.AddAsync(courseSyllabusDocument);
                 await _context.SaveChangesAsync();
-                qPTemplate.CourseSyllabusDocumentId = courseSyllabusDocument.CourseSyllabusDocumentId;
+                qPTemplate.CourseSyllabusDocumentId = courseSyllabusDocument.DocumentId;
             }
             else
             {

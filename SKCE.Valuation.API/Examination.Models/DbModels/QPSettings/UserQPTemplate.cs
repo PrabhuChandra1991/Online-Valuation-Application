@@ -24,5 +24,6 @@ namespace SKCE.Examination.Models.DbModels.QPSettings
         public string? GraphName { get; set; }
         public string? TableName { get; set; }
         public string? QPCode { get; set; }
+        public bool? IsQPSelected { get; set; }
     }
 }

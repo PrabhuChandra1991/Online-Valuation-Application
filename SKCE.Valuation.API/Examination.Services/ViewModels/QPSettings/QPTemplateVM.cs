@@ -54,6 +54,7 @@ namespace SKCE.Examination.Services.ViewModels.QPSettings
         public string? SubmittedQPDocumentName { get; set; }
         public string? SubmittedQPDocumentUrl { get; set; }
         public long? ParentUserQPTemplateId { get; set; }
+        public bool? IsQPSelected { get; set; }
     }
     public class QPTemplateDocumentVM : AuditModel
     {
@@ -126,6 +127,7 @@ namespace SKCE.Examination.Services.ViewModels.QPSettings
         public string SubmittedQPDocumentName { get; set; }
         public string SubmittedQPDocumentUrl { get; set; }
         public  long? ParentUserQPTemplateId { get; set; }
+        public bool? IsQPSelected { get; set; }
     }
     public class QPDocumentValidationVM
     {

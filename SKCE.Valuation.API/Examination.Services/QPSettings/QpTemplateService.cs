@@ -26,6 +26,9 @@ using Microsoft.AspNetCore.Http;
 using DocumentFormat.OpenXml.Office.SpreadSheetML.Y2023.MsForms;
 using DocumentFormat.OpenXml.Office2010.Word;
 using DocumentFormat.OpenXml.ExtendedProperties;
+using System.Threading.Tasks;
+using Spire.Doc.Collections;
+using Spire.Doc.Fields;
 namespace SKCE.Examination.Services.QPSettings
 {
     public class QpTemplateService 
@@ -413,6 +416,7 @@ namespace SKCE.Examination.Services.QPSettings
                 foreach (var assignedUser in qpDocument.QPAssignedUsers)
                 {
                     var userQPTemplate = _context.UserQPTemplates.FirstOrDefault(uqp => uqp.UserQPTemplateId == assignedUser.UserQPTemplateId && uqp.IsActive);
+                 
                     if (userQPTemplate == null)
                     {
                         var newAssignedUser = new UserQPTemplate
@@ -424,6 +428,8 @@ namespace SKCE.Examination.Services.QPSettings
                             QPTemplateStatusTypeId = 8,
                             QPDocumentId = assignedUser.IsQPOnly ? qpDocument.QPOnlyDocumentId : qpDocument.QPDocumentId
                         };
+                        //var qpToPrintDocument = await _context.Documents.FirstOrDefaultAsync(d => d.DocumentId == qpDocument.DocumentId);
+                        //userQPTemplate.QPDocumentId = await _bookmarkProcessor.GetUpdatedExpertQPDocument(qpTemplate, userQPTemplate, qpToPrintDocument.Name, qPDocumentUserVM.IsQPOnly ? "QP" : "QPAK");
                         AuditHelper.SetAuditPropertiesForInsert(newAssignedUser, 1);
                         _context.UserQPTemplates.Add(newAssignedUser);
                         _context.SaveChanges();
@@ -494,7 +500,8 @@ namespace SKCE.Examination.Services.QPSettings
                         QPDocumentId = u.QPDocumentId,
                         SubmittedQPDocumentId = u.SubmittedQPDocumentId,
                         IsQPOnly = u.IsQPOnly,
-                        ParentUserQPTemplateId= u.ParentUserQPTemplateId
+                        IsQPSelected=u.IsQPSelected,
+                        ParentUserQPTemplateId = u.ParentUserQPTemplateId
                     }).ToList();
                 foreach (var userTemplate in userQPGenerateTemplates)
                 {
@@ -574,6 +581,7 @@ namespace SKCE.Examination.Services.QPSettings
                         SubmittedQPDocumentId= userTemplate.SubmittedQPDocumentId,
                         ParentUserQPTemplateId= userTemplate.ParentUserQPTemplateId,
                         QPTemplateId= userTemplate.QPTemplateId,
+                        IsQPSelected=userTemplate.IsQPSelected,
                         SubmittedQPDocumentName = (submittedDocument != null)?submittedDocument.Name:string.Empty,
                         SubmittedQPDocumentUrl= (submittedDocument != null) ? submittedDocument.Url : string.Empty,
                     });
@@ -660,6 +668,7 @@ namespace SKCE.Examination.Services.QPSettings
                         QPDocumentId = u.QPDocumentId,
                         SubmittedQPDocumentId = u.SubmittedQPDocumentId,
                         IsQPOnly = u.IsQPOnly,
+                        IsQPSelected=u.IsQPSelected,
                         ParentUserQPTemplateId = u.ParentUserQPTemplateId
                     }).ToList();
                     foreach (var userTemplate in userQPGenerateTemplates)
@@ -699,6 +708,7 @@ namespace SKCE.Examination.Services.QPSettings
                                 InstitutionId = userTemplate.InstitutionId,
                                 ParentUserQPTemplateId = userTemplate.ParentUserQPTemplateId,
                                 QPTemplateId = userTemplate.QPTemplateId,
+                                IsQPSelected=userTemplate.IsQPSelected,
                                 SubmittedQPDocumentName = (submittedDocument != null) ? submittedDocument.Name : string.Empty,
                                 SubmittedQPDocumentUrl = (submittedDocument != null) ? submittedDocument.Url : string.Empty,
                             });
@@ -719,6 +729,7 @@ namespace SKCE.Examination.Services.QPSettings
                             QPDocumentId = u.QPDocumentId,
                             SubmittedQPDocumentId = u.SubmittedQPDocumentId,
                             IsQPOnly = u.IsQPOnly,
+                            IsQPSelected=u.IsQPSelected,
                             ParentUserQPTemplateId = u.ParentUserQPTemplateId
                         }).ToList();
 
@@ -740,6 +751,7 @@ namespace SKCE.Examination.Services.QPSettings
                             SubmittedQPDocumentId = userTemplate.SubmittedQPDocumentId,
                             ParentUserQPTemplateId = userTemplate.ParentUserQPTemplateId,
                             QPTemplateId = userTemplate.QPTemplateId,
+                            IsQPSelected=userTemplate.IsQPSelected,
                             SubmittedQPDocumentName = (submittedDocument != null) ? submittedDocument.Name : string.Empty,
                             SubmittedQPDocumentUrl = (submittedDocument != null) ? submittedDocument.Url : string.Empty,
                         });
@@ -815,12 +827,13 @@ namespace SKCE.Examination.Services.QPSettings
         {
             return await GetUserQPTemplatesAsync(userId);
         }
-        public bool? AssignTemplateForQPGenerationAsync(QPDocumentUserVM qPDocumentUserVM,QPDocumentVM qPDocument,QPTemplate qPTemplate)
+        public async Task<bool?> AssignTemplateForQPGenerationAsync(QPDocumentUserVM qPDocumentUserVM,QPDocumentVM qPDocument,QPTemplate qPTemplate)
         {
             var qpTemplate =  _context.QPTemplates.FirstOrDefault(qp => qp.QPTemplateId == qPTemplate.QPTemplateId);
             if (qpTemplate == null) return null;
             qpTemplate.QPTemplateStatusTypeId = 2; //QP Generation Allocated
-
+            var qpDocumentId = qPDocumentUserVM.IsQPOnly ? qPDocument.QPOnlyDocumentId : qPDocument.QPDocumentId;
+            
             var userQPTemplate = new UserQPTemplate()
             {
                 InstitutionId = qPDocument.InstitutionId,
@@ -828,8 +841,13 @@ namespace SKCE.Examination.Services.QPSettings
                 UserId = qPDocumentUserVM.UserId,
                 QPTemplateStatusTypeId = 8,//Generation QP InProgress
                 QPDocumentId = qPDocumentUserVM.IsQPOnly? qPDocument.QPOnlyDocumentId: qPDocument.QPDocumentId,
-                IsQPOnly = qPDocumentUserVM.IsQPOnly
+                IsQPOnly = qPDocumentUserVM.IsQPOnly,
+                IsQPSelected=false,
             };
+            //var qpDocument = _context.QPDocuments.FirstOrDefault(u => u.QPDocumentId == userQPTemplate.QPDocumentId);
+            //var qpToPrintDocument = await _context.Documents.FirstOrDefaultAsync(d => d.DocumentId == qpDocument.DocumentId);
+            //userQPTemplate.QPDocumentId =await GetUpdatedExpertQPDocument(qPTemplate, userQPTemplate, qpToPrintDocument.Name, qPDocumentUserVM.IsQPOnly?"QP":"QPAK");
+            
             AuditHelper.SetAuditPropertiesForInsert(userQPTemplate, 1);
             _context.UserQPTemplates.Add(userQPTemplate);
              _context.SaveChanges();
@@ -1911,7 +1929,6 @@ namespace SKCE.Examination.Services.QPSettings
             var qpTemplate = await _context.QPTemplates.FirstOrDefaultAsync(qp => qp.QPTemplateId == userQPTemplate.QPTemplateId);
             if (qpTemplate == null) return null;
             qpTemplate.QPTemplateStatusTypeId = 7; //QP Selected
-            qpTemplate.QPCode = qpCode;
             AuditHelper.SetAuditPropertiesForUpdate(qpTemplate, 1);
             await _context.SaveChangesAsync();
             if (userQPTemplate != null)
@@ -1921,8 +1938,12 @@ namespace SKCE.Examination.Services.QPSettings
                 var qpToPrintDocument = await _context.Documents.FirstOrDefaultAsync(d => d.DocumentId == qpDocument.DocumentId );
                 if (qpSelectedDocument == null || qpToPrintDocument == null) return false;
                 await _bookmarkProcessor.ProcessBookmarksAndPrint(qpTemplate, userQPTemplate, qpSelectedDocument.Name, qpToPrintDocument.Name, isForPrint);
-                if(isForPrint)
-                qpTemplate.PrintedDocumentId = userQPTemplate.SubmittedQPDocumentId;
+                if (isForPrint)
+                {
+                    userQPTemplate.QPCode = qpCode;
+                    userQPTemplate.IsQPSelected = true;
+                    qpTemplate.PrintedDocumentId = userQPTemplate.SubmittedQPDocumentId;
+                }
                 await _context.SaveChangesAsync();
                 return true;
             }
@@ -2021,6 +2042,190 @@ namespace SKCE.Examination.Services.QPSettings
 
             return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(htmlContent));
 
+        }
+        public async Task<long> GetUpdatedExpertQPDocument(QPTemplate qPTemplate, UserQPTemplate userQPTemplate, string inputDocPath, string qpType)
+        {
+            try
+            {
+                // Save the updated document
+                var updatedSourcePath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}.docx", "TempDocument", DateTime.Now.ToString("ddMMyyyyhhmmss")));
+
+                Document sourceDoc = await _azureBlobStorageHelper.DownloadWordDocumentFromBlob(inputDocPath);
+
+                // Dictionary of bookmarks and their new values
+                Dictionary<string, string> bookmarkUpdates = new Dictionary<string, string>
+                {
+                    { "QPCODE", "" },
+                    { "EXAMMONTH", "" },
+                    { "EXAMYEAR", "" },
+                    { "EXAMTYPE", "" },
+                    { "REGULATIONYEAR", "" },
+                    { "PROGRAMME","" },
+                    { "SEMESTER", "" },
+                    { "COURSECODE", "" },
+                    { "COURSETITLE", "" },
+                    { "SUPPORTCATALOGS", "" }
+                };
+                // Iterate through all bookmarks in the source document
+                foreach (var bookmark in bookmarkUpdates)
+                {
+                    string bookmarkName = bookmark.Key;
+                    string bookmarkHtml = string.Empty;
+                    if (bookmarkName == "PROGRAMME")
+                    {
+                        var examinations = _context.Examinations.Where(cd => cd.CourseId == qPTemplate.CourseId).ToList();
+                        var departments = _context.Departments.ToList();
+                        var departmentVMs = examinations.Join(departments, cd => cd.DepartmentId, d => d.DepartmentId,
+                            (cd, d) => new { cd, d })
+                        .Where(cd => cd.cd.InstitutionId == userQPTemplate.InstitutionId)
+                        .Select(cd => new
+                        {
+                            DepartmentId = cd.d.DepartmentId,
+                            DepartmentName = cd.d.Name,
+                            DepartmentShortName = cd.d.ShortName,
+                        }).ToList();
+
+                        var departmentIds = departmentVMs.Select(q => q.DepartmentId).ToList();
+
+                        if (departmentIds.Any() && departmentIds.Count > 2)
+                        {
+                            bookmarkHtml = System.String.Join(", ", _context.Departments.Where(d => departmentIds.Contains(d.DepartmentId)).Select(d => d.ShortName).ToList());
+                        }
+                        else
+                            bookmarkHtml = System.String.Join(", ", _context.Departments.Where(d => departmentIds.Contains(d.DepartmentId)).Select(d => d.Name).ToList());
+                    }
+                    else if (bookmarkName == "COURSECODE")
+                    {
+                        bookmarkHtml = _context.Courses.FirstOrDefault(c =>
+                        c.CourseId == qPTemplate.CourseId)?.Code ?? string.Empty;
+                    }
+                    else if (bookmarkName == "COURSETITLE")
+                    {
+                        bookmarkHtml = _context.Courses.FirstOrDefault(c =>
+                        c.CourseId == qPTemplate.CourseId)?.Name ?? string.Empty;
+                    }
+                    else if (bookmarkName == "SEMESTER")
+                    {
+                        bookmarkHtml = _context.QPTemplates.FirstOrDefault(c =>
+                        c.QPTemplateId == qPTemplate.QPTemplateId)?.Semester.ToString() ?? string.Empty;
+                    }
+                    else if (bookmarkName == "QPCODE")
+                    {
+                        bookmarkHtml = _context.QPTemplates.FirstOrDefault(c =>
+                        c.QPTemplateId == qPTemplate.QPTemplateId)?.QPCode.ToString() ?? string.Empty;
+                    }
+                    else if (bookmarkName == "EXAMMONTH")
+                    {
+                        bookmarkHtml = _context.QPTemplates.FirstOrDefault(c =>
+                        c.QPTemplateId == qPTemplate.QPTemplateId)?.ExamMonth.ToString() ?? string.Empty;
+                    }
+                    else if (bookmarkName == "EXAMYEAR")
+                    {
+                        bookmarkHtml = _context.QPTemplates.FirstOrDefault(c =>
+                        c.QPTemplateId == qPTemplate.QPTemplateId)?.ExamYear.ToString() ?? string.Empty;
+                    }
+                    else if (bookmarkName == "EXAMTYPE")
+                    {
+                        bookmarkHtml = _context.QPTemplates.FirstOrDefault(c =>
+                        c.QPTemplateId == qPTemplate.QPTemplateId)?.ExamType.ToString() ?? string.Empty;
+                    }
+                    else if (bookmarkName == "REGULATIONYEAR")
+                    {
+                        bookmarkHtml = _context.QPTemplates.FirstOrDefault(c =>
+                        c.QPTemplateId == qPTemplate.QPTemplateId)?.RegulationYear.ToString() ?? string.Empty;
+                    }
+                    else if (bookmarkName == "SUPPORTCATALOGS")
+                    {
+                        bookmarkHtml = string.Empty;
+                        var GraphName = string.Empty;
+                        var TableName = string.Empty;
+                        if (userQPTemplate.IsGraphsRequired.Value)
+                        {
+                            bookmarkHtml = $"Graph Sheet required - {userQPTemplate.GraphName}";
+                        }
+                        if (userQPTemplate.IsTablesAllowed.Value)
+                        {
+                            bookmarkHtml = bookmarkHtml + $"Tables are allowed - {userQPTemplate.TableName}";
+                        }
+                    }
+                    bookmarkUpdates[bookmark.Key] = bookmarkHtml;
+                }
+                var courseSyllabusDocument = _context.CourseSyllabusDocuments.FirstOrDefault(c => c.CourseId == qPTemplate.CourseId);
+                var courseSyllabusWordDocument = _context.Documents.FirstOrDefault(d => d.DocumentId == courseSyllabusDocument.WordDocumentId);
+                // Load the template document where bookmarks need to be replaced
+                Document SyllabusWordDoc = await _azureBlobStorageHelper.DownloadWordDocumentFromBlob(courseSyllabusWordDocument.Name);
+
+                // Loop through each bookmark and update text
+                foreach (var bookmark in bookmarkUpdates)
+                {
+                    Spire.Doc.Bookmark sbookMark = sourceDoc.Bookmarks[bookmark.Key];
+                    if (sbookMark != null)
+                    {
+                        if (sbookMark.BookmarkStart.OwnerParagraph.Items.Count > 0)
+                        {
+                            foreach (var item in sbookMark.BookmarkStart.OwnerParagraph.Items)
+                            {
+                                if (item is TextRange textRange)
+                                {
+                                    if (textRange.Text == sbookMark.Name)
+                                    {
+                                        // Replace the text in the bookmark with the new value
+                                        textRange.Text = bookmark.Value;
+                                    }
+                                }
+                                if (item is Spire.Doc.BookmarkEnd bookmarkEnd)
+                                {
+                                    if (bookmarkEnd.OwnerParagraph.Text.TrimStart() == sbookMark.Name)
+                                    {
+                                        foreach (var bookowner in sbookMark.BookmarkStart.OwnerParagraph.Items)
+                                        {
+                                            if (bookowner is TextRange textRange1)
+                                            {
+                                                if (textRange1.Text == sbookMark.Name)
+                                                {
+                                                    // Replace the text in the bookmark with the new value
+                                                    textRange1.Text = bookmark.Value;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Iterate through all bookmarks in the source document
+                foreach (Spire.Doc.Bookmark bookmark2 in SyllabusWordDoc.Bookmarks)
+                {
+                    string bookmarkName = bookmark2.Name;
+                    // Find the same bookmark in the destination document
+                    Spire.Doc.Bookmark destinationBookmark = sourceDoc.Bookmarks.FindByName(bookmarkName);
+                    if (destinationBookmark != null)
+                    {
+                        // Extract content from the source bookmark (including images)
+                        DocumentObjectCollection sourceContent = bookmark2.BookmarkStart.OwnerParagraph.ChildObjects;
+
+                        // Clear existing content in destination bookmark
+                        Paragraph destParagraph = destinationBookmark.BookmarkStart.OwnerParagraph;
+                        destParagraph.ChildObjects.Clear();
+
+                        // Copy content to the destination bookmark
+                        foreach (DocumentObject obj in sourceContent)
+                        {
+                            destParagraph.ChildObjects.Add(obj.Clone());
+                        }
+                    }
+                }
+                sourceDoc.SaveToFile(updatedSourcePath, FileFormat.Docx);
+
+                return _azureBlobStorageHelper.UploadFileToBlob(updatedSourcePath, string.Format("{0}_{1}.docx", bookmarkUpdates["COURSECODE"], qpType)).Result;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+           
         }
     }
 }

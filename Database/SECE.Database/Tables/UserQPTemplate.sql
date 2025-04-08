@@ -14,6 +14,7 @@
 	[GraphName] NVARCHAR(255)  NULL,
 	[TableName] NVARCHAR(255)  NULL,
 	[QPCode] NVARCHAR(255)  NULL,
+	[IsQPSelected] BIT NULL DEFAULT 0,
 	[IsActive] BIT NOT NULL,
 	[CreatedDate] DATETIME NOT NULL,
 	[CreatedById] BIGINT NOT NULL,

@@ -117,14 +117,14 @@
                       <br>
                       <button class="btn btn-sm btn-primary" (click)="openDocUploadModal(lgDocModal,element.userQPTemplateId)"
                         [disabled]="element.qpTemplateStatusTypeId === 9 || element.qpTemplateStatusTypeId === 11">
-                        Upload generated QP.
+                        Upload generated QP
                       </button>
                       <br>
-                      <a href="{{element.qpDocumentUrl}}">
+                      <a target="_blank" download  href="{{element.qpDocumentUrl}}">
                         Download QP template
                       </a> 
                       <br>
-                      <a href="{{element.courseSyllabusDocumentUrl}}">
+                      <a target="_blank" download  href="{{element.courseSyllabusDocumentUrl}}">
                         Download Syllabus
                       </a>      
                   </td>
@@ -265,7 +265,7 @@
             <!-- Loop through assigned users -->
             <div formArrayName="qpAssignedUsers">
               <div class="row" *ngFor="let assignedUser of qpDocument.qpAssignedUsers; let userIndex = index" [formGroupName]="userIndex">
-              <div class="row">
+              <div class="row" [ngClass]="assignedUser.isQPSelected == true ? 'background-color-green' : ''">
                 <!-- Expert Selection -->
                 <div class="col-sm-6">
                   <div class="mb-4">
@@ -298,7 +298,13 @@
                 </div>
                 <div class="col-sm-4" *ngIf="assignedUser.statusTypeId === 9">
                   <button class="btn btn-sm btn-primary"
-                          (click)="printQPDocument(assignedUser.userQPTemplateId)"
+                          (click)="printQPDocument(assignedUser.userQPTemplateId,false)"
+                          *ngIf="assignedUser.statusTypeId === 9">
+                    Preview
+                  </button>                  
+                   &nbsp;&nbsp;&nbsp;                         
+                   <button class="btn btn-sm btn-primary"
+                          (click)="printQPDocument(assignedUser.userQPTemplateId,true)"
                           *ngIf="assignedUser.statusTypeId === 9">
                     Print
                   </button>
@@ -341,7 +347,11 @@
                     </div>
                     <div class="col-sm-4" *ngIf="assignedScrutinyUser.statusTypeId === 11">
                       <button class="btn btn-sm btn-primary"
-                              (click)="printQPDocument(assignedScrutinyUser.userQPTemplateId)">
+                              (click)="printQPDocument(assignedUser.userQPTemplateId,false)">
+                        Preview
+                      </button>
+                      <button class="btn btn-sm btn-primary"
+                              (click)="printQPDocument(assignedScrutinyUser.userQPTemplateId,true)">
                         Print
                       </button>
                     </div> 
@@ -385,7 +395,7 @@
         </div><!-- Col -->
         <div class="col-sm-6 text-end">
           <div class="mt-4">
-            <button type="button" class="btn btn-primary" (click)="printQPDocument(qpTemplateId)" *ngIf="isQPDocValidated">Preview</button>
+            <button type="button" class="btn btn-primary" (click)="printQPDocument(qpTemplateId,false)" *ngIf="isQPDocValidated">Preview</button>
           </div>
         </div><!-- Col -->
       </div><!-- Row -->

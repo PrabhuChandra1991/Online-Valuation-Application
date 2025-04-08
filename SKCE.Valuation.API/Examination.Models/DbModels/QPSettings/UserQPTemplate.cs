@@ -25,5 +25,6 @@ namespace SKCE.Examination.Models.DbModels.QPSettings
         public string? TableName { get; set; }
         public string? QPCode { get; set; }
         public bool? IsQPSelected { get; set; }
+        public long? UserQPDocumentId { get; set; }
     }
 }

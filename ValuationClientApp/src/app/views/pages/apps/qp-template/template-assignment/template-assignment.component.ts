@@ -616,8 +616,8 @@ isUserAlreadySelected(qpAssignedUsers: any[], userId: number, currentIndex: numb
     }
   }
 
-  printQPDocument(userqpTemplateId:number){
-    this.templateService.printQPTemplate(userqpTemplateId).subscribe({
+  printQPDocument(userqpTemplateId:number,isForPrint:boolean){
+    this.templateService.printQPTemplate(userqpTemplateId,isForPrint).subscribe({
       next: () => {
         //this.toastr.success('updated successfully!'); 
       },

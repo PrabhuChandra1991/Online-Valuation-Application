@@ -109,6 +109,28 @@ namespace SKCE.Examination.Services.Helpers
             return document.DocumentId; // Return the generated Document ID
         }
 
+        // Uploads a file to Azure Blob Storage
+        public async Task<long> UploadDocxFileToBlob(string filePath, string fileName)
+        {
+            BlobContainerClient containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
+            BlobClient blobClient = containerClient.GetBlobClient(fileName);
+
+            await using FileStream uploadFileStream = File.OpenRead(filePath);
+            await blobClient.UploadAsync(uploadFileStream, new BlobHttpHeaders { ContentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+
+            // Save file metadata in the database
+            var document = new Document
+            {
+                Name = blobClient.Name,
+                Url = blobClient.Uri.ToString()
+            };
+            AuditHelper.SetAuditPropertiesForInsert(document, 1);
+            _context.Documents.Add(document);
+            await _context.SaveChangesAsync();
+
+            return document.DocumentId; // Return the generated Document ID
+        }
+
         /// <summary>
         /// Lists all files in the blob container.
         /// </summary>

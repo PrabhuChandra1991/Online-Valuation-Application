@@ -5,14 +5,11 @@ import { UserService } from '../../services/user.service';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
-import { MatIconModule } from '@angular/material/icon';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
 import { UserFormComponent } from '../../forms/shared/user-form.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { User  } from '../../models/user.model';
 import { ToastrService } from 'ngx-toastr';
-import {MatButtonModule} from '@angular/material/button';
 import { Router } from '@angular/router';
 import { UserProfile } from '../../models/userProfile.model';
 import { SpinnerService } from '../../services/spinner.service';
@@ -26,12 +23,9 @@ import { SpinnerService } from '../../services/spinner.service';
           MatTableModule,
           MatPaginatorModule,
           MatSortModule,
-          MatIconModule,
           MatLabel,
           MatFormField,
-          MatInputModule,
-          UserFormComponent,
-          MatButtonModule
+          UserFormComponent
         ],
   templateUrl: './user.component.html',
   styleUrl: './user.component.scss'
@@ -92,7 +86,7 @@ export class UserComponent implements OnInit{
         this.users = data;
         this.dataSource.data = this.users; // Avoid reassigning MatTableDataSource
         this.dataSource.paginator = this.paginator;
-        this.dataSource.sort = this.sort;
+        //this.dataSource.sort = this.sort;
       },
       (error) => {
         console.error('Error fetching users:', error);
@@ -118,13 +112,13 @@ export class UserComponent implements OnInit{
   // Ensure it's empty for new user
   this.isEditMode = false;
     this.selectedUser = null;
-    this.modalRef = this.modalService.open(this.userModal, { size: 'lg', backdrop: 'static' });
+    this.modalRef = this.modalService.open(this.userModal, { backdrop: 'static' });
   }
 
   openEditUserDialog(user: any) {
     this.selectedUser = { ...user }; // Load selected user data
     this.isEditMode = true;
-    this.modalRef = this.modalService.open(this.userModal, { size: 'lg', backdrop: 'static' });
+    this.modalRef = this.modalService.open(this.userModal, { backdrop: 'static' });
   }
 
   handleFormSubmit(userData: any) {
@@ -224,6 +218,3 @@ export class UserComponent implements OnInit{
   }
 
 }
-
-
-

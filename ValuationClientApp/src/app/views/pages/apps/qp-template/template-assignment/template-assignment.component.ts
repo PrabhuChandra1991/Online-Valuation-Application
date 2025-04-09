@@ -8,7 +8,6 @@ import { FormBuilder, FormGroup, FormArray, Validators, FormsModule, ReactiveFor
 import { ToastrService } from 'ngx-toastr';
 import { SpinnerService } from '../../../services/spinner.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -16,7 +15,6 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import { InstituteService } from '../../../services/institute.service';
-import { MatButtonModule } from '@angular/material/button';
 import { QPDocumentService } from '../../../services/qpdocument.service';
 
 
@@ -31,9 +29,7 @@ import { QPDocumentService } from '../../../services/qpdocument.service';
     FormsModule,
     ReactiveFormsModule,
     MatFormFieldModule, MatInputModule, MatTableModule, MatSortModule, MatPaginatorModule,
-    MatCheckboxModule,
-    MatIconModule,
-    MatButtonModule
+    MatCheckboxModule
 
 ],
   templateUrl: './template-assignment.component.html',
@@ -42,7 +38,8 @@ import { QPDocumentService } from '../../../services/qpdocument.service';
 export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
 [x: string]: any;
 
-  isAdmin: Boolean ;
+  isAdmin: Boolean;
+  isInstitutionLoaded: Boolean = false;
   isEditMode: Boolean;
   defaultNavActiveId = 1;
   basicModalCode: any;
@@ -233,13 +230,14 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
 
   loadTemplateaForInstitute(institutionId:number): void {     
     //let institutionId = 2;
+    this.isInstitutionLoaded=false;
         this.spinnerService.toggleSpinnerState(true);
         this.templateService.getTemplates(institutionId).subscribe({
           next: (data: any[]) => {
-
             this.dataSource.data = data;
             this.dataSource.paginator = this.paginator;
-          this.dataSource.sort = this.sort;
+            this.dataSource.sort = this.sort;
+            this.isInstitutionLoaded=true;
             console.log('qp templated loaded:', JSON.stringify(data));
           },
           error: (error) => {
@@ -292,7 +290,7 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
 
  onInstituteChange(event: Event): void {
   this.selectedInstituteId = (event.target as HTMLSelectElement).value;
- this.loadTemplateaForInstitute(this.selectedInstituteId);
+  this.loadTemplateaForInstitute(this.selectedInstituteId);
 }
 
 getAssignmentForTemplateId(templateId: any){

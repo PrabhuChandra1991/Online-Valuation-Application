@@ -1,11 +1,9 @@
 import { MenuItem } from './menu.model';
 
 export const MENU: MenuItem[] = [
-
   {
     label: 'User Management',
     icon: 'home',
-
     link: '/apps/user',
     role: [1]
   },
@@ -21,22 +19,21 @@ export const MENU: MenuItem[] = [
     link: '/apps/importhistory',
     role: [1]
   },
-
-{
-    label: 'Template Assignment',
+  {
+    label: 'Quest. Paper Management',
     icon: 'check-square',
     link: '/apps/assigntemplate',
     role: [1]
   },
   {
-    label: 'Template Management',
+    label: 'Quest. Paper Status',
     icon: 'clipboard',
     link: '/apps/qptemplate',
     role: [1]
   },
 
   {
-    label: 'Assigned Template',
+    label: 'Assigned Quest. Papers',
     icon: 'list',
     link: '/apps/assigntemplate',
     role: [2]

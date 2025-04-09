@@ -4,3 +4,18 @@
   align-items: center;
   justify-content: center;
 }
+
+.auth-page .auth-side-wrapper {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+}
+
+.banner {
+  background-image: url('https://bond.edu.au/sites/default/files/styles/wide_l/public/blog/Subject%20selection%201920x480.png.avif');
+  background-position:25px 60%;
+  width:100%;
+  height: 250px;
+  border-top-left-radius: .5rem;
+  border-top-right-radius: .5rem;
+}

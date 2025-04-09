@@ -44,7 +44,8 @@ export class ImportHistoryComponent implements OnInit{
   @ViewChild(MatSort) sort: MatSort;
 
   constructor(private fb: FormBuilder,
-              private importHistoryService:ImportHistoryService
+              private importHistoryService:ImportHistoryService,
+              private router: Router
               ){}
 
   ngOnInit(): void {
@@ -86,6 +87,10 @@ export class ImportHistoryComponent implements OnInit{
         console.error('Error loading history:', error);
       }
     });
+  }
+
+  gotoImportMaster() {
+    this.router.navigate(['/apps/master']);
   }
 
 }

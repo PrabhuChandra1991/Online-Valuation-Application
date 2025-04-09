@@ -5,7 +5,6 @@ import { NgScrollbarModule } from 'ngx-scrollbar';
 import { TemplateManagementService } from '../../../services/template-management.service';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule,Validators } from '@angular/forms';
-import { MatIcon } from '@angular/material/icon';
 import { ToastrService } from 'ngx-toastr';
 import { SpinnerService } from '../../../services/spinner.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -24,8 +23,6 @@ export interface TemplateData {
   Month: Number;
   Year: Number;
 }
-
-
                       
 @Component({
   selector: 'app-template-list',
@@ -36,7 +33,6 @@ export interface TemplateData {
     NgbTooltip,
     CommonModule,
     ReactiveFormsModule,
-    MatIcon,
     MatFormFieldModule, MatInputModule, MatTableModule, MatSortModule, MatPaginatorModule
     
 ],
@@ -74,7 +70,6 @@ export class TemplateManagemenComponent implements OnInit, AfterViewInit {
 
     isUploadedPrintPreviewQPAnswerDocument = false;
     uploadedFileNamePrintPreviewQPAnswer = ''
-
 
     displayedColumns: string[] = ['qpTemplateName', 'courseCode', 'courseName', 'qpTemplateStatusTypeName'];
     dataSource = new MatTableDataSource<any>([]);

@@ -1,8 +1,8 @@
 <form [formGroup]="userForm">
     <div class="container">
       <div class="row">
-        <div class="col-md-6">
-          <div class="mb-3">
+        <div class="col-md-12">
+          <div class="my-2">
             <label class="form-label">Name<span class="text-danger"> *</span></label>
             <input type="text" class="form-control" formControlName="name" placeholder="Enter name" >
             <small class="text-danger" *ngIf="userForm.get('name')?.invalid && userForm.get('name')?.touched">
@@ -13,9 +13,11 @@
             Numerics not allowed
         </small> -->
           </div>
-        </div>
-        <div class="col-md-6">
-          <div class="mb-3">
+        </div>        
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="my-2">
             <label class="form-label">Email<span class="text-danger"> *</span></label>
             <input type="email" class="form-control" formControlName="email" placeholder="Enter email">
             <small class="text-danger" *ngIf="userForm.get('email')?.invalid && userForm.get('email')?.touched">
@@ -25,8 +27,8 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-md-6">
-          <div class="mb-3">
+        <div class="col-md-12">
+          <div class="my-2">
             <label class="form-label">Mobile Number<span class="text-danger"> *</span></label>
             <input type="number" class="form-control" formControlName="mobileNumber" placeholder="Enter mobile number">
             <small class="text-danger" *ngIf="userForm.get('mobileNumber')?.invalid && userForm.get('mobileNumber')?.touched">
@@ -58,7 +60,7 @@
     </div>
 
     <div class="modal-footer">
-      <button type="button" class="btn btn-secondary" (click)="close()">Cancel</button>
+      <button type="button" class="btn btn-danger" (click)="close()">Cancel</button>
       <button type="button" class="btn btn-primary" (click)="save()" [disabled]="userForm.invalid">
         <span *ngIf="!isSubmitting">Save</span>
         <span *ngIf="isSubmitting">Save</span>

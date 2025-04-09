@@ -1,10 +1,10 @@
 <nav class="navbar">
   <div class="navbar-content">
 
-    <div class="logo-mini-wrapper">
+    <!-- <div class="logo-mini-wrapper">
       <img src="images/logo-mini-light.png" class="logo-mini logo-mini-light" alt="logo">
       <img src="images/logo-mini-dark.png" class="logo-mini logo-mini-dark" alt="logo">
-    </div>
+    </div> -->
 
     <!-- <form class="search-form">
       <div class="input-group">
@@ -14,15 +14,15 @@
         <input type="text" class="form-control" id="navbarForm" placeholder="Search here...">
       </div>
     </form> -->
-    <div class="w-40px overflow-hidden ms-3">
+    <!-- <div class="w-40px overflow-hidden ms-3">
       <a routerLink="/" class="sidebar-brand">
         <img src="https://skcet.ac.in/wp-content/uploads/2024/08/skcet-logo.png" alt="logo" class="mt-1 w-200px">
       </a>
-    </div>
+    </div> -->
 
     <ul class="navbar-nav">
       <li class="theme-switcher-wrapper nav-item">
-        <input type="checkbox" (change)="onThemeCheckboxChange($event)" value="" id="theme-switcher">
+        <!-- <input type="checkbox" (change)="onThemeCheckboxChange($event)" value="" id="theme-switcher">
         <label for="theme-switcher">
           <div class="box">
             <div class="ball"></div>
@@ -31,7 +31,7 @@
               <i class="feather icon-moon"></i>
             </div>
           </div>
-        </label>
+        </label> -->
       </li>
       <!-- <li class="nav-item" ngbDropdown>
         <a class="nav-link" ngbDropdownToggle id="languageDropdown" role="button">
@@ -153,10 +153,10 @@
 
       <li class="nav-item nav-profile" ngbDropdown>
         <a class="nav-link w-30px h-30px ms-1 rounded-circle" ngbDropdownToggle id="profileDropdown">
-          <img class="w-30px rounded-circle" src="https://png.pngtree.com/png-clipart/20191120/original/pngtree-outline-user-icon-png-image_5045523.jpg" alt="profile">
+          <img class="w-30px rounded-circle" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="profile">
         </a>
         <div ngbDropdownMenu class="px-0" aria-labelledby="profileDropdown">
-          <div class="d-flex flex-column align-items-center border-bottom px-5 py-3">
+          <!-- <div class="d-flex flex-column align-items-center border-bottom px-5 py-3">
             <div class="mb-3">
               <img class="w-80px h-80px rounded-circle" src="https://placehold.co/80x80" alt="">
             </div>
@@ -164,7 +164,7 @@
               <p class="tx-16 fw-bolder">{{userObj.username}} - {{userObj.mode}}</p>
               <p class="fs-12px text-secondary">{{userObj.email}}</p>
             </div>
-          </div>
+          </div> -->
           <ul class="list-unstyled p-1">
             <!-- <li>
               <a routerLink="" class="dropdown-item py-2 d-flex ms-0">
@@ -173,10 +173,14 @@
               </a>
             </li> -->
             <li>
-              <button type="button" class="dropdown-item py-2 d-flex ms-0 btn btn-link float-end"  (click)="editProfile()">
+              <a (click)="editProfile()" class="dropdown-item py-2 d-flex ms-0">
+                <i class="feather icon-edit mt-0 me-2 icon-md"></i>
+                <span>Edit Profile</span>
+              </a>
+              <!-- <button type="button" class="dropdown-item py-2 d-flex ms-0 btn btn-link float-end"  (click)="editProfile()">
                 <i class="feather icon-edit me-2 icon-md"></i>
                 <span>Edit Profile</span>
-              </button>
+              </button> -->
               <!-- <a href="" (click)="editProfile()" class="dropdown-item py-2 d-flex ms-0">
                 <i class="feather icon-edit me-2 icon-md"></i>
                 <span>Edit Profile</span>
@@ -190,7 +194,7 @@
             </li> -->
             <li>
               <a href="" (click)="onLogout($event)" class="dropdown-item py-2 d-flex ms-0">
-                <i class="feather icon-log-out me-2 icon-md"></i>
+                <i class="feather icon-log-out mt-0 me-2 icon-md"></i>
                 <span>Log Out</span>
               </a>
             </li>
@@ -199,9 +203,9 @@
       </li>
     </ul>
 
-    <a href="" class="sidebar-toggler" (click)="toggleSidebar($event)">
+    <!-- <a href="" class="sidebar-toggler" (click)="toggleSidebar($event)">
       <i class="feather icon-menu"></i>
-    </a>
+    </a> -->
 
   </div>
 </nav>

@@ -5,7 +5,6 @@
     padding-top: 65px !important;
 }
 
-
 .sidebar .sidebar-body .sidebar-nav .nav-item {
     position: relative;
     padding: 5px 0 !important;
@@ -16,14 +15,17 @@
     color: #3c4858;
     text-transform: capitalize;
     font-size: 13px;
-    padding: 10px 15px;
+    padding: 10px 10px;
+    height: unset !important;
+}
+.sidebar .sidebar-body .sidebar-nav .nav-item > .nav-link .link-title {
+    margin-left: 25px;
+}
+.sidebar .sidebar-body .sidebar-nav .nav-item:hover > .nav-link .link-title {
+    margin-left: 26px;
 }
 .sidebar .sidebar-body .sidebar-nav .nav-item.mm-active > .nav-link, .sidebar .sidebar-body .sidebar-nav .nav-item:hover .nav-link {
     background-color: $primary;
     box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgb(0 77 163 / 41%);
     color: #fff;
-}
-
-.sidebar .sidebar-body .sidebar-nav .nav-item > .nav-link{
-    height: unset !important    ;
 }

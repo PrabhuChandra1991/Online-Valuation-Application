@@ -80,8 +80,8 @@ export class TemplateManagementService {
     return this.http.get(`${this.apiUrl}/api/QpTemplate/AssignQPForScrutinity/${userId}/${userQPTemplateId}`);
   }
 
-  printQPTemplate(userqpTemplateId : number): Observable<any> {
-    return this.http.get(`${this.apiUrl}/api/QpTemplate/PrintSelectedQP/${userqpTemplateId}/1222/true`);
+  printQPTemplate(userqpTemplateId : number,isForPrint:boolean): Observable<any> {
+    return this.http.get(`${this.apiUrl}/api/QpTemplate/PrintSelectedQP/${userqpTemplateId}/1222/${isForPrint}`);
   }
 
 }

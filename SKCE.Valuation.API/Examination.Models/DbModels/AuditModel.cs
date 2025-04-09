@@ -1,7 +1,6 @@
-﻿
-namespace SKCE.Examination.Models.DbModels.Common
+﻿namespace SKCE.Examination.Models.DbModels
 {
-  public  class AuditModel
+    public abstract class AuditModel
     {
         public bool IsActive { get; set; }
         public long CreatedById { get; set; }

@@ -1,5 +1,5 @@
 ﻿
-using SKCE.Examination.Models.DbModels.Common;
+using SKCE.Examination.Models.DbModels;
 
 namespace SKCE.Examination.Services.ViewModels.QPSettings
 {

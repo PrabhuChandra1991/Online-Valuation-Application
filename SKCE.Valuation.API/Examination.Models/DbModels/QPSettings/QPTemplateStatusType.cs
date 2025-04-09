@@ -1,5 +1,4 @@
-﻿using SKCE.Examination.Models.DbModels.Common;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -9,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SKCE.Examination.Models.DbModels.QPSettings
 {
-        [Table("QPTemplateStatusType", Schema = "dbo")]
+    [Table("QPTemplateStatusType", Schema = "dbo")]
         public class QPTemplateStatusType : AuditModel
         {
 

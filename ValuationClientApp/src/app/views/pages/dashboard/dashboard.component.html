@@ -160,7 +160,7 @@
               </div>
             </div>
   <!-- Designation Section -->
-  <h6 class="mt-4">Designation Experience </h6>
+  <h6 class="mt-4">Designation and Experience </h6>
   <button type="button" class="btn btn-link float-end" (click)="openDesignationModal()" *ngIf="!isMaxReached">
     Add Designation
   </button>
@@ -200,7 +200,7 @@
                 <th>Course Name</th>
                 <th>Degree Type</th>
                 <th>Years Handled</th>
-                <th>Handled in Last 2 Semesters</th>
+                <th>No. of Semesters Handled</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -361,7 +361,7 @@
         </span>
       </div>
       <div class="mb-3">
-        <label>Experience <span class="text-danger">*</span></label>
+        <label>Experience in Years(decimal points allowed) <span class="text-danger">*</span></label>
         <input type="number" class="form-control" formControlName="experience" />
         <span class="text-danger" *ngIf="designationForm.controls.experience.touched &&
         (designationForm.controls.experience.errors?.['required'] ||

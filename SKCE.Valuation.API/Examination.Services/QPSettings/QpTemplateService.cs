@@ -2085,7 +2085,6 @@ namespace SKCE.Examination.Services.QPSettings
         }
         public async Task<bool?> PrintSelectedQPAsync(long userqpTemplateId, string qpCode, bool isForPrint)
         {
-            //TODO which we need to pass from UI
             Random random = new Random();
             int randomNumber = random.Next(1000, 10000);
             qpCode = randomNumber.ToString();

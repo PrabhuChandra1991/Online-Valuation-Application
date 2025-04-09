@@ -23,20 +23,20 @@ export const MENU: MenuItem[] = [
   },
 
 {
-    label: 'Template Assignment',
+    label: 'Question Paper Management',
     icon: 'check-square',
     link: '/apps/assigntemplate',
     role: [1]
   },
-  {
-    label: 'Template Management',
-    icon: 'clipboard',
-    link: '/apps/qptemplate',
-    role: [1]
-  },
+  // {
+  //   label: 'Question Paper Status',
+  //   icon: 'clipboard',
+  //   link: '/apps/qptemplate',
+  //   role: [1]
+  // },
 
   {
-    label: 'Assigned Template',
+    label: 'Assigned Question Papers',
     icon: 'list',
     link: '/apps/assigntemplate',
     role: [2]

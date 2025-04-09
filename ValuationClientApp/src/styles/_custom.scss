@@ -71,8 +71,8 @@ table tr, table td {
     border-spacing: 0 !important;
     background-color: #f2f2f2 !important;
     border: 1px solid #c7c7c7 !important;
-    border-top-left-radius: 1rem !important;
-    border-top-right-radius: 1rem !important;    
+    border-top-left-radius: 0.7rem !important;
+    border-top-right-radius: 0.7rem !important;    
     //border-style: hidden !important;
 }
 .table-responsive .mat-mdc-header-row, .table-responsive .mat-mdc-row {
@@ -86,15 +86,15 @@ table tr, table td {
 }
 
 
-.pagination .mat-mdc-paginator {
+.pagination .mat-mdc-paginator, .pagination .mat-mdc-form-field {
     font-family: $font-family-nunito-sans !important;
 }
 .pagination {
     font-size: 14px !important;
     background-color: #ffffff !important;
     border:1px solid #c7c7c7 !important;
-    border-bottom-left-radius: 1rem;
-    border-bottom-right-radius: 1rem;
+    border-bottom-left-radius: 0.7rem;
+    border-bottom-right-radius: 0.7rem;
 }
 .pagination .mdc-text-field {
     border: 0 !important;
@@ -111,6 +111,12 @@ table tr, table td {
 }
 .pagination .mat-mdc-select {
     font-size: 14px !important;
+}
+
+@media only screen and (max-width: 770px) {
+    .mat-mdc-paginator-page-size-label {
+        display: none;
+    }
 }
 
 .mdc-checkbox__background {

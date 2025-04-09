@@ -36,8 +36,8 @@
             "assets": [
               {
                 "glob": "**/*",
-                "input": "src/assets/",
-                "output": "/assets/"
+                "input": "src/images/",
+                "output": "/images/"
               },
               {
                 "glob": "**/*",

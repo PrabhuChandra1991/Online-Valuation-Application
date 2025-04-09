@@ -1,4 +1,4 @@
-import { AfterViewInit, OnInit, Component, TemplateRef, ViewChild, ElementRef} from '@angular/core';
+import { OnInit, Component, TemplateRef, ViewChild, ElementRef} from '@angular/core';
 import { NgbDropdownModule, NgbNavModule, NgbTooltip, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { TemplateManagementService } from '../../../services/template-management.service';
@@ -11,8 +11,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatSort, MatSortModule } from '@angular/material/sort';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import { InstituteService } from '../../../services/institute.service';
 import { QPDocumentService } from '../../../services/qpdocument.service';
@@ -28,14 +28,17 @@ import { QPDocumentService } from '../../../services/qpdocument.service';
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    MatFormFieldModule, MatInputModule, MatTableModule, MatSortModule, MatPaginatorModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatSortModule,
     MatCheckboxModule
-
-],
+  ],
   templateUrl: './template-assignment.component.html',
   styleUrl: './template-assignment.component.scss'
 })
-export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
+export class TemplateAssignmentComponent implements OnInit {
 [x: string]: any;
 
   isAdmin: Boolean;
@@ -63,9 +66,11 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
     institutionId:number;
     displayedColumns: string[] = ['qpTemplateName','courseCode','courseName','qpTemplateStatusTypeName','actions'];
     dataSource = new MatTableDataSource<any>([]);
-      @ViewChild(MatPaginator) paginator: MatPaginator;
-        @ViewChild(MatSort) sort: MatSort;
-  selectedAssignment: any | null ;
+
+    @ViewChild(MatPaginator) paginator: MatPaginator;
+    @ViewChild(MatSort) sort: MatSort;
+
+    selectedAssignment: any | null ;
     modalRef!: NgbModalRef;
     @ViewChild('assignmentModal') assignmentModal: any;
     @ViewChild('course') courseInput!: ElementRef;
@@ -96,8 +101,7 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
       private instituteService: InstituteService,
       private toastr: ToastrService,
       private route: ActivatedRoute,
-    private qpDocumentService: QPDocumentService    ) {
-
+      private qpDocumentService: QPDocumentService    ) {
 
     }
 
@@ -135,16 +139,10 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
 
     }
 
-  ngAfterViewInit(): void {
-
-    // Show the chat-coloadAssignedTemplatesntent when a chat-item is clicked on tablet and mobile devices
-    // document.querySelectorAll('.chat-list .chat-item').forEach(item => {
-    //   item.addEventListener('click', event => {
-    //     document.querySelector('.chat-content')!.classList.toggle('show');
-    //   })
-    // });
-
-  }
+  // ngAfterViewInit(): void {
+  //   this.dataSource.paginator = this.paginator;
+  //   this.dataSource.sort = this.sort;
+  // }
 
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
@@ -228,7 +226,7 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
     });
   }
 
-  loadTemplateaForInstitute(institutionId:number): void {     
+  loadTemplateaForInstitute(institutionId:number): void {    
     //let institutionId = 2;
     this.isInstitutionLoaded=false;
         this.spinnerService.toggleSpinnerState(true);
@@ -263,7 +261,6 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
 
   loadAssignedTemplates(): void {
     const loggedData = localStorage.getItem('userData');
-    
     if (loggedData) {
       const userData = JSON.parse(loggedData);
 
@@ -272,7 +269,7 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
           this.templates = data;
           this.dataSource.data = this.templates;
           this.dataSource.paginator = this.paginator;
-         this.dataSource.sort = this.sort;
+          this.dataSource.sort = this.sort;
           console.log('assigned qp templated loaded:', this.templates);
         },
         error: (error) => {
@@ -777,5 +774,3 @@ isUserAlreadySelected(qpAssignedUsers: any[], userId: number, currentIndex: numb
   }
 
 }
-
-

@@ -154,6 +154,8 @@ export class DashboardComponent implements OnInit   {
     userDesignationId: 0,
     designationId: designation.DesignationId,
     userId: this.selectedUserId,
+    collegeName:'',
+    departmentName: '',    
     experience: 0,
     isCurrent: false
   }));
@@ -188,6 +190,8 @@ export class DashboardComponent implements OnInit   {
 
     this.designationForm = this.fb.group({
       expName: ['', Validators.required],
+      collegeName: [''],
+      departmentName: [''],
       experience: ['', [Validators.required, Validators.min(1)]],
       isCurrent: [false]
     });
@@ -521,6 +525,8 @@ saveExperience() {
 
     // Update the existing Qualification
     this.designations[this.selectedDesignationIndex].designationId = this.designationForm.value.expName;
+    this.designations[this.selectedDesignationIndex].collegeName = this.designationForm.value.collegeName;
+    this.designations[this.selectedDesignationIndex].departmentName = this.designationForm.value.departmentName;    
     this.designations[this.selectedDesignationIndex].experience = this.designationForm.value.experience;
     this.designations[this.selectedDesignationIndex].isCurrent = this.designationForm.value.isCurrent;
 
@@ -546,6 +552,8 @@ saveExperience() {
     let newDesignation: UserDesignation = {
       userDesignationId:0,
       designationId: this.designationForm.value.expName,
+      collegeName: this.designationForm.value.collegeName,
+      departmentName: this.designationForm.value.departmentName,      
       userId: this.selectedUserId,
       experience: this.designationForm.value.experience,
       isCurrent: this.designationForm?.value?.isCurrent?this.designationForm?.value?.isCurrent: false,

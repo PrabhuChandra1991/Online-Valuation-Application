@@ -5,9 +5,8 @@ import { NgApexchartsModule } from 'ng-apexcharts';
 import { CommonModule } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 import { UserService } from '../services/user.service';
-import { MatIcon } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import {MatButtonModule} from '@angular/material/button';
+import { ActivatedRoute } from '@angular/router';
 import { DashboardService } from '../services/dashboard.service';
 import { UserAreaOfSpecialization  } from '../models/userAreaOfSpecialization.model';
 import { UserDesignation } from '../models/userDesignation.model';
@@ -32,10 +31,9 @@ const currentDate = new Date().toISOString();
     NgbDatepickerModule,
     NgApexchartsModule,
     CommonModule,
-    MatIcon,
     MatCheckboxModule,
-    MatButtonModule,
     RouterLink,
+    MatCheckboxModule
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
@@ -329,6 +327,9 @@ export class DashboardComponent implements OnInit   {
 
        if(selectedUser)
        {
+        // this.userForm.controls['name'].disable();
+        // this.userForm.controls['mobileNumber'].disable();
+        // this.userForm.controls['email'].disable();
         this.selectedUser = selectedUser;
 
         //assign child elements dynamically

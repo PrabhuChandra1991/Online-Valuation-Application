@@ -16264,7 +16264,7 @@ full-calendar.fc .btn-group-vertical > .btn-group:not(:first-child) > .fc-button
   }
 }
 [data-bs-theme=light] {
-  --bs-app-bg: #f9fafb;
+  --bs-app-bg: #f1f4fa;
   --bs-box-shadow: 0 0.5rem 1rem rgba(183, 192, 206, 0.2);
   --bs-box-shadow-sm: 0 0.125rem 0.25rem rgba(183, 192, 206, 0.2);
   --bs-box-shadow-lg: 0 1rem 2rem rgba(183, 192, 206, 0.6);
@@ -18946,12 +18946,6 @@ th[sortable].desc:before {
   .timeline .event:after {
     right: -31.8px;
   }
-}
-
-.auth-page .auth-side-wrapper {
-  width: 100%;
-  height: 100%;
-  background-size: cover;
 }
 
 .chat-wrapper {

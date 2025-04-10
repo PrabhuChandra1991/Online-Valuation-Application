@@ -1,11 +1,9 @@
 import { MenuItem } from './menu.model';
 
 export const MENU: MenuItem[] = [
-
   {
     label: 'User Management',
     icon: 'home',
-
     link: '/apps/user',
     role: [1]
   },
@@ -21,20 +19,18 @@ export const MENU: MenuItem[] = [
     link: '/apps/importhistory',
     role: [1]
   },
-
-{
+  {
     label: 'Question Paper Management',
     icon: 'check-square',
     link: '/apps/assigntemplate',
     role: [1]
   },
-  // {
-  //   label: 'Question Paper Status',
-  //   icon: 'clipboard',
-  //   link: '/apps/qptemplate',
-  //   role: [1]
-  // },
-
+  {
+    label: 'Question Paper Status',
+    icon: 'clipboard',
+    link: '/apps/qptemplate',
+    role: [1]
+  },
   {
     label: 'Assigned Question Papers',
     icon: 'list',

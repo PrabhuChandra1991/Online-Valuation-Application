@@ -58,3 +58,8 @@
 /SKCE.Valuation.API/Examination.Models/obj/project.nuget.cache
 /SKCE.Valuation.API/.vs/SKCE.Examination/copilot-chat/6f55d49d/sessions/26628185-fab9-4bb7-9782-5e10c1435d2c
 /SKCE.Valuation.API/Examination.Services/bin/Release/net8.0/SyllabusDocumentTemplate/Syllabus_sample template.doc
+SKCE.Valuation.API/SKCE.Valuation.API/appsettings.Development.json
+Database/SECE.Database/SKCE_1.Examination.Database.publish.xml
+Database/SECE.Database/SKCE.Examination.Database.publish.xml
+SKCE.Valuation.API/SKCE.Valuation.API/appsettings.Development.json
+ValuationClientApp/package-lock.json

@@ -1,4 +1,44 @@
-input[type=text], input[type=number],input[type=text], input[type=date]
-    input[type=checkbox]input[type=email]{
-        border: .25px solid #004da3;
-    }
+// input[type=text], input[type=number],input[type=text], input[type=date]
+//     input[type=checkbox]input[type=email]{
+//         border: .25px solid #004da3;
+//     }
+
+.card-body {
+    padding-top: 2rem !important;
+}
+
+table tr, table td {
+    border: 0 !important;
+}
+
+table th {
+    padding-bottom: 0.5rem !important;
+    padding-left: 0 !important;
+}
+
+table tbody td {
+    padding: 0.5rem;
+    //padding: 0.75rem 0.75rem 0 0.85rem;
+}
+
+table tbody button {
+    padding: 0;
+}
+
+
+.container h5 {
+    text-transform: uppercase;
+}
+.col-action {
+    text-align: center;
+    width: 150px;
+}
+
+.card .readonly {
+    background-color: #e9ecef !important;
+    cursor: default !important;
+}
+
+// .container {
+//     border-bottom: 1px solid #c7c7c7 !important;
+// }

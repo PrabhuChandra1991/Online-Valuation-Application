@@ -19,5 +19,7 @@ namespace SKCE.Examination.Models.DbModels.Common
         public long UserId { get; set; }
         public long Experience { get; set; }
         public bool IsCurrent { get; set; }
+        public string? CollegeName { get; set; }
+        public string? DepartmentName { get; set; }
     }
 }

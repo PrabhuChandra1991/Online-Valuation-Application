@@ -349,7 +349,96 @@
                   </div>
                 </div>
               </div>
+            </div>
+  <!-- Designation Section -->
+  <h6 class="mt-4">Designation and Experience </h6>
+  <button type="button" class="btn btn-link float-end" (click)="openDesignationModal()" *ngIf="!isMaxReached">
+    Add Designation
+  </button>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Designation</th>
+        <th>Experience</th>
+        <th>Is Current</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let exp of designations; let i = index">
+        <td>{{ getDesignationName(exp.designationId) }}</td>
+        <td>{{ exp.experience }}</td>
+        <!-- <td>{{ exp.isCurrent }}</td> -->
+        <td><mat-icon [style.color]="exp.isCurrent ? 'green' : 'red'">
+          {{ exp.isCurrent ? 'check_circle' : 'cancel' }}
+        </mat-icon></td>
+        <td>
+          <button (click)="editExperience(i)" mat-icon-button color="primary"><mat-icon>edit</mat-icon></button>
+          <button (click)="deleteExperience(i)" mat-icon-button color="danger"><mat-icon>delete</mat-icon></button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+            <!-- User Courses Table -->
+          <h6 class="mt-4"> Course Handled
+            <button type="button" class="btn btn-link float-end" (click)="openUserCourseModal()">
+              Add Course
+            </button>
+          </h6>
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Course Name</th>
+                <th>Degree Type</th>
+                <th>Years Handled</th>
+                <th>No. of Semesters Handled</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let course of userCourses; let i = index">
+                <td>{{ course.courseName }}</td>
+                <td>{{ getDegreeTypeName(course.degreeTypeId) }}</td>
+                <td>{{ course.numberOfYearsHandled }}</td>
+                <!-- <td>{{ course.isHandledInLast2Semester ? 'Yes' : 'No' }} -->
 
+                <td><mat-icon [style.color]="course.isHandledInLast2Semester ? 'green' : 'red'">
+                  {{ course.isHandledInLast2Semester ? 'check_circle' : 'cancel' }}
+                </mat-icon></td>
+                <td>
+                  <button (click)="editUserCourse(i)" mat-icon-button color="primary"><mat-icon>edit</mat-icon></button>
+                  <button (click)="deleteUserCourse(i)" mat-icon-button color="danger"><mat-icon>delete</mat-icon></button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+            <!-- Area of Specialization Section -->
+            <h6 class="mt-4">Area of Specialization
+              <button type="button" class="btn btn-link float-end" (click)="openSpecializationModal()">
+                Add Specialization
+              </button>
+            </h6>
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Area of Specialization</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let specialization of specializations; let i = index">
+                  <td>{{ specialization.areaOfSpecializationName }}</td>
+
+                  <!-- <td>{{ specialization.experience }}</td>
+                  <td>{{ specialization.handledLastTwoSemesters ? 'Yes' : 'No' }}</td> -->
+                  <td>
+                    <button (click)="editSpecialization(i)" mat-icon-button color="primary"><mat-icon>edit</mat-icon></button>
+                    <button (click)="deleteSpecialization(i)" mat-icon-button color="danger"><mat-icon>delete</mat-icon></button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
               <div class="container">
                 <div class="row">
                   <div class="col-md-10"></div>
@@ -405,13 +494,13 @@
           </select>
           <span class="text-danger" *ngIf="designationForm.controls.expName.touched &&
         (designationForm.controls.expName.errors?.['required'] )">
-            Designation is required.
-          </span>
-        </div>
-        <div class="mb-3">
-          <label>Experience in Years(decimal points allowed) <span class="text-danger">*</span></label>
-          <input type="number" class="form-control" formControlName="experience" />
-          <span class="text-danger" *ngIf="designationForm.controls.experience.touched &&
+        Designation is required.
+        </span>
+      </div>
+      <div class="mb-3">
+        <label>Experience in Years(decimal points allowed) <span class="text-danger">*</span></label>
+        <input type="number" class="form-control" formControlName="experience" />
+        <span class="text-danger" *ngIf="designationForm.controls.experience.touched &&
         (designationForm.controls.experience.errors?.['required'] ||
         designationForm.controls.experience.errors?.['min'])">
             Experience is required. Minimum value is 1.

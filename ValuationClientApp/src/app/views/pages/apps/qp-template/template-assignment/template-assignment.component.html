@@ -334,11 +334,25 @@
                       </select>
                     </div>
                   </div>
-                  <div class="col-sm-3 d-flex align-items-center">
-                    <button class="btn btn-sm btn-primary" [disabled]="assignedScrutinyUser.userQPTemplateId !== 0"
-                      (click)="assignScrutinity(assignedScrutinyUser)">
-                      Assign Scrutinity
-                    </button>
+                  <div class="row" >
+                    <div class="col-sm-4">
+                      {{assignedScrutinyUser.statusTypeName}}
+                    </div>
+                    <div class="col-sm-4" *ngIf="assignedScrutinyUser.statusTypeId === 11">
+                      <a target="_blank" href="{{assignedScrutinyUser.submittedQPDocumentUrl}}">{{assignedScrutinyUser.submittedQPDocumentName}}</a>
+                    </div>
+                    <div class="col-sm-4" *ngIf="assignedScrutinyUser.statusTypeId === 11">
+                      <button class="btn btn-sm btn-primary"
+                              (click)="printQPDocument(assignedUser.userQPTemplateId,false)">
+                        Preview
+                      </button>
+                      &nbsp;&nbsp;&nbsp;    
+                      <button class="btn btn-sm btn-primary"
+                              (click)="printQPDocument(assignedScrutinyUser.userQPTemplateId,true)">
+                        Print
+                      </button>
+                    </div> 
+                    <br> 
                   </div>
                 </div>
                 <div class="row">

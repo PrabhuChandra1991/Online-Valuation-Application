@@ -39,7 +39,7 @@ namespace SKCE.Examination.Services.Common
         {
             var department = await _context.Departments.FindAsync(id);
             if (department == null) return false;
-            AuditHelper.SetAuditPropertiesForUpdate(department, department.ModifiedById);
+            AuditHelper.SetAuditPropertiesForUpdate(department, updatedDepartment.ModifiedById);
             department.Name = updatedDepartment.Name;
             department.ShortName = updatedDepartment.ShortName;
 

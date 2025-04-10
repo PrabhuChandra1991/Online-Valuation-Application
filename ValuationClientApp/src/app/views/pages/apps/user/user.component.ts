@@ -30,6 +30,7 @@ import { SpinnerService } from '../../services/spinner.service';
   templateUrl: './user.component.html',
   styleUrl: './user.component.scss'
 })
+
 export class UserComponent implements OnInit{
 
   users: any[] = [];
@@ -101,12 +102,10 @@ export class UserComponent implements OnInit{
     this.router.navigate(['/dashboard/edit', userId]);
   }
 
-
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
-
 
   openCreateUserDialog() {
   // Ensure it's empty for new user
@@ -132,26 +131,24 @@ export class UserComponent implements OnInit{
       // Create logic
       this.createUser(userData);
     }
-
   }
 
   createUser(userData: any) {
-
     this.spinnerService.toggleSpinnerState(true);
     this.isSubmitting = true;
     const userObj: UserProfile = {
 
           userId: 0,
-          name: userData.name || '',
-          email: userData.email || '',
           gender:  '',
           salutation: '',
+          name: userData.name || '',
+          email: userData.email || '',          
           mobileNumber:userData.mobileNumber.toString() || '',
+          departmentName: userData.departmentName || '',
+          collegeName: userData.collegeName || '',
           roleId: 2,
           mode:'',
-          totalExperience: 0,
-          departmentName: '',
-          collegeName: '',
+          totalExperience: 0,          
           bankAccountName: '',
           bankName : '',
           bankAccountNumber: '',
@@ -169,8 +166,8 @@ export class UserComponent implements OnInit{
           modifiedDate:'',
         };
 
-        console.log('userObj', JSON.stringify(userObj));
-    this.userService.addUser(userObj).subscribe({
+      console.log('userObj', JSON.stringify(userObj));
+      this.userService.addUser(userObj).subscribe({
       next: () => {
         this.toastr.success('User added successfully!');
         this.loadUsers();
@@ -180,7 +177,6 @@ export class UserComponent implements OnInit{
       error: (res) => {
         this.toastr.error(res['error']['message']);
         this.spinnerService.toggleSpinnerState(false);
-
       },
       complete: () => {
         this.isSubmitting = false;

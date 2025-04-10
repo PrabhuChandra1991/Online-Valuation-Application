@@ -15,7 +15,7 @@ import { UserQualification } from '../models/userQualification';
 import { User } from '../models/user.model';
 import { UserCourse } from '../models/userCourse.model';
 import { SpinnerService } from '../services/spinner.service';
-
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 const currentDate = new Date().toISOString();
 
@@ -31,6 +31,8 @@ const currentDate = new Date().toISOString();
     NgbDatepickerModule,
     NgApexchartsModule,
     CommonModule,
+    MatCheckboxModule,
+    RouterLink,
     MatCheckboxModule
   ],
   templateUrl: './dashboard.component.html',
@@ -166,7 +168,8 @@ export class DashboardComponent implements OnInit   {
     private toastr: ToastrService,
     private route: ActivatedRoute,
     private dashboardService: DashboardService,
-    private spinnerService: SpinnerService
+    private spinnerService: SpinnerService,
+    private router: Router
   ) {
 
      // Initialize the form with validation
@@ -915,7 +918,17 @@ validateTableData(): boolean {
     this.userService.updateUser(userData.userId, userData).subscribe({
       next: () => {
         this.toastr.success('User updated successfully!');
-
+        let  loggedUserData = null;
+      
+         const userDataString = localStorage.getItem('userData');
+         loggedUserData = userDataString ? JSON.parse(userDataString) : null;
+        
+         if (localStorage.getItem('isLoggedin') === 'true') {
+          if(loggedUserData.roleId == 1)
+            this.router.navigate(['/apps/user']);
+          else
+            this.router.navigate(['/apps/assigntemplate']);
+           }
       },
       error: () => {
         this.toastr.error('Failed to update user. Please try again.');

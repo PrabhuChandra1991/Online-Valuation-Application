@@ -20,20 +20,19 @@ export const MENU: MenuItem[] = [
     role: [1]
   },
   {
-    label: 'Quest. Paper Management',
+    label: 'Question Paper Management',
     icon: 'check-square',
     link: '/apps/assigntemplate',
     role: [1]
   },
   {
-    label: 'Quest. Paper Status',
+    label: 'Question Paper Status',
     icon: 'clipboard',
     link: '/apps/qptemplate',
     role: [1]
   },
-
   {
-    label: 'Assigned Quest. Papers',
+    label: 'Assigned Question Papers',
     icon: 'list',
     link: '/apps/assigntemplate',
     role: [2]

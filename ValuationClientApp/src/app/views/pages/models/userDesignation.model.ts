@@ -2,6 +2,8 @@ export interface UserDesignation {
     userDesignationId: number;
     designationId: number;
     userId: number;
+    collegeName: string;
+    departmentName: string;    
     experience: number;
     isCurrent: boolean;
     isActive: boolean;

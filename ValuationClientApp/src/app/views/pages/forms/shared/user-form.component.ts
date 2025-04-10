@@ -25,8 +25,8 @@ export class UserFormComponent {
       name: [{ value: '', disabled: this.isEditMode }, Validators.required],
       email: [{ value: '', disabled: this.isEditMode }, [Validators.required, Validators.email]],
       mobileNumber: [{ value: '', disabled: this.isEditMode }, [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
-      collegeName: [{ value: '', disabled: this.isEditMode }],
-      departmentName: [{ value: '', disabled: this.isEditMode }],
+      collegeName: [''],
+      departmentName: [''],
       qualification: [''],
       workExperience: [0, [Validators.min(0)]]      
     });

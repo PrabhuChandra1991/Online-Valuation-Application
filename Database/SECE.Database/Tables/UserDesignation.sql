@@ -4,8 +4,6 @@
 	[DesignationId] BIGINT NOT NULL,
 	[UserId] BIGINT NOT NULL FOREIGN KEY (UserId) REFERENCES [User](UserId),
 	[Experience] BIGINT NOT NULL,
-	[CollegeName] NVARCHAR(255) NULL,
-	[Department] NVARCHAR(255) NULL,
 	[IsCurrent] BIT  NULL,
 	IsActive BIT DEFAULT 1,
     CreatedDate DATETIME DEFAULT GETDATE(),

@@ -1,7 +1,7 @@
 <div class="container">
   <div class="row col-8">
     <div class="col-md-3" *ngIf="isAdmin">
-      <button class="btn btn-primary " (click)="openAssignModal(lgModal)">Assign Template</button>
+      <button class="btn btn-primary " (click)="openAssignModal(lgModal)">Assign Question Paper</button>
     </div>
     <div class="institute" *ngIf="isAdmin">
       <div class="col-md-2 mt-2 px-3">
@@ -152,7 +152,7 @@
 <!-- Lg Modal -->
 <ng-template #lgModal let-modal>
   <div class="modal-header">
-    <h5 class="modal-title" id="exampleModalLabel">Assign Template</h5>
+    <h5 class="modal-title" id="exampleModalLabel">Question Paper Assignment</h5>
     <button type="button" class="btn-close" (click)="modal.close('by: close icon')" aria-label="Close"></button>
   </div>
   <div class="modal-body">

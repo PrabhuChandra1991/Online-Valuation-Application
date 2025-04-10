@@ -23,7 +23,7 @@ namespace SKCE.Examination.API.Controllers.Common
 
 
             if (tempPassword == null)
-                return BadRequest(new ResultModel { Message = "Invalid email ID." });
+                return BadRequest(new ResultModel { Message = "Invalid Email Id or Your account is in disabled state." });
 
             return Ok(new ResultModel { Message= "Temporary password sent to your email." });
         }

@@ -113,18 +113,18 @@
                   </td>
                   }
                   @else{
-                    <td mat-cell *matCellDef="let element">
+                    <td mat-cell *matCellDef="let element" >
                       <br>
-                      <button class="btn btn-sm btn-primary" (click)="openDocUploadModal(lgDocModal,element.userQPTemplateId)"
+                      <button *ngIf="element.qpTemplateStatusTypeId === 8 || element.qpTemplateStatusTypeId === 10" class="btn btn-sm btn-primary" (click)="openDocUploadModal(lgDocModal,element.userQPTemplateId)"
                         [disabled]="element.qpTemplateStatusTypeId === 9 || element.qpTemplateStatusTypeId === 11">
                         Upload generated QP
                       </button>
                       <br>
-                      <a target="_blank" download  href="{{element.qpDocumentUrl}}">
+                      <a *ngIf="element.qpTemplateStatusTypeId === 8 || element.qpTemplateStatusTypeId === 10" target="_blank" download  href="{{element.qpDocumentUrl}}">
                         Download QP template
                       </a> 
                       <br>
-                      <a target="_blank" download  href="{{element.courseSyllabusDocumentUrl}}">
+                      <a *ngIf="element.qpTemplateStatusTypeId === 8 || element.qpTemplateStatusTypeId === 10" target="_blank" download  href="{{element.courseSyllabusDocumentUrl}}">
                         Download Syllabus
                       </a>      
                   </td>

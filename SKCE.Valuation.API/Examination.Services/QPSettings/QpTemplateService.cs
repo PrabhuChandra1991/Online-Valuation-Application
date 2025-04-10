@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SKCE.Examination.Models.DbModels.Common;
 using SKCE.Examination.Models.DbModels.QPSettings;
-using SKCE.Examination.Services.ServiceContracts;
 using SKCE.Examination.Services.ViewModels.QPSettings;
 using AutoMapper;
 using SKCE.Examination.Services.Helpers;
@@ -10,26 +9,12 @@ using Microsoft.Extensions.Configuration;
 using Spire.Doc;
 using Document = Spire.Doc.Document;
 using Spire.Doc.Documents;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Linq;
 using Azure.Storage.Blobs;
 using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Spreadsheet;
-using Syncfusion.Pdf;
-using System.Buffers;
 using Syncfusion.DocIO.DLS;
 using Syncfusion.DocIO;
-using DocumentFormat.OpenXml.Bibliography;
-using DocumentFormat.OpenXml.Presentation;
-using Text = DocumentFormat.OpenXml.Presentation.Text;
-using Microsoft.AspNetCore.Http;
-using DocumentFormat.OpenXml.Office.SpreadSheetML.Y2023.MsForms;
-using DocumentFormat.OpenXml.Office2010.Word;
-using DocumentFormat.OpenXml.ExtendedProperties;
-using System.Threading.Tasks;
 using Spire.Doc.Collections;
 using Spire.Doc.Fields;
-using DocumentFormat.OpenXml.InkML;
 namespace SKCE.Examination.Services.QPSettings
 {
     public class QpTemplateService 
@@ -1972,6 +1957,11 @@ namespace SKCE.Examination.Services.QPSettings
                 await _context.SaveChangesAsync();
                 var document = _context.Documents.FirstOrDefault(d => d.DocumentId == documentId);
                 SaveBookmarksToDatabaseByFilePath(document?.Name, userQPTemplateId, documentId);
+                //disable user if all assigned QP's are submitted.
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId == userQPTemplate.UserId);
+                if (user != null && !_context.UserQPTemplates.Any(u => u.UserId == userQPTemplate.UserId && (u.QPTemplateStatusTypeId == 8 || u.QPTemplateStatusTypeId == 10)))
+                    user.IsActive = false;
+                await _context.SaveChangesAsync();
                 return true;
             }
         }
@@ -2028,6 +2018,11 @@ namespace SKCE.Examination.Services.QPSettings
             userQPTemplate.QPTemplateStatusTypeId = 11;//Scrutinized QP Submitted
             userQPTemplate.SubmittedQPDocumentId = (documentId == 0) ? userQPTemplate.SubmittedQPDocumentId : documentId;
             AuditHelper.SetAuditPropertiesForUpdate(userQPTemplate, 1);
+            await _context.SaveChangesAsync();
+            //disable user if all assigned QP's are submitted.
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId == userQPTemplate.UserId);
+            if (user != null && !_context.UserQPTemplates.Any(u => u.UserId == userQPTemplate.UserId && (u.QPTemplateStatusTypeId == 8 || u.QPTemplateStatusTypeId == 10)))
+                user.IsActive = false;
             await _context.SaveChangesAsync();
             return true;
         }

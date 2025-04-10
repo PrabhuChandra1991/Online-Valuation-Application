@@ -20,7 +20,7 @@ namespace SKCE.Examination.Services.Common
 
         public async Task<string?> GenerateTempPasswordAsync(string email)
         {
-            var user = _context.Users.FirstOrDefault(u => u.Email == email);
+            var user = _context.Users.FirstOrDefault(u => u.Email == email && u.IsActive);
             if (user == null)
                 return null;
 

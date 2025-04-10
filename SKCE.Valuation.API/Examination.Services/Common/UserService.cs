@@ -74,6 +74,7 @@ namespace SKCE.Examination.Services.Common
 
         public async Task<User> UpdateUserAsync(User user)
         {
+            user.IsActive = true;
             AuditHelper.SetAuditPropertiesForUpdate(user, 1);
             foreach (var userCourse in user.UserCourses)
             {

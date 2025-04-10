@@ -261,18 +261,20 @@ namespace SKCE.Examination.Services.Helpers
                 }
 
                 var previewdocPath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}_{2}.docx", bookmarkUpdates["COURSECODE"], qPTemplate.QPCode, DateTime.Now.ToString("ddMMyyyyhhmmss")));
+                templateDoc.Watermark = null;
                 templateDoc.SaveToFile(previewdocPath, FileFormat.Docx);
 
-                //// Remove evaluation watermark from the output document By OpenXML
+                ////// Remove evaluation watermark from the output document By OpenXML
                 RemoveTextFromDocx(previewdocPath, "Evaluation Warning: The document was created with Spire.Doc for .NET.");
-                Console.WriteLine("Bookmarks replaced successfully!");
+                //Console.WriteLine("Bookmarks replaced successfully!");
 
                 // Save the modified document as PDF
                 var previewPdfPath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}_{2}.pdf", bookmarkUpdates["COURSECODE"], qPTemplate.QPCode, DateTime.Now.ToString("ddMMyyyyhhmmss")));
                 ConvertToPdfBySyncfusion(previewdocPath, previewPdfPath);
-                
-                //Need to test pdf without using Sync fusion
-                //templateDoc.SaveToFile(previewPdfPath, FileFormat.PDF);
+
+                //Document finalVersionDoc = new Document(previewdocPath);
+                ////Need to test pdf without using Sync fusion
+                //finalVersionDoc.SaveToFile(previewPdfPath, FileFormat.PDF);
                 
                 OpenPdfInBrowser(previewPdfPath);
 
@@ -370,6 +372,7 @@ namespace SKCE.Examination.Services.Helpers
                 }
 
                 doc.MainDocumentPart.Document.Save(); // Save changes
+                doc.Save();
             }
         }
         /// <summary>

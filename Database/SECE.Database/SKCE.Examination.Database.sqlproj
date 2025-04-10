@@ -86,6 +86,10 @@
     <Build Include="Tables\QPDocumentBookMark.sql" />
     <Build Include="Tables\UserQPDocumentBookMark.sql" />
     <Build Include="Tables\CourseSyllabusMaster.sql" />
+    <Build Include="Tables\Answersheet.sql" />
+    <Build Include="Tables\AnswersheetImportHistory.sql" />
+    <Build Include="Tables\AnswersheetQuestionMark.sql" />
+    <Build Include="Tables\SelectedQPDetail.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="SKCE.Examination.Database.sqlproj.user" />

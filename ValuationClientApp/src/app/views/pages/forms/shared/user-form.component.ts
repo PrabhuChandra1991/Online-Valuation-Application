@@ -25,9 +25,10 @@ export class UserFormComponent {
       name: [{ value: '', disabled: this.isEditMode }, Validators.required],
       email: [{ value: '', disabled: this.isEditMode }, [Validators.required, Validators.email]],
       mobileNumber: [{ value: '', disabled: this.isEditMode }, [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
-     qualification: [''],
-      workExperience: [0, [Validators.min(0)]],
-      collegeName: ['']
+      collegeName: [{ value: '', disabled: this.isEditMode }],
+      departmentName: [{ value: '', disabled: this.isEditMode }],
+      qualification: [''],
+      workExperience: [0, [Validators.min(0)]]      
     });
   }
 
@@ -48,7 +49,7 @@ export class UserFormComponent {
     if (this.userForm.invalid) return; // Prevent submission if invalid
 
     this.isSubmitting = true;
-   // this.formSubmit.emit(this.userForm.value); // Emit valid form data
+    //this.formSubmit.emit(this.userForm.value); // Emit valid form data
     this.formSubmit.emit(this.userForm.getRawValue()); // Get disabled values to
   }
 

@@ -42,6 +42,7 @@ namespace SKCE.Examination.Services.Helpers
         {
             try
             {
+               
                 // Save the updated document
                 var updatedSourcePath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}.docx", qPTemplate.QPTemplateName, DateTime.Now.ToString("ddMMyyyyhhmmss")));
                 //Loading license
@@ -120,8 +121,13 @@ namespace SKCE.Examination.Services.Helpers
                     }
                     else if (bookmarkName == "QPCODE")
                     {
-                        bookmarkHtml = _context.QPTemplates.FirstOrDefault(c =>
-                        c.QPTemplateId == qPTemplate.QPTemplateId)?.QPCode.ToString() ?? string.Empty;
+                        bookmarkHtml = string.Empty;
+                        if (isForPrint)
+                        {
+                            bookmarkHtml = GetQPCode(qPTemplate);
+                            qPTemplate.QPCode = bookmarkHtml;
+                            userQPTemplate.QPCode = bookmarkHtml;
+                        }
                     }
                     else if (bookmarkName == "EXAMMONTH")
                     {
@@ -254,7 +260,7 @@ namespace SKCE.Examination.Services.Helpers
                     }
                 }
 
-                var previewdocPath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}.docx", qPTemplate.QPTemplateName, DateTime.Now.ToString("ddMMyyyyhhmmss")));
+                var previewdocPath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}_{2}.docx", bookmarkUpdates["COURSECODE"], qPTemplate.QPCode, DateTime.Now.ToString("ddMMyyyyhhmmss")));
                 templateDoc.SaveToFile(previewdocPath, FileFormat.Docx);
 
                 //// Remove evaluation watermark from the output document By OpenXML
@@ -262,24 +268,20 @@ namespace SKCE.Examination.Services.Helpers
                 Console.WriteLine("Bookmarks replaced successfully!");
 
                 // Save the modified document as PDF
-                var previewPdfPath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}.pdf", qPTemplate.QPTemplateName, DateTime.Now.ToString("ddMMyyyyhhmmss")));
+                var previewPdfPath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}_{2}.pdf", bookmarkUpdates["COURSECODE"], qPTemplate.QPCode, DateTime.Now.ToString("ddMMyyyyhhmmss")));
                 ConvertToPdfBySyncfusion(previewdocPath, previewPdfPath);
-
+                
+                //Need to test pdf without using Sync fusion
+                //templateDoc.SaveToFile(previewPdfPath, FileFormat.PDF);
+                
                 OpenPdfInBrowser(previewPdfPath);
 
                 if (!isForPrint) return;
-                var documentId = _azureBlobStorageHelper.UploadFileToBlob(outputPdfPath, string.Format("{0}_{1}_{2}_{3}.pdf", qPTemplate.QPTemplateName, qPTemplate.QPCode, qPTemplate.ExamYear, DateTime.UtcNow.ToShortDateString()));
-                
+                var pdfDocumentId = await _azureBlobStorageHelper.UploadFileToBlob(previewPdfPath, string.Format("{0}_{1}_{2}_{3}.pdf", qPTemplate.QPTemplateName, qPTemplate.QPCode, qPTemplate.ExamYear, DateTime.UtcNow.ToShortDateString()));
+                var wordDocumentId = await _azureBlobStorageHelper.UploadDocxFileToBlob(previewdocPath, string.Format("{0}_{1}_{2}_{3}.pdf", qPTemplate.QPTemplateName, qPTemplate.QPCode, qPTemplate.ExamYear, DateTime.UtcNow.ToShortDateString()));
+
+                SaveSelectedQPDetail(qPTemplate, userQPTemplate, wordDocumentId, pdfDocumentId);
                 SaveBookmarksToDatabaseByFilePath(inputDocPath, qPTemplate.QPTemplateId,userQPTemplate.SubmittedQPDocumentId);
-
-                var selectedQPTemplate = _context.QPTemplates.Where(qp => qp.QPTemplateId == qPTemplate.QPTemplateId);
-                if (selectedQPTemplate != null)
-                {
-                    //selectedQPTemplate.Selected
-                }
-                // Trigger printing
-                //PrintPdf(outputPdfPath, printerName, numberOfCopies);
-
                 Console.WriteLine("Processing and printing completed successfully.");
             }
             catch (Exception ex)
@@ -287,7 +289,38 @@ namespace SKCE.Examination.Services.Helpers
                 Console.WriteLine("Error: " + ex.Message);
             }
         }
-
+        private string GetQPCode(QPTemplate qPTemplate)
+        {
+            var qpCode = string.Empty;
+            string[] months = qPTemplate.ExamMonth.Split('/');
+            var runningNumber = (_context.SelectedQPDetails.Count() + 1).ToString();
+            Random random = new Random();
+            int randomNumber = random.Next(1000, 10000);
+            qpCode = $"{string.Join("", months.Select(m => m.Trim()[0]))}{qPTemplate.ExamYear}{runningNumber}{randomNumber.ToString()}";
+            return qpCode;
+        }
+        private void SaveSelectedQPDetail(QPTemplate qPTemplate, UserQPTemplate userQPTemplate, long wordDocumentId,long documentId)
+        {
+            var selectedQPDetail = new SelectedQPDetail
+            {
+                BatchYear = qPTemplate.BatchYear,
+                CourseId = qPTemplate.CourseId,
+                DegreeTypeId = qPTemplate.DegreeTypeId,
+                ExamMonth = qPTemplate.ExamMonth,
+                ExamType = qPTemplate.ExamType,
+                ExamYear = qPTemplate.ExamYear,
+                InstitutionId = userQPTemplate.InstitutionId,
+                QPPrintedById = 1,
+                QPPrintedDate = DateTime.Now,
+                QPPrintedDocumentId = documentId,
+                QPPrintedWordDocumentId = wordDocumentId,
+                RegulationYear = qPTemplate.RegulationYear,
+                Semester = qPTemplate.Semester
+            };
+            AuditHelper.SetAuditPropertiesForInsert(selectedQPDetail,1);
+            _context.SelectedQPDetails.Add(selectedQPDetail);
+            _context.SaveChanges();
+        }
         static void ConvertToPdfBySyncfusion(string docxPath, string pdfPath)
         {
             // Load the Word document
@@ -435,50 +468,6 @@ namespace SKCE.Examination.Services.Helpers
             return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(htmlContent));
 
         }
-        private static void PrintPdf(string pdfPath, string printerName, int copies)
-        {
-            try
-            {
-                // Load the PDF into Aspose.Words.Document
-                Document pdfDoc = new(pdfPath);
-
-                //PrinterSettings printerSettings = new PrinterSettings
-                //{
-                //    PrinterName = printerName,
-                //    Copies = (short)copies,
-                //    Collate = true
-                //};
-
-                // Print the document
-                //pdfDoc.Print(printerSettings);
-
-                //// Use ProcessStartInfo to print the PDF using the default PDF viewer
-                //ProcessStartInfo printProcessInfo = new ProcessStartInfo()
-                //{
-                //    Verb = "print",
-                //    FileName = pdfPath,
-                //    CreateNoWindow = true,
-                //    WindowStyle = ProcessWindowStyle.Hidden
-                //};
-
-                //Process printProcess = new Process();
-                //printProcess.StartInfo = printProcessInfo;
-                //printProcess.Start();
-
-                //printProcess.WaitForInputIdle();
-                //System.Threading.Thread.Sleep(3000); // Wait for the print job to start
-
-                //if (!printProcess.CloseMainWindow())
-                //{
-                //    printProcess.Kill();
-                //}
-                Console.WriteLine("Printing started...");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Printing failed: " + ex.Message);
-            }
-        }
         private void LoadLicense()
         {
             // This line attempts to set a license from several locations relative to the executable and Aspose.Words.dll.
@@ -497,5 +486,6 @@ namespace SKCE.Examination.Services.Helpers
                 Console.WriteLine("\nThere was an error setting the license: " + e.Message);
             }
         }
+
     }
 }

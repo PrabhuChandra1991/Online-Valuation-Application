@@ -33,6 +33,13 @@ namespace SKCE.Examination.Models.DbModels.Common
         public DbSet<ImportHistory> ImportHistories { get; set; }
         public DbSet<QPDocumentBookMark> QPDocumentBookMarks { get; set; }
         public DbSet<UserQPDocumentBookMark> UserQPDocumentBookMarks { get; set; }
+        
+        public DbSet<AnswersheetImportHistory> AnswersheetImportHistories { get; set; }
+        public DbSet<Answersheet> Answersheets { get; set; }
+        public DbSet<AnswersheetQuestionMark> AnswersheetQuestionMarks { get; set; }
+
+
+        public DbSet<SelectedQPDetail> SelectedQPDetails { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

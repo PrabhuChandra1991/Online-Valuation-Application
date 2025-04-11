@@ -15,16 +15,16 @@ xmlns="http://www.w3.org/TR/REC-html40">
   <o:Author>Venkatesha KM</o:Author>
   <o:Template>Normal</o:Template>
   <o:LastAuthor>Venkatesha KM</o:LastAuthor>
-  <o:Revision>27</o:Revision>
-  <o:TotalTime>247</o:TotalTime>
+  <o:Revision>28</o:Revision>
+  <o:TotalTime>250</o:TotalTime>
   <o:Created>2025-04-02T14:04:00Z</o:Created>
-  <o:LastSaved>2025-04-02T22:11:00Z</o:LastSaved>
+  <o:LastSaved>2025-04-11T08:22:00Z</o:LastSaved>
   <o:Pages>2</o:Pages>
-  <o:Words>125</o:Words>
-  <o:Characters>714</o:Characters>
-  <o:Lines>5</o:Lines>
+  <o:Words>131</o:Words>
+  <o:Characters>750</o:Characters>
+  <o:Lines>6</o:Lines>
   <o:Paragraphs>1</o:Paragraphs>
-  <o:CharactersWithSpaces>838</o:CharactersWithSpaces>
+  <o:CharactersWithSpaces>880</o:CharactersWithSpaces>
   <o:Version>16.00</o:Version>
  </o:DocumentProperties>
  <o:OfficeDocumentSettings>
@@ -37,6 +37,7 @@ href="Syllabus_sample%20template_files/colorschememapping.xml">
 <!--[if gte mso 9]><xml>
  <w:WordDocument>
   <w:View>Print</w:View>
+  <w:Zoom>110</w:Zoom>
   <w:SpellingState>Clean</w:SpellingState>
   <w:GrammarState>Clean</w:GrammarState>
   <w:TrackMoves>false</w:TrackMoves>
@@ -733,17 +734,17 @@ div.WordSection1
  style='width:100.0%;mso-cellspacing:1.5pt;border:solid black 1.5pt;mso-yfti-tbllook:
  1184;mso-padding-alt:0in 5.4pt 0in 5.4pt'>
  <tr style='mso-yfti-irow:0;mso-yfti-firstrow:yes'>
-  <td width="15%" style='width:15.0%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
+  <td width="25%" style='width:25.4%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
   <p class=MsoNormal><b><span style='mso-fareast-font-family:"Times New Roman"'><span
   style='mso-spacerun:yes'>  </span><a name=CourseCode></a><o:p></o:p></span></b></p>
   </td>
-  <td width="70%" style='width:70.0%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
+  <td width="65%" style='width:65.22%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
   <p class=MsoNormal align=center style='text-align:center'><a name=CourseName><b><span
   style='mso-fareast-font-family:"Times New Roman"'><span
   style='mso-spacerun:yes'> </span></span></b></a><b><span style='mso-fareast-font-family:
   "Times New Roman"'><o:p></o:p></span></b></p>
   </td>
-  <td width="15%" style='width:15.0%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'
+  <td width="8%" style='width:8.1%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'
   ">
   <p class=MsoNormal><a name=LTPC><b><span style='mso-fareast-font-family:"Times New Roman"'>LTPC</span></b></a><span
   style='mso-fareast-font-family:"Times New Roman"'><o:p></o:p></span></p>
@@ -770,11 +771,11 @@ div.WordSection1
   </td>
  </tr>
  <tr style='mso-yfti-irow:4'>
-  <td width="15%" style='width:15.0%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
+  <td width="25%" style='width:25.4%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
   <p class=MsoNormal align=center style='text-align:center'><span
   style='mso-fareast-font-family:"Times New Roman"'>1<o:p></o:p></span></p>
   </td>
-  <td width="90%" colspan=2 style='width:90.0%;border:solid black 1.5pt;
+  <td width="73%" colspan=2 style='width:73.64%;border:solid black 1.5pt;
   padding:.75pt .75pt .75pt .75pt'>
   <p class=MsoNormal><a name=CourseObjectives1><span style='mso-fareast-font-family:
   "Times New Roman"'>CourseObjectives1</span></a><span style='mso-fareast-font-family:
@@ -782,11 +783,11 @@ div.WordSection1
   </td>
  </tr>
  <tr style='mso-yfti-irow:5'>
-  <td width="15%" style='width:15.0%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
+  <td width="25%" style='width:25.4%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
   <p class=MsoNormal align=center style='text-align:center'><span
   style='mso-fareast-font-family:"Times New Roman"'>2<o:p></o:p></span></p>
   </td>
-  <td width="90%" colspan=2 style='width:90.0%;border:solid black 1.5pt;
+  <td width="73%" colspan=2 style='width:73.64%;border:solid black 1.5pt;
   padding:.75pt .75pt .75pt .75pt'>
   <p class=MsoNormal><a name=CourseObjectives2><span style='mso-fareast-font-family:
   "Times New Roman"'>CourseObjectives2</span></a><span style='mso-fareast-font-family:
@@ -794,11 +795,11 @@ div.WordSection1
   </td>
  </tr>
  <tr style='mso-yfti-irow:6'>
-  <td width="15%" style='width:15.0%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
+  <td width="25%" style='width:25.4%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
   <p class=MsoNormal align=center style='text-align:center'><span
   style='mso-fareast-font-family:"Times New Roman"'>3<o:p></o:p></span></p>
   </td>
-  <td width="90%" colspan=2 style='width:90.0%;border:solid black 1.5pt;
+  <td width="73%" colspan=2 style='width:73.64%;border:solid black 1.5pt;
   padding:.75pt .75pt .75pt .75pt'>
   <p class=MsoNormal><a name=CourseObjectives3><span style='mso-fareast-font-family:
   "Times New Roman"'>CourseObjectives3</span></a><span style='mso-fareast-font-family:
@@ -806,11 +807,11 @@ div.WordSection1
   </td>
  </tr>
  <tr style='mso-yfti-irow:7'>
-  <td width="15%" style='width:15.0%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
+  <td width="25%" style='width:25.4%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
   <p class=MsoNormal align=center style='text-align:center'><span
   style='mso-fareast-font-family:"Times New Roman"'>4<o:p></o:p></span></p>
   </td>
-  <td width="90%" colspan=2 style='width:90.0%;border:solid black 1.5pt;
+  <td width="73%" colspan=2 style='width:73.64%;border:solid black 1.5pt;
   padding:.75pt .75pt .75pt .75pt'>
   <p class=MsoNormal><a name=CourseObjectives4><span style='mso-fareast-font-family:
   "Times New Roman"'>CourseObjectives4</span></a><span style='mso-fareast-font-family:
@@ -818,11 +819,11 @@ div.WordSection1
   </td>
  </tr>
  <tr style='mso-yfti-irow:8'>
-  <td width="15%" style='width:15.0%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
+  <td width="25%" style='width:25.4%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
   <p class=MsoNormal align=center style='text-align:center'><span
   style='mso-fareast-font-family:"Times New Roman"'>5<o:p></o:p></span></p>
   </td>
-  <td width="90%" colspan=2 style='width:90.0%;border:solid black 1.5pt;
+  <td width="73%" colspan=2 style='width:73.64%;border:solid black 1.5pt;
   padding:.75pt .75pt .75pt .75pt'>
   <p class=MsoNormal><a name=CourseObjectives5><span style='mso-fareast-font-family:
   "Times New Roman"'>CourseObjectives5</span></a><span style='mso-fareast-font-family:
@@ -836,87 +837,104 @@ div.WordSection1
   </td>
  </tr>
  <tr style='mso-yfti-irow:10'>
-  <td width="15%" style='width:15.0%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
+  <td width="25%" style='width:25.4%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
   <p class=MsoNormal align=center style='text-align:center'><a
   name=CourseOutcomesHead1><span style='mso-fareast-font-family:"Times New Roman"'>CourseOutcomesHead1</span></a><span
   style='mso-fareast-font-family:"Times New Roman"'><o:p></o:p></span></p>
   </td>
-  <td width="75%" style='width:75.0%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
+  <td width="65%" style='width:65.22%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
   <p class=MsoNormal><a name=CourseOutcomes1><span style='mso-fareast-font-family:
   "Times New Roman"'>CourseOutcomes1</span></a><span style='mso-fareast-font-family:
   "Times New Roman"'><o:p></o:p></span></p>
   </td>
-  <td width="10%" style='width:10.0%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
+  <td width="8%" style='width:8.1%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
   <p class=MsoNormal align=center style='text-align:center'><a name=RBT1><span
   style='mso-fareast-font-family:"Times New Roman"'>RBT1</span></a><span
   style='mso-fareast-font-family:"Times New Roman"'><o:p></o:p></span></p>
   </td>
  </tr>
  <tr style='mso-yfti-irow:11'>
-  <td width="15%" style='width:15.0%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
+  <td width="25%" style='width:25.4%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
   <p class=MsoNormal align=center style='text-align:center'><a
   name=CourseOutcomesHead2><span style='mso-fareast-font-family:"Times New Roman"'>CourseOutcomesHead2</span></a><span
   style='mso-fareast-font-family:"Times New Roman"'><o:p></o:p></span></p>
   </td>
-  <td width="75%" style='width:75.0%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
+  <td width="65%" style='width:65.22%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
   <p class=MsoNormal><a name=CourseOutcomes2><span style='mso-fareast-font-family:
   "Times New Roman"'>CourseOutcomes2</span></a><span style='mso-fareast-font-family:
   "Times New Roman"'><o:p></o:p></span></p>
   </td>
-  <td width="10%" style='width:10.0%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
+  <td width="8%" style='width:8.1%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
   <p class=MsoNormal align=center style='text-align:center'><a name=RBT2><span
   style='mso-fareast-font-family:"Times New Roman"'>RBT2</span></a><span
   style='mso-fareast-font-family:"Times New Roman"'><o:p></o:p></span></p>
   </td>
  </tr>
  <tr style='mso-yfti-irow:12'>
-  <td width="15%" style='width:15.0%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
+  <td width="25%" style='width:25.4%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
   <p class=MsoNormal align=center style='text-align:center'><a
   name=CourseOutcomesHead3><span style='mso-fareast-font-family:"Times New Roman"'>CourseOutcomesHead3</span></a><span
   style='mso-fareast-font-family:"Times New Roman"'><o:p></o:p></span></p>
   </td>
-  <td width="75%" style='width:75.0%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
+  <td width="65%" style='width:65.22%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
   <p class=MsoNormal><a name=CourseOutcomes3><span style='mso-fareast-font-family:
   "Times New Roman"'>CourseOutcomes3</span></a><span style='mso-fareast-font-family:
   "Times New Roman"'><o:p></o:p></span></p>
   </td>
-  <td width="10%" style='width:10.0%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
+  <td width="8%" style='width:8.1%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
   <p class=MsoNormal align=center style='text-align:center'><a name=RBT3><span
   style='mso-fareast-font-family:"Times New Roman"'>RBT3</span></a><span
   style='mso-fareast-font-family:"Times New Roman"'><o:p></o:p></span></p>
   </td>
  </tr>
  <tr style='mso-yfti-irow:13'>
-  <td width="15%" style='width:15.0%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
+  <td width="25%" style='width:25.4%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
   <p class=MsoNormal align=center style='text-align:center'><a
   name=CourseOutcomesHead4><span style='mso-fareast-font-family:"Times New Roman"'>CourseOutcomesHead4</span></a><span
   style='mso-fareast-font-family:"Times New Roman"'><o:p></o:p></span></p>
   </td>
-  <td width="75%" style='width:75.0%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
+  <td width="65%" style='width:65.22%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
   <p class=MsoNormal><a name=CourseOutcomes4><span style='mso-fareast-font-family:
   "Times New Roman"'>CourseOutcomes4</span></a><span style='mso-fareast-font-family:
   "Times New Roman"'><o:p></o:p></span></p>
   </td>
-  <td width="10%" style='width:10.0%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
+  <td width="8%" style='width:8.1%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
   <p class=MsoNormal align=center style='text-align:center'><a name=RBT4><span
   style='mso-fareast-font-family:"Times New Roman"'>RBT4</span></a><span
   style='mso-fareast-font-family:"Times New Roman"'><o:p></o:p></span></p>
   </td>
  </tr>
- <tr style='mso-yfti-irow:14;mso-yfti-lastrow:yes'>
-  <td width="15%" style='width:15.0%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
+ <tr style='mso-yfti-irow:14'>
+  <td width="25%" style='width:25.4%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
   <p class=MsoNormal align=center style='text-align:center'><a
   name=CourseOutcomesHead5><span style='mso-fareast-font-family:"Times New Roman"'>CourseOutcomesHead5</span></a><span
   style='mso-fareast-font-family:"Times New Roman"'><o:p></o:p></span></p>
   </td>
-  <td width="75%" style='width:75.0%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
+  <td width="65%" style='width:65.22%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
   <p class=MsoNormal><a name=CourseOutcomes5><span style='mso-fareast-font-family:
   "Times New Roman"'>CourseOutcomes5</span></a><span style='mso-fareast-font-family:
   "Times New Roman"'><o:p></o:p></span></p>
   </td>
-  <td width="10%" style='width:10.0%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
+  <td width="8%" style='width:8.1%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
   <p class=MsoNormal align=center style='text-align:center'><a name=RBT5><span
   style='mso-fareast-font-family:"Times New Roman"'>RBT5</span></a><span
+  style='mso-fareast-font-family:"Times New Roman"'><o:p></o:p></span></p>
+  </td>
+ </tr>
+ <tr style='mso-yfti-irow:15;mso-yfti-lastrow:yes'>
+  <td width="25%" style='width:25.4%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
+  <p class=MsoNormal align=center style='text-align:center'><a
+  name=CourseOutcomesHead6><span style='mso-fareast-font-family:"Times New Roman"'>CourseOutcomesHead6</span></a><span
+  style='mso-fareast-font-family:"Times New Roman"'><o:p></o:p></span></p>
+  </td>
+  <td width="65%" style='width:65.22%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
+  <p class=MsoNormal><a name=CourseOutcomes6><span style='mso-fareast-font-family:
+  "Times New Roman"'>CourseOutcomes6</span></a><span style='mso-fareast-font-family:
+  "Times New Roman"'><o:p></o:p></span></p>
+  </td>
+  <td width="8%" style='width:8.1%;border:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
+  <p class=MsoNormal align=center style='text-align:center'><a name=RBT6><span
+  style='mso-fareast-font-family:"Times New Roman"'>RBT6</span></a><span
   style='mso-fareast-font-family:"Times New Roman"'><o:p></o:p></span></p>
   </td>
  </tr>

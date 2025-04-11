@@ -283,6 +283,7 @@ namespace SKCE.Examination.Services.QPSettings
             }
 
             string updatedFilePath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), "UpdatedSyllabusDocument.docx");
+            doc.Watermark = null;
             doc.SaveToFile(updatedFilePath, FileFormat.Docx);
             //// Remove evaluation watermark from the output document By OpenXML
             RemoveTextFromDocx(updatedFilePath, "Evaluation Warning: The document was created with Spire.Doc for .NET.");
@@ -626,7 +627,7 @@ namespace SKCE.Examination.Services.QPSettings
                 qPTemplate.QPTemplateStatusTypeName = qpTemplateStatuss.FirstOrDefault(qps => qps.QPTemplateStatusTypeId == qPTemplate.QPTemplateStatusTypeId)?.Name ?? string.Empty;
                 qPTemplate.CourseCode = courses.FirstOrDefault(c => c.CourseId == qPTemplate.CourseId)?.Code ?? string.Empty;
                 qPTemplate.CourseName = courses.FirstOrDefault(c => c.CourseId == qPTemplate.CourseId)?.Name ?? string.Empty;
-                var userQPGenerateTemplates = _context.UserQPTemplates.Where(u => u.QPTemplateId == qPTemplate.QPTemplateId && (u.QPTemplateStatusTypeId == 8 || u.QPTemplateStatusTypeId == 9) && u.InstitutionId == institutionId && u.IsActive)
+                var userQPGenerateTemplates = _context.UserQPTemplates.Where(u => u.QPTemplateId == qPTemplate.QPTemplateId && (u.QPTemplateStatusTypeId == 8 || u.QPTemplateStatusTypeId == 9) && u.IsActive)
                     .Select(u => new UserQPTemplateVM
                     {
                         UserQPTemplateId = u.UserQPTemplateId,
@@ -2281,9 +2282,10 @@ namespace SKCE.Examination.Services.QPSettings
                         }
                     }
                 }
+                sourceDoc.Watermark = null;
                 sourceDoc.SaveToFile(updatedSourcePath, FileFormat.Docx);
-
-                return _azureBlobStorageHelper.UploadDocxFileToBlob(updatedSourcePath, string.Format("{0}_{1}_{2}.docx", bookmarkUpdates["COURSECODE"], bookmarkUpdates["EXAMYEAR"], bookmarkUpdates["EXAMMONTH"].Replace("/",""), qpType)).Result;
+                RemoveTextFromDocx(updatedSourcePath, "Evaluation Warning: The document was created with Spire.Doc for .NET.");
+                return _azureBlobStorageHelper.UploadDocxFileToBlob(updatedSourcePath, string.Format("{0}_{1}_{2}_{3}.docx", inputDocPath.Replace(".docx",""), bookmarkUpdates["COURSECODE"], bookmarkUpdates["EXAMYEAR"], bookmarkUpdates["EXAMMONTH"].Replace("/",""), qpType)).Result;
             }
             catch (Exception ex)
             {

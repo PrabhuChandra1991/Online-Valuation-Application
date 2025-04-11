@@ -128,7 +128,7 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
         {
           // console.log('selected institute',this.selectedInstituteId);
 
-          this.loadTemplateaForInstitute(this.selectedInstituteId);
+          this.loadTemplateaForInstitute(0);
 
         }
 
@@ -232,7 +232,7 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
   }
 
   loadTemplateaForInstitute(institutionId:number): void {     
-    //let institutionId = 2;
+     institutionId = 0;
         this.spinnerService.toggleSpinnerState(true);
         this.templateService.getTemplates(institutionId).subscribe({
           next: (data: any[]) => {
@@ -573,7 +573,7 @@ isUserAlreadySelected(qpAssignedUsers: any[], userId: number, currentIndex: numb
           this.spinnerService.toggleSpinnerState(false);
           this.toasterService.success('Qp Template assigned successfully')
           this.modalService.dismissAll();
-
+          this.loadTemplateaForInstitute(0);
         },
         error: (error) => {
           console.error('Save failed:', error);

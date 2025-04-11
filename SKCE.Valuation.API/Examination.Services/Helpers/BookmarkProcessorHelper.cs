@@ -20,6 +20,8 @@ using DocumentFormat.OpenXml.Math;
 using Spire.Doc.Fields;
 using Amazon.Runtime.Internal.Transform;
 using Microsoft.EntityFrameworkCore;
+using Syncfusion.Pdf.Parsing;
+using Syncfusion.Pdf;
 
 namespace SKCE.Examination.Services.Helpers
 {
@@ -335,7 +337,7 @@ namespace SKCE.Examination.Services.Helpers
             // Save the PDF file
             pdfDocument.Save(pdfPath);
             document.Close();
-            //OpenPdfInBrowser(pdfPath);
+
             System.Console.WriteLine("DOCX to PDF conversion By Syncfusion completed.");
         }
         static void ApplyPdfSecurity(Syncfusion.Pdf.PdfDocument pdfDocument)

@@ -481,7 +481,7 @@ namespace SKCE.Examination.Services.Helpers
             try
             {
                 // Apply Syncfusion License
-                SyncfusionLicenseProvider.RegisterLicense("YOUR_LICENSE_KEY_HERE");
+                SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NNaF5cXmBCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdmWXtfcXRQQ2lZWEJwW0VWYUA=");
                 Console.WriteLine("License set successfully.");
             }
             catch (Exception e)

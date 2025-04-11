@@ -15,6 +15,7 @@ using Syncfusion.DocIO.DLS;
 using Syncfusion.DocIO;
 using Spire.Doc.Collections;
 using Spire.Doc.Fields;
+using Syncfusion.Licensing;
 namespace SKCE.Examination.Services.QPSettings
 {
     public class QpTemplateService 
@@ -290,6 +291,7 @@ namespace SKCE.Examination.Services.QPSettings
 
             // Convert DOCX to PDF for preview By Syncfusion
             string outputPdfPathBySyncfusion = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), "UpdatedSyllabusDocument.pdf");
+            SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NNaF5cXmBCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdmWXtfcXRQQ2lZWEJwW0VWYUA=");
             ConvertToPdfBySyncfusion(updatedFilePath, outputPdfPathBySyncfusion);
 
             return (outputPdfPathBySyncfusion, updatedFilePath);

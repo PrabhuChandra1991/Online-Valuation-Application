@@ -1,4 +1,5 @@
 export const environment = {
     production: false,
-    apiURL : "http://localhost:5088"
+    apiURL : "https://skce-examination-api-gnfkgaatc2ehd5dt.centralindia-01.azurewebsites.net"
+    //apiURL : "https://skce-examination-api.azurewebsites.net"
 };

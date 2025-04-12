@@ -306,6 +306,19 @@ namespace SKCE.Examination.Services.Helpers
         }
         private void SaveSelectedQPDetail(QPTemplate qPTemplate, UserQPTemplate userQPTemplate, long wordDocumentId,long documentId)
         {
+            var existingQPTemplate = _context.QPTemplates.FirstOrDefault(q => q.QPTemplateId == qPTemplate.QPTemplateId);
+            if(existingQPTemplate != null)
+            {
+                existingQPTemplate.QPCode = qPTemplate.QPCode;
+                AuditHelper.SetAuditPropertiesForUpdate(existingQPTemplate, 1);
+            }
+            var existingUserQPTemplate = _context.UserQPTemplates.FirstOrDefault(q => q.QPTemplateId == userQPTemplate.UserQPTemplateId);
+            if (existingUserQPTemplate != null)
+            {
+                existingUserQPTemplate.QPCode = qPTemplate.QPCode;
+                AuditHelper.SetAuditPropertiesForUpdate(existingUserQPTemplate, 1);
+            }
+
             var selectedQPDetail = new SelectedQPDetail
             {
                 BatchYear = qPTemplate.BatchYear,
@@ -323,6 +336,7 @@ namespace SKCE.Examination.Services.Helpers
                 Semester = qPTemplate.Semester,
                 UserQPTemplateId = userQPTemplate.UserQPTemplateId,
                 IsQPOnly = userQPTemplate.IsQPOnly,
+                QPCode = qPTemplate.QPCode,
             };
             AuditHelper.SetAuditPropertiesForInsert(selectedQPDetail,1);
             _context.SelectedQPDetails.Add(selectedQPDetail);

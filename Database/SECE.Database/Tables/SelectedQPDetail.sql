@@ -16,6 +16,7 @@
 	[QPPrintedById] BIGINT NULL,
 	[UserQPTemplateId] BIGINT NULL,
 	[IsQPOnly] BIT NULL,
+	[QPCode] NVARCHAR(255)  NULL,
 	[IsActive] BIT DEFAULT 1,
 	CreatedDate DATETIME DEFAULT GETDATE(),
 	CreatedById BIGINT NOT NULL,

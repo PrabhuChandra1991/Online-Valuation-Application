@@ -1,4 +1,6 @@
 ﻿using SKCE.Examination.Models.DbModels;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace SKCE.Examination.Services.ViewModels.QPSettings
 {
@@ -138,5 +140,18 @@ namespace SKCE.Examination.Services.ViewModels.QPSettings
         public long UserId { get; set; }
         public string UserName { get; set; }
         public bool IsAvailableForQPAssignment { get; set; }
+    }
+
+    public class SelectedQPDetailVM
+    {
+        public long InstitutionId { get; set; }
+        public long CourseId { get; set; }
+        public string RegulationYear { get; set; }
+        public string BatchYear { get; set; }
+        public long DegreeTypeId { get; set; }
+        public string ExamType { get; set; }
+        public long Semester { get; set; }
+        public string ExamMonth { get; set; }
+        public string ExamYear { get; set; }
     }
 }

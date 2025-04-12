@@ -40,7 +40,7 @@ namespace SKCE.Examination.Services.Helpers
             printerName = configuration["Print:PrinterName"] ?? throw new ArgumentNullException(nameof(configuration), "PrinterName is not configured.");
         }
         // Processes bookmarks in a source document and prints the modified document
-        public async Task ProcessBookmarksAndPrint(QPTemplate qPTemplate, UserQPTemplate userQPTemplate, string inputDocPath, string documentPathToPrint, bool isForPrint)
+        public async Task ProcessBookmarksAndPrint(QPTemplate qPTemplate, UserQPTemplate userQPTemplate, string inputDocPath, string documentPathToPrint, bool isForPrint, long printedWordDocumentId)
         {
             try
             {
@@ -124,7 +124,7 @@ namespace SKCE.Examination.Services.Helpers
                     else if (bookmarkName == "QPCODE")
                     {
                         bookmarkHtml = string.Empty;
-                        if (isForPrint)
+                        if (isForPrint && userQPTemplate.IsQPOnly)
                         {
                             bookmarkHtml = GetQPCode(qPTemplate);
                             qPTemplate.QPCode = bookmarkHtml;
@@ -281,11 +281,11 @@ namespace SKCE.Examination.Services.Helpers
                 OpenPdfInBrowser(previewPdfPath);
 
                 if (!isForPrint) return;
-                var pdfDocumentId = await _azureBlobStorageHelper.UploadFileToBlob(previewPdfPath, string.Format("{0}_{1}_{2}_{3}.pdf", qPTemplate.QPTemplateName, qPTemplate.QPCode, qPTemplate.ExamYear, DateTime.UtcNow.ToShortDateString()));
-                var wordDocumentId = await _azureBlobStorageHelper.UploadDocxFileToBlob(previewdocPath, string.Format("{0}_{1}_{2}_{3}.pdf", qPTemplate.QPTemplateName, qPTemplate.QPCode, qPTemplate.ExamYear, DateTime.UtcNow.ToShortDateString()));
+                var pdfDocumentId = await _azureBlobStorageHelper.UploadFileToBlob(previewPdfPath, string.Format("{0}_{1}_{2}_{3}_{4}.pdf", qPTemplate.QPTemplateName, qPTemplate.QPCode, qPTemplate.ExamYear, bookmarkUpdates["COURSECODE"], DateTime.UtcNow.ToShortDateString()));
+                var wordDocumentId = await _azureBlobStorageHelper.UploadDocxFileToBlob(previewdocPath, string.Format("{0}_{1}_{2}_{3}_{4}.docx", qPTemplate.QPTemplateName, qPTemplate.QPCode, qPTemplate.ExamYear, bookmarkUpdates["COURSECODE"], DateTime.UtcNow.ToShortDateString()));
 
-                SaveSelectedQPDetail(qPTemplate, userQPTemplate, wordDocumentId, pdfDocumentId);
-                SaveBookmarksToDatabaseByFilePath(inputDocPath, qPTemplate.QPTemplateId,userQPTemplate.SubmittedQPDocumentId);
+                SaveSelectedQPDetail(qPTemplate, userQPTemplate, printedWordDocumentId, pdfDocumentId);
+                //SaveBookmarksToDatabaseByFilePath(inputDocPath, qPTemplate.QPTemplateId,userQPTemplate.SubmittedQPDocumentId);
                 Console.WriteLine("Processing and printing completed successfully.");
             }
             catch (Exception ex)
@@ -319,11 +319,15 @@ namespace SKCE.Examination.Services.Helpers
                 QPPrintedDocumentId = documentId,
                 QPPrintedWordDocumentId = wordDocumentId,
                 RegulationYear = qPTemplate.RegulationYear,
-                Semester = qPTemplate.Semester
+                Semester = qPTemplate.Semester,
+                UserQPTemplateId = userQPTemplate.UserQPTemplateId,
+                IsQPOnly = userQPTemplate.IsQPOnly,
             };
             AuditHelper.SetAuditPropertiesForInsert(selectedQPDetail,1);
             _context.SelectedQPDetails.Add(selectedQPDetail);
             _context.SaveChanges();
+
+            SaveSelectedQPBookmarksByFilePath(selectedQPDetail);
         }
         static void ConvertToPdfBySyncfusion(string docxPath, string pdfPath)
         {
@@ -374,7 +378,6 @@ namespace SKCE.Examination.Services.Helpers
                 }
 
                 doc.MainDocumentPart.Document.Save(); // Save changes
-                doc.Save();
             }
         }
         /// <summary>
@@ -491,6 +494,40 @@ namespace SKCE.Examination.Services.Helpers
                 Console.WriteLine("\nThere was an error setting the license: " + e.Message);
             }
         }
+        public void SaveSelectedQPBookmarksByFilePath(SelectedQPDetail selectedQPDetail)
+        {
+            var fileName = _context.Documents.FirstOrDefault(d => d.DocumentId == selectedQPDetail.QPPrintedWordDocumentId)?.Name;
+            Document sourceDoc = _azureBlobStorageHelper.DownloadWordDocumentFromBlob(fileName).Result;
+            // Iterate through all bookmarks in the source document
 
+            var qpDocumentBookMarks = new List<SelectedQPBookMarkDetail>();
+            foreach (Spire.Doc.Bookmark bookmark in sourceDoc.Bookmarks)
+            {
+                string bookmarkHtmlBase64 = ConvertBookmarkToHtmlBase64(sourceDoc, bookmark);
+
+                if (!string.IsNullOrEmpty(bookmarkHtmlBase64))
+                {
+                    var existingQpBookMark = _context.SelectedQPBookMarkDetails.FirstOrDefault(qpb => qpb.SelectedQPDetailId == selectedQPDetail.SelectedQPDetailId && qpb.BookMarkName == bookmark.Name);
+                    if (existingQpBookMark == null)
+                    {
+                        var qPDocumentBookMark = new SelectedQPBookMarkDetail
+                        {
+                            SelectedQPDetailId = selectedQPDetail.SelectedQPDetailId,
+                            BookMarkName = bookmark.Name,
+                            BookMarkText = bookmarkHtmlBase64
+                        };
+                        AuditHelper.SetAuditPropertiesForInsert(qPDocumentBookMark, 1);
+                        qpDocumentBookMarks.Add(qPDocumentBookMark);
+                    }
+                    else
+                    {
+                        existingQpBookMark.BookMarkText = bookmarkHtmlBase64;
+                        AuditHelper.SetAuditPropertiesForUpdate(existingQpBookMark, 1);
+                    }
+                }
+            }
+            _context.SelectedQPBookMarkDetails.AddRange(qpDocumentBookMarks);
+            _context.SaveChanges();
+        }
     }
 }

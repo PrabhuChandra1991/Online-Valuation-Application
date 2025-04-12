@@ -16,6 +16,9 @@ using Syncfusion.DocIO;
 using Spire.Doc.Collections;
 using Spire.Doc.Fields;
 using Syncfusion.Licensing;
+using Spire.Xls.Core.Spreadsheet;
+using BookmarksNavigator = Spire.Doc.Documents.BookmarksNavigator;
+using System.Linq;
 namespace SKCE.Examination.Services.QPSettings
 {
     public class QpTemplateService 
@@ -151,7 +154,7 @@ namespace SKCE.Examination.Services.QPSettings
             if (rowData.Count == 0) return qPTemplate;
 
             // 3. Replace bookmarks in Word document
-           var (updatedPdfPath, updatedwordPath) = ReplaceBookmarks(rowData);
+           var (updatedPdfPath, updatedwordPath) = ReplaceBookmarks(rowData, qPTemplate);
 
             // 🔹 Step 5: Upload PDF to Azure Blob Storage
             long syllabuspdfDocumentId =  await UploadFileToBlobAsync(pdfFileName, updatedPdfPath);
@@ -181,6 +184,7 @@ namespace SKCE.Examination.Services.QPSettings
                     existingCourseSyllabusDocument.DocumentId = syllabuspdfDocumentId;
                     existingCourseSyllabusDocument.WordDocumentId = syllabusDocumentId;
                     AuditHelper.SetAuditPropertiesForUpdate(existingCourseSyllabusDocument, 1);
+                    qPTemplate.CourseSyllabusDocumentId = existingCourseSyllabusDocument.DocumentId;
                 }
                 await _context.SaveChangesAsync();
             }
@@ -258,10 +262,10 @@ namespace SKCE.Examination.Services.QPSettings
 
             return rowData;
         }
-        private (string, string) ReplaceBookmarks(Dictionary<string, string> rowData)
+        private (string, string) ReplaceBookmarks(Dictionary<string, string> rowData, QPTemplateVM qPTemplate)
         {
            Spire.Doc.Document doc = new Spire.Doc.Document();
-            var wordTemplatePath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), "SyllabusDocumentTemplate\\Syllabus_sample template.doc");
+            var wordTemplatePath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), $"SyllabusDocumentTemplate\\{qPTemplate.DegreeTypeName}_Syllabustemplate.docx");
             doc.LoadFromFile(wordTemplatePath);
            foreach (Spire.Doc.Bookmark bookmark in doc.Bookmarks)
             {
@@ -270,6 +274,7 @@ namespace SKCE.Examination.Services.QPSettings
                 if(bookmark.Name.Contains("CourseObjectives") || bookmark.Name.Contains("CourseOutcomesHead") 
                 || bookmark.Name.Contains("CourseOutcomes") || bookmark.Name.Contains("RBT")
                 || bookmark.Name.Contains("CourseModule") || bookmark.Name.Contains("CourseHours")
+                || bookmark.Name.Contains("TextBook") || bookmark.Name.Contains("WebResources")
                 || bookmark.Name.Contains("CourseContent") || bookmark.Name.Contains("ReferenceBook"))
                 {
                     if(rowData[bookmark.Name.Remove(bookmark.Name.Length - 1, 1)].Split("[").Length > Convert.ToInt32(bookmark.Name.Substring(bookmark.Name.Length - 1)))
@@ -1034,7 +1039,7 @@ namespace SKCE.Examination.Services.QPSettings
             var qpSelectedDocument = await _context.Documents.FirstOrDefaultAsync(d => d.DocumentId == generatedDocumentId);
             var qpToPrintDocument = await _context.Documents.FirstOrDefaultAsync(d => d.DocumentId == userQPDocument.DocumentId);
             if (qpSelectedDocument == null || qpToPrintDocument == null) return false;
-            await _bookmarkProcessor.ProcessBookmarksAndPrint(qPtemplate, userQPtemplate, qpSelectedDocument.Name, qpToPrintDocument.Name, false);
+            await _bookmarkProcessor.ProcessBookmarksAndPrint(qPtemplate, userQPtemplate, qpSelectedDocument.Name, qpToPrintDocument.Name, false, generatedDocumentId);
             return true;
         }
         private async Task<(string,bool)> UGQPValidationAsync(UserQPTemplate userQPTemplate, Document doc)
@@ -2106,7 +2111,7 @@ namespace SKCE.Examination.Services.QPSettings
                 var qpSelectedDocument = await _context.Documents.FirstOrDefaultAsync(d => d.DocumentId == userQPTemplate.SubmittedQPDocumentId);
                 var qpToPrintDocument = await _context.Documents.FirstOrDefaultAsync(d => d.DocumentId == qpDocument.DocumentId );
                 if (qpSelectedDocument == null || qpToPrintDocument == null) return false;
-                await _bookmarkProcessor.ProcessBookmarksAndPrint(qpTemplate, userQPTemplate, qpSelectedDocument.Name, qpToPrintDocument.Name, isForPrint);
+                await _bookmarkProcessor.ProcessBookmarksAndPrint(qpTemplate, userQPTemplate, qpSelectedDocument.Name, qpToPrintDocument.Name, isForPrint, userQPTemplate.SubmittedQPDocumentId);
                
                 await _context.SaveChangesAsync();
                 return true;
@@ -2131,13 +2136,46 @@ namespace SKCE.Examination.Services.QPSettings
         }
         public void SaveBookmarksToDatabaseByFilePath(string fileName, long userqpTemplateId, long documentId)
         {
-            Document sourceDoc = _azureBlobStorageHelper.DownloadWordDocumentFromBlob(fileName).Result;
+            Spire.Doc.Document sourceDoc = _azureBlobStorageHelper.DownloadWordDocumentFromBlob(fileName).Result;
             // Iterate through all bookmarks in the source document
 
             var qpDocumentBookMarks = new List<UserQPDocumentBookMark>();
             foreach (Spire.Doc.Bookmark bookmark in sourceDoc.Bookmarks)
             {
-                string bookmarkHtmlBase64 = ConvertBookmarkToHtmlBase64(sourceDoc, bookmark);
+                // Find the bookmark
+                BookmarksNavigator navigator = new BookmarksNavigator(sourceDoc);
+                navigator.MoveToBookmark(bookmark.Name);
+
+                // Extract the content inside the bookmark as a document fragment
+                Spire.Doc.Documents.TextBodyPart content = navigator.GetBookmarkContent();
+
+                // Create a new temporary document to hold this content
+                Spire.Doc.Document tempDoc = new Spire.Doc.Document();
+                Spire.Doc.Section section = tempDoc.AddSection();
+
+                foreach (Spire.Doc.Body item in content.BodyItems)
+                {
+                    section.Body.ChildObjects.Add(item.Clone());
+                }
+
+                // Save to a MemoryStream as HTML with embedded base64 images
+                MemoryStream htmlStream = new MemoryStream();
+                tempDoc.SaveToStream(htmlStream, FileFormat.Html);
+
+                // Rewind the stream
+                htmlStream.Position = 0;
+
+                // Read HTML content from stream
+                string htmlContent;
+                using (StreamReader reader = new StreamReader(htmlStream))
+                {
+                    htmlContent = reader.ReadToEnd();
+                }
+
+                // Convert HTML content to Base64
+                byte[] htmlBytes = System.Text.Encoding.UTF8.GetBytes(htmlContent);
+                string bookmarkHtmlBase64 = Convert.ToBase64String(htmlBytes);
+                //string bookmarkHtmlBase64 = ConvertBookmarkToHtmlBase64(sourceDoc, bookmark);
 
                 if (!string.IsNullOrEmpty(bookmarkHtmlBase64))
                 {
@@ -2294,6 +2332,96 @@ namespace SKCE.Examination.Services.QPSettings
                 throw ex;
             }
            
+        }
+
+        public async Task<bool> ProcessSelectedQPBookMarks(long userQPTemplateId) {
+
+            var selectedQPDetail = _context.SelectedQPDetails.FirstOrDefault(qp => qp.UserQPTemplateId == userQPTemplateId && !qp.IsQPOnly.Value);
+            if(selectedQPDetail == null) return false;
+            SaveSelectedQPBookmarksByFilePath(selectedQPDetail);
+            return true;
+        }
+        public void SaveSelectedQPBookmarksByFilePath(SelectedQPDetail selectedQPDetail)
+        {
+            var fileName = _context.Documents.FirstOrDefault(d => d.DocumentId == selectedQPDetail.QPPrintedWordDocumentId)?.Name;
+            Document sourceDoc = _azureBlobStorageHelper.DownloadWordDocumentFromBlob(fileName).Result;
+            // Iterate through all bookmarks in the source document
+
+            var qpDocumentBookMarks = new List<SelectedQPBookMarkDetail>();
+            foreach (Spire.Doc.Bookmark bookmark in sourceDoc.Bookmarks)
+            {
+                if(!bookmark.Name.StartsWith("Q") || bookmark.Name.Equals("QPCODE")) continue;
+               
+                string bookmarkHtmlBase64 = ConvertBookmarkToHtmlBase64(sourceDoc, bookmark);
+
+                if (!string.IsNullOrEmpty(bookmarkHtmlBase64))
+                {
+                    var existingQpBookMark = _context.SelectedQPBookMarkDetails.FirstOrDefault(qpb => qpb.SelectedQPDetailId == selectedQPDetail.SelectedQPDetailId && qpb.BookMarkName == bookmark.Name);
+                    if (existingQpBookMark == null)
+                    {
+                        var qPDocumentBookMark = new SelectedQPBookMarkDetail
+                        {
+                            SelectedQPDetailId = selectedQPDetail.SelectedQPDetailId,
+                            BookMarkName = bookmark.Name,
+                            BookMarkText = bookmarkHtmlBase64
+                        };
+                        AuditHelper.SetAuditPropertiesForInsert(qPDocumentBookMark, 1);
+                        qpDocumentBookMarks.Add(qPDocumentBookMark);
+                    }
+                    else
+                    {
+                        existingQpBookMark.BookMarkText = bookmarkHtmlBase64;
+                        AuditHelper.SetAuditPropertiesForUpdate(existingQpBookMark, 1);
+                    }
+                }
+            }
+            _context.SelectedQPBookMarkDetails.AddRange(qpDocumentBookMarks);
+            _context.SaveChanges();
+        }
+
+        public async Task<List<SelectedQPBookMarkDetail>> GetQPAKDetails(SelectedQPDetailVM selectedQPDetailVM, string questionNumber)
+        {
+            var selectedQPDetail = _context.SelectedQPDetails.FirstOrDefault(qp => 
+            qp.InstitutionId == selectedQPDetailVM.InstitutionId &&
+            qp.CourseId == selectedQPDetailVM.CourseId &&
+            qp.RegulationYear == selectedQPDetailVM.RegulationYear &&
+            qp.BatchYear == selectedQPDetailVM.BatchYear &&
+            qp.DegreeTypeId == selectedQPDetailVM.DegreeTypeId &&
+            qp.ExamType == selectedQPDetailVM.ExamType &&
+            qp.Semester == selectedQPDetailVM.Semester &&
+            qp.ExamMonth == selectedQPDetailVM.ExamMonth &&
+            qp.ExamYear == selectedQPDetailVM.ExamYear && !qp.IsQPOnly.Value);
+
+            if (selectedQPDetail == null) return new List<SelectedQPBookMarkDetail>();
+            List<string> questionBookMarks = new List<string>();
+            questionBookMarks.Add(questionNumber);
+            questionBookMarks.Add($"{questionNumber}IMG");
+            questionBookMarks.Add($"{questionNumber}MARKS");
+            questionBookMarks.Add($"{questionNumber}AK");
+            var selectedQPBookMarks = await _context.SelectedQPBookMarkDetails
+                .Where(qpb => qpb.SelectedQPDetailId == selectedQPDetail.SelectedQPDetailId && questionBookMarks.Contains(qpb.BookMarkName))
+                .ToListAsync();
+            return selectedQPBookMarks;
+        }
+
+        public async Task<List<SelectedQPBookMarkDetail>> GetAllQPAKDetails(SelectedQPDetailVM selectedQPDetailVM)
+        {
+            var selectedQPDetail = _context.SelectedQPDetails.FirstOrDefault(qp =>
+            qp.InstitutionId == selectedQPDetailVM.InstitutionId &&
+            qp.CourseId == selectedQPDetailVM.CourseId &&
+            qp.RegulationYear == selectedQPDetailVM.RegulationYear &&
+            qp.BatchYear == selectedQPDetailVM.BatchYear &&
+            qp.DegreeTypeId == selectedQPDetailVM.DegreeTypeId &&
+            qp.ExamType == selectedQPDetailVM.ExamType &&
+            qp.Semester == selectedQPDetailVM.Semester &&
+            qp.ExamMonth == selectedQPDetailVM.ExamMonth &&
+            qp.ExamYear == selectedQPDetailVM.ExamYear && !qp.IsQPOnly.Value);
+
+            if (selectedQPDetail == null) return new List<SelectedQPBookMarkDetail>();
+            var selectedQPBookMarks = await _context.SelectedQPBookMarkDetails
+                .Where(qpb => qpb.SelectedQPDetailId == selectedQPDetail.SelectedQPDetailId)
+                .ToListAsync();
+            return selectedQPBookMarks;
         }
     }
 }

@@ -24,6 +24,7 @@ namespace SKCE.Examination.Models.DbModels.QPSettings
         public long QPPrintedWordDocumentId { get; set; }
         public DateTime QPPrintedDate { get; set; }
         public long QPPrintedById { get; set; }
-        
+        public long? UserQPTemplateId { get; set; }
+        public bool? IsQPOnly { get; set; }
     }
 }

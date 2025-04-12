@@ -1,0 +1,12 @@
+﻿CREATE TABLE [dbo].[SelectedQPBookMarkDetail]
+(
+	[SelectedQPBookMarkDetailId] BIGINT NOT NULL PRIMARY KEY IDENTITY(1,1),
+	[SelectedQPDetailId] BIGINT NOT NULL,
+	[BookMarkName] NVARCHAR(50) NOT NULL,
+	[BookMarkText] NVARCHAR(MAX) NULL,
+	[IsActive] BIT DEFAULT 1,
+	CreatedDate DATETIME DEFAULT GETDATE(),
+	CreatedById BIGINT NOT NULL DEFAULT 1,
+	ModifiedDate DATETIME DEFAULT GETDATE(),
+	ModifiedById BIGINT NOT NULL DEFAULT 1
+)

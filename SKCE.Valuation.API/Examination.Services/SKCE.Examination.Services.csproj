@@ -33,7 +33,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="SyllabusDocumentTemplate\PG_Syllabustemplate.docx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="SyllabusDocumentTemplate\Syllabus_sample template.doc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="SyllabusDocumentTemplate\UG_Syllabustemplate.docx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

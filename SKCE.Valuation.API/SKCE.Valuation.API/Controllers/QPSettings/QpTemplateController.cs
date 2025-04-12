@@ -3,6 +3,7 @@ using DocumentFormat.OpenXml.Office2010.Word;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Mvc;
 using SKCE.Examination.Models.DbModels.Common;
+using SKCE.Examination.Models.DbModels.QPSettings;
 using SKCE.Examination.Services.Helpers;
 using SKCE.Examination.Services.QPSettings;
 using SKCE.Examination.Services.ViewModels.Common;
@@ -183,5 +184,27 @@ namespace SKCE.Examination.API.Controllers.QPSettings
             return Ok(result);
         }
 
+        [HttpGet("ProcessSelectedQPBookMarks/{userQPTemplateId}")]
+        public async Task<ActionResult<bool>> ProcessSelectedQPBookMarks(long userQPTemplateId)
+        {
+            var userQPTemplate = await _qpTemplateService.ProcessSelectedQPBookMarks(userQPTemplateId);
+            if (userQPTemplate == null) return NotFound();
+            return Ok(userQPTemplate);
+        }
+
+        [HttpPost("GetQPAKDetails")]
+        public async Task<ActionResult<List<SelectedQPBookMarkDetail>>> GetQPAKDetails(SelectedQPDetailVM selectedQPDetailVM, string questionNumber)
+        {
+            var selectedQPBookMarkDetails = await _qpTemplateService.GetQPAKDetails(selectedQPDetailVM, questionNumber);
+            if (selectedQPBookMarkDetails == null) return NotFound();
+            return Ok(selectedQPBookMarkDetails);
+        }
+        [HttpPost("GetAllQPAKDetails")]
+        public async Task<ActionResult<List<SelectedQPBookMarkDetail>>> GetAllQPAKDetails(SelectedQPDetailVM selectedQPDetailVM)
+        {
+            var selectedQPBookMarkDetails = await _qpTemplateService.GetAllQPAKDetails(selectedQPDetailVM);
+            if (selectedQPBookMarkDetails == null) return NotFound();
+            return Ok(selectedQPBookMarkDetails);
+        }
     }
 }

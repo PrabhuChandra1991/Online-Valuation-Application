@@ -14,6 +14,8 @@
 	[QPPrintedWordDocumentId] BIGINT NULL,
 	[QPPrintedDate] DATETIME NULL,
 	[QPPrintedById] BIGINT NULL,
+	[UserQPTemplateId] BIGINT NULL,
+	[IsQPOnly] BIT NULL,
 	[IsActive] BIT DEFAULT 1,
 	CreatedDate DATETIME DEFAULT GETDATE(),
 	CreatedById BIGINT NOT NULL,

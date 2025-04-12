@@ -19,6 +19,8 @@ using Syncfusion.Licensing;
 using Spire.Xls.Core.Spreadsheet;
 using BookmarksNavigator = Spire.Doc.Documents.BookmarksNavigator;
 using System.Linq;
+using System.Xml;
+using HtmlAgilityPack;
 namespace SKCE.Examination.Services.QPSettings
 {
     public class QpTemplateService 
@@ -2343,42 +2345,101 @@ namespace SKCE.Examination.Services.QPSettings
         }
         public void SaveSelectedQPBookmarksByFilePath(SelectedQPDetail selectedQPDetail)
         {
-            var fileName = _context.Documents.FirstOrDefault(d => d.DocumentId == selectedQPDetail.QPPrintedWordDocumentId)?.Name;
-            Document sourceDoc = _azureBlobStorageHelper.DownloadWordDocumentFromBlob(fileName).Result;
-            // Iterate through all bookmarks in the source document
-
-            var qpDocumentBookMarks = new List<SelectedQPBookMarkDetail>();
-            foreach (Spire.Doc.Bookmark bookmark in sourceDoc.Bookmarks)
+            try
             {
-                if(!bookmark.Name.StartsWith("Q") || bookmark.Name.Equals("QPCODE")) continue;
-               
-                string bookmarkHtmlBase64 = ConvertBookmarkToHtmlBase64(sourceDoc, bookmark);
-
-                if (!string.IsNullOrEmpty(bookmarkHtmlBase64))
+                var fileName = _context.Documents.FirstOrDefault(d => d.DocumentId == selectedQPDetail.QPPrintedWordDocumentId)?.Name;
+                Document sourceDoc = _azureBlobStorageHelper.DownloadWordDocumentFromBlob(fileName).Result;
+                // Iterate through all bookmarks in the source document
+                var qpDocumentBookMarks = new List<SelectedQPBookMarkDetail>();
+                foreach (Spire.Doc.Bookmark bookmark in sourceDoc.Bookmarks)
                 {
-                    var existingQpBookMark = _context.SelectedQPBookMarkDetails.FirstOrDefault(qpb => qpb.SelectedQPDetailId == selectedQPDetail.SelectedQPDetailId && qpb.BookMarkName == bookmark.Name);
-                    if (existingQpBookMark == null)
+                    string bookmarkHtmlBase64 = string.Empty;
+                    if (!bookmark.Name.StartsWith("Q") || bookmark.Name.Equals("QPCODE")) continue;
+                    try
                     {
-                        var qPDocumentBookMark = new SelectedQPBookMarkDetail
-                        {
-                            SelectedQPDetailId = selectedQPDetail.SelectedQPDetailId,
-                            BookMarkName = bookmark.Name,
-                            BookMarkText = bookmarkHtmlBase64
-                        };
-                        AuditHelper.SetAuditPropertiesForInsert(qPDocumentBookMark, 1);
-                        qpDocumentBookMarks.Add(qPDocumentBookMark);
+                        bookmarkHtmlBase64 = ExtractBookmarkAsHtmlBase64(sourceDoc, bookmark.Name);
                     }
-                    else
+                    catch (Exception)
                     {
-                        existingQpBookMark.BookMarkText = bookmarkHtmlBase64;
-                        AuditHelper.SetAuditPropertiesForUpdate(existingQpBookMark, 1);
+                        continue;
+                    }
+
+                    if (!string.IsNullOrEmpty(bookmarkHtmlBase64))
+                    {
+                        var existingQpBookMark = _context.SelectedQPBookMarkDetails.FirstOrDefault(qpb => qpb.SelectedQPDetailId == selectedQPDetail.SelectedQPDetailId && qpb.BookMarkName == bookmark.Name);
+                        if (existingQpBookMark == null)
+                        {
+                            var qPDocumentBookMark = new SelectedQPBookMarkDetail
+                            {
+                                SelectedQPDetailId = selectedQPDetail.SelectedQPDetailId,
+                                BookMarkName = bookmark.Name,
+                                BookMarkText = bookmarkHtmlBase64
+                            };
+                            AuditHelper.SetAuditPropertiesForInsert(qPDocumentBookMark, 1);
+                            qpDocumentBookMarks.Add(qPDocumentBookMark);
+                        }
+                        else
+                        {
+                            existingQpBookMark.BookMarkText = bookmarkHtmlBase64;
+                            AuditHelper.SetAuditPropertiesForUpdate(existingQpBookMark, 1);
+                        }
                     }
                 }
+                _context.SelectedQPBookMarkDetails.AddRange(qpDocumentBookMarks);
+                _context.SaveChanges();
             }
-            _context.SelectedQPBookMarkDetails.AddRange(qpDocumentBookMarks);
-            _context.SaveChanges();
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
+        public string ExtractBookmarkAsHtmlBase64(Document doc, string bookmarkName)
+        {
+            //// Load the Word documentDocument
+            //Document doc = new Document();
+            //doc.LoadFromFile(filePath);
+
+            // Find the bookmark  
+            BookmarksNavigator navigator = new BookmarksNavigator(doc);
+            navigator.MoveToBookmark(bookmarkName);
+
+            // Extract the content inside the bookmark as a document fragment  
+            Spire.Doc.Documents.TextBodyPart content = navigator.GetBookmarkContent();
+
+            // Create a new temporary document to hold this content  
+            Document tempDoc = new Document();
+            Section section = tempDoc.AddSection();
+
+            foreach (DocumentObject item in content.BodyItems)
+            {
+                section.Body.ChildObjects.Add(item.Clone());
+            }
+
+            // Force inline styles and embedded images manually via options (not passed to stream save)
+            var options = new HtmlExportOptions
+            {
+                CssStyleSheetType = Spire.Doc.CssStyleSheetType.Inline,
+                ImageEmbedded = true
+            };
+            string htmlContent = string.Empty;
+            // Save to file first to apply options (required for options to take effect)
+            tempDoc.SaveToFile("temp.html", FileFormat.Html);
+
+            if (bookmarkName.Contains("IMG"))
+            {
+                htmlContent = LoadHtmlWithEmbeddedResources("temp.html", Path.GetDirectoryName("temp.html"));
+            }
+            else
+            {
+                // Read file back to stream or string (simulate SaveToStream with options)
+                 htmlContent = File.ReadAllText("temp.html");
+            }
+            htmlContent = htmlContent.Replace("Evaluation Warning: The document was created with Spire.Doc for .NET.", "");
+            var base64Html = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(htmlContent));
+
+            return base64Html;
+        }
         public async Task<List<SelectedQPBookMarkDetail>> GetQPAKDetails(SelectedQPDetailVM selectedQPDetailVM, string questionNumber)
         {
             var selectedQPDetail = _context.SelectedQPDetails.FirstOrDefault(qp => 
@@ -2422,6 +2483,74 @@ namespace SKCE.Examination.Services.QPSettings
                 .Where(qpb => qpb.SelectedQPDetailId == selectedQPDetail.SelectedQPDetailId)
                 .ToListAsync();
             return selectedQPBookMarks;
+        }
+
+        public static string LoadHtmlWithEmbeddedResources(string htmlFilePath, string basePath)
+        {
+            var htmlDoc = new HtmlDocument();
+            htmlDoc.Load(htmlFilePath);
+
+            // Embed CSS files
+            var linkNodes = htmlDoc.DocumentNode.SelectNodes("//link[@rel='stylesheet']");
+            if (linkNodes != null)
+            {
+                foreach (var link in linkNodes)
+                {
+                    var href = link.GetAttributeValue("href", null);
+                    if (href != null)
+                    {
+                        var cssPath = Path.Combine(basePath, href);
+                        if (File.Exists(cssPath))
+                        {
+                            var cssContent = File.ReadAllText(cssPath);
+                            var styleNode = HtmlNode.CreateNode($"<style>{cssContent}</style>");
+                            link.ParentNode.ReplaceChild(styleNode, link);
+                        }
+                    }
+                }
+            }
+
+            // Embed images as base64
+            var imgNodes = htmlDoc.DocumentNode.SelectNodes("//img[@src]");
+            if (imgNodes != null)
+            {
+                foreach (var img in imgNodes)
+                {
+                    var src = img.GetAttributeValue("src", null);
+                    if (src != null)
+                    {
+                        var imgPath = Path.Combine(basePath, src);
+                        if (File.Exists(imgPath))
+                        {
+                            var imgBytes = File.ReadAllBytes(imgPath);
+                            var base64 = Convert.ToBase64String(imgBytes);
+                            var ext = Path.GetExtension(imgPath).TrimStart('.');
+                            var mime = GetMimeType(ext);
+
+                            img.SetAttributeValue("src", $"data:{mime};base64,{base64}");
+                        }
+                    }
+                }
+            }
+
+            using (var sw = new StringWriter())
+            {
+                htmlDoc.Save(sw);
+                return sw.ToString();
+            }
+        }
+
+        private static string GetMimeType(string ext)
+        {
+            return ext.ToLower() switch
+            {
+                "png" => "image/png",
+                "jpg" or "jpeg" => "image/jpeg",
+                "gif" => "image/gif",
+                "bmp" => "image/bmp",
+                "svg" => "image/svg+xml",
+                _ => "application/octet-stream"
+            };
         }
     }
 }

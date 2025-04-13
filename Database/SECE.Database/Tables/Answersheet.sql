@@ -27,3 +27,7 @@
 	[ModifiedDate] DATETIME DEFAULT GETDATE(),
 	[ModifiedById] BIGINT NOT NULL 
 )
+GO  
+ALTER TABLE [dbo].[Answersheet]
+ADD CONSTRAINT [UC_Answersheet] UNIQUE([DummyNumber])
+GO  

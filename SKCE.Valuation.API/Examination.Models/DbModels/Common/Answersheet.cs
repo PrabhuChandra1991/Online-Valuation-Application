@@ -17,6 +17,7 @@ namespace SKCE.Examination.Models.DbModels.Common
         public required string RegulationYear { get; set; }
         public required int Semester { get; set; }
         public required int DegreeTypeId { get; set; }
+        public required string ExamType { get; set; }
         public required string ExamMonth { get; set; }
         public required string ExamYear { get; set; }
         public required string DummyNumber { get; set; }

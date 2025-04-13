@@ -2144,41 +2144,16 @@ namespace SKCE.Examination.Services.QPSettings
             var qpDocumentBookMarks = new List<UserQPDocumentBookMark>();
             foreach (Spire.Doc.Bookmark bookmark in sourceDoc.Bookmarks)
             {
-                // Find the bookmark
-                BookmarksNavigator navigator = new BookmarksNavigator(sourceDoc);
-                navigator.MoveToBookmark(bookmark.Name);
-
-                // Extract the content inside the bookmark as a document fragment
-                Spire.Doc.Documents.TextBodyPart content = navigator.GetBookmarkContent();
-
-                // Create a new temporary document to hold this content
-                Spire.Doc.Document tempDoc = new Spire.Doc.Document();
-                Spire.Doc.Section section = tempDoc.AddSection();
-
-                foreach (Spire.Doc.Body item in content.BodyItems)
+                string bookmarkHtmlBase64 = string.Empty;
+                if (!bookmark.Name.StartsWith("Q") || bookmark.Name.Equals("QPCODE")) continue;
+                try
                 {
-                    section.Body.ChildObjects.Add(item.Clone());
+                    bookmarkHtmlBase64 = ExtractBookmarkAsHtmlBase64(sourceDoc, bookmark.Name);
                 }
-
-                // Save to a MemoryStream as HTML with embedded base64 images
-                MemoryStream htmlStream = new MemoryStream();
-                tempDoc.SaveToStream(htmlStream, FileFormat.Html);
-
-                // Rewind the stream
-                htmlStream.Position = 0;
-
-                // Read HTML content from stream
-                string htmlContent;
-                using (StreamReader reader = new StreamReader(htmlStream))
+                catch (Exception)
                 {
-                    htmlContent = reader.ReadToEnd();
+                    continue;
                 }
-
-                // Convert HTML content to Base64
-                byte[] htmlBytes = System.Text.Encoding.UTF8.GetBytes(htmlContent);
-                string bookmarkHtmlBase64 = Convert.ToBase64String(htmlBytes);
-                //string bookmarkHtmlBase64 = ConvertBookmarkToHtmlBase64(sourceDoc, bookmark);
-
                 if (!string.IsNullOrEmpty(bookmarkHtmlBase64))
                 {
                     var existingQpBookMark = _context.UserQPDocumentBookMarks.FirstOrDefault(qpb => qpb.UserQPTemplateId == userqpTemplateId && qpb.BookMarkName == bookmark.Name && qpb.DocumentId == documentId);

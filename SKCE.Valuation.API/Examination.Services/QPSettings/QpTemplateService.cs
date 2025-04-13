@@ -2442,7 +2442,7 @@ namespace SKCE.Examination.Services.QPSettings
         }
         public async Task<List<SelectedQPBookMarkDetail>> GetQPAKDetails(SelectedQPDetailVM selectedQPDetailVM, string questionNumber)
         {
-            var selectedQPDetail = _context.SelectedQPDetails.FirstOrDefault(qp => 
+            var selectedQPDetail = _context.SelectedQPDetails.Where(qp => 
             qp.InstitutionId == selectedQPDetailVM.InstitutionId &&
             qp.CourseId == selectedQPDetailVM.CourseId &&
             qp.RegulationYear == selectedQPDetailVM.RegulationYear &&
@@ -2451,7 +2451,7 @@ namespace SKCE.Examination.Services.QPSettings
             qp.ExamType == selectedQPDetailVM.ExamType &&
             qp.Semester == selectedQPDetailVM.Semester &&
             qp.ExamMonth == selectedQPDetailVM.ExamMonth &&
-            qp.ExamYear == selectedQPDetailVM.ExamYear && !qp.IsQPOnly.Value);
+            qp.ExamYear == selectedQPDetailVM.ExamYear && !qp.IsQPOnly.Value).OrderByDescending(d => d.QPPrintedDate).FirstOrDefault();
 
             if (selectedQPDetail == null) return new List<SelectedQPBookMarkDetail>();
             List<string> questionBookMarks = new List<string>();
@@ -2467,7 +2467,7 @@ namespace SKCE.Examination.Services.QPSettings
 
         public async Task<List<SelectedQPBookMarkDetail>> GetAllQPAKDetails(SelectedQPDetailVM selectedQPDetailVM)
         {
-            var selectedQPDetail = _context.SelectedQPDetails.FirstOrDefault(qp =>
+            var selectedQPDetail = _context.SelectedQPDetails.Where(qp =>
             qp.InstitutionId == selectedQPDetailVM.InstitutionId &&
             qp.CourseId == selectedQPDetailVM.CourseId &&
             qp.RegulationYear == selectedQPDetailVM.RegulationYear &&
@@ -2476,7 +2476,7 @@ namespace SKCE.Examination.Services.QPSettings
             qp.ExamType == selectedQPDetailVM.ExamType &&
             qp.Semester == selectedQPDetailVM.Semester &&
             qp.ExamMonth == selectedQPDetailVM.ExamMonth &&
-            qp.ExamYear == selectedQPDetailVM.ExamYear && !qp.IsQPOnly.Value);
+            qp.ExamYear == selectedQPDetailVM.ExamYear && !qp.IsQPOnly.Value).OrderByDescending(d=>d.QPPrintedDate).FirstOrDefault();
 
             if (selectedQPDetail == null) return new List<SelectedQPBookMarkDetail>();
             var selectedQPBookMarks = await _context.SelectedQPBookMarkDetails

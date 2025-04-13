@@ -23,6 +23,7 @@ using Microsoft.EntityFrameworkCore;
 using Syncfusion.Pdf.Parsing;
 using Syncfusion.Pdf;
 using HtmlAgilityPack;
+using System.Threading.Tasks;
 
 namespace SKCE.Examination.Services.Helpers
 {
@@ -125,7 +126,7 @@ namespace SKCE.Examination.Services.Helpers
                     else if (bookmarkName == "QPCODE")
                     {
                         bookmarkHtml = string.Empty;
-                        if (isForPrint && userQPTemplate.IsQPOnly)
+                        if (isForPrint)
                         {
                             bookmarkHtml = GetQPCode(qPTemplate);
                             qPTemplate.QPCode = bookmarkHtml;
@@ -304,7 +305,7 @@ namespace SKCE.Examination.Services.Helpers
             qpCode = $"{string.Join("", months.Select(m => m.Trim()[0]))}{qPTemplate.ExamYear}{runningNumber}{randomNumber.ToString()}";
             return qpCode;
         }
-        private void SaveSelectedQPDetail(QPTemplate qPTemplate, UserQPTemplate userQPTemplate, long wordDocumentId,long documentId)
+        private async Task SaveSelectedQPDetail(QPTemplate qPTemplate, UserQPTemplate userQPTemplate, long wordDocumentId,long documentId)
         {
             var existingQPTemplate = _context.QPTemplates.FirstOrDefault(q => q.QPTemplateId == qPTemplate.QPTemplateId);
             if(existingQPTemplate != null)
@@ -317,6 +318,22 @@ namespace SKCE.Examination.Services.Helpers
             {
                 existingUserQPTemplate.QPCode = qPTemplate.QPCode;
                 AuditHelper.SetAuditPropertiesForUpdate(existingUserQPTemplate, 1);
+            }
+           var selectedExaminations= _context.Examinations.Where(qp =>
+            qp.InstitutionId == userQPTemplate.InstitutionId &&
+            qp.CourseId == qPTemplate.CourseId &&
+            qp.RegulationYear == qPTemplate.RegulationYear &&
+            qp.BatchYear == qPTemplate.BatchYear &&
+            qp.DegreeTypeId == qPTemplate.DegreeTypeId &&
+            qp.ExamType == qPTemplate.ExamType &&
+            qp.Semester == qPTemplate.Semester &&
+            qp.ExamMonth == qPTemplate.ExamMonth &&
+            qp.ExamYear == qPTemplate.ExamYear).ToList();
+            foreach (var selectedExamination in selectedExaminations)
+            {
+                selectedExamination.IsQPPrinted = true;
+                selectedExamination.QPPrintedById = 1;
+                selectedExamination.QPPrintedDate = DateTime.Now;
             }
 
             var selectedQPDetail = new SelectedQPDetail

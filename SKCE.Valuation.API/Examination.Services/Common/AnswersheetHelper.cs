@@ -14,6 +14,7 @@ namespace SKCE.Examination.Services.Common
 
         public async Task<string> ImportDummyNumberByExcel(Stream excelStream, long loggedInUserId)
         {
+            int countExists = 0;
             int countSuccess = 0;
             int countError = 0;
 
@@ -36,6 +37,7 @@ namespace SKCE.Examination.Services.Common
                 var institions = this._dbContext.Institutions.ToList();
                 var courses = this._dbContext.Courses.ToList();
                 var degreeTypes = this._dbContext.DegreeTypes.ToList();
+                var existingDummyNumbers = this._dbContext.Answersheets.Select(x => x.DummyNumber).ToList();
 
                 foreach (var dataRow in dataRows)
                 {
@@ -65,25 +67,32 @@ namespace SKCE.Examination.Services.Common
 
                     if (IsValid)
                     {
-                        this._dbContext.Answersheets.Add(new Answersheet
+                        if (existingDummyNumbers.Any(x => x == cellDummyNo))
                         {
-                            InstitutionId = instition != null ? instition.InstitutionId : 0,
-                            CourseId = course != null ? course.CourseId : 0,
-                            BatchYear = cellBatch,
-                            RegulationYear = cellRegulation,
-                            Semester = int.Parse(cellSemester),
-                            DegreeTypeId = degreeType != null ? (int)degreeType.DegreeTypeId : 0,
-                            ExamType = cellExamType,
-                            ExamMonth = cellExamMonth,
-                            ExamYear = cellExamYear,
-                            DummyNumber = cellDummyNo,
-                            IsActive = true,
-                            CreatedById = loggedInUserId,
-                            CreatedDate = DateTime.Now,
-                            ModifiedById = loggedInUserId,
-                            ModifiedDate = DateTime.Now
-                        });
-                        countSuccess++;
+                            countExists++;
+                        }
+                        else
+                        {
+                            this._dbContext.Answersheets.Add(new Answersheet
+                            {
+                                InstitutionId = instition != null ? instition.InstitutionId : 0,
+                                CourseId = course != null ? course.CourseId : 0,
+                                BatchYear = cellBatch,
+                                RegulationYear = cellRegulation,
+                                Semester = int.Parse(cellSemester),
+                                DegreeTypeId = degreeType != null ? (int)degreeType.DegreeTypeId : 0,
+                                ExamType = cellExamType,
+                                ExamMonth = cellExamMonth,
+                                ExamYear = cellExamYear,
+                                DummyNumber = cellDummyNo,
+                                IsActive = true,
+                                CreatedById = loggedInUserId,
+                                CreatedDate = DateTime.Now,
+                                ModifiedById = loggedInUserId,
+                                ModifiedDate = DateTime.Now
+                            });
+                            countSuccess++;
+                        }
                     }
                     else
                     {
@@ -93,7 +102,7 @@ namespace SKCE.Examination.Services.Common
 
                 await this._dbContext.SaveChangesAsync();
 
-                return $"Imported Sucessfull...!. Success Count is " + countSuccess.ToString() + ", Error Count is " + countError.ToString();
+                return $"Data Imported Sucessfully. \n Already Exists : {countExists.ToString()}  \n Success imported : {countSuccess.ToString()}\n Validation Error : " + countError.ToString();
 
             }
             catch (Exception ex)

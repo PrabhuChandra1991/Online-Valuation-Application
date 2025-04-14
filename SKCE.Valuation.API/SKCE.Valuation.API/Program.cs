@@ -31,6 +31,7 @@ builder.Services.AddAutoMapper(typeof(QPTemplateMappingProfile));
 builder.Services.AddScoped<AzureBlobStorageHelper>();
 builder.Services.AddScoped<BookmarkProcessor>();
 builder.Services.AddScoped<InstitutionService>();
+builder.Services.AddScoped<AnswersheetService>();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers()

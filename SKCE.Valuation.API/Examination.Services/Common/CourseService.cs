@@ -38,7 +38,7 @@ namespace SKCE.Examination.Services.Common
                     finalCourseList.Add(course);
                 }
             }
-            return courses;
+            return courses.OrderBy(x => x.Name).ToList();
         }
         public async Task<Course?> GetCourseByIdAsync(long id)
         {

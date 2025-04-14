@@ -120,9 +120,11 @@
                         Upload generated QP
                       </button>
                       <br>
+                      <br>
                       <a *ngIf="element.qpTemplateStatusTypeId === 8 || element.qpTemplateStatusTypeId === 10" target="_blank" download  href="{{element.qpDocumentUrl}}">
                         Download QP template
                       </a> 
+                      <br>
                       <br>
                       <a *ngIf="element.qpTemplateStatusTypeId === 8 || element.qpTemplateStatusTypeId === 10" target="_blank" download  href="{{element.courseSyllabusDocumentUrl}}">
                         Download Syllabus

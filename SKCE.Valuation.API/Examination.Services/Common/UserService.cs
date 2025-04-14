@@ -106,9 +106,9 @@ namespace SKCE.Examination.Services.Common
             await _context.SaveChangesAsync();
             return true;
         }
-        public async Task<bool> CheckSameNameOtherUserExists(string Name, long userId)
+        public async Task<bool> CheckSameNameOtherUserExists(User user, long userId)
         {
-            return  _context.Users.Any(u => u.Name == Name && u.UserId != userId);
+            return  _context.Users.Any(u => (u.Email == user.Email || u.MobileNumber == user.MobileNumber) && u.UserId != userId);
         }
     }
 }

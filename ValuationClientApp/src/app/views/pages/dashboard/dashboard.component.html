@@ -25,7 +25,7 @@
                 <!-- Name -->
                 <div class="col-sm-4">
                   <label class="form-label">Name <span class="text-danger"> *</span></label>
-                  <input type="text" class="form-control" formControlName="name" [attr.readonly]='!isUserEnabled' />
+                  <input type="text" class="form-control" formControlName="name" [readonly]="isUserEnabled" />
                   <span class="text-danger"
                     *ngIf="(userForm.controls.name.touched) && userForm.controls.name.errors?.required">
                     Name is required
@@ -62,7 +62,7 @@
 
                 <div class="col-sm-4">
                   <label class="form-label">Email Address <span class="text-danger">*</span></label>
-                  <input type="text" formControlName="email" class="form-control" readonly />
+                  <input type="text" formControlName="email" class="form-control" [readonly]="isUserEnabled" />
                   <span class="text-danger"
                     *ngIf="(userForm.controls.email.touched) && userForm.controls.email.errors?.required">
                     Email is required
@@ -71,7 +71,7 @@
 
                 <div class="col-sm-4">
                   <label class="form-label">Mobile Number <span class="text-danger">*</span></label>
-                  <input type="text" formControlName="mobileNumber" class="form-control" readonly />
+                  <input type="text" formControlName="mobileNumber" class="form-control" [readonly]="isUserEnabled"/>
                   <span class="text-danger"
                     *ngIf="(userForm.controls.mobileNumber.touched) && userForm.controls.mobileNumber.errors?.required">
                     Mobile Number is required
@@ -430,12 +430,12 @@
           </span>
         </div>
         <div class="mb-3">
-          <label>No.Of.Semester <span class="text-danger">*</span></label>
+          <label>No. of Semesters Handled <span class="text-danger">*</span></label>
           <input type="number" class="form-control" formControlName="numberOfYearsHandled" />
         </div>
         <div class="mb-3">
           <input type="checkbox" formControlName="isHandledInLast2Semester" />
-          <label>Handled in Last 2 Semesters</label>
+          <label>&nbsp;Whether Handled in Last 2 Semesters?</label>
         </div>
       </form>
     </div>

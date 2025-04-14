@@ -8,7 +8,6 @@ import { UserService } from '../services/user.service';
 import { MatIcon } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import {MatButtonModule} from '@angular/material/button';
-import { ActivatedRoute } from '@angular/router';
 import { DashboardService } from '../services/dashboard.service';
 import { UserAreaOfSpecialization  } from '../models/userAreaOfSpecialization.model';
 import { UserDesignation } from '../models/userDesignation.model';
@@ -17,6 +16,7 @@ import { UserQualification } from '../models/userQualification';
 import { User } from '../models/user.model';
 import { UserCourse } from '../models/userCourse.model';
 import { SpinnerService } from '../services/spinner.service';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 
 const currentDate = new Date().toISOString();
@@ -35,7 +35,8 @@ const currentDate = new Date().toISOString();
     CommonModule,
     MatIcon,
     MatCheckboxModule,
-    MatButtonModule
+    MatButtonModule,
+    RouterLink,
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
@@ -172,7 +173,8 @@ export class DashboardComponent implements OnInit   {
     private toastr: ToastrService,
     private route: ActivatedRoute,
     private dashboardService: DashboardService,
-    private spinnerService: SpinnerService
+    private spinnerService: SpinnerService,
+    private router: Router
   ) {
 
      // Initialize the form with validation
@@ -387,15 +389,16 @@ export class DashboardComponent implements OnInit   {
 
         this.userForm.updateValueAndValidity();
 
-        if(selectedUser.isEnabled)
-          this.isUserEnabled = true;
-          //this.userForm.controls['name'].disable();
+        if(selectedUser.isEnabled){
+          const loggedData = localStorage.getItem('userData');
+          if (loggedData) {
+            const loggedInuserData = JSON.parse(loggedData);
 
-        console.log("after patch",this.userForm.value);
-
-
+            if(selectedUser.isEnabled && loggedInuserData.roleId != 1)
+              this.isUserEnabled = true;
+          }
+        }
        }
-        console.log('selectedUser Details:', selectedUser);
       },
       error: (err) => {
         console.error('Error fetching user:', err);
@@ -924,7 +927,17 @@ validateTableData(): boolean {
     this.userService.updateUser(userData.userId, userData).subscribe({
       next: () => {
         this.toastr.success('User updated successfully!');
-
+        let  loggedUserData = null;
+      
+        const userDataString = localStorage.getItem('userData');
+        loggedUserData = userDataString ? JSON.parse(userDataString) : null;
+       
+        if (localStorage.getItem('isLoggedin') === 'true') {
+         if(loggedUserData.roleId == 1)
+           this.router.navigate(['/apps/user']);
+         else
+           this.router.navigate(['/apps/assigntemplate']);
+          }
       },
       error: () => {
         this.toastr.error('Failed to update user. Please try again.');

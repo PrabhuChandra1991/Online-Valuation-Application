@@ -55,7 +55,7 @@ namespace SKCE.Examination.API.Controllers.Common
             try
             {
                 if (id != user.UserId) return BadRequest();
-                var duplicateUserCheck = await _userService.CheckSameNameOtherUserExists(user.Name, user.UserId);
+                var duplicateUserCheck = await _userService.CheckSameNameOtherUserExists(user, user.UserId);
                 if (!duplicateUserCheck)
                 {
                     var updatedUser = await _userService.UpdateUserAsync(user);
@@ -63,7 +63,7 @@ namespace SKCE.Examination.API.Controllers.Common
                 }
                 else
                 {
-                    return BadRequest(new ResultModel() { Message = "User Name is already exists." });
+                    return BadRequest(new ResultModel() { Message = "User is already exists." });
                 }
             }
             catch (Exception ex)

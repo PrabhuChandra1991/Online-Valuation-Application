@@ -69,5 +69,13 @@ namespace SKCE.Examination.Services.Common
             return result.ToString();
         }
 
+
+        public async Task<List<AnswersheetQuestionAnswerDto>> GetQuestionAndAnswersByAnswersheetIdAsync(long answersheetId)
+        {
+            var helper = new AnswersheetQuestionAnswerHelper(this._context);
+            var result = await helper.GetQuestionAndAnswersByAnswersheetId(answersheetId);
+            return result.ToList();
+        }
+
     }
 }

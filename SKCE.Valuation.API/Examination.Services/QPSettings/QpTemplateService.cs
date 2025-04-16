@@ -449,6 +449,7 @@ namespace SKCE.Examination.Services.QPSettings
                         //send email
                         if (emailUser != null)
                         {
+                            emailUser.IsActive = true;
                             _emailService.SendEmailAsync(emailUser.Email, "Question Paper Assignment Notification – Sri Krishna Institutions, Coimbatore",
                               $"Dear {emailUser.Name}," +
                               $"\n\nYou have been assigned to generate a Question Paper for the following course:" +
@@ -588,6 +589,7 @@ namespace SKCE.Examination.Services.QPSettings
                         //send email
                         if (emailUser != null)
                         {
+                            emailUser.IsActive = true;
                             _emailService.SendEmailAsync(emailUser.Email, "Question Paper Assignment Notification – Sri Krishna Institutions, Coimbatore",
                               $"Dear {emailUser.Name}," +
                               $"\n\nYou have been assigned to generate a Question Paper for the following course:" +
@@ -2027,6 +2029,7 @@ namespace SKCE.Examination.Services.QPSettings
             //send email
             if (emailUser != null)
             {
+                emailUser.IsActive = true;
                 _emailService.SendEmailAsync(emailUser.Email, "Question Paper Assignment Scrutinization Notification – Sri Krishna Institutions, Coimbatore",
                   $"Dear {emailUser.Name}," +
                   $"\n\nYou have been assigned for Scrutinization for a Question Paper for the following course:" +

@@ -1226,7 +1226,7 @@ namespace SKCE.Examination.Services.QPSettings
             List<string> errors = new List<string>();
             HashSet<string> validBTs = new() { "U", "AP", "AN" };
             HashSet<string> validCOs = new() { "CO1", "CO2", "CO3", "CO4", "CO5", "CO6" };
-            HashSet<int> validMarks = new() { 6, 8, 10 };
+            HashSet<int> validMarks = new() { 0, 6, 8, 10, 16 };
 
             // Sample marks allocation for each CO-BT combination
             Dictionary<(string CO, string BT), int> marksDistribution = new Dictionary<(string, string), int>();
@@ -1306,12 +1306,12 @@ namespace SKCE.Examination.Services.QPSettings
                 if (string.IsNullOrEmpty(subQ1Text)) errors.Add($"❌ Q{qNo} SubQ1 text is empty.");
                 if (string.IsNullOrEmpty(subQ1CO) || !validCOs.Contains(subQ1CO)) errors.Add($"❌ Q{qNo} SubQ1 CO is invalid.");
                 if (string.IsNullOrEmpty(subQ1BT) || !validBTs.Contains(subQ1BT)) errors.Add($"❌ Q{qNo} SubQ1 BT is invalid.");
-                if (!validMarks.Contains(subQ1Marks)) errors.Add($"❌ Q{qNo} SubQ1 Marks should be 6, 8, or 10.");
+                if (!validMarks.Contains(subQ1Marks)) errors.Add($"❌ Q{qNo} SubQ1 Marks should be 0, 6, 8, 10 or 16.");
 
                 if (string.IsNullOrEmpty(subQ2Text)) errors.Add($"❌ Q{qNo} SubQ2 text is empty.");
                 if (string.IsNullOrEmpty(subQ2CO) || !validCOs.Contains(subQ2CO)) errors.Add($"❌ Q{qNo} SubQ2 CO is invalid.");
                 if (string.IsNullOrEmpty(subQ2BT) || !validBTs.Contains(subQ2BT)) errors.Add($"❌ Q{qNo} SubQ2 BT is invalid.");
-                if (!validMarks.Contains(subQ2Marks)) errors.Add($"❌ Q{qNo} SubQ2 Marks should be 6, 8, or 10.");
+                if (!validMarks.Contains(subQ2Marks)) errors.Add($"❌ Q{qNo} SubQ2 Marks should be 0, 6, 8, 10 or 16.");
 
                 if (!string.IsNullOrEmpty(qpakAssigned) && string.IsNullOrEmpty(subQ2AnswerKey)) errors.Add($"❌ Q{qNo} Answer key is missing for SubQ2 (QPAK assigned).");
 
@@ -1577,7 +1577,7 @@ namespace SKCE.Examination.Services.QPSettings
             List<string> errors = new List<string>();
             HashSet<string> validBTs = new() { "U", "AP", "AN" };
             HashSet<string> validCOs = new() { "CO1", "CO2", "CO3", "CO4", "CO5", "CO6" };
-            HashSet<int> validMarks = new() { 6, 8, 10 };
+            HashSet<int> validMarks = new() { 0, 5, 10, 15 };
             // Sample marks allocation for each CO-BT combination
             Dictionary<(string CO, string BT), int> marksDistribution = new Dictionary<(string, string), int>();
             Dictionary<string, int> coTotals = new Dictionary<string, int>(); // Total per CO
@@ -1585,7 +1585,7 @@ namespace SKCE.Examination.Services.QPSettings
             int grandTotal = 0; // Total of all marks
 
             int totalPartBMarks = 0;
-            int expectedPartBMarks = 128;
+            int expectedPartBMarks = 120;
 
             for (int qNo = 11; qNo <= 18; qNo++)
             {
@@ -1654,16 +1654,16 @@ namespace SKCE.Examination.Services.QPSettings
                 if (string.IsNullOrEmpty(subQ1Text)) errors.Add($"❌ Q{qNo} SubQ1 text is empty.");
                 if (string.IsNullOrEmpty(subQ1CO) || !validCOs.Contains(subQ1CO)) errors.Add($"❌ Q{qNo} SubQ1 CO is invalid.");
                 if (string.IsNullOrEmpty(subQ1BT) || !validBTs.Contains(subQ1BT)) errors.Add($"❌ Q{qNo} SubQ1 BT is invalid.");
-                if (!validMarks.Contains(subQ1Marks)) errors.Add($"❌ Q{qNo} SubQ1 Marks should be 6, 8, or 10.");
+                if (!validMarks.Contains(subQ1Marks)) errors.Add($"❌ Q{qNo} SubQ1 Marks should be 0, 5, 10, or 15.");
 
                 if (string.IsNullOrEmpty(subQ2Text)) errors.Add($"❌ Q{qNo} SubQ2 text is empty.");
                 if (string.IsNullOrEmpty(subQ2CO) || !validCOs.Contains(subQ2CO)) errors.Add($"❌ Q{qNo} SubQ2 CO is invalid.");
                 if (string.IsNullOrEmpty(subQ2BT) || !validBTs.Contains(subQ2BT)) errors.Add($"❌ Q{qNo} SubQ2 BT is invalid.");
-                if (!validMarks.Contains(subQ2Marks)) errors.Add($"❌ Q{qNo} SubQ2 Marks should be 6, 8, or 10.");
+                if (!validMarks.Contains(subQ2Marks)) errors.Add($"❌ Q{qNo} SubQ2 Marks should be 0, 5, 10, or 15.");
 
                 if (!string.IsNullOrEmpty(qpakAssigned) && string.IsNullOrEmpty(subQ2AnswerKey)) errors.Add($"❌ Q{qNo} Answer key is missing for SubQ2 (QPAK assigned).");
 
-                if (totalMarks != 16) errors.Add($"❌ Q{qNo} Total Marks = {totalMarks} (should be 16).");
+                if (totalMarks != 15) errors.Add($"❌ Q{qNo} Total Marks = {totalMarks} (should be 15).");
 
                 // Add to table
                 //htmlTable.Append($"<tr><td>Q{qNo}</td><td>{subQ1Text}</td><td>{subQ1CO}</td><td>{subQ1BT}</td><td>{subQ1Marks}</td><td>{subQ2Text}</td><td>{subQ2CO}</td><td>{subQ2BT}</td><td>{subQ2Marks}</td><td>{totalMarks}</td></tr>");
@@ -1750,7 +1750,7 @@ namespace SKCE.Examination.Services.QPSettings
             List<string> errors = new List<string>();
             HashSet<string> validBTs = new() { "U", "AP", "AN" };
             HashSet<string> validCOs = new() { "CO1", "CO2", "CO3", "CO4", "CO5", "CO6" };
-            HashSet<int> validMarks = new() { 10 };
+            HashSet<int> validMarks = new() { 0, 10, 20 };
             // Sample marks allocation for each CO-BT combination
             Dictionary<(string CO, string BT), int> marksDistribution = new Dictionary<(string, string), int>();
             Dictionary<string, int> coTotals = new Dictionary<string, int>(); // Total per CO
@@ -1825,12 +1825,12 @@ namespace SKCE.Examination.Services.QPSettings
                 if (string.IsNullOrEmpty(subQ1Text)) errors.Add($"❌ Q{qNo} SubQ1 text is empty.");
                 if (string.IsNullOrEmpty(subQ1CO) || !validCOs.Contains(subQ1CO)) errors.Add($"❌ Q{qNo} SubQ1 CO is invalid.");
                 if (string.IsNullOrEmpty(subQ1BT) || !validBTs.Contains(subQ1BT)) errors.Add($"❌ Q{qNo} SubQ1 BT is invalid.");
-                if (!validMarks.Contains(subQ1Marks)) errors.Add($"❌ Q{qNo} SubQ1 Marks should be 10.");
+                if (!validMarks.Contains(subQ1Marks)) errors.Add($"❌ Q{qNo} SubQ1 Marks should be 0, 10, 20.");
 
                 if (string.IsNullOrEmpty(subQ2Text)) errors.Add($"❌ Q{qNo} SubQ2 text is empty.");
                 if (string.IsNullOrEmpty(subQ2CO) || !validCOs.Contains(subQ2CO)) errors.Add($"❌ Q{qNo} SubQ2 CO is invalid.");
                 if (string.IsNullOrEmpty(subQ2BT) || !validBTs.Contains(subQ2BT)) errors.Add($"❌ Q{qNo} SubQ2 BT is invalid.");
-                if (!validMarks.Contains(subQ2Marks)) errors.Add($"❌ Q{qNo} SubQ2 Marks should be 10.");
+                if (!validMarks.Contains(subQ2Marks)) errors.Add($"❌ Q{qNo} SubQ2 Marks should be 0, 10, 20.");
 
                 if (!string.IsNullOrEmpty(qpakAssigned) && string.IsNullOrEmpty(subQ2AnswerKey)) errors.Add($"❌ Q{qNo} Answer key is missing for SubQ2 (QPAK assigned).");
 
@@ -1997,6 +1997,7 @@ namespace SKCE.Examination.Services.QPSettings
                     GraphName = qpUserTemplate.GraphName,
                     QPTemplateId = qpUserTemplate.QPTemplateId,
                     SubmittedQPDocumentId = qpUserTemplate.SubmittedQPDocumentId,
+                    UserQPDocumentId = qpUserTemplate.SubmittedQPDocumentId
                 };
                 AuditHelper.SetAuditPropertiesForInsert(userQPTemplate, 1);
                 _context.UserQPTemplates.Add(userQPTemplate);

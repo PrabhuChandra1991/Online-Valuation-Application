@@ -24,6 +24,7 @@ using Syncfusion.Pdf.Parsing;
 using Syncfusion.Pdf;
 using HtmlAgilityPack;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace SKCE.Examination.Services.Helpers
 {
@@ -42,7 +43,7 @@ namespace SKCE.Examination.Services.Helpers
             printerName = configuration["Print:PrinterName"] ?? throw new ArgumentNullException(nameof(configuration), "PrinterName is not configured.");
         }
         // Processes bookmarks in a source document and prints the modified document
-        public async Task ProcessBookmarksAndPrint(QPTemplate qPTemplate, UserQPTemplate userQPTemplate, string inputDocPath, string documentPathToPrint, bool isForPrint, long printedWordDocumentId)
+        public async Task<string> ProcessBookmarksAndPrint(QPTemplate qPTemplate, UserQPTemplate userQPTemplate, string inputDocPath, string documentPathToPrint, bool isForPrint, long printedWordDocumentId)
         {
             try
             {
@@ -280,20 +281,21 @@ namespace SKCE.Examination.Services.Helpers
                 ////Need to test pdf without using Sync fusion
                 //finalVersionDoc.SaveToFile(previewPdfPath, FileFormat.PDF);
                 
-                OpenPdfInBrowser(previewPdfPath);
+                //OpenPdfInBrowser(previewPdfPath);
 
-                if (!isForPrint) return;
+                if (!isForPrint) return previewPdfPath;
+
                 var pdfDocumentId = await _azureBlobStorageHelper.UploadFileToBlob(previewPdfPath, string.Format("{0}_{1}_{2}_{3}_{4}.pdf", qPTemplate.QPTemplateName, qPTemplate.QPCode, qPTemplate.ExamYear, bookmarkUpdates["COURSECODE"], DateTime.UtcNow.ToShortDateString()));
                 var wordDocumentId = await _azureBlobStorageHelper.UploadDocxFileToBlob(previewdocPath, string.Format("{0}_{1}_{2}_{3}_{4}.docx", qPTemplate.QPTemplateName, qPTemplate.QPCode, qPTemplate.ExamYear, bookmarkUpdates["COURSECODE"], DateTime.UtcNow.ToShortDateString()));
 
-                SaveSelectedQPDetail(qPTemplate, userQPTemplate, printedWordDocumentId, pdfDocumentId);
-                //SaveBookmarksToDatabaseByFilePath(inputDocPath, qPTemplate.QPTemplateId,userQPTemplate.SubmittedQPDocumentId);
-                Console.WriteLine("Processing and printing completed successfully.");
+               await SaveSelectedQPDetail(qPTemplate, userQPTemplate, printedWordDocumentId, pdfDocumentId);
+               return previewPdfPath;
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Error: " + ex.Message);
             }
+            return string.Empty;
         }
         private string GetQPCode(QPTemplate qPTemplate)
         {
@@ -369,7 +371,7 @@ namespace SKCE.Examination.Services.Helpers
             Syncfusion.Pdf.PdfDocument pdfDocument = new Syncfusion.Pdf.PdfDocument();
             Syncfusion.DocIORenderer.DocIORenderer renderer = new Syncfusion.DocIORenderer.DocIORenderer();
             pdfDocument = renderer.ConvertToPDF(document);
-            ApplyPdfSecurity(pdfDocument);
+            //ApplyPdfSecurity(pdfDocument);
             // Save the PDF file
             pdfDocument.Save(pdfPath);
             document.Close();

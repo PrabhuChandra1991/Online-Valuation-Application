@@ -178,10 +178,26 @@ namespace SKCE.Examination.API.Controllers.QPSettings
         }
 
         [HttpGet("PrintSelectedQP/{userqpTemplateId}/{qpCode}/{isForPrint}")]
-        public async Task<ActionResult<bool>> PrintSelectedQP(long userqpTemplateId, string qpCode, bool isForPrint)
+        public async Task<IActionResult> PrintSelectedQP(long userqpTemplateId, string qpCode, bool isForPrint)
         {
-            var result = await _qpTemplateService.PrintSelectedQPAsync(userqpTemplateId, qpCode, isForPrint);
-            return Ok(result);
+            var filePath = await _qpTemplateService.PrintSelectedQPAsync(userqpTemplateId, qpCode, isForPrint);
+            if (filePath != string.Empty) { 
+                byte[] fileBytes = System.IO.File.ReadAllBytes(filePath);
+                string base64Pdf = Convert.ToBase64String(fileBytes);
+
+                return Ok(new
+                {
+                    FileName = filePath.Split("\\")[filePath.Split("\\").Length - 1],
+                    ContentType = "application/pdf",
+                    Base64Content = base64Pdf
+                });
+            }
+            return Ok(new
+            {
+                FileName = string.Empty,
+                ContentType = "application/pdf",
+                Base64Content = string.Empty
+            });
         }
 
         [HttpGet("ProcessSelectedQPBookMarks/{userQPTemplateId}")]

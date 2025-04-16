@@ -615,14 +615,41 @@ isUserAlreadySelected(qpAssignedUsers: any[], userId: number, currentIndex: numb
       this.modalRef.close();
     }
   }
-
+  openPdfInTab(base64String: string, filename: string) {
+    const byteCharacters = atob(base64String);
+    const byteNumbers = new Array(byteCharacters.length);
+  
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+  
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: 'application/pdf' });
+    const blobUrl = URL.createObjectURL(blob);
+  
+    // Create a temporary anchor to download with filename
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  
+    // Optionally, open in new tab too
+    window.open(blobUrl, '_blank');
+  }
   printQPDocument(userqpTemplateId:number,isForPrint:boolean){
     this.templateService.printQPTemplate(userqpTemplateId,isForPrint).subscribe({
-      next: () => {
-        //this.toastr.success('updated successfully!'); 
+      next: (response) => {
+        if(response.base64Content != ""){
+          this.openPdfInTab(response.base64Content,response.fileName);
+          this.toastr.success('File downloaded successfully!');
+        }else{
+          this.toastr.error('No file found to print!');
+        }
       },
-      error: (res) => {
-        this.toastr.error(res['error']['message']);
+      error: (response) => {
+        this.toastr.error('No file found to print!');
         this.spinnerService.toggleSpinnerState(false);
       },
       complete: () => {

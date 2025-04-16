@@ -2108,15 +2108,15 @@ namespace SKCE.Examination.Services.QPSettings
                 throw ;
             }
         }
-        public async Task<bool?> PrintSelectedQPAsync(long userqpTemplateId, string qpCode, bool isForPrint)
+        public async Task<string?> PrintSelectedQPAsync(long userqpTemplateId, string qpCode, bool isForPrint)
         {
             Random random = new Random();
             int randomNumber = random.Next(1000, 10000);
             qpCode = randomNumber.ToString();
             var userQPTemplate = await _context.UserQPTemplates.FirstOrDefaultAsync(uqp => uqp.UserQPTemplateId == userqpTemplateId);
-            if (userQPTemplate == null) return null;
+            if (userQPTemplate == null) return string.Empty;
             var qpTemplate = await _context.QPTemplates.FirstOrDefaultAsync(qp => qp.QPTemplateId == userQPTemplate.QPTemplateId);
-            if (qpTemplate == null) return null;
+            if (qpTemplate == null) return string.Empty;
             qpTemplate.QPTemplateStatusTypeId = 7; //QP Selected
             qpTemplate.QPCode = qpCode;
            AuditHelper.SetAuditPropertiesForUpdate(qpTemplate, 1);
@@ -2132,13 +2132,13 @@ namespace SKCE.Examination.Services.QPSettings
                 var qpDocument = _context.QPDocuments.FirstOrDefault(u => u.QPDocumentId == userQPTemplate.QPDocumentId);
                 var qpSelectedDocument = await _context.Documents.FirstOrDefaultAsync(d => d.DocumentId == userQPTemplate.SubmittedQPDocumentId);
                 var qpToPrintDocument = await _context.Documents.FirstOrDefaultAsync(d => d.DocumentId == qpDocument.DocumentId );
-                if (qpSelectedDocument == null || qpToPrintDocument == null) return false;
-                await _bookmarkProcessor.ProcessBookmarksAndPrint(qpTemplate, userQPTemplate, qpSelectedDocument.Name, qpToPrintDocument.Name, isForPrint, userQPTemplate.SubmittedQPDocumentId);
+                if (qpSelectedDocument == null || qpToPrintDocument == null) return string.Empty;
+                var pdfPath = await _bookmarkProcessor.ProcessBookmarksAndPrint(qpTemplate, userQPTemplate, qpSelectedDocument.Name, qpToPrintDocument.Name, isForPrint, userQPTemplate.SubmittedQPDocumentId);
                
                 await _context.SaveChangesAsync();
-                return true;
+                return pdfPath;
             }
-            return true;
+            return string.Empty;
         }
         public async Task<IEnumerable<QPAssignmentExpertVM>> GetExpertsForQPAssignmentAsync()
         {

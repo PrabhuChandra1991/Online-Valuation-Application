@@ -49,9 +49,16 @@ namespace SKCE.Examination.API.Controllers.Common
             return Ok(new { Message = importedInfo });
         }
 
+        [HttpGet("GetQuestionAndAnswersByAnswersheetId")]
+        public async Task<ActionResult<List<AnswersheetQuestionAnswerDto>>> GetQuestionAndAnswersByAnswersheetId(long answersheetId)
+        {
+
+            var result = await _answersheetService.GetQuestionAndAnswersByAnswersheetIdAsync(answersheetId);
+            return Ok(result);
+        }
+
         [HttpGet("GetConsolidatedExamAnswersheets")]
-        public async Task<ActionResult<List<AnswersheetQuestionAnswerDto>>>
-             GetExamConsolidatedAnswersheets(long institutionId)
+        public async Task<ActionResult<List<AnswersheetQuestionAnswerDto>>> GetExamConsolidatedAnswersheets(long institutionId)
         {
 
             var result = await _answersheetService.GetExamConsolidatedAnswersheetsAsync(institutionId);

@@ -454,7 +454,7 @@ namespace SKCE.Examination.Services.QPSettings
                               $"Dear {emailUser.Name}," +
                               $"\n\nGreetings from Sri Krishna Institutions!" +
                               $"\n\nWe are pleased to inform you that you have been appointed as a Question Paper Setter for the upcoming End Semester Theory Examinations scheduled in {qPTemplate.ExamMonth}, {qPTemplate.ExamYear} under the autonomous scheme of our institution." +
-                              $"\n\n Course Details\n Course Code:{courseDetails.Code}\n Course Name:{courseDetails.Name}" +
+                              $"\n\n Course Details\n\n Course Code:{courseDetails.Code}\n Course Name:{courseDetails.Name}" +
                               $"\n Details regarding the assigned course(s), syllabus and question paper format, are available in the following link. \nPortal Link:  {_configuration["LoginUrl"]} -Kindly login using your email id and OTP received to your mail" +
                               $"\n\nAfter preparing the question paper, kindly re-login using the above link and upload the question paper along with Answer Key within 7 days from the date of receipt of this email." +
                               $"\n\nNote: Use only the question paper format available on the portal. Do not modify or delete any unused rows in the format." +
@@ -594,13 +594,17 @@ namespace SKCE.Examination.Services.QPSettings
                         if (emailUser != null)
                         {
                             emailUser.IsActive = true;
-                            _emailService.SendEmailAsync(emailUser.Email, "Question Paper Assignment Notification – Sri Krishna Institutions, Coimbatore",
+                            _emailService.SendEmailAsync(emailUser.Email, "CONFIDENTIAL – Appointment as Question Paper Setter – Sri Krishna Institutions",
                               $"Dear {emailUser.Name}," +
-                              $"\n\nYou have been assigned to generate a Question Paper for the following course:" +
-                              $"\n\n Course:{courseDetails.Code} - {courseDetails.Name} \n Degree Type: {degreeType.Name} \n\n" +
-                              $"\n\nPlease review the assigned question paper and submit it before the due date." +
-                              $"\n To View Assignment please click here {_configuration["LoginUrl"]}" +
-                              $"\n\nContact Details:\nName:\nContact Number:\n\nThank you for your cooperation. We look forward to your valuable contribution to our institution.\n\nWarm regards,\nSri Krishna College of Engineering and Technology").Wait();
+                              $"\n\nGreetings from Sri Krishna Institutions!" +
+                              $"\n\nWe are pleased to inform you that you have been appointed as a Question Paper Setter for the upcoming End Semester Theory Examinations scheduled in {qpTemplate.ExamMonth}, {qpTemplate.ExamYear} under the autonomous scheme of our institution." +
+                              $"\n\n Course Details\n\n Course Code:{courseDetails.Code}\n Course Name:{courseDetails.Name}" +
+                              $"\n Details regarding the assigned course(s), syllabus and question paper format, are available in the following link. \nPortal Link:  {_configuration["LoginUrl"]} -Kindly login using your email id and OTP received to your mail" +
+                              $"\n\nAfter preparing the question paper, kindly re-login using the above link and upload the question paper along with Answer Key within 7 days from the date of receipt of this email." +
+                              $"\n\nNote: Use only the question paper format available on the portal. Do not modify or delete any unused rows in the format." +
+                              $"\n\nPlease treat this communication as confidential. If you have any queries or require assistance, feel free to contact us." +
+                              $"\n\nThank you for your valued contribution." +
+                              $"\n\nWarm regards,\nDr. Ramesh Kumar R,\nDean – Examinations,\nSri Krishna Institutions,\n8300034477.").Wait();
                         }
                     }
 
@@ -2034,13 +2038,17 @@ namespace SKCE.Examination.Services.QPSettings
             if (emailUser != null)
             {
                 emailUser.IsActive = true;
-                _emailService.SendEmailAsync(emailUser.Email, "Question Paper Assignment Scrutinization Notification – Sri Krishna Institutions, Coimbatore",
-                  $"Dear {emailUser.Name}," +
-                  $"\n\nYou have been assigned for Scrutinization for a Question Paper for the following course:" +
-                  $"\n\n Course:{courseDetails.Code} - {courseDetails.Name} \n Degree Type: {degreeType.Name}" +
-                  $"\n\nPlease review the assigned question paper and submit it before the due date." +
-                  $"\n To View Assignment please click here {_configuration["LoginUrl"]}" +
-                  $"\n\nContact Details:\nName:\nContact Number:\n\nThank you for your cooperation. We look forward to your valuable contribution to our institution.\n\nWarm regards,\nSri Krishna College of Engineering and Technology").Wait();
+                _emailService.SendEmailAsync(emailUser.Email, "CONFIDENTIAL – Appointment as Question Paper Scrutinizer – Sri Krishna Institutions",
+                               $"Dear {emailUser.Name}," +
+                               $"\n\nGreetings from Sri Krishna Institutions!" +
+                               $"\n\nWe are pleased to inform you that you have been appointed as a Question Paper Scrutinizer for the upcoming End Semester Theory Examinations scheduled in {qpTemplate.ExamMonth}, {qpTemplate.ExamYear} under the autonomous scheme of our institution." +
+                               $"\n\n Course Details\n\n Course Code:{courseDetails.Code}\n Course Name:{courseDetails.Name}" +
+                               $"\n Details regarding the assigned course(s), syllabus and question paper and answer key to be scrutinized are available in the following link. \nPortal Link:  {_configuration["LoginUrl"]} -Kindly login using your email id and OTP received to your mail" +
+                               $"\n\nAfter scrutinizing the question paper and answer key kindly re-login using the above link and upload the scrutinized question paper along with answer key within 3 days from the date of receipt of this email:" +
+                               $"\n\nNote: Use only the question paper and answer Key downloaded from the portal. Do not modify or delete any unused rows in the format." +
+                               $"\n\nPlease treat this communication as confidential. If you have any queries or require assistance, feel free to contact us." +
+                               $"\n\nThank you for your valued contribution." +
+                               $"\n\nWarm regards,\nDr. Ramesh Kumar R,\nDean – Examinations,\nSri Krishna Institutions,\n8300034477.").Wait();
             }
             return true;
        }

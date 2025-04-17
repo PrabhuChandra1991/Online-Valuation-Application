@@ -105,7 +105,7 @@ void SeedDefaultUser(ExaminationDbContext context)
             Salutation="Mr.",
             Gender="Male",
             Name = "Super Admin",
-            Email = "superadmin@skitech.ai",
+            Email = "coesuperadmin@skcet.ac.in",
             MobileNumber = "8300034477",
             RoleId = 1,
             CollegeName = "SRI KRISHNA COLLEGE OF ENGINEERING TECHNOLOGY",

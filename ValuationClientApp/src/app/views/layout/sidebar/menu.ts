@@ -4,14 +4,13 @@ export const MENU: MenuItem[] = [
 
   {
     label: 'User Management',
-    icon: 'home',
-
+    icon: 'user',
     link: '/apps/user',
     role: [1]
   },
   {
     label: 'Master Data',
-    icon: 'list',
+    icon: 'folder',
     link: '/apps/master',
     role: [1]
   },
@@ -21,8 +20,7 @@ export const MENU: MenuItem[] = [
     link: '/apps/importhistory',
     role: [1]
   },
-
-{
+  {
     label: 'Question Paper Management',
     icon: 'check-square',
     link: '/apps/assigntemplate',
@@ -34,20 +32,19 @@ export const MENU: MenuItem[] = [
   //   link: '/apps/qptemplate',
   //   role: [1]
   // },
-
-    {
-        label: 'Answersheet Management',
-        icon: 'clipboard',
-        link: '/apps/answersheet',
-        role: [1]
-    },
-    {
-        label: 'Answersheet consolidated view',
-        icon: 'clipboard',
-        link: '/apps/answersheet/consolidatedview',
-        role: [1]
-    },
-    {
+  {
+    label: 'Answersheet Management',
+    icon: 'clipboard',
+    link: '/apps/answersheet',
+    role: [1]
+  },
+  {
+    label: 'Answersheet consolidated view',
+    icon: 'clipboard',
+    link: '/apps/answersheet/consolidatedview',
+    role: [1]
+  },
+  {
     label: 'Assigned Question Papers',
     icon: 'list',
     link: '/apps/assigntemplate',

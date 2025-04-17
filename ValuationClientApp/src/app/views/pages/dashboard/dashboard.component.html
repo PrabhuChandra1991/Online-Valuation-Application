@@ -146,8 +146,8 @@
                   <!-- PhD Checkbox -->
                   <div class="row mb-4">
                     <div class="col-sm-4 mt-4">
-                      <mat-checkbox #hasPhdInput formControlName="hasPhd" (click)="OnPhDCheck()">Have you completed a
-                        PhD?</mat-checkbox>
+                      <label class="form-label">Have you completed PhD?<span class="text-danger"></span></label>
+                      <mat-checkbox #hasPhdInput formControlName="hasPhd" (click)="OnPhDCheck()">(If Yes)</mat-checkbox>
                     </div>
                     <div class="col-sm-4" *ngIf="qualification.isCompleted">
                       <label class="form-label">Specialization<span class="text-danger"> *</span></label>
@@ -174,7 +174,7 @@
                     <th>Department</th>
                     <th>College Name</th>
                     <th>Experience</th>
-                    <th>Is Current</th>
+                    <th>Current Position</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -198,7 +198,7 @@
                 </tbody>
               </table>
               <!-- User Courses Table -->
-              <h6 class="mt-4"> Course Handled
+              <h6 class="mt-4"> Courses Handled
                 <button type="button" class="btn btn-link float-end" (click)="openUserCourseModal()">
                   Add Course
                 </button>
@@ -208,8 +208,8 @@
                   <tr>
                     <th>Course Name</th>
                     <th>Degree Type</th>
-                    <th>Years Handled</th>
                     <th>No. of Semesters Handled</th>
+                    <th>Whether Handled in Last 2 Semesters?</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -434,8 +434,8 @@
           <input type="number" class="form-control" formControlName="numberOfYearsHandled" />
         </div>
         <div class="mb-3">
-          <input type="checkbox" formControlName="isHandledInLast2Semester" />
-          <label>&nbsp;Whether Handled in Last 2 Semesters?</label>
+          <label>&nbsp;Whether Handled in Last 2 Semesters?</label>&nbsp;&nbsp;
+          <input type="checkbox" formControlName="isHandledInLast2Semester"/> &nbsp; (If Yes)
         </div>
       </form>
     </div>

@@ -584,8 +584,8 @@ namespace SKCE.Examination.Services.QPSettings
                         };
                         var qpAkDocument = _context.QPDocuments.FirstOrDefault(u => u.QPDocumentId == newAssignedUser.QPDocumentId);
                         var qpToPrintDocument = await _context.Documents.FirstOrDefaultAsync(d => d.DocumentId == qpAkDocument.DocumentId);
-                        newAssignedUser.UserQPDocumentId = await GetUpdatedExpertQPDocument(qpTemplate, newAssignedUser, qpToPrintDocument.Name, newAssignedUser.IsQPOnly ? "QP" : "QPAK", bookmarkUpdates);
-                        
+                        //newAssignedUser.UserQPDocumentId = await GetUpdatedExpertQPDocument(qpTemplate, newAssignedUser, qpToPrintDocument.Name, newAssignedUser.IsQPOnly ? "QP" : "QPAK", bookmarkUpdates);
+                        newAssignedUser.UserQPDocumentId = qpToPrintDocument.DocumentId;
                         AuditHelper.SetAuditPropertiesForInsert(newAssignedUser, 1);
                         _context.UserQPTemplates.Add(newAssignedUser);
                         _context.SaveChanges();
@@ -1007,8 +1007,8 @@ namespace SKCE.Examination.Services.QPSettings
             };
             var qpAkDocument = _context.QPDocuments.FirstOrDefault(u => u.QPDocumentId == userQPTemplate.QPDocumentId);
             var qpToPrintDocument = await _context.Documents.FirstOrDefaultAsync(d => d.DocumentId == qpAkDocument.DocumentId);
-            userQPTemplate.UserQPDocumentId = await GetUpdatedExpertQPDocument(qPTemplate, userQPTemplate, qpToPrintDocument.Name, qPDocumentUserVM.IsQPOnly ? "QP" : "QPAK", bookmarkUpdates);
-
+            //userQPTemplate.UserQPDocumentId = await GetUpdatedExpertQPDocument(qPTemplate, userQPTemplate, qpToPrintDocument.Name, qPDocumentUserVM.IsQPOnly ? "QP" : "QPAK", bookmarkUpdates);
+            userQPTemplate.UserQPDocumentId = qpToPrintDocument.DocumentId;
             AuditHelper.SetAuditPropertiesForInsert(userQPTemplate, 1);
             _context.UserQPTemplates.Add(userQPTemplate);
              _context.SaveChanges();

@@ -117,7 +117,7 @@ export class UserComponent implements OnInit{
   // Ensure it's empty for new user
   this.isEditMode = false;
     this.selectedUser = null;
-    this.modalRef = this.modalService.open(this.userModal, { size: 'lg', backdrop: 'static' });
+    this.modalRef = this.modalService.open(this.userModal, { size: 'md', backdrop: 'static' });
   }
 
   openEditUserDialog(user: any) {

@@ -4,7 +4,7 @@ export const MENU: MenuItem[] = [
 
   {
     label: 'User Management',
-    icon: 'user',
+    icon: 'users',
     link: '/apps/user',
     role: [1]
   },

@@ -23,18 +23,22 @@ export default [
         ]
     },
     {
+        path: 'evaluate',
+        loadComponent: () => import('./evaluate/evaluate.component').then(c => c.EvaluateComponent)
+    },
+    {
         path: 'chat',
         loadComponent: () => import('./chat/chat.component').then(c => c.ChatComponent)
     },
     {
         path: 'user',
         loadComponent: () => import('./user/user.component').then(c => c.UserComponent),
-        canActivate:[authGuard]
+        canActivate: [authGuard]
     },
     {
         path: 'register',
         loadComponent: () => import('../auth/register/register.component').then(c => c.RegisterComponent),
-        canActivate:[authGuard]
+        canActivate: [authGuard]
     },
     {
         path: 'calendar',
@@ -43,26 +47,26 @@ export default [
     {
         path: 'qptemplate',
         loadComponent: () => import('./qp-template/template-management/template-management.component').then(c => c.TemplateManagemenComponent),
-        canActivate:[authGuard]
+        canActivate: [authGuard]
     },
     {
         path: 'assigntemplate',
         loadComponent: () => import('./qp-template/template-assignment/template-assignment.component').then(c => c.TemplateAssignmentComponent),
-        canActivate:[authGuard]
+        canActivate: [authGuard]
     },
     {
-     path: 'edit/:id',
-            loadComponent: () => import('./qp-template/template-assignment/template-assignment.component').then(c => c.TemplateAssignmentComponent),
-            canActivate: [authGuard]
+        path: 'edit/:id',
+        loadComponent: () => import('./qp-template/template-assignment/template-assignment.component').then(c => c.TemplateAssignmentComponent),
+        canActivate: [authGuard]
     },
     {
         path: 'master',
         loadComponent: () => import('./master/master.component')
             .then(c => c.MasterComponent),
-        canActivate:[authGuard]
+        canActivate: [authGuard]
     },
     {
-      path: 'importhistory',
+        path: 'importhistory',
         loadComponent: () => import('./import-history/import-history.component')
             .then(c => c.ImportHistoryComponent),
         canActivate: [authGuard]
@@ -77,14 +81,14 @@ export default [
         path: 'qptemplate',
         loadComponent: () => import('./qp-template/template-management/template-management.component')
             .then(c => c.TemplateManagemenComponent),
-        canActivate:[authGuard]
+        canActivate: [authGuard]
     },
     {
         path: 'answersheet',
         loadComponent: () => import('./answersheet/answersheet-management/answersheet-management.component')
-            .then(c => c.AnswersheetManagementComponent) 
+            .then(c => c.AnswersheetManagementComponent)
     },
-     {
+    {
         path: 'answersheet/consolidatedview',
         loadComponent: () => import('./answersheet/consolidatedview/consolidatedview.component')
             .then(c => c.ConsolidatedviewComponent),

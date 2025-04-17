@@ -1,4 +1,4 @@
-import { AfterViewInit, OnInit, Component, TemplateRef, ViewChild} from '@angular/core';
+import { AfterViewInit, OnInit, Component, TemplateRef, ViewChild } from '@angular/core';
 import { NgbDropdownModule, NgbNavModule, NgbTooltip, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { CommonModule } from '@angular/common';
@@ -79,7 +79,7 @@ export class ImportHistoryComponent implements OnInit{
         this.dataSource.data = this.importHistories;
         this.dataSource.paginator = this.paginator;
        this.dataSource.sort = this.sort;
-       console.log('history data:', this.importHistories);
+      //  console.log('history data:', this.importHistories);
       },
 
       error: (error) => {

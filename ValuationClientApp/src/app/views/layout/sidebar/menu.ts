@@ -35,7 +35,19 @@ export const MENU: MenuItem[] = [
   //   role: [1]
   // },
 
-  {
+    {
+        label: 'Answersheet Management',
+        icon: 'clipboard',
+        link: '/apps/answersheet',
+        role: [1]
+    },
+    {
+        label: 'Answersheet consolidated view',
+        icon: 'clipboard',
+        link: '/apps/answersheet/consolidatedview',
+        role: [1]
+    },
+    {
     label: 'Assigned Question Papers',
     icon: 'list',
     link: '/apps/assigntemplate',

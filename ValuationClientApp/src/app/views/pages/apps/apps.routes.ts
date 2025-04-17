@@ -51,23 +51,43 @@ export default [
         canActivate:[authGuard]
     },
     {
-            path: 'edit/:id',
+     path: 'edit/:id',
             loadComponent: () => import('./qp-template/template-assignment/template-assignment.component').then(c => c.TemplateAssignmentComponent),
             canActivate: [authGuard]
     },
     {
         path: 'master',
-        loadComponent: () => import('./master/master.component').then(c => c.MasterComponent),
+        loadComponent: () => import('./master/master.component')
+            .then(c => c.MasterComponent),
         canActivate:[authGuard]
     },
     {
       path: 'importhistory',
-      loadComponent: () => import('./import-history/import-history.component').then(c => c.ImportHistoryComponent),
-      canActivate:[authGuard]
-  },
-  {
-    path: 'valuation',
-    loadComponent: () => import('./valuation/answer-valuation/answer-valuation.component').then(c => c.AnswerValuationComponent),
-    canActivate:[authGuard]
-},
+        loadComponent: () => import('./import-history/import-history.component')
+            .then(c => c.ImportHistoryComponent),
+        canActivate: [authGuard]
+    },
+    {
+        path: 'valuation',
+        loadComponent: () => import('./valuation/answer-valuation/answer-valuation.component')
+            .then(c => c.AnswerValuationComponent),
+        canActivate: [authGuard]
+    },
+    {
+        path: 'qptemplate',
+        loadComponent: () => import('./qp-template/template-management/template-management.component')
+            .then(c => c.TemplateManagemenComponent),
+        canActivate:[authGuard]
+    },
+    {
+        path: 'answersheet',
+        loadComponent: () => import('./answersheet/answersheet-management/answersheet-management.component')
+            .then(c => c.AnswersheetManagementComponent) 
+    },
+     {
+        path: 'answersheet/consolidatedview',
+        loadComponent: () => import('./answersheet/consolidatedview/consolidatedview.component')
+            .then(c => c.ConsolidatedviewComponent),
+        canActivate: [authGuard]
+    },
 ] as Routes;

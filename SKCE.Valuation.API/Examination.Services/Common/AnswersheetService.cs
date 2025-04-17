@@ -48,7 +48,7 @@ namespace SKCE.Examination.Services.Common
                            RegulationYear = answersheet.RegulationYear,
                            BatchYear = answersheet.BatchYear,
                            DegreeTypeName = dtype.Name,
-                           ExampType = answersheet.ExamYear,
+                           ExamType = answersheet.ExamYear,
                            Semester = answersheet.Semester,
                            CourseId = answersheet.CourseId,
                            CourseCode = course.Code,
@@ -75,6 +75,13 @@ namespace SKCE.Examination.Services.Common
             var helper = new AnswersheetQuestionAnswerHelper(this._context);
             var result = await helper.GetQuestionAndAnswersByAnswersheetId(answersheetId);
             return result.ToList();
+        }
+
+        public async Task<List<AnswersheetConsolidatedDto>> GetExamConsolidatedAnswersheetsAsync(long institutionId)
+        {
+            var helper = new AnswersheetConsolidatedHelper(this._context);
+            var result = await helper.GetConsolidatedItems(institutionId);
+            return result;
         }
 
     }

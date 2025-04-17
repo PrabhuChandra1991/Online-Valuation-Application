@@ -23,10 +23,6 @@ export default [
         ]
     },
     {
-        path: 'evaluate',
-        loadComponent: () => import('./evaluate/evaluate.component').then(c => c.EvaluateComponent)
-    },
-    {
         path: 'chat',
         loadComponent: () => import('./chat/chat.component').then(c => c.ChatComponent)
     },

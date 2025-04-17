@@ -289,9 +289,9 @@ public class QPDataImportHelper
             if (institution != null)
             {
                 var documentId = _azureBlobStorageHelper.UploadFileAsync(file.OpenReadStream(), file.FileName, file.ContentType).Result;
-                if (qpDocuments.Any(qp => qp.InstitutionId == institution.InstitutionId && qp.RegulationYear == regulation && qp.DegreeTypeName == degreeTypeName && qp.DocumentTypeId == documetTypeId))
+                if (qpDocuments.Any(qp => qp.InstitutionId == institution.InstitutionId && qp.RegulationYear == regulation && qp.DegreeTypeName == degreeTypeName && qp.DocumentTypeId == documetTypeId && qp.ExamType.ToLower().Contains(examType.ToLower())))
                 {
-                    var existingQPDocument = _dbContext.QPDocuments.FirstOrDefault(qp => qp.InstitutionId == institution.InstitutionId && qp.RegulationYear == regulation && qp.DegreeTypeName == degreeTypeName && qp.DocumentTypeId == documetTypeId);
+                    var existingQPDocument = _dbContext.QPDocuments.FirstOrDefault(qp => qp.InstitutionId == institution.InstitutionId && qp.RegulationYear == regulation && qp.DegreeTypeName == degreeTypeName && qp.DocumentTypeId == documetTypeId && qp.ExamType.ToLower().Contains(examType.ToLower()));
                     if (existingQPDocument != null)
                     {
                         existingQPDocument.DocumentId = documentId;

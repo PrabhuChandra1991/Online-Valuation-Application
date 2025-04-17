@@ -105,7 +105,7 @@ void SeedDefaultUser(ExaminationDbContext context)
             Salutation="Mr.",
             Gender="Male",
             Name = "Super Admin",
-            Email = "coesuperadmin@skcet.ac.in",
+            Email = builder.Configuration["SuperAdminEmail"].ToString(),
             MobileNumber = "8300034477",
             RoleId = 1,
             CollegeName = "SRI KRISHNA COLLEGE OF ENGINEERING TECHNOLOGY",

@@ -9,10 +9,10 @@
         <div ngbDropdownMenu class="px-0" aria-labelledby="profileDropdown">
           <ul class="list-unstyled p-1">
             <li>
-              <button type="button" class="dropdown-item py-2 d-flex ms-0 btn btn-link float-end"  (click)="editProfile()">
+              <a (click)="editProfile()" class="dropdown-item py-2 d-flex ms-0">
                 <i class="feather icon-edit me-2 icon-md"></i>
                 <span>Edit Profile</span>
-              </button>
+              </a>
             </li>
             <li>
               <a href="" (click)="onLogout($event)" class="dropdown-item py-2 d-flex ms-0">

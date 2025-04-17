@@ -1,5 +1,6 @@
 ﻿using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using DocumentFormat.OpenXml.Packaging;
 using Microsoft.Extensions.Configuration;
 using SKCE.Examination.Models.DbModels.Common;
 using Spire.Doc;
@@ -86,6 +87,22 @@ namespace SKCE.Examination.Services.Helpers
                 throw new Exception($"Blob {blobName} not found in container {_containerName}.");
             }
         }
+        public async Task<MemoryStream> DownloadWordDocumentFromBlobToOpenXML(string blobName)
+        {
+            BlobContainerClient containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
+            BlobClient blobClient = containerClient.GetBlobClient(blobName);
+
+            if (await blobClient.ExistsAsync())
+            {
+                MemoryStream stream = new MemoryStream();
+                await blobClient.DownloadToAsync(stream);
+                return stream;
+            }
+            else
+            {
+                throw new Exception($"Blob {blobName} not found in container {_containerName}.");
+            }
+        }
 
         // Uploads a file to Azure Blob Storage
         public async Task<long> UploadFileToBlob(string filePath, string fileName)
@@ -117,6 +134,27 @@ namespace SKCE.Examination.Services.Helpers
 
             await using FileStream uploadFileStream = File.OpenRead(filePath);
             await blobClient.UploadAsync(uploadFileStream, new BlobHttpHeaders { ContentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+
+            // Save file metadata in the database
+            var document = new Document
+            {
+                Name = blobClient.Name,
+                Url = blobClient.Uri.ToString()
+            };
+            AuditHelper.SetAuditPropertiesForInsert(document, 1);
+            _context.Documents.Add(document);
+            await _context.SaveChangesAsync();
+
+            return document.DocumentId; // Return the generated Document ID
+        }
+
+        // Uploads a file to Azure Blob Storage
+        public async Task<long> UploadDocxSteamFileToBlob(MemoryStream fileStream, string fileName)
+        {
+            BlobContainerClient containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
+            BlobClient blobClient = containerClient.GetBlobClient(fileName);
+
+            await blobClient.UploadAsync(fileStream,overwrite: true);
 
             // Save file metadata in the database
             var document = new Document

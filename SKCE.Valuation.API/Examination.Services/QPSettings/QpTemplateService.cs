@@ -21,6 +21,10 @@ using BookmarksNavigator = Spire.Doc.Documents.BookmarksNavigator;
 using System.Linq;
 using System.Xml;
 using HtmlAgilityPack;
+using DocumentFormat.OpenXml;
+using static Spire.Xls.Core.Spreadsheet.HTMLOptions;
+using DocumentFormat.OpenXml.Wordprocessing;
+using Paragraph = Spire.Doc.Documents.Paragraph;
 namespace SKCE.Examination.Services.QPSettings
 {
     public class QpTemplateService 
@@ -454,8 +458,8 @@ namespace SKCE.Examination.Services.QPSettings
                               $"Dear {emailUser.Name}," +
                               $"\n\nGreetings from Sri Krishna Institutions!" +
                               $"\n\nWe are pleased to inform you that you have been appointed as a Question Paper Setter for the upcoming End Semester Theory Examinations scheduled in {qPTemplate.ExamMonth}, {qPTemplate.ExamYear} under the autonomous scheme of our institution." +
-                              $"\n\n Course Details\n\n Course Code:{courseDetails.Code}\n Course Name:{courseDetails.Name}" +
-                              $"\n Details regarding the assigned course(s), syllabus and question paper format, are available in the following link. \nPortal Link:  {_configuration["LoginUrl"]} -Kindly login using your email id and OTP received to your mail" +
+                              $"\n\nCourse Details\n\n Course Code:{courseDetails.Code}\n Course Name:{courseDetails.Name}" +
+                              $"\n\nDetails regarding the assigned course(s), syllabus and question paper format, are available in the following link. \nPortal Link:  {_configuration["LoginUrl"]} -Kindly login using your email id and OTP received to your mail" +
                               $"\n\nAfter preparing the question paper, kindly re-login using the above link and upload the question paper along with Answer Key within 7 days from the date of receipt of this email." +
                               $"\n\nNote: Use only the question paper format available on the portal. Do not modify or delete any unused rows in the format." +
                               $"\n\nPlease treat this communication as confidential. If you have any queries or require assistance, feel free to contact us." +
@@ -584,8 +588,8 @@ namespace SKCE.Examination.Services.QPSettings
                         };
                         var qpAkDocument = _context.QPDocuments.FirstOrDefault(u => u.QPDocumentId == newAssignedUser.QPDocumentId);
                         var qpToPrintDocument = await _context.Documents.FirstOrDefaultAsync(d => d.DocumentId == qpAkDocument.DocumentId);
-                        //newAssignedUser.UserQPDocumentId = await GetUpdatedExpertQPDocument(qpTemplate, newAssignedUser, qpToPrintDocument.Name, newAssignedUser.IsQPOnly ? "QP" : "QPAK", bookmarkUpdates);
-                        newAssignedUser.UserQPDocumentId = qpToPrintDocument.DocumentId;
+                        newAssignedUser.UserQPDocumentId = await GetUpdatedExpertQPDocumentByOpenXML(qpTemplate, newAssignedUser, qpToPrintDocument.Name, newAssignedUser.IsQPOnly ? "QP" : "QPAK", bookmarkUpdates);
+                        //newAssignedUser.UserQPDocumentId = qpToPrintDocument.DocumentId;
                         AuditHelper.SetAuditPropertiesForInsert(newAssignedUser, 1);
                         _context.UserQPTemplates.Add(newAssignedUser);
                         _context.SaveChanges();
@@ -598,8 +602,8 @@ namespace SKCE.Examination.Services.QPSettings
                               $"Dear {emailUser.Name}," +
                               $"\n\nGreetings from Sri Krishna Institutions!" +
                               $"\n\nWe are pleased to inform you that you have been appointed as a Question Paper Setter for the upcoming End Semester Theory Examinations scheduled in {qpTemplate.ExamMonth}, {qpTemplate.ExamYear} under the autonomous scheme of our institution." +
-                              $"\n\n Course Details\n\n Course Code:{courseDetails.Code}\n Course Name:{courseDetails.Name}" +
-                              $"\n Details regarding the assigned course(s), syllabus and question paper format, are available in the following link. \nPortal Link:  {_configuration["LoginUrl"]} -Kindly login using your email id and OTP received to your mail" +
+                              $"\n\nCourse Details\n\n Course Code:{courseDetails.Code}\n Course Name:{courseDetails.Name}" +
+                              $"\n\nDetails regarding the assigned course(s), syllabus and question paper format, are available in the following link. \nPortal Link:  {_configuration["LoginUrl"]} -Kindly login using your email id and OTP received to your mail" +
                               $"\n\nAfter preparing the question paper, kindly re-login using the above link and upload the question paper along with Answer Key within 7 days from the date of receipt of this email." +
                               $"\n\nNote: Use only the question paper format available on the portal. Do not modify or delete any unused rows in the format." +
                               $"\n\nPlease treat this communication as confidential. If you have any queries or require assistance, feel free to contact us." +
@@ -1007,8 +1011,8 @@ namespace SKCE.Examination.Services.QPSettings
             };
             var qpAkDocument = _context.QPDocuments.FirstOrDefault(u => u.QPDocumentId == userQPTemplate.QPDocumentId);
             var qpToPrintDocument = await _context.Documents.FirstOrDefaultAsync(d => d.DocumentId == qpAkDocument.DocumentId);
-            //userQPTemplate.UserQPDocumentId = await GetUpdatedExpertQPDocument(qPTemplate, userQPTemplate, qpToPrintDocument.Name, qPDocumentUserVM.IsQPOnly ? "QP" : "QPAK", bookmarkUpdates);
-            userQPTemplate.UserQPDocumentId = qpToPrintDocument.DocumentId;
+            userQPTemplate.UserQPDocumentId = await GetUpdatedExpertQPDocumentByOpenXML(qPTemplate, userQPTemplate, qpToPrintDocument.Name, qPDocumentUserVM.IsQPOnly ? "QP" : "QPAK", bookmarkUpdates);
+            //userQPTemplate.UserQPDocumentId = qpToPrintDocument.DocumentId;
             AuditHelper.SetAuditPropertiesForInsert(userQPTemplate, 1);
             _context.UserQPTemplates.Add(userQPTemplate);
              _context.SaveChanges();
@@ -2042,8 +2046,8 @@ namespace SKCE.Examination.Services.QPSettings
                                $"Dear {emailUser.Name}," +
                                $"\n\nGreetings from Sri Krishna Institutions!" +
                                $"\n\nWe are pleased to inform you that you have been appointed as a Question Paper Scrutinizer for the upcoming End Semester Theory Examinations scheduled in {qpTemplate.ExamMonth}, {qpTemplate.ExamYear} under the autonomous scheme of our institution." +
-                               $"\n\n Course Details\n\n Course Code:{courseDetails.Code}\n Course Name:{courseDetails.Name}" +
-                               $"\n Details regarding the assigned course(s), syllabus and question paper and answer key to be scrutinized are available in the following link. \nPortal Link:  {_configuration["LoginUrl"]} -Kindly login using your email id and OTP received to your mail" +
+                               $"\n\nCourse Details\n\n Course Code:{courseDetails.Code}\n Course Name:{courseDetails.Name}" +
+                               $"\n\nDetails regarding the assigned course(s), syllabus and question paper and answer key to be scrutinized are available in the following link. \nPortal Link:  {_configuration["LoginUrl"]} -Kindly login using your email id and OTP received to your mail" +
                                $"\n\nAfter scrutinizing the question paper and answer key kindly re-login using the above link and upload the scrutinized question paper along with answer key within 3 days from the date of receipt of this email:" +
                                $"\n\nNote: Use only the question paper and answer Key downloaded from the portal. Do not modify or delete any unused rows in the format." +
                                $"\n\nPlease treat this communication as confidential. If you have any queries or require assistance, feel free to contact us." +
@@ -2335,7 +2339,13 @@ namespace SKCE.Examination.Services.QPSettings
                     }
                 }
                 sourceDoc.Watermark = null;
-                sourceDoc.SaveToFile(updatedSourcePath, FileFormat.Docx);
+                //sourceDoc.SaveOptions.KeepContentControl = true;
+                using (MemoryStream stream = new MemoryStream())
+                {
+                    sourceDoc.SaveToStream(stream, FileFormat.Docx);
+                    File.WriteAllBytes(updatedSourcePath, stream.ToArray());
+                }
+                //sourceDoc.SaveToFile(updatedSourcePath, FileFormat.Docx);
                 RemoveTextFromDocx(updatedSourcePath, "Evaluation Warning: The document was created with Spire.Doc for .NET.");
                 return _azureBlobStorageHelper.UploadDocxFileToBlob(updatedSourcePath, string.Format("{0}_{1}_{2}_{3}.docx", inputDocPath.Replace(".docx",""), bookmarkUpdates["COURSECODE"], bookmarkUpdates["EXAMYEAR"], bookmarkUpdates["EXAMMONTH"].Replace("/",""), qpType)).Result;
             }
@@ -2344,6 +2354,74 @@ namespace SKCE.Examination.Services.QPSettings
                 throw ex;
             }
            
+        }
+
+        public async Task<long> GetUpdatedExpertQPDocumentByOpenXML(QPTemplate qPTemplate, UserQPTemplate userQPTemplate, string inputDocPath, string qpType, Dictionary<string, string> bookmarkUpdates)
+        {
+            try
+            {
+                // Save the updated document
+                var updatedSourcePath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}.docx", "TempDocument", DateTime.Now.ToString("ddMMyyyyhhmmss")));
+                MemoryStream sourceStream = await _azureBlobStorageHelper.DownloadWordDocumentFromBlobToOpenXML(inputDocPath);
+                sourceStream.Position = 0;
+                var courseSyllabusDocument = _context.CourseSyllabusDocuments.FirstOrDefault(c => c.CourseId == qPTemplate.CourseId);
+                var courseSyllabusWordDocument = _context.Documents.FirstOrDefault(d => d.DocumentId == courseSyllabusDocument.WordDocumentId);
+                // Load the template document where bookmarks need to be replaced
+                MemoryStream sourceSyllabusStream = await _azureBlobStorageHelper.DownloadWordDocumentFromBlobToOpenXML(courseSyllabusWordDocument.Name);
+                using (WordprocessingDocument SyllabusWordDoc = WordprocessingDocument.Open(sourceSyllabusStream, true))
+                {
+                    var bookmarks = SyllabusWordDoc.MainDocumentPart.RootElement.Descendants<DocumentFormat.OpenXml.Wordprocessing.BookmarkStart>();
+
+                    foreach (var bookmark in bookmarks)
+                    {
+                        string name = bookmark.Name;
+                        string textValue = bookmark.NextSibling<Run>()?.GetFirstChild<Text>()?.Text;
+
+                        if (!string.IsNullOrEmpty(name) && textValue != null)
+                        {
+                            bookmarkUpdates[name] = textValue;
+                        }
+                    }
+                }
+                using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(sourceStream, true))
+                {
+                    var body = wordDoc.MainDocumentPart.Document.Body;
+
+                    foreach (var kvp in bookmarkUpdates)
+                    {
+                        string bookmarkName = kvp.Key;
+                        string newText = kvp.Value;
+
+                        DocumentFormat.OpenXml.Wordprocessing.BookmarkStart bookmarkStart = body.Descendants<DocumentFormat.OpenXml.Wordprocessing.BookmarkStart>()
+                                                          .FirstOrDefault(b => b.Name == bookmarkName);
+
+                        if (bookmarkStart != null)
+                        {
+                            // Remove old content between start and end
+                            OpenXmlElement currentElement = bookmarkStart.NextSibling();
+                            while (currentElement != null &&
+                                   !(currentElement is DocumentFormat.OpenXml.Wordprocessing.BookmarkEnd && ((DocumentFormat.OpenXml.Wordprocessing.BookmarkEnd)currentElement).Id == bookmarkStart.Id))
+                            {
+                                OpenXmlElement nextElement = currentElement.NextSibling();
+                                currentElement.Remove();
+                                currentElement = nextElement;
+                            }
+
+                            // Insert new text
+                            Run run = new Run(new Text(newText));
+                            bookmarkStart.Parent.InsertAfter(run, bookmarkStart);
+                        }
+                    }
+                    wordDoc.MainDocumentPart.Document.Save();
+                }
+                sourceStream.Position = 0; // Reset stream before returning
+                return _azureBlobStorageHelper.UploadDocxSteamFileToBlob(sourceStream, string.Format("{0}_{1}_{2}_{3}.docx", inputDocPath.Replace(".docx", ""), bookmarkUpdates["COURSECODE"], bookmarkUpdates["EXAMYEAR"], bookmarkUpdates["EXAMMONTH"].Replace("/", ""), qpType)).Result;
+           }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
         }
 
         public async Task<bool> ProcessSelectedQPBookMarks(long userQPTemplateId) {

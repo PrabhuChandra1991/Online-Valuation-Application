@@ -68,6 +68,7 @@ export class AnswersheetManagementComponent {
     'examMonth',
     'examYear',
     'dummyNumber',
+    'allocatedUserName'
   ];
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -78,8 +79,8 @@ export class AnswersheetManagementComponent {
   institutes: any[] = [];
   courses: any[] = [];
 
-  selectedInstituteId: string = '';
-  selectedCourseId: string = '';
+  selectedInstituteId: number = 0;
+  selectedCourseId: number = 0;
 
   constructor(
     private fb: FormBuilder,
@@ -119,10 +120,12 @@ export class AnswersheetManagementComponent {
   }
 
   onInstituteChange(event: Event): void {
-    this.selectedInstituteId = (event.target as HTMLSelectElement).value;
+    this.selectedInstituteId =parseInt( (event.target as HTMLSelectElement).value);
+    this.loadData();
   }
   onCourseChange(event: Event): void {
-    this.selectedCourseId = (event.target as HTMLSelectElement).value;
+    this.selectedCourseId = parseInt((event.target as HTMLSelectElement).value);
+    this.loadData();
   }
 
   loadAllInstitues(): void {
@@ -150,10 +153,7 @@ export class AnswersheetManagementComponent {
   }
 
   loadData(): void {
-    this.loadAnswersheets(
-      parseInt(this.selectedInstituteId),
-      parseInt(this.selectedCourseId)
-    );
+    this.loadAnswersheets(this.selectedInstituteId, this.selectedCourseId);
   }
 
   //---------

@@ -3,7 +3,7 @@
   <div class="row mt-4">
     <div class="col-md-3">
       <select id="institutionId" class="form-select" (change)="onInstituteChange($event)">
-        <option [value]="">Select Institution</option>
+        <option [value]="0">Select Institution</option>
         <option *ngFor="let inst of institutes" [value]="inst.institutionId">
           {{ inst.name }}
         </option>
@@ -11,7 +11,7 @@
     </div>
     <div class="col-md-5">
       <select id="courseId" class="form-select" (change)="onCourseChange($event)">
-        <option [value]="">Select Course</option>
+        <option [value]="0">Select Course</option>
         <option *ngFor="let course of courses" [value]="course.courseId">
           {{ course.name }} - ({{ course.code }})
         </option>
@@ -110,10 +110,19 @@
 
           <ng-container matColumnDef="dummyNumber">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>
-              Dummy Number
+              Dummy number
             </th>
             <td mat-cell *matCellDef="let element">
               {{ element.dummyNumber }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="allocatedUserName">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+              Allocated Evaluator
+            </th>
+            <td mat-cell *matCellDef="let element">
+              {{ element.allocatedUserName }}
             </td>
           </ng-container>
 

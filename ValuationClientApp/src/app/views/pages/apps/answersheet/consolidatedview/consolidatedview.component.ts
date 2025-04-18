@@ -69,8 +69,11 @@ export class ConsolidatedviewComponent {
     'courseCode',
     'examMonth',
     'examYear', 
-    'studentCount',
-    'dummyNumberCount'
+    'studentTotalCount',
+    'answerSheetTotalCount',
+    'answerSheetAllocatedCount',
+    'answerSheetNotAllocatedCount',
+    'actions'
   ];
 
   @ViewChild(MatPaginator) paginator: MatPaginator;

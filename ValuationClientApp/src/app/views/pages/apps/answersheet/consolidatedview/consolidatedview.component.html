@@ -105,21 +105,48 @@
                     </td>
                 </ng-container>
 
-                <ng-container matColumnDef="studentCount">
+                <ng-container matColumnDef="studentTotalCount">
                     <th mat-header-cell *matHeaderCellDef mat-sort-header>
                         Student Count
                     </th>
                     <td mat-cell *matCellDef="let element">
-                        {{ element.studentCount }}
+                        {{ element.studentTotalCount }}
                     </td>
                 </ng-container>
 
-                <ng-container matColumnDef="dummyNumberCount">
+                <ng-container matColumnDef="answerSheetTotalCount">
                     <th mat-header-cell *matHeaderCellDef mat-sort-header>
-                        Dummy Number Count
+                        Total Answersheets
                     </th>
                     <td mat-cell *matCellDef="let element">
-                        {{ element.dummyNumberCount }}
+                        {{ element.answerSheetTotalCount }}
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="answerSheetAllocatedCount">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                        Allocated answersheets
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                        {{ element.answerSheetAllocatedCount }}
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="answerSheetNotAllocatedCount">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                        Not allocated answersheets
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                        <a>
+                        {{ element.answerSheetNotAllocatedCount }} </a>
+                    </td>
+                </ng-container>
+
+                <!-- Actions Column -->
+                <ng-container matColumnDef="actions">
+                    <th mat-header-cell *matHeaderCellDef> Actions </th>
+                    <td mat-cell *matCellDef="let element">
+                        <a class="link-opacity-50-hover" >Allocate</a>
                     </td>
                 </ng-container>
 

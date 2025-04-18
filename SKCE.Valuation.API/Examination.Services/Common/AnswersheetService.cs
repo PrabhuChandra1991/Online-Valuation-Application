@@ -34,6 +34,9 @@ namespace SKCE.Examination.Services.Common
                        join course in _context.Courses on answersheet.CourseId equals course.CourseId
                        join dtype in _context.DegreeTypes on answersheet.DegreeTypeId equals dtype.DegreeTypeId
 
+                       join allocatedUser in this._context.Users on answersheet.AllocatedToUserId equals allocatedUser.UserId into allocatedUserResults
+                       from allocatedUserResult in allocatedUserResults.DefaultIfEmpty()
+
                        where
                        answersheet.IsActive == true
                        && (answersheet.InstitutionId == institutionId || institutionId == null)
@@ -56,7 +59,8 @@ namespace SKCE.Examination.Services.Common
                            ExamMonth = answersheet.ExamMonth,
                            ExamYear = answersheet.ExamYear,
                            DummyNumber = answersheet.DummyNumber,
-                           UploadedBlobStorageUrl = answersheet.UploadedBlobStorageUrl
+                           UploadedBlobStorageUrl = answersheet.UploadedBlobStorageUrl,
+                           AllocatedUserName = (allocatedUserResult != null ? allocatedUserResult.Name : string.Empty)
                        }).ToListAsync();
 
             return resultItems;

@@ -41,7 +41,7 @@ export class UserComponent implements OnInit{
 
   users: any[] = [];
   selectedUser: User | null ;
-  modalRef!: NgbModalRef;
+  modalRef: NgbModalRef;
   isEditMode:boolean;
   isSubmitting: boolean = false; // Track API call status
 

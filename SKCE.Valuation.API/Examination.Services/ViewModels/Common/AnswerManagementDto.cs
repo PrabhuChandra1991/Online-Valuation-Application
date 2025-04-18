@@ -23,5 +23,7 @@ namespace SKCE.Examination.Services.ViewModels.Common
         public string ExamYear { get; set; } = string.Empty;
         public string DummyNumber { get; set; } = string.Empty;
         public string? UploadedBlobStorageUrl { get; set; }= string.Empty;
+        public string? AllocatedUserName { get; set; }= string.Empty;
+        
     }
 }

@@ -19,8 +19,10 @@ namespace SKCE.Examination.Services.ViewModels.Common
         public required int Semester { get; set; }
         public required string ExamMonth { get; set; }
         public required string ExamYear { get; set; }
-        public required long  StudentCount { get; set; }
-        public required long DummyNumberCount { get; set; }
+        public required long  StudentTotalCount { get; set; }
+        public required long AnswerSheetTotalCount { get; set; }
+        public required long AnswerSheetAllocatedCount { get; set; }
+        public required long AnswerSheetNotAllocatedCount { get; set; }
 
     }
 }

@@ -21,6 +21,7 @@ table .btn {
 }
 table .btn.active {
     background-color: #cbd1db;
+    box-shadow: var(--bs-btn-active-shadow);
 }
 table .btn:hover {
     background-color: #cbd1db; 
@@ -44,7 +45,7 @@ table .error {
 .scroll {
     overflow-x: scroll;
     overflow-y: hidden;
-    background-color: #ffffff;
+    background-color: white;
 }
 .q-container {
     //width:1500px;    

@@ -1,3 +1,9 @@
+
+
+.toast {  
+    font-family: $font-family-nunito-sans; 
+}
+
 .card-body {
     flex: 1 1 auto;
     padding: var(--bs-card-spacer-y) var(--bs-card-spacer-x);
@@ -19,16 +25,20 @@
 
 .form-control {
     border-radius: .5rem;
-    border: 1px solid #c7c7c7;
+    border: 1px solid $disabled-border;
+}
+
+.form-control:disabled {
+    background-color: $disabled-bg;
 }
 
 .form-control:focus {
-    border: 1px solid #969696;
+    border: 1px solid $focus-border;
 }
 
 .form-select {
     border-radius: .5rem !important;
-    border: 1px solid #c7c7c7 !important;
+    border: 1px solid $disabled-border !important;
 }
 
 .btn {
@@ -49,15 +59,15 @@
 
     .table-responsive table tr,
     .table-responsive table td {
-        border-top: 1px solid #c7c7c7 !important;
+        border-top: 1px solid $disabled-border !important;
     }
 
     .table-responsive .mat-mdc-table {
         overflow: hidden !important;
         border-collapse: separate !important;
         border-spacing: 0 !important;
-        background-color: #f2f2f2 !important;
-        border: 1px solid #c7c7c7 !important;
+        background-color: $disabled-bg !important;
+        border: 1px solid $disabled-border !important;
         border-top-left-radius: 0.7rem !important;
         border-top-right-radius: 0.7rem !important;
         //border-style: hidden !important;
@@ -73,17 +83,14 @@
     }
 
     .table-responsive .mat-mdc-row {
-        background-color: #ffffff !important;
+        background-color: white !important;
     }
 }
 
-
-
-
 .pagination {
     font-size: 14px !important;
-    background-color: #ffffff !important;
-    border: 1px solid #c7c7c7 !important;
+    background-color: white !important;
+    border: 1px solid $disabled-border !important;
     border-bottom-left-radius: 0.7rem;
     border-bottom-right-radius: 0.7rem;
 
@@ -124,14 +131,19 @@
     border: 2px solid $primary !important;
 }
 
+.readonly {
+    background-color: $disabled-bg !important;
+    cursor: default !important;
+}
+
 .disabled .mdc-checkbox__background {
-    background-color: #808080 !important;
-    border: 1px solid #949494 !important;
+    background-color: $disabled-bg !important;
+    border: 1px solid $disabled-border !important;
 }
 
 select.disabled {
-    background-color: #e9ecef !important;
-    border: 1px solid #949494 !important; 
+    background-color: $disabled-bg !important;
+    border: 1px solid $disabled-border !important; 
 }
 
 a.disabled,
@@ -140,5 +152,5 @@ select.disabled,
 .mat-mdc-checkbox.disabled {
     pointer-events: none;
     cursor: not-allowed;
-    color: #808080;
+    color: $disabled-text;
 }

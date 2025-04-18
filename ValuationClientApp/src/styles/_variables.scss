@@ -34,16 +34,23 @@ $cyan:    #0dcaf0 !default;
 // --- Bootstrap Theme Colors --- //
 //
 $primary:         #004da3 !default;
-$secondary:       $gray-600 !default;
-$success:         #05a34a !default;
-$info:            #66d1d1 !default;
-$warning:         #fbbc06 !default;
-$danger:          #ff3366 !default;
+$secondary:       #6c757d !default;
+$success:         #198754 !default;
+$info:            #0dcaf0 !default;
+$warning:         #ffc107 !default;
+$danger:          #dc3545 !default;
 $light:           $gray-200 !default;
 $dark:            $gray-900 !default;
 //
 // --- Bootstrap Theme Colors --- //
 
+
+// --- SKCIT Custom Colors --- //
+$disabled-border: #c7c7c7;
+$disabled-bg:     #f2f2f2;
+$disabled-text:   #808080;
+$focus-border:    #969696;
+// --- SKCIT Custom Colors --- //
 
 
 // Social colors

@@ -1,16 +1,15 @@
 <div class="container">
   <h3>Answersheet Management</h3>
   <div class="row mt-4">
-    <div class="col-md-4 mb-3">
+    <div class="col-md-3">
       <select id="institutionId" class="form-select" (change)="onInstituteChange($event)">
         <option [value]="">Select Institution</option>
         <option *ngFor="let inst of institutes" [value]="inst.institutionId">
           {{ inst.name }}
         </option>
       </select>
-
     </div>
-    <div class="col-md-4 mb-3">
+    <div class="col-md-5">
       <select id="courseId" class="form-select" (change)="onCourseChange($event)">
         <option [value]="">Select Course</option>
         <option *ngFor="let course of courses" [value]="course.courseId">

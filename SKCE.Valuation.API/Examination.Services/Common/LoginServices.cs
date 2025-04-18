@@ -38,9 +38,8 @@ namespace SKCE.Examination.Services.Common
             AuditHelper.SetAuditPropertiesForInsert(loginHistory, user.UserId);
             await _context.UserLoginHistories.AddAsync(loginHistory);
             await _context.SaveChangesAsync();
-            _emailService.SendEmailAsync(email, "Sri Krishna Institutions-Examinations- Temporary Password", $"Dear {user.Name},\n\nPlease use your Email id and temporary password to login.\n\nYour temporary password is: {tempPassword} (valid for 20 minutes) \n\nThanks\nSKCE Admin"+
+            _emailService.SendEmailAsync(email, "Sri Krishna Institutions-Examinations- Temporary Password", $"Dear {user.Name},\n\nPlease use your Email id and temporary password to login.\n\nYour temporary password is: {tempPassword} (valid for 20 minutes)"+
                 $"\n\nWarm regards,\nDr. Ramesh Kumar R,\nDean – Examinations,\nSri Krishna Institutions,\n8300034477.").Wait();
-
             return tempPassword;
         }
 

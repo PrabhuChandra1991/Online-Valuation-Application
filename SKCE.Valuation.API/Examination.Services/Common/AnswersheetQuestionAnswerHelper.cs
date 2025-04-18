@@ -37,7 +37,7 @@ namespace SKCE.Examination.Services.Common
                 && x.RegulationYear == answersheet.RegulationYear && x.BatchYear == answersheet.BatchYear
                 && x.DegreeTypeId == answersheet.DegreeTypeId && x.ExamType == answersheet.ExamType
                 && x.Semester == answersheet.Semester && x.ExamMonth == answersheet.ExamMonth
-                && x.ExamYear == answersheet.ExamYear && x.IsActive).FirstAsync();
+                && x.ExamYear == answersheet.ExamYear && x.IsActive).FirstOrDefaultAsync();
 
             if (selectedQP == null)
                 return resultItems;

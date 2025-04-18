@@ -50,6 +50,12 @@ export const MENU: MenuItem[] = [
     link: '/apps/assigntemplate',
     role: [2]
   },
+  {
+    label: 'Evaluation Assigned',
+    icon: 'clipboard',
+    link: '/apps/evaluationlist',
+    role: [1]
+  },
   // {
   //   label: 'Valuation',
   //   icon: 'list',

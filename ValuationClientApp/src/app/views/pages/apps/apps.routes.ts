@@ -23,6 +23,16 @@ export default [
         ]
     },
     {
+        path: 'evaluationlist',
+        loadComponent: () => import('./evaluation/list/evaluation-list.component').then(c => c.EvaluationListComponent),
+        canActivate: [authGuard]
+    },
+    {
+        path: 'evaluate/:data',
+        loadComponent: () => import('./evaluation/evaluate/evaluate.component').then(c => c.EvaluateComponent),
+        canActivate: [authGuard]
+    },
+    {
         path: 'chat',
         loadComponent: () => import('./chat/chat.component').then(c => c.ChatComponent)
     },

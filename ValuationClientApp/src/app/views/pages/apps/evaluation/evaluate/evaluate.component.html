@@ -51,9 +51,9 @@
                     <tr>
                         <td class="question" *ngFor="let item of qaList; let i = index">
                             <button *ngIf="item.questionNumber != ''" class="btn btn-light" type="button" [attr.id]="'btn' + (i + 1)"
-                                (click)="getQuestionDetails($event)">{{item.questionNumber}}</button>
+                                (click)="getQuestionDetails($event)" tabindex="-1">{{item.questionNumber}}</button>
                             <input *ngIf="item.questionNumber != ''" class="form-control border-0 text-center" type="text" maxlength="2"
-                                [attr.max]="item.mark" [attr.id]="'txt' + (i + 1)" (click)="highlightQuestion($event)" (keyup)="validateMark($event)">
+                                [attr.max]="item.mark" [attr.id]="'txt' + (i + 1)" (click)="highlightQuestion($event)" (keyup)="validateMark($event, item.mark)">
                                 <label class="or" *ngIf="item.questionNumber == ''">OR</label>
                         </td>
                     </tr>

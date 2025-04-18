@@ -48,7 +48,7 @@ namespace SKCE.Examination.Services.Common
                            RegulationYear = answersheet.RegulationYear,
                            BatchYear = answersheet.BatchYear,
                            DegreeTypeName = dtype.Name,
-                           ExamType = answersheet.ExamYear,
+                           ExamType = answersheet.ExamType,
                            Semester = answersheet.Semester,
                            CourseId = answersheet.CourseId,
                            CourseCode = course.Code,

@@ -318,10 +318,10 @@
                     <a target="_blank" href="{{assignedUser.finalQPPrintedWordDocumentUrl}}">{{assignedUser.finalQPPrintedWordDocumentName}}</a>
                   </div>
                 </div>
-                <br>          
+                <div class="row" ><br></div>           
               </div>
             </div>
-            <br>
+            <div class="row" ><br></div> 
             <div formArrayName="qpScrutinityUsers">
               <div class="row" *ngFor="let assignedScrutinyUser of qpDocument.qpScrutinityUsers; let userIndex = index" [formGroupName]="userIndex">
                   <div class="row" [ngClass]="assignedScrutinyUser.isQPSelected == true ? 'background-color-green' : ''">
@@ -370,6 +370,7 @@
                       <a target="_blank" href="{{assignedScrutinyUser.finalQPPrintedWordDocumentUrl}}">{{assignedScrutinyUser.finalQPPrintedWordDocumentName}}</a>
                     </div>
                    </div>
+                   <div class="row" ><br></div> 
               </div>
             </div>
           </div>

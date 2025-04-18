@@ -583,6 +583,7 @@ isUserAlreadySelected(qpAssignedUsers: any[], userId: number, currentIndex: numb
           this.toasterService.success('Qp Template assigned successfully')
           this.modalService.dismissAll();
           this.loadTemplateaForInstitute(0);
+          window.location.reload(); 
         },
         error: (error) => {
           console.error('Save failed:', error);
@@ -607,6 +608,7 @@ isUserAlreadySelected(qpAssignedUsers: any[], userId: number, currentIndex: numb
         this.toastr.success('User updated successfully!');
         this.loadAssignedTemplates();
         this.modalRef.close();
+        window.location.reload(); 
       },
       error: (res) => {
         this.toastr.error(res['error']['message']);

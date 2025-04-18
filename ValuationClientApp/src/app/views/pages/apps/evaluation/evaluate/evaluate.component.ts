@@ -154,33 +154,33 @@ export class EvaluateComponent implements OnInit {
   }
 
   validateMark(event: any) {
-    // if (event.target.value) {
-    //   if (event.target.value.match(/[^0-9]/g)) {
-    //     this.toastr.error('Please add only numbers.');
-    //     event.target.value = event.target.value.replace(/[^\d]/g, '');
-    //     return;
-    //   }
-    //   //console.log(event.target.value + " > " + event.srcElement.max + " = " + (parseFloat(event.target.value) > parseInt(event.srcElement.max)));
-    //   //console.log(event.target.value + " < " + event.srcElement.max + " = " + (parseFloat(event.target.value) < parseInt(event.srcElement.max)));
-    //   //console.log((parseFloat(event.target.value) < parseInt(event.srcElement.max)));
-    //   //set textbox color red if alloted mark greater than the question mark
-    //   if ((event.target.value < 0) || (parseFloat(event.target.value) > parseInt(event.srcElement.max))) {
-    //     event.srcElement.classList.add('error');
-    //   }
-    //   else {
-    //     event.srcElement.classList.remove('error');
-    //   }
-    //   this.obtainedMarks = 0;
-    //   let txtList = document.querySelectorAll(".question .form-control") as NodeListOf<HTMLInputElement>;
-    //   txtList.forEach((item: HTMLInputElement) => {
-    //     if (item.value) {
-    //       this.obtainedMarks += parseFloat(item.value); // sum all text box marks
-    //     }
-    //     else {
-    //       item.classList.remove('error'); // remove red color if the mark is removed or empty
-    //     }
-    //   });
-    // }
+    if (event.target.value) {
+      if (event.target.value.match(/[^0-9]/g)) {
+        this.toastr.error('Please add only numbers.');
+        event.target.value = event.target.value.replace(/[^\d]/g, '');
+        return;
+      }
+      //console.log(event.target.value + " > " + event.srcElement.max + " = " + (parseFloat(event.target.value) > parseInt(event.srcElement.max)));
+      //console.log(event.target.value + " < " + event.srcElement.max + " = " + (parseFloat(event.target.value) < parseInt(event.srcElement.max)));
+      //console.log((parseFloat(event.target.value) < parseInt(event.srcElement.max)));
+      //set textbox color red if alloted mark greater than the question mark
+      if ((event.target.value < 0) || (parseFloat(event.target.value) > parseInt(event.srcElement.max))) {
+        event.srcElement.classList.add('error');
+      }
+      else {
+        event.srcElement.classList.remove('error');
+      }
+      this.obtainedMarks = 0;
+      let txtList = document.querySelectorAll(".question .form-control") as NodeListOf<HTMLInputElement>;
+      txtList.forEach((item: HTMLInputElement) => {
+        if (item.value) {
+          this.obtainedMarks += parseFloat(item.value); // sum all text box marks
+        }
+        else {
+          item.classList.remove('error'); // remove red color if the mark is removed or empty
+        }
+      });
+    }
   }
 
   filter(part: string) {

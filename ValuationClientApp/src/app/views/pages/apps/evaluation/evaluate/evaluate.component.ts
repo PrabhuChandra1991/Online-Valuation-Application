@@ -241,26 +241,4 @@ export class EvaluateComponent implements OnInit {
     console.error('PDF error: ', error);
   }
 
-  // getQuestionData() {
-  //   for (let index = 1; index <= 30; index++) {  
-  //     let part = "A";
-  //     if (index>10 && index<=20) {
-  //       part = "B"
-  //     }
-  //     else if (index>20) {
-  //       part = "C"
-  //     }
-  //     let isOpt = false;
-  //     if ((index == 11) || (index == 13) || (index == 15) || (index == 17) || (index == 19)) {
-  //       isOpt = true;
-  //     }
-  //     if ((index == 21) || (index == 23) || (index == 25) || (index == 27) || (index == 29)) {
-  //       isOpt = true;
-  //     }
-  //     console.log(index + "=" + isOpt);
-  //     let quest = { "questionId": index, "part": part, "questionNumber": index, "question": "Question "+ index , "answerKey": "This is the answer for question " + index, "mark": index, "allotedMark": 0, "isOptional": isOpt }
-  //     this.qaList.push(quest);
-  //   }    
-  // }
-
 }

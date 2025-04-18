@@ -7,8 +7,8 @@
             <div class="banner" style="background-image: url('images/login-banner.png');">
             </div>
           </div>
-          <div class="col-md-12">
-            <div class="auth-form-wrapper px-7 py-4">
+          <div class="col-md-12 px-3">
+            <div class="auth-form-wrapper px-2 py-4">
               <div class="d-flex justify-content-center align-items-center flex-column">
                 <div class="mb-3 w-100px overflow-hidden">
                   <img class src="images/skcet-logo.png" alt="logo">
@@ -17,32 +17,47 @@
                   to your account.</h4>
               </div>
               <form class="forms-sample" #actorForm="ngForm">
-                <div class="mb-4 px-7">
-                  <!-- <label for="exampleInputEmail1" class="form-label">Email address</label> -->
-                  <input type="email" name="userEmail" [(ngModel)]="userObj.email" required #email="ngModel"
-                    class="form-control" id="exampleInputEmail1" placeholder="Email address"
-                    [disabled]="isOTPRequested">
-                  <div class="text-danger">
-                    <span *ngIf="email.errors?.['required'] && email.touched">Email is required</span>
-                    <!-- <span *ngIf="email.errors?.['pattern']">Email is not valid</span> pattern="^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$" -->
+
+                <div class="row mb-4">
+                  <div class="col-md-3"></div>
+                  <div class="col-md-6">
+                    <!-- <label for="exampleInputEmail1" class="form-label">Email address</label> -->
+                    <input type="email" name="userEmail" [(ngModel)]="userObj.email" required #email="ngModel"
+                      class="form-control" id="exampleInputEmail1" placeholder="Email address"
+                      [disabled]="isOTPRequested">
+                    <div class="text-danger">
+                      <span *ngIf="email.errors?.['required'] && email.touched">Email is required</span>
+                      <!-- <span *ngIf="email.errors?.['pattern']">Email is not valid</span> pattern="^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$" -->
+                    </div>
+                    <div class="col-md-3"></div>
                   </div>
                 </div>
-                <div class="mb-4 px-7" *ngIf="isOTPRequested">
-                  <!-- <label for="exampleInputPassword1" class="form-label">One Time Password</label> -->
-                  <input type="number" class="form-control" [(ngModel)]="userObj.tempPassword"
-                    id="exampleInputPassword1" required #otp="ngModel" placeholder="One Time Password" name="tempPassword"
-                    value="">
-                  <div class="text-danger">
-                    <span *ngIf="otp.errors?.['required'] && otp.touched">Onetime password is required</span>
-                    <!-- <span *ngIf="otp.errors?.['pattern']">Onetime password is not valid</span> -->
+
+                <div class="row mb-4" *ngIf="isOTPRequested">
+                  <div class="col-md-3"></div>
+                  <div class="col-md-6">
+                    <!-- <label for="exampleInputPassword1" class="form-label">One Time Password</label> -->
+                    <input type="number" class="form-control" [(ngModel)]="userObj.tempPassword"
+                      id="exampleInputPassword1" required #otp="ngModel" placeholder="One Time Password"
+                      name="tempPassword" value="">
+                    <div class="text-danger">
+                      <span *ngIf="otp.errors?.['required'] && otp.touched">Onetime password is required</span>
+                      <!-- <span *ngIf="otp.errors?.['pattern']">Onetime password is not valid</span> -->
+                    </div>
                   </div>
-                </div>                
-                <div class="text-center">
-                  <button (click)="requestPassword()" type="submit" *ngIf="!isOTPRequested"
-                    class="btn btn-primary px-3">Request Password</button>
-                  <button (click)="login()" type="submit" *ngIf="isOTPRequested"
-                    class="btn btn-primary px-3">Login</button>
+                  <div class="col-md-3"></div>
                 </div>
+
+                <div class="row mb-3">
+                  <div class="col-md-4"></div>
+                  <div class="col-md-4 d-grid"><button (click)="requestPassword()" type="submit" *ngIf="!isOTPRequested"
+                      class="btn btn-primary px-5">Request Password</button>
+                    <button (click)="login()" type="submit" *ngIf="isOTPRequested"
+                      class="btn btn-primary px-5">Login</button>
+                  </div>
+                  <div class="col-md-4"></div>
+                </div>
+
                 <!-- <a routerLink="/auth/register" class="d-block mt-3 text-secondary">Not a user? Sign up</a> -->
               </form>
             </div>

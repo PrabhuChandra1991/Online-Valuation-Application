@@ -25,7 +25,7 @@ import { encode } from 'js-base64';
 
 export class EvaluationListComponent implements OnInit {
   answerSheetList: any[] = [];
-  displayedColumns: string[] = ['institutionName', 'courseCode', 'courseName', 'degreeTypeName', 'regulationYear', 'batchYear', 'examYear', 'examMonth', 'semester', 'actions'];
+  displayedColumns: string[] = ['institutionName', 'courseCode', 'courseName', 'degreeTypeName', 'regulationYear', 'batchYear', 'examYear', 'examMonth', 'semester', 'examType', 'actions'];
   dataSource = new MatTableDataSource<any>([]);
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;

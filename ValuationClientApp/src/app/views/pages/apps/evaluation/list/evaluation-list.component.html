@@ -73,6 +73,12 @@
                         <td mat-cell *matCellDef="let element"> {{ element.semester }} </td>
                     </ng-container>
 
+                    <!-- examType Column -->
+                    <ng-container matColumnDef="examType">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Exam Type </th>
+                        <td mat-cell *matCellDef="let element"> {{ element.examType }} </td>
+                    </ng-container>
+
                     <!-- Actions Column -->
                     <ng-container matColumnDef="actions">
                         <th mat-header-cell *matHeaderCellDef> Actions </th>

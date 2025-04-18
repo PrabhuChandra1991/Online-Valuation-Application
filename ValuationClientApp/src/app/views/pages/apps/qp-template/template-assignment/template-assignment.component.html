@@ -1,156 +1,112 @@
 <div class="container">
-  <div class="row col-8">
-    <div class="col-md-3" *ngIf="isAdmin">
-      <button class="btn btn-primary " (click)="openAssignModal(lgModal)">Assign Question Paper</button>
+  <h3>Assigned Templates</h3>
+  <div class="row mt-4">
+    <div class="col-lg-3 col-md-5">
+      <input class="form-control" (keyup)="applyFilter($event)" placeholder="Search">
     </div>
-    <!-- <div class="institute" *ngIf="isAdmin">
-      <div class="col-md-2 mt-2 px-3">
-        <label>Institution <span class="text-danger">*</span></label>
-      </div>
-      <div class="col-md-3">
-        <select id="institutionId" class="form-select" (change)="onInstituteChange($event)">
-          <option [value]="">Select Institution</option>
-          <option *ngFor="let inst of institutes" [value]="inst.institutionId">{{ inst.name }}</option>
-        </select>
-      </div>
-    </div> -->
+    <div class="col-lg-7 col-md-2">
+      &nbsp;
+    </div>
+    <div class="col-lg-2 col-md-5 d-grid">
+      <button class="btn btn-primary float-end me-1" (click)="openAssignModal(lgModal)">Assign Question Paper</button>
+    </div>
   </div>
-  <div class="row mt-2">
-    <!-- <div class="col-md-8" *ngIf="isAdmin">
-      <button class="btn btn-primary me-1" (click)="openAssignModal(lgModal)">Assign Template</button>
-    </div> -->
-    <!-- <div class="col-md-2" *ngIf="isAdmin">
 
-      <button class="btn btn-primary me-1" (click)="openAssignModal(lgModal)">Assign Template</button>
-    </div> -->
-    <!-- <div class="col-md-2 ">
-      <label>Institution <span class="text-danger">*</span></label>
-      <select formControlName="institutionId" class="form-select" >
-        <option *ngFor="let inst of institutes" [value]="inst.institutionId">{{ inst.name }}</option>
-      </select>
-    </div> -->
-    <div class="row mt-5">
-      <div class="col-lg-12 grid-margin stretch-card">
-        <div class="card">
-          <div class="card-body">
-            <h4 class="card-title">Assigned Templates</h4>
-            <div class="table-responsive">
-              <!-- <table class="table table-striped mt-0">
-                <thead>
-                  <tr>
-                    <th># </th>
-                    <th>QP Template</th>
-                    <th>Course Code</th>
-                    <th>Month</th>
-                    <th>Year</th>
-                    <th>QP Template</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td colspan="6" class="text-center">No data to display</td>
-                  </tr>
-                </tbody>
-              </table> -->
-              <!-- Search Input -->
-              <mat-form-field appearance="outline">
-                <mat-label>Search User</mat-label>
-                <input matInput (keyup)="applyFilter($event)" placeholder="Search">
-              </mat-form-field>
+  <div class="row mt-4">
+    <div class="col-lg-12 custom-table-style">
+      <div class="table-responsive">
 
-              <!-- Table -->
-              <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+        <!-- Table -->
+        <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
 
-                <!-- Name Column -->
-                <ng-container matColumnDef="qpTemplateName">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Template Name</th>
-                  <td mat-cell *matCellDef="let element"> {{ element.qpTemplateName }} </td>
-                </ng-container>
+          <!-- Name Column -->
+          <ng-container matColumnDef="qpTemplateName">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Template Name</th>
+            <td mat-cell *matCellDef="let element"> {{ element.qpTemplateName }} </td>
+          </ng-container>
 
-                <ng-container matColumnDef="courseCode">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Course Code </th>
-                  <td mat-cell *matCellDef="let element">{{ element.courseCode}} </td>
-                </ng-container>
+          <ng-container matColumnDef="courseCode">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Course Code </th>
+            <td mat-cell *matCellDef="let element">{{ element.courseCode}} </td>
+          </ng-container>
 
-                <ng-container matColumnDef="courseName">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Course Name </th>
-                  <td mat-cell *matCellDef="let element">{{ element.courseName }} </td>
-                </ng-container>
+          <ng-container matColumnDef="courseName">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Course Name </th>
+            <td mat-cell *matCellDef="let element">{{ element.courseName }} </td>
+          </ng-container>
 
-                <ng-container matColumnDef="qpTemplateStatusTypeName">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Template Status </th>
-                  <td mat-cell *matCellDef="let element">{{ element.qpTemplateStatusTypeName }}  </td>
-                </ng-container>
+          <ng-container matColumnDef="qpTemplateStatusTypeName">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Template Status </th>
+            <td mat-cell *matCellDef="let element">{{ element.qpTemplateStatusTypeName }} </td>
+          </ng-container>
 
-                <!-- Mobile Number Column -->
-                <ng-container matColumnDef="expert1Name">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Expert -1 Name </th>
-                  <td mat-cell *matCellDef="let element"> {{ element.expert1Name }} </td>
-                </ng-container>
+          <!-- Mobile Number Column -->
+          <ng-container matColumnDef="expert1Name">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Expert -1 Name </th>
+            <td mat-cell *matCellDef="let element"> {{ element.expert1Name }} </td>
+          </ng-container>
 
-                <ng-container matColumnDef="expert1Status">
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header> Expert - 1 Status</th>
-                  <td mat-cell *matCellDef="let element">{{ element.expert1Status }} </td>
-                </ng-container>
+          <ng-container matColumnDef="expert1Status">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Expert - 1 Status</th>
+            <td mat-cell *matCellDef="let element">{{ element.expert1Status }} </td>
+          </ng-container>
 
-                  <ng-container matColumnDef="expert2Name" >
-                    <th mat-header-cell *matHeaderCellDef mat-sort-header> Expert -2 Name </th>
-                    <td mat-cell *matCellDef="let element"> {{ element.expert2Name }} </td>
-                  </ng-container>
-                  <ng-container matColumnDef="expert2Status">
-                    <th mat-header-cell *matHeaderCellDef mat-sort-header> Expert - 2 Status </th>
-                    <td mat-cell *matCellDef="let element"> {{ element.expert2Status }} </td>
-                  </ng-container>
+          <ng-container matColumnDef="expert2Name">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Expert -2 Name </th>
+            <td mat-cell *matCellDef="let element"> {{ element.expert2Name }} </td>
+          </ng-container>
+          <ng-container matColumnDef="expert2Status">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Expert - 2 Status </th>
+            <td mat-cell *matCellDef="let element"> {{ element.expert2Status }} </td>
+          </ng-container>
 
-                <ng-container matColumnDef="actions">
-                  <th mat-header-cell *matHeaderCellDef> Actions </th>
-                  @if(isAdmin)
-                  {
-                  <td mat-cell *matCellDef="let element">
-                    <button mat-icon-button color="primary" (click)="editAssignment(lgModal,element.qpTemplateId)" *ngIf="isAdmin">
-                      <mat-icon>edit</mat-icon>
-                    </button>
-                  </td>
-                  }
-                  @else{
-                    <td mat-cell *matCellDef="let element" >
-                      <br>
-                      <button *ngIf="element.qpTemplateStatusTypeId === 8 || element.qpTemplateStatusTypeId === 10" class="btn btn-sm btn-primary" (click)="openDocUploadModal(lgDocModal,element.userQPTemplateId)"
-                        [disabled]="element.qpTemplateStatusTypeId === 9 || element.qpTemplateStatusTypeId === 11">
-                        Upload generated QP
-                      </button>
-                      <br>
-                      <br>
-                      <a *ngIf="element.qpTemplateStatusTypeId === 8 || element.qpTemplateStatusTypeId === 10" target="_blank" download  href="{{element.qpDocumentUrl}}">
-                        Download QP template
-                      </a> 
-                      <br>
-                      <br>
-                      <a *ngIf="element.qpTemplateStatusTypeId === 8 || element.qpTemplateStatusTypeId === 10" target="_blank" download  href="{{element.courseSyllabusDocumentUrl}}">
-                        Download Syllabus
-                      </a>      
-                  </td>
-                  }
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef> Actions </th>
+            @if(isAdmin)
+            {
+            <td mat-cell *matCellDef="let element">
+              <button mat-icon-button color="primary" (click)="editAssignment(lgModal,element.qpTemplateId)"
+                *ngIf="isAdmin">
+                <mat-icon>edit</mat-icon>
+              </button>
+            </td>
+            }
+            @else{
+            <td mat-cell *matCellDef="let element">
+              <a class="primary link-opacity-50-hover" *ngIf="element.qpTemplateStatusTypeId === 8 || element.qpTemplateStatusTypeId === 10"
+                (click)="openDocUploadModal(lgDocModal,element.userQPTemplateId)"
+                [ngClass]="(element.qpTemplateStatusTypeId === 9 || element.qpTemplateStatusTypeId === 11) ? 'disabled' : ''">
+                Upload generated QP
+              </a>
+              <br>
+              <a class="primary link-opacity-50-hover" *ngIf="element.qpTemplateStatusTypeId === 8 || element.qpTemplateStatusTypeId === 10" target="_blank"
+                download href="{{element.qpDocumentUrl}}">
+                Download QP template
+              </a>
+              <br>
+              <a class="primary link-opacity-50-hover" *ngIf="element.qpTemplateStatusTypeId === 8 || element.qpTemplateStatusTypeId === 10" target="_blank"
+                download href="{{element.courseSyllabusDocumentUrl}}">
+                Download Syllabus
+              </a>
+            </td>
+            }
 
-                </ng-container>
+          </ng-container>
 
-                <!-- Table Header & Row Definitions -->
-                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          <!-- Table Header & Row Definitions -->
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 
-              </table>
+        </table>
 
-              <!-- Pagination -->
-              <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
-            </div>
-          </div>
-        </div>
       </div>
+      <!-- Pagination -->
+      <mat-paginator class="mt-3 pagination" [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+
     </div>
   </div>
 </div>
 
-<!-- Lg Modal -->
 <!-- Lg Modal -->
 <ng-template #lgModal let-modal>
   <div class="modal-header">
@@ -163,9 +119,9 @@
       <div class="row">
         <div class="col-md-6">
           <div class="mb-3">
-            <label for="template"
-                   class="form-label">Course</label>
-            <select class="form-select" #course formControlName="courseId" id="course" (change)="onCourseChange($event)">
+            <label for="template" class="form-label">Course</label>
+            <select class="form-select" #course formControlName="courseId" id="course"
+              (change)="onCourseChange($event)">
               <option selected disabled>Select Course</option>
               <option *ngFor="let course of courses" [value]="course.courseId">
                 {{course.code}} - {{ course.name }}
@@ -181,16 +137,15 @@
       <div class="row">
         <div class="col-sm-4">
           <div class="mb-3">
-            <label for="degreeTypeName"
-                   class="form-label">Degree Type</label>
+            <label for="degreeTypeName" class="form-label">Degree Type</label>
             <input type="text" class="form-control" formControlName="degreeTypeName">
           </div>
         </div><!-- Col -->
         <div class="col-sm-4">
           <div class="mb-3">
-            <label for="regulationYear"
-                   class="form-label">Requlation Year</label>
-            <input type="text" class="form-control" formControlName="regulationYear" placeholder="Enter Regulation Year">
+            <label for="regulationYear" class="form-label">Requlation Year</label>
+            <input type="text" class="form-control" formControlName="regulationYear"
+              placeholder="Enter Regulation Year">
 
           </div>
         </div><!-- Col -->
@@ -207,15 +162,13 @@
       <div class="row">
         <div class="col-sm-4">
           <div class="mb-3">
-            <label for="examYear"
-                   class="form-label">Exam Year</label>
+            <label for="examYear" class="form-label">Exam Year</label>
             <input type="text" class="form-control" formControlName="examYear" />
           </div>
         </div><!-- Col -->
         <div class="col-sm-4">
           <div class="mb-3">
-            <label for="examMonth"
-                   class="form-label">Exam Month</label>
+            <label for="examMonth" class="form-label">Exam Month</label>
             <input type="text" class="form-control" formControlName="examMonth" placeholder="Enter Exam Month">
           </div>
         </div><!-- Col -->
@@ -232,23 +185,21 @@
       <div class="row">
         <div class="col-sm-4">
           <div class="mb-3">
-            <label for="semester"
-                   class="form-label">Semester</label>
+            <label for="semester" class="form-label">Semester</label>
             <input type="text" class="form-control" formControlName="semester" />
           </div>
         </div><!-- Col -->
         <div class="col-sm-4">
           <div class="mb-3">
-            <label for="studentCount"
-                   class="form-label">Students Count</label>
+            <label for="studentCount" class="form-label">Students Count</label>
             <input type="text" class="form-control" formControlName="studentCount">
           </div>
         </div><!-- Col -->
         <div class="col-sm-4" *ngIf="isCourseSyllabusDocuploaded">
           <div class="mb-3">
-            <label for="courseSyllabusDocumentName"
-                   class="form-label">Syllabus Document</label><br />
-            <a target="_blank" href="{{templateAssignmentForm.controls['courseSyllabusDocumentUrl'].value}}">{{templateAssignmentForm.controls['courseSyllabusDocumentName'].value}}</a>
+            <label for="courseSyllabusDocumentName" class="form-label">Syllabus Document</label><br />
+            <a target="_blank"
+              href="{{templateAssignmentForm.controls['courseSyllabusDocumentUrl'].value}}">{{templateAssignmentForm.controls['courseSyllabusDocumentName'].value}}</a>
 
           </div>
         </div><!-- Col -->
@@ -257,7 +208,8 @@
       <div *ngIf="qpTemplateData">
 
         <div formArrayName="qpDocuments">
-          <div class="row" *ngFor="let qpDocument of qpTemplateData.qpDocuments; let docIndex = index" [formGroupName]="docIndex">
+          <div class="row" *ngFor="let qpDocument of qpTemplateData.qpDocuments; let docIndex = index"
+            [formGroupName]="docIndex">
             <div class="col-md-6">
               <div class="mb-3">
                 <label class="form-label">Template Name: {{ qpDocument.qpDocumentName }}</label>
@@ -266,103 +218,109 @@
 
             <!-- Loop through assigned users -->
             <div formArrayName="qpAssignedUsers">
-              <div class="row" *ngFor="let assignedUser of qpDocument.qpAssignedUsers; let userIndex = index" [formGroupName]="userIndex">
-              <div class="row" [ngClass]="assignedUser.isQPSelected == true ? 'background-color-green' : ''">
-                <!-- Expert Selection -->
-                <div class="col-sm-6">
-                  <div class="mb-4">
-                    <label class="form-label">Expert - {{ userIndex + 1 }}</label>
-                    <select class="form-select" formControlName="userId" [ngClass]="assignedUser.statusTypeId === 9 ? 'disabled' : ''"
-                            (change)="updateUserDetails(docIndex, userIndex,$event)">
-                      <option value="">Select Expert</option>
-                      <option *ngFor="let user of users" [value]="user.userId"
-                              [disabled]="isUserAlreadySelected(qpDocument.qpAssignedUsers, user.userId, userIndex)">
-                        {{ user.userName }}
-                      </option>
-                    </select>
+              <div class="row" *ngFor="let assignedUser of qpDocument.qpAssignedUsers; let userIndex = index"
+                [formGroupName]="userIndex">
+                <div class="row" [ngClass]="assignedUser.isQPSelected == true ? 'background-color-green' : ''">
+                  <!-- Expert Selection -->
+                  <div class="col-sm-6">
+                    <div class="mb-4">
+                      <label class="form-label">Expert - {{ userIndex + 1 }}</label>
+                      <select class="form-select" formControlName="userId"
+                        [ngClass]="assignedUser.statusTypeId === 9 ? 'disabled' : ''"
+                        (change)="updateUserDetails(docIndex, userIndex,$event)">
+                        <option value="">Select Expert</option>
+                        <option *ngFor="let user of users" [value]="user.userId"
+                          [disabled]="isUserAlreadySelected(qpDocument.qpAssignedUsers, user.userId, userIndex)">
+                          {{ user.userName }}
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- Is QP Only Checkbox -->
+                  <div class="col-sm-4">
+                    <br>
+                    <mat-checkbox formControlName="isQPOnly"
+                      [ngClass]="assignedUser.statusTypeId === 9 ? 'disabled' : ''"
+                      (change)="updateIsQPOnly(docIndex, userIndex, $event.checked)">Is QP Only
+                    </mat-checkbox>
                   </div>
                 </div>
-
-                <!-- Is QP Only Checkbox -->
-                <div class="col-sm-4">                 
+                <div class="row" *ngIf="assignedUser.statusTypeId === 9">
+                  <div class="col-sm-4">
+                    {{assignedUser.statusTypeName}}
+                  </div>
+                  <div class="col-sm-4" *ngIf="assignedUser.statusTypeId === 9">
+                    <a target="_blank"
+                      href="{{assignedUser.submittedQPDocumentUrl}}">{{assignedUser.submittedQPDocumentName}}</a>
+                  </div>
+                  <div class="col-sm-4" *ngIf="assignedUser.statusTypeId === 9">
+                    <button class="btn btn-sm btn-primary"
+                      (click)="printQPDocument(assignedUser.userQPTemplateId,false)"
+                      *ngIf="assignedUser.statusTypeId === 9">
+                      Preview
+                    </button>
+                    &nbsp;&nbsp;&nbsp;
+                    <button class="btn btn-sm btn-primary" (click)="printQPDocument(assignedUser.userQPTemplateId,true)"
+                      *ngIf="assignedUser.statusTypeId === 9">
+                      Print
+                    </button>
+                  </div>
                   <br>
-                  <mat-checkbox formControlName="isQPOnly" [ngClass]="assignedUser.statusTypeId === 9 ? 'disabled' : ''"                                 
-                                (change)="updateIsQPOnly(docIndex, userIndex, $event.checked)">Is QP Only
-                  </mat-checkbox>
-                </div> 
-              </div>
-              <div class="row" *ngIf="assignedUser.statusTypeId === 9">
-                <div class="col-sm-4">
-                  {{assignedUser.statusTypeName}}
                 </div>
-                <div class="col-sm-4" *ngIf="assignedUser.statusTypeId === 9">
-                  <a target="_blank" href="{{assignedUser.submittedQPDocumentUrl}}">{{assignedUser.submittedQPDocumentName}}</a>
-                </div>
-                <div class="col-sm-4" *ngIf="assignedUser.statusTypeId === 9">
-                  <button class="btn btn-sm btn-primary"
-                          (click)="printQPDocument(assignedUser.userQPTemplateId,false)"
-                          *ngIf="assignedUser.statusTypeId === 9">
-                    Preview
-                  </button>                  
-                   &nbsp;&nbsp;&nbsp;                         
-                   <button class="btn btn-sm btn-primary"
-                          (click)="printQPDocument(assignedUser.userQPTemplateId,true)"
-                          *ngIf="assignedUser.statusTypeId === 9">
-                    Print
-                  </button>
-                </div> 
-                <br>   
-                </div> 
-                <br>          
+                <br>
               </div>
             </div>
             <br>
             <div formArrayName="qpScrutinityUsers">
-              <div class="row" *ngFor="let assignedScrutinyUser of qpDocument.qpScrutinityUsers; let userIndex = index" [formGroupName]="userIndex">
-                  <div class="row">
-                    <div class="col-sm-6">
-                      <div class="mb-4">
-                        <label class="form-label">Scrutiny - {{ userIndex + 1 }}</label>
-                        <select class="form-select" formControlName="userId" [disabled]="assignedScrutinyUser.userQPTemplateId !== 0"
-                          [ngClass]="assignedScrutinyUser.statusTypeId === 11 ? 'disabled' : ''"
-                          (change)="updateScrutinyUserDetails(docIndex, userIndex,$event)">
-                          <option value="">Select Scrutiny </option>
-                          <option *ngFor="let user of getScrutinyUsers(assignedScrutinyUser)" [value]="user.userId">
-                            {{ user.userName }}
-                          </option>
-                        </select>
-                      </div>
-                    </div>
-                    <div class="col-sm-3 d-flex align-items-center">                     
-                      <button class="btn btn-sm btn-primary" [disabled]="assignedScrutinyUser.userQPTemplateId !== 0"
-                        (click)="assignScrutinity(assignedScrutinyUser)">
-                        Assign Scrutinity
-                      </button>
+              <div class="row" *ngFor="let assignedScrutinyUser of qpDocument.qpScrutinityUsers; let userIndex = index"
+                [formGroupName]="userIndex">
+                <div class="row">
+                  <div class="col-sm-6">
+                    <div class="mb-4">
+                      <label class="form-label">Scrutiny - {{ userIndex + 1 }}</label>
+                      <select class="form-select" formControlName="userId"
+                        [disabled]="assignedScrutinyUser.userQPTemplateId !== 0"
+                        [ngClass]="assignedScrutinyUser.statusTypeId === 11 ? 'disabled' : ''"
+                        (change)="updateScrutinyUserDetails(docIndex, userIndex,$event)">
+                        <option value="">Select Scrutiny </option>
+                        <option *ngFor="let user of getScrutinyUsers(assignedScrutinyUser)" [value]="user.userId">
+                          {{ user.userName }}
+                        </option>
+                      </select>
                     </div>
                   </div>
-                  <div class="row" >
-                    <div class="col-sm-4">
-                      {{assignedScrutinyUser.statusTypeName}}
-                    </div>
-                    <div class="col-sm-4" *ngIf="assignedScrutinyUser.statusTypeId === 11">
-                      <a target="_blank" href="{{assignedScrutinyUser.submittedQPDocumentUrl}}">{{assignedScrutinyUser.submittedQPDocumentName}}</a>
-                    </div>
-                    <div class="col-sm-4" *ngIf="assignedScrutinyUser.statusTypeId === 11">
-                      <button class="btn btn-sm btn-primary"
-                              (click)="printQPDocument(assignedUser.userQPTemplateId,false)">
-                        Preview
-                      </button>
-                      &nbsp;&nbsp;&nbsp;    
-                      <button class="btn btn-sm btn-primary"
-                              (click)="printQPDocument(assignedScrutinyUser.userQPTemplateId,true)">
-                        Print
-                      </button>
-                    </div> 
-                    <br> 
+                  <div class="col-sm-3 d-flex align-items-center">
+                    <button class="btn btn-sm btn-primary" [disabled]="assignedScrutinyUser.userQPTemplateId !== 0"
+                      (click)="assignScrutinity(assignedScrutinyUser)">
+                      Assign Scrutinity
+                    </button>
                   </div>
+                </div>
+                <div class="row">
+                  <div class="col-sm-4">
+                    {{assignedScrutinyUser.statusTypeName}}
+                  </div>
+                  <div class="col-sm-4" *ngIf="assignedScrutinyUser.statusTypeId === 11">
+                    <a target="_blank"
+                      href="{{assignedScrutinyUser.submittedQPDocumentUrl}}">{{assignedScrutinyUser.submittedQPDocumentName}}</a>
+                  </div>
+                  <div class="col-sm-4" *ngIf="assignedScrutinyUser.statusTypeId === 11">
+                    <button class="btn btn-sm btn-primary"
+                      (click)="printQPDocument(assignedUser.userQPTemplateId,false)">
+                      Preview
+                    </button>
+                    &nbsp;&nbsp;&nbsp;
+                    <button class="btn btn-sm btn-primary"
+                      (click)="printQPDocument(assignedScrutinyUser.userQPTemplateId,true)">
+                      Print
+                    </button>
+                  </div>
+                  <br>
+                </div>
               </div>
             </div>
-            
+
 
           </div>
         </div>
@@ -370,10 +328,10 @@
     </form>
   </div>
   <div class="modal-footer">
-    <button type="button" class="btn btn-secondary" (click)="close()">Close</button>
+    <button type="button" class="btn btn-danger" (click)="close()">Close</button>
 
-    <button type="button" class="btn btn-primary" *ngIf="(qpTemplateId == 0)"
-            (click)="onSave()" [disabled]="!isCourseSyllabusDocuploaded">
+    <button type="button" class="btn btn-primary" *ngIf="(qpTemplateId == 0)" (click)="onSave()"
+      [disabled]="!isCourseSyllabusDocuploaded">
       Save changes
     </button>
 
@@ -392,13 +350,16 @@
       <div class="row">
         <div class="col-sm-6">
           <div class="mb-3">
-            <label class="form-label" for="filename">Upload QP / QP Answer Key document <span class="text-danger"> *</span> </label>
-            <input class="form-control" multiple value="qpDocumentsformf['file']" type="file" id="masterfile" formControlName="file" (change)="onQPDocDataFileChange($event)">
+            <label class="form-label" for="filename">Upload QP / QP Answer Key document <span class="text-danger">
+                *</span> </label>
+            <input class="form-control" multiple value="qpDocumentsformf['file']" type="file" id="masterfile"
+              formControlName="file" (change)="onQPDocDataFileChange($event)">
           </div>
         </div><!-- Col -->
         <div class="col-sm-6 text-end">
           <div class="mt-4">
-            <button type="button" class="btn btn-primary" (click)="printQPDocument(qpTemplateId,false)" *ngIf="isQPDocValidated">Preview</button>
+            <button type="button" class="btn btn-primary" (click)="printQPDocument(qpTemplateId,false)"
+              *ngIf="isQPDocValidated">Preview</button>
           </div>
         </div><!-- Col -->
       </div><!-- Row -->
@@ -419,7 +380,7 @@
           <input type="checkbox" class="form-check-input mx-1 mb-2" name="graph" (change)="showTextBox($event)">
           <mat-form-field appearance="outline" *ngIf="isGraphsRequired">
             <mat-label>Enter Graph Name</mat-label>
-            <input matInput name="graphName" placeholder="Graph Name" required  #graphName>
+            <input matInput name="graphName" placeholder="Graph Name" required #graphName>
           </mat-form-field>
         </div>
         <div class="col-lg-4">
@@ -429,7 +390,7 @@
           <input type="checkbox" class="form-check-input mx-1 mb-2" name="table" (change)="showTextBox($event)">
           <mat-form-field appearance="outline" *ngIf="isTablesAllowed">
             <mat-label>Enter Table Name</mat-label>
-            <input matInput name="tableName" placeholder="Table Name" required  #tableName>
+            <input matInput name="tableName" placeholder="Table Name" required #tableName>
           </mat-form-field>
         </div>
       </div><!-- Row -->
@@ -437,10 +398,12 @@
   </div>
 
   <div class="modal-footer">
-    <button type="button" class="btn btn-secondary" (click)="close()">Close</button>
+    <button type="button" class="btn btn-danger" (click)="close()">Close</button>
     <div>
-      <button type="button" class="btn btn-primary" *ngIf="!isQPDocValidated" [disabled]="!isQPDocUploaded" (click)="validate(qpTemplateId)">Validate</button>
+      <button type="button" class="btn btn-primary" *ngIf="!isQPDocValidated" [disabled]="!isQPDocUploaded"
+        (click)="validate(qpTemplateId)">Validate</button>
     </div>
-    <button type="button" class="btn btn-primary" *ngIf="isQPDocValidated" (click)="submit(qpTemplateId)">Submit</button>
+    <button type="button" class="btn btn-primary" *ngIf="isQPDocValidated"
+      (click)="submit(qpTemplateId)">Submit</button>
   </div>
 </ng-template>

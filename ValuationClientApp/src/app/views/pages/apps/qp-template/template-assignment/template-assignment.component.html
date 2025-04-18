@@ -291,7 +291,7 @@
                   </mat-checkbox>
                 </div> 
               </div>
-              <div class="row" *ngIf="assignedUser.statusTypeId === 9">
+              <div class="row" *ngIf="assignedUser.statusTypeId === 9" [ngClass]="assignedUser.isQPSelected == true ? 'background-color-green' : ''">
                 <div class="col-sm-4">
                   {{assignedUser.statusTypeName}}
                 </div>
@@ -305,7 +305,7 @@
                     Preview
                   </button>                  
                    &nbsp;&nbsp;&nbsp;                         
-                   <button class="btn btn-sm btn-primary"
+                   <button class="btn btn-sm btn-primary" [disabled]="assignedUser.isQPSelected"
                           (click)="printQPDocument(assignedUser.userQPTemplateId,true)"
                           *ngIf="assignedUser.statusTypeId === 9">
                     Print
@@ -313,13 +313,18 @@
                 </div> 
                 <br>   
                 </div> 
+                <div class="row" *ngIf="assignedUser.isQPSelected" [ngClass]="assignedUser.isQPSelected == true ? 'background-color-green' : ''">
+                  <div class="col-sm-4">
+                    <a target="_blank" href="{{assignedUser.finalQPPrintedWordDocumentUrl}}">{{assignedUser.finalQPPrintedWordDocumentName}}</a>
+                  </div>
+                </div>
                 <br>          
               </div>
             </div>
             <br>
             <div formArrayName="qpScrutinityUsers">
               <div class="row" *ngFor="let assignedScrutinyUser of qpDocument.qpScrutinityUsers; let userIndex = index" [formGroupName]="userIndex">
-                  <div class="row">
+                  <div class="row" [ngClass]="assignedScrutinyUser.isQPSelected == true ? 'background-color-green' : ''">
                     <div class="col-sm-6">
                       <div class="mb-4">
                         <label class="form-label">Scrutiny - {{ userIndex + 1 }}</label>
@@ -340,7 +345,7 @@
                       </button>
                     </div>
                   </div>
-                  <div class="row" >
+                  <div class="row" [ngClass]="assignedScrutinyUser.isQPSelected == true ? 'background-color-green' : ''">
                     <div class="col-sm-4">
                       {{assignedScrutinyUser.statusTypeName}}
                     </div>
@@ -349,21 +354,24 @@
                     </div>
                     <div class="col-sm-4" *ngIf="assignedScrutinyUser.statusTypeId === 11">
                       <button class="btn btn-sm btn-primary"
-                              (click)="printQPDocument(assignedUser.userQPTemplateId,false)">
+                              (click)="printQPDocument(assignedScrutinyUser.userQPTemplateId,false)">
                         Preview
                       </button>
                       &nbsp;&nbsp;&nbsp;    
-                      <button class="btn btn-sm btn-primary"
+                      <button class="btn btn-sm btn-primary" [disabled]="assignedScrutinyUser.isQPSelected"
                               (click)="printQPDocument(assignedScrutinyUser.userQPTemplateId,true)">
                         Print
                       </button>
                     </div> 
                     <br> 
                   </div>
+                  <div class="row" [ngClass]="assignedScrutinyUser.isQPSelected == true ? 'background-color-green' : ''" *ngIf="assignedScrutinyUser.isQPSelected">
+                    <div class="col-sm-4">
+                      <a target="_blank" href="{{assignedScrutinyUser.finalQPPrintedWordDocumentUrl}}">{{assignedScrutinyUser.finalQPPrintedWordDocumentName}}</a>
+                    </div>
+                   </div>
               </div>
             </div>
-            
-
           </div>
         </div>
       </div>
@@ -398,7 +406,7 @@
         </div><!-- Col -->
         <div class="col-sm-6 text-end">
           <div class="mt-4">
-            <button type="button" class="btn btn-primary" (click)="printQPDocument(qpTemplateId,false)" *ngIf="isQPDocValidated">Preview</button>
+            <button type="button" class="btn btn-primary" (click)="previewGeneratedDcument(qpTemplateId)" *ngIf="isQPDocValidated">Preview</button>
           </div>
         </div><!-- Col -->
       </div><!-- Row -->

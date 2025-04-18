@@ -31,5 +31,9 @@ export class QPDocumentService {
     let resp = this.http.post(`${this.apiUrl}/api/QpTemplate/SubmitGeneratedQP/${documentId}?IsGraphsRequired=${isGraphsRequired}&GraphName=${graphName}&isTablesAllowed=${isTablesAllowed}&tableName=${tableName}`, formData);
     return resp;
   }
+  generatedQPPreview(formData: any, userQPTemplateId: number,): Observable<any> {
+    let resp = this.http.post(`${this.apiUrl}/api/QpTemplate/GeneratedQPPreview/${userQPTemplateId}`, formData);
+    return resp;
+  }
 
 }

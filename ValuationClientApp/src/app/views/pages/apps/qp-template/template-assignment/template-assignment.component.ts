@@ -648,11 +648,17 @@ isUserAlreadySelected(qpAssignedUsers: any[], userId: number, currentIndex: numb
     window.open(blobUrl, '_blank');
   }
   printQPDocument(userqpTemplateId:number,isForPrint:boolean){
+    this.spinnerService.toggleSpinnerState(true);
     this.templateService.printQPTemplate(userqpTemplateId,isForPrint).subscribe({
       next: (response) => {
         if(response.base64Content != ""){
           this.openPdfInTab(response.base64Content,response.fileName);
           this.toastr.success('File downloaded successfully!');
+          if(isForPrint){
+            this.close()
+            window.location.reload();  
+          }
+         
         }else{
           this.toastr.error('No file found to print!');
         }
@@ -674,6 +680,7 @@ isUserAlreadySelected(qpAssignedUsers: any[], userId: number, currentIndex: numb
       next: () => {
         this.close();
         this.spinnerService.toggleSpinnerState(false);
+        window.location.reload(); 
       },
       error: (res) => {
         this.close();
@@ -772,6 +779,36 @@ isUserAlreadySelected(qpAssignedUsers: any[], userId: number, currentIndex: numb
     }
   }
 
+  previewGeneratedDcument(userqpTemplateId:number){
+    this.spinnerService.toggleSpinnerState(true);
+    const formData = new FormData();
+    const fileSourceValue = this.qpDocDataForm.get('fileSource')?.value;
+
+    if (fileSourceValue !== null && fileSourceValue !== undefined) {
+        formData.append('file', fileSourceValue);
+    }
+
+    this.qpDocumentService.generatedQPPreview(formData,userqpTemplateId).subscribe({
+      next: (response) => {
+        if(response.base64Content != ""){
+          this.openPdfInTab(response.base64Content,response.fileName);
+          this.toastr.success('File downloaded successfully!');
+        }else{
+          this.toastr.error('No file found to print!');
+        }
+        this.spinnerService.toggleSpinnerState(false);
+      },
+      error: (response) => {
+        this.toastr.error('No file found to print!');
+        this.spinnerService.toggleSpinnerState(false);
+      },
+      complete: () => {
+       // this.isSubmitting = false;
+        this.spinnerService.toggleSpinnerState(false);
+      }
+    });
+  }
+
   submit(qpDocumentId:number) {
     this.spinnerService.toggleSpinnerState(true);
     const formData = new FormData();
@@ -800,7 +837,8 @@ isUserAlreadySelected(qpAssignedUsers: any[], userId: number, currentIndex: numb
         //console.log(response)
         if(response) {
           this.toastr.success('Data submitted successfully!');
-          this.close();          
+          this.close(); 
+          window.location.reload();         
         }
       },
       error: (response) => {

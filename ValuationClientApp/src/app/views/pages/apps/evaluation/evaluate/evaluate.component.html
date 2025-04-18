@@ -61,19 +61,20 @@
             </table>
         </div>
     
-        <div class="row mt-3">
-            <div class="col-md-3">
+        <div class="row mt-3 p-0">
+            <div class="col-md-7 p-0 pt-2">
                 Maximum Mark for selected question:&nbsp;&nbsp;{{activeQuestionMark}}
             </div>
-            <div class="col-md-6">            
-            </div>
-            <div class="col-md-3" style="text-align: right;">
+            <div class="col-md-3 p-0 pt-2 mb-2">
                 <h5 [ngClass]="obtainedMarks > totalMarks ? 'text-danger' : ''">Total marks obtained:&nbsp;&nbsp;{{obtainedMarks}}&nbsp;/&nbsp;{{totalMarks}}</h5>
+            </div>
+            <div class="col-md-2 p-0 d-grid">
+                <button class="btn btn-primary" (click)="submitEvaluation()">Submit Evaluation</button>
             </div>
         </div>
     
         <div class="row mt-3">
-            <div class="col-lg-6 ps-0">
+            <div class="col-md-6 ps-0">
                 <div class="card p-3">
                     <h5>Question:</h5>
                     <div [innerHtml]="activeQuestion"></div>
@@ -84,7 +85,7 @@
                     <div [innerHtml]="activeAnswer"></div>
                 </div>
             </div>
-            <div class="col-lg-6 p-0">
+            <div class="col-md-6 p-0">
                 <div class="card p-3">
                     <div class="pdf-container">
                         <pdf-viewer [src]="src" [rotation]="0" [original-size]="false" [show-all]="true"

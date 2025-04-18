@@ -183,6 +183,18 @@ export class EvaluateComponent implements OnInit {
     }
   }
 
+  submitEvaluation() {
+    if(this.obtainedMarks == 0) {
+      this.toastr.warning('Obained Marks is 0. Please evaluate.');
+    }
+    else if (this.obtainedMarks > this.totalMarks) {
+      this.toastr.error('Obtained Marks are more than Total marks. Please verify.');
+    }
+    else {
+      this.toastr.success("Evaluation submitted successfully");
+    }
+  }
+
   filter(part: string) {
     let list = this.qaList.filter(e => e.part === part);
     return list;

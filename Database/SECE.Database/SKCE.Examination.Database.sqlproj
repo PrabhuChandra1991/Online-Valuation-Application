@@ -88,7 +88,7 @@
     <Build Include="Tables\CourseSyllabusMaster.sql" />
     <Build Include="Tables\Answersheet.sql" />
     <Build Include="Tables\AnswersheetImportHistory.sql" />
-    <Build Include="Tables\AnswersheetQuestionMark.sql" />
+    <Build Include="Tables\AnswersheetQuestionwiseMark.sql" />
     <Build Include="Tables\SelectedQPDetail.sql" />
     <Build Include="Tables\SelectedQPBookMarkDetail.sql" />
   </ItemGroup>

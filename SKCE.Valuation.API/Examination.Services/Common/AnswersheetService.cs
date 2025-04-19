@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using SKCE.Examination.Models.DbModels.Common;
 using SKCE.Examination.Services.ViewModels.Common;
 using System;
@@ -86,6 +85,42 @@ namespace SKCE.Examination.Services.Common
             var helper = new AnswersheetConsolidatedHelper(this._context);
             var result = await helper.GetConsolidatedItems(institutionId);
             return result;
+        }
+
+        public async Task<Boolean> SaveAnswersheetMarkAsync(AnswersheetQuestionwiseMark mark)
+        {
+            var markRecord = await _context.AnswersheetQuestionwiseMarks.FirstOrDefaultAsync(e => 
+                e.AnswersheetId == mark.AnswersheetId && 
+                e.QuestionNumber == mark.QuestionNumber && 
+                e.QuestionNumberSubNum == mark.QuestionNumberSubNum);
+
+            if (markRecord == null)
+            {
+                mark.IsActive = true;
+                mark.CreatedDate = DateTime.Now;
+                mark.ModifiedDate = DateTime.Now;
+
+                _context.AnswersheetQuestionwiseMarks.Add(mark);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            else
+            {
+                if (mark.ObtainedMark > 0)
+                {
+                    markRecord.ModifiedDate = DateTime.Now;
+                    markRecord.ObtainedMark = mark.ObtainedMark;
+
+                    await _context.SaveChangesAsync();
+                    return true;
+                }
+                else
+                {
+                    _context.AnswersheetQuestionwiseMarks.Remove(markRecord);
+                    await _context.SaveChangesAsync();
+                    return true;
+                }                
+            }            
         }
 
     }

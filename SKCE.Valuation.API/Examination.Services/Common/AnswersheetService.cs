@@ -108,7 +108,7 @@ namespace SKCE.Examination.Services.Common
             }
             else
             {
-                if (mark.ObtainedMark > 0)
+                if (mark.ObtainedMark > 0 && mark.ObtainedMark != markRecord.ObtainedMark)
                 {
                     markRecord.ModifiedById = mark.ModifiedById;
                     markRecord.ModifiedDate = DateTime.Now;
@@ -117,12 +117,16 @@ namespace SKCE.Examination.Services.Common
                     await _context.SaveChangesAsync();
                     return true;
                 }
-                else
+                else if (mark.ObtainedMark == 0)
                 {
                     _context.AnswersheetQuestionwiseMarks.Remove(markRecord);
                     await _context.SaveChangesAsync();
                     return true;
-                }                
+                }
+                else
+                {
+                    return true;
+                }
             }            
         }
 

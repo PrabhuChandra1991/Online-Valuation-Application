@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SKCE.Examination.Services.Common
+namespace SKCE.Examination.Services.EntityHelpers
 {
     public class AnswersheetQuestionAnswerHelper
     {
@@ -25,13 +25,13 @@ namespace SKCE.Examination.Services.Common
         {
             var resultItems = new List<AnswersheetQuestionAnswerDto>();
 
-            var answersheet = await this._dbContext.Answersheets
+            var answersheet = await _dbContext.Answersheets
                 .FirstOrDefaultAsync(x => x.AnswersheetId == answersheetId && x.IsActive);
 
             if (answersheet == null)
                 return resultItems;
 
-            var selectedQP = await this._dbContext.SelectedQPDetails
+            var selectedQP = await _dbContext.SelectedQPDetails
                 .Where(x =>
                 x.InstitutionId == answersheet.InstitutionId && x.CourseId == answersheet.CourseId
                 && x.RegulationYear == answersheet.RegulationYear && x.BatchYear == answersheet.BatchYear
@@ -42,10 +42,10 @@ namespace SKCE.Examination.Services.Common
             if (selectedQP == null)
                 return resultItems;
 
-            var selectedQPMarks = await this._dbContext.SelectedQPBookMarkDetails
+            var selectedQPMarks = await _dbContext.SelectedQPBookMarkDetails
                 .Where(x => x.SelectedQPDetailId == selectedQP.SelectedQPDetailId && x.IsActive).ToListAsync();
 
-            var degreeType = await this._dbContext.DegreeTypes.FirstAsync(x => x.DegreeTypeId == selectedQP.DegreeTypeId);
+            var degreeType = await _dbContext.DegreeTypes.FirstAsync(x => x.DegreeTypeId == selectedQP.DegreeTypeId);
 
             if (selectedQPMarks.Count != 0)
             {

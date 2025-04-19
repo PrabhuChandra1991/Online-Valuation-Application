@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SKCE.Examination.Models.DbModels.Common;
+using SKCE.Examination.Services.EntityHelpers;
 using SKCE.Examination.Services.ViewModels.Common;
 using System;
 using System.Collections.Generic;
@@ -22,6 +23,11 @@ namespace SKCE.Examination.Services.Common
         public async Task<IEnumerable<Answersheet>> GetAllAnswersheetsAsync()
         {
             return await _context.Answersheets.ToListAsync();
+        }
+
+        public async Task<Answersheet?> GetAnswersheetAsync(long id)
+        {
+            return await _context.Answersheets.FindAsync(id);
         }
 
         public async Task<IEnumerable<AnswerManagementDto>> GetAnswersheetDetailsAsync(
@@ -83,63 +89,19 @@ namespace SKCE.Examination.Services.Common
         public async Task<List<AnswersheetConsolidatedDto>> GetExamConsolidatedAnswersheetsAsync(long institutionId)
         {
             var helper = new AnswersheetConsolidatedHelper(this._context);
-            var result = await helper.GetConsolidatedItems(institutionId);
-            return result;
+            return await helper.GetConsolidatedItems(institutionId);
         }
 
-        public async Task<List<AnswersheetQuestionwiseMark>> GetAnswersheetMarkAsync(long submittedByID, long answersheetId)
+        public async Task<List<AnswersheetQuestionwiseMark>> GetAnswersheetMarkAsync(long answersheetId)
         {
-            var markRecord = await _context.AnswersheetQuestionwiseMarks
-                .Where(e =>
-                e.AnswersheetId == answersheetId &&
-                e.ModifiedById == submittedByID &&
-                e.IsActive == true)
-                .ToListAsync();
-
-            return markRecord;
+            var helper = new AnswersheetMarkTransHelper(this._context);
+            return await helper.GetAnswersheetMarkAsync(answersheetId);
         }
 
-        public async Task<Boolean> SaveAnswersheetMarkAsync(AnswersheetQuestionwiseMark mark)
+        public async Task<Boolean> SaveAnswersheetMarkAsync(AnswersheetQuestionwiseMark entity)
         {
-            var markRecord = await _context.AnswersheetQuestionwiseMarks.FirstOrDefaultAsync(e => 
-                e.AnswersheetId == mark.AnswersheetId && 
-                e.QuestionNumber == mark.QuestionNumber && 
-                e.QuestionNumberSubNum == mark.QuestionNumberSubNum &&
-                e.IsActive == true);
-
-            if (markRecord == null)
-            {
-                mark.IsActive = true;
-                mark.CreatedDate = DateTime.Now;
-                mark.ModifiedById = mark.CreatedById;
-                mark.ModifiedDate = DateTime.Now;
-
-                _context.AnswersheetQuestionwiseMarks.Add(mark);
-                await _context.SaveChangesAsync();
-                return true;
-            }
-            else
-            {
-                if (mark.ObtainedMark > 0 && mark.ObtainedMark != markRecord.ObtainedMark)
-                {
-                    markRecord.ModifiedById = mark.ModifiedById;
-                    markRecord.ModifiedDate = DateTime.Now;
-                    markRecord.ObtainedMark = mark.ObtainedMark;
-
-                    await _context.SaveChangesAsync();
-                    return true;
-                }
-                else if (mark.ObtainedMark == 0)
-                {
-                    _context.AnswersheetQuestionwiseMarks.Remove(markRecord);
-                    await _context.SaveChangesAsync();
-                    return true;
-                }
-                else
-                {
-                    return true;
-                }
-            }            
+            var helper = new AnswersheetMarkTransHelper(this._context);
+            return await helper.SaveAnswersheetMarkAsync(entity);
         }
 
     }

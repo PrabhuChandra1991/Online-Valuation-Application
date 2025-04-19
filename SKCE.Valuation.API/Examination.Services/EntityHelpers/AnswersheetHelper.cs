@@ -2,7 +2,7 @@
 using DocumentFormat.OpenXml.Spreadsheet;
 using SKCE.Examination.Models.DbModels.Common;
 
-namespace SKCE.Examination.Services.Common
+namespace SKCE.Examination.Services.EntityHelpers
 {
     internal class AnswersheetHelper
     {
@@ -34,10 +34,10 @@ namespace SKCE.Examination.Services.Common
                 var headerRow = rows.First();
                 var dataRows = worksheetPart.Worksheet.Descendants<Row>().Skip(1).ToList();
 
-                var institions = this._dbContext.Institutions.ToList();
-                var courses = this._dbContext.Courses.ToList();
-                var degreeTypes = this._dbContext.DegreeTypes.ToList();
-                var existingDummyNumbers = this._dbContext.Answersheets.Select(x => x.DummyNumber).ToList();
+                var institions = _dbContext.Institutions.ToList();
+                var courses = _dbContext.Courses.ToList();
+                var degreeTypes = _dbContext.DegreeTypes.ToList();
+                var existingDummyNumbers = _dbContext.Answersheets.Select(x => x.DummyNumber).ToList();
 
                 foreach (var dataRow in dataRows)
                 {
@@ -73,7 +73,7 @@ namespace SKCE.Examination.Services.Common
                         }
                         else
                         {
-                            this._dbContext.Answersheets.Add(new Answersheet
+                            _dbContext.Answersheets.Add(new Answersheet
                             {
                                 InstitutionId = instition != null ? instition.InstitutionId : 0,
                                 CourseId = course != null ? course.CourseId : 0,
@@ -100,7 +100,7 @@ namespace SKCE.Examination.Services.Common
                     }
                 }
 
-                await this._dbContext.SaveChangesAsync();
+                await _dbContext.SaveChangesAsync();
 
                 return $"Data Imported Sucessfully. \n Already Exists : {countExists.ToString()}  \n Success imported : {countSuccess.ToString()}\n Validation Error : " + countError.ToString();
 

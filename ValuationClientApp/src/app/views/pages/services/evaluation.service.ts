@@ -28,8 +28,8 @@ export class EvaluationService {
     return this.http.get(`${this.apiUrl}/api/Answersheet/GetQuestionAndAnswersByAnswersheetId?answersheetId=${answersheetId}`);
   }
 
-  getAnswersheetMark(submittedById: number, answersheetId: number): Observable<any> {
-    return this.http.get(`${this.apiUrl}/api/Answersheet/GetAnswersheetMark?submittedByID=${submittedById}&answersheetId=${answersheetId}`);
+  getAnswersheetMark(answersheetId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/api/Answersheet/GetAnswersheetMark?answersheetId=${answersheetId}`);
   }
 
   saveAnswersheetMark(answersheetMark: AnswersheetMark): Observable<any> {

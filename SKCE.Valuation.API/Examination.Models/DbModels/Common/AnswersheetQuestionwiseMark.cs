@@ -11,8 +11,10 @@ namespace SKCE.Examination.Models.DbModels.Common
         public long AnswersheetQuestionwiseMarkId { get; set; }
         public long AnswersheetId { get; set; }
         public int QuestionNumber { get; set; }
-        public int QuestionNumberSubNum { get; set; } 
-        public decimal? MaximumMark { get; set; }
-        public decimal? ObtainedMark { get; set; }
+        public int QuestionNumberSubNum { get; set; }
+        public string QuestionPartName { get; set; } = string.Empty;
+        public string QuestionGroupName { get; set; } = string.Empty;
+        public decimal MaximumMark { get; set; }
+        public decimal ObtainedMark { get; set; }
     }
 }

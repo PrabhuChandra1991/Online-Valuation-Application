@@ -18,10 +18,20 @@ namespace SKCE.Examination.API.Controllers.Common
             _answersheetService = answersheetService;
         }
 
-        [HttpGet("GetAnswersheets")]
+        [HttpGet]
         public async Task<ActionResult<IEnumerable<Answersheet>>> GetAnswersheets()
         {
             var result = await _answersheetService.GetAllAnswersheetsAsync();
+            return Ok(result);
+        }
+
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Answersheet>> GetAnswersheet(long id )
+        {
+            var result = await _answersheetService.GetAnswersheetAsync(id);
+            if (result == null)
+                return NotFound();
             return Ok(result);
         }
 
@@ -67,11 +77,11 @@ namespace SKCE.Examination.API.Controllers.Common
 
         // GET: /api/Answersheet/GetAnswersheetMark
         [HttpGet("GetAnswersheetMark")]
-        public async Task<IActionResult> GetAnswersheetMark([FromQuery] long submittedByID, [FromQuery] long answersheetId)
+        public async Task<IActionResult> GetAnswersheetMark([FromQuery] long answersheetId)
         {
             try
             {
-                var response = await _answersheetService.GetAnswersheetMarkAsync(submittedByID, answersheetId);
+                var response = await _answersheetService.GetAnswersheetMarkAsync(answersheetId);
                 return Ok(response);
             }
             catch (Exception ex)
@@ -82,11 +92,11 @@ namespace SKCE.Examination.API.Controllers.Common
 
         // POST: /api/Answersheet/SaveAnswersheetMark
         [HttpPost("SaveAnswersheetMark")]
-        public async Task<IActionResult> SaveAnswersheetMark(AnswersheetQuestionwiseMark mark)
+        public async Task<IActionResult> SaveAnswersheetMark(AnswersheetQuestionwiseMark entity)
         {
             try
             {
-                var response = await _answersheetService.SaveAnswersheetMarkAsync(mark);
+                var response = await _answersheetService.SaveAnswersheetMarkAsync(entity);
                 return Ok(new { Message = (response) ? "Success" : "Failed" });
             }
             catch (Exception ex)
@@ -94,5 +104,7 @@ namespace SKCE.Examination.API.Controllers.Common
                 return BadRequest(new ResultModel() { Message = "Error while saving Mark." });
             }
         }
+
+
     }
 }

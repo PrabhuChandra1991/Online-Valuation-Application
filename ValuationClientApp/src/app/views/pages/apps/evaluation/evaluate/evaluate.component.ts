@@ -62,7 +62,7 @@ export class EvaluateComponent implements OnInit {
   }
 
   getAnswersheetMark() {
-    this.evaluationService.getAnswersheetMark(this.loggedinUserId, this.primaryData.answersheetId).subscribe(
+    this.evaluationService.getAnswersheetMark(this.primaryData.answersheetId).subscribe(
       (data: any) => {
         console.log("saved mark data: ", data)
         this.answersheetMarkData = data;

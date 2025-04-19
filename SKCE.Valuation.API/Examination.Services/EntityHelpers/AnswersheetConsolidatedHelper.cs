@@ -2,7 +2,7 @@
 using SKCE.Examination.Models.DbModels.Common;
 using SKCE.Examination.Services.ViewModels.Common;
 
-namespace SKCE.Examination.Services.Common
+namespace SKCE.Examination.Services.EntityHelpers
 {
     public class AnswersheetConsolidatedHelper
     {
@@ -16,11 +16,11 @@ namespace SKCE.Examination.Services.Common
             var resultItems = new List<AnswersheetConsolidatedDto>();
 
             var examItems =
-                await (from exam in this._dbContext.Examinations
-                       join institution in this._dbContext.Institutions on exam.InstitutionId equals institution.InstitutionId
-                       join course in this._dbContext.Courses on exam.CourseId equals course.CourseId
-                       join dept in this._dbContext.Departments on exam.DepartmentId equals dept.DepartmentId
-                       join degType in this._dbContext.DegreeTypes on exam.DegreeTypeId equals degType.DegreeTypeId
+                await (from exam in _dbContext.Examinations
+                       join institution in _dbContext.Institutions on exam.InstitutionId equals institution.InstitutionId
+                       join course in _dbContext.Courses on exam.CourseId equals course.CourseId
+                       join dept in _dbContext.Departments on exam.DepartmentId equals dept.DepartmentId
+                       join degType in _dbContext.DegreeTypes on exam.DegreeTypeId equals degType.DegreeTypeId
 
                        where exam.InstitutionId == institutionId && exam.IsActive == true
 
@@ -28,12 +28,12 @@ namespace SKCE.Examination.Services.Common
                        {
                            exam.ExaminationId,
                            InstitutionCode = institution.Code,
-                           CourseId = course.CourseId,
+                           course.CourseId,
                            CourseCode = course.Code,
                            DepartmentName = dept.ShortName,
                            exam.RegulationYear,
                            exam.BatchYear,
-                           DegreeTypeId = exam.DegreeTypeId,
+                           exam.DegreeTypeId,
                            DegreeName = degType.Name,
                            exam.ExamType,
                            exam.Semester,
@@ -42,7 +42,7 @@ namespace SKCE.Examination.Services.Common
                            exam.StudentCount
                        }).ToListAsync();
 
-            var answersheetItems = this._dbContext.Answersheets.Where(x => x.InstitutionId == institutionId && x.IsActive).ToList();
+            var answersheetItems = _dbContext.Answersheets.Where(x => x.InstitutionId == institutionId && x.IsActive).ToList();
 
             foreach (var item in examItems)
             {

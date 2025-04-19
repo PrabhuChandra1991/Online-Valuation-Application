@@ -54,7 +54,7 @@ export const MENU: MenuItem[] = [
     label: 'Evaluation Assigned',
     icon: 'clipboard',
     link: '/apps/evaluationlist',
-    role: [1]
+    role: [2]
   },
   // {
   //   label: 'Valuation',

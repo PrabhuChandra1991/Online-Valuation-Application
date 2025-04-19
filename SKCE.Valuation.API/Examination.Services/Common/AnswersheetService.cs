@@ -87,13 +87,25 @@ namespace SKCE.Examination.Services.Common
             return result;
         }
 
+        public async Task<List<AnswersheetQuestionwiseMark>> GetAnswersheetMarkAsync(long submittedByID, long answersheetId)
+        {
+            var markRecord = await _context.AnswersheetQuestionwiseMarks
+                .Where(e =>
+                e.AnswersheetId == answersheetId &&
+                e.ModifiedById == submittedByID &&
+                e.IsActive == true)
+                .ToListAsync();
+
+            return markRecord;
+        }
+
         public async Task<Boolean> SaveAnswersheetMarkAsync(AnswersheetQuestionwiseMark mark)
         {
             var markRecord = await _context.AnswersheetQuestionwiseMarks.FirstOrDefaultAsync(e => 
                 e.AnswersheetId == mark.AnswersheetId && 
                 e.QuestionNumber == mark.QuestionNumber && 
                 e.QuestionNumberSubNum == mark.QuestionNumberSubNum &&
-                e.IsActive == mark.IsActive);
+                e.IsActive == true);
 
             if (markRecord == null)
             {

@@ -65,6 +65,21 @@ namespace SKCE.Examination.API.Controllers.Common
             return Ok(result);
         }
 
+        // GET: /api/Answersheet/GetAnswersheetMark
+        [HttpGet("GetAnswersheetMark")]
+        public async Task<IActionResult> GetAnswersheetMark([FromQuery] long submittedByID, [FromQuery] long answersheetId)
+        {
+            try
+            {
+                var response = await _answersheetService.GetAnswersheetMarkAsync(submittedByID, answersheetId);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResultModel() { Message = "Error while saving Mark." });
+            }
+        }
+
         // POST: /api/Answersheet/SaveAnswersheetMark
         [HttpPost("SaveAnswersheetMark")]
         public async Task<IActionResult> SaveAnswersheetMark(AnswersheetQuestionwiseMark mark)

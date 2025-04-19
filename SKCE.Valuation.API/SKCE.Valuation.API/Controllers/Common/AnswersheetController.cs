@@ -65,8 +65,19 @@ namespace SKCE.Examination.API.Controllers.Common
             return Ok(result);
         }
 
-
-
-
+        // POST: /api/Answersheet/SaveAnswersheetMark
+        [HttpPost("SaveAnswersheetMark")]
+        public async Task<IActionResult> SaveAnswersheetMark(AnswersheetQuestionwiseMark mark)
+        {
+            try
+            {
+                var response = await _answersheetService.SaveAnswersheetMarkAsync(mark);
+                return Ok(new { Message = (response) ? "Success" : "Failed" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResultModel() { Message = "Error while saving Mark." });
+            }
+        }
     }
 }

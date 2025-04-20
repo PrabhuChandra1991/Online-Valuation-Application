@@ -106,5 +106,21 @@ namespace SKCE.Examination.API.Controllers.Common
         }
 
 
+        // POST: /api/Answersheet/SaveAnswersheetMark
+        [HttpPost("AllocateAnswerSheetsToUser")]
+        public async Task<IActionResult> AllocateAnswerSheetsToUser(AnswersheetAllocateInputModel inputData)
+        {
+            try
+            {
+                var response = await _answersheetService.AllocateAnswerSheetsToUser(inputData);
+                return Ok(new { Message = (response) ? "Success" : "Failed" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResultModel() { Message = "Error on AllocateAnswerSheetsToUser." });
+            }
+        }
+
+
     }
 }

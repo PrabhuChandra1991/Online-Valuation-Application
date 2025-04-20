@@ -34,6 +34,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { AnswersheetService } from '../../../services/answersheet.service';
 import { InstituteService } from '../../../services/institute.service';
 import { TemplateManagementService } from '../../../services/template-management.service';
+import { ThirdPartyDraggable } from '@fullcalendar/interaction/index.js';
 
 
 @Component({
@@ -57,7 +58,10 @@ import { TemplateManagementService } from '../../../services/template-management
   styleUrl: './consolidatedview.component.scss'
 })
 export class ConsolidatedviewComponent {
+
   allocateAnswersheetForm!: FormGroup;
+  allocateTransactionInprogress: boolean = false;
+
   modalRef: NgbModalRef;
   gridDataItems: any[] = [];
   dataSource = new MatTableDataSource<any>([]);
@@ -96,8 +100,8 @@ export class ConsolidatedviewComponent {
   ) {
 
     this.allocateAnswersheetForm = this.fb.group({
-      userId: ['', Validators.required],
-      noOfAnswersheetsAllocated: ['', Validators.required]
+      userId: ['0', Validators.required],
+      noOfAnswersheetsAllocated: ['0', Validators.required]
     })
 
   }
@@ -171,8 +175,31 @@ export class ConsolidatedviewComponent {
     }
   }
 
+
+  closeAllocationPopup() {
+    this.modalRef.dismiss();
+    this.allocateTransactionInprogress = false;
+  }
+
   saveAllocation() {
-    console.log("save allocation")
+    this.allocateTransactionInprogress = true;
+    this.answersheetService.AllocateAnswerSheetsToUser(
+      this.selectedElement.examinationId,
+      parseInt(this.allocateAnswersheetForm.value.userId),
+      parseInt(this.allocateAnswersheetForm.value.noOfAnswersheetsAllocated)).subscribe(
+        (data: any) => {
+          console.log("save data: ", data)
+          if (data.message.toLowerCase() == 'success') {
+            // this.toastr.success("Mark auto saved.");
+          }
+          this.closeAllocationPopup();
+        },
+        (error) => {
+          console.error('Error saving mark:', error);
+          // this.toastr.error('Failed to save mark.');
+          this.closeAllocationPopup();
+        }
+      )
   }
 
   updateAllocation(user: any) {
@@ -188,6 +215,7 @@ export class ConsolidatedviewComponent {
   allocationDialog(entity: any) {
     this.selectedElement = entity;
     this.modalRef = this.modalService.open(this.allocateModal, { size: 'md', backdrop: 'static' });
+    this.allocateTransactionInprogress = false;
   }
 
 }

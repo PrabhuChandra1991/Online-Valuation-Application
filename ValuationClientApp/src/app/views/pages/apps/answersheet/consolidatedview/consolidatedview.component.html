@@ -170,11 +170,18 @@
 <ng-template #allocateModal let-modal>
     <div class="modal-header">
         <h5 class="modal-title">Allocate answersheet</h5>
-        <button type="button" class="btn-close" (click)="modal.dismiss()()"></button>
+        <button type="button" class="btn-close" (click)="closeAllocationPopup()"></button>
     </div>
     <div class="modal-body">
         <form [formGroup]="allocateAnswersheetForm">
 
+            <div class="row mb-3">
+                <b>
+                    <label>Course code : </label>
+                    <label>{{selectedElement.courseCode}}</label>
+                </b>
+            </div>
+            <hr>
             <div class="row mb-3">
                 <div class="col-sm-6">
                     <label>Student count</label>
@@ -214,27 +221,26 @@
                     <select class="form-select" formControlName="userId" (change)="updateAllocation($event)">
                         <option value="">Select Expert</option>
                         <option *ngFor="let user of users" [value]="user.userId"
-                        [disabled]="disableIfAdmin(user.userId)">
+                            [disabled]="disableIfAdmin(user.userId)">
                             {{ user.userName }}
                         </option>
                     </select>
                 </div>
                 <div class="col-sm-6" *ngIf="enterAllocation">
                     <label>Number of answersheets <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" formControlName="noOfAnswersheetsAllocated"
-                        maxlength="4" pattern="[0-9]*" />
-                        <span class="text-danger"
-                        *ngIf="(allocateAnswersheetForm.controls.collegeName.touched) && 
-                        allocateAnswersheetForm.controls.collegeName.hasError('pattern')">
+                    <input type="text" class="form-control" formControlName="noOfAnswersheetsAllocated" maxlength="4"
+                        pattern="[0-9]*" />
+                    <span class="text-danger" *ngIf="(allocateAnswersheetForm.controls.noOfAnswersheetsAllocated.touched) && 
+                        allocateAnswersheetForm.controls.noOfAnswersheetsAllocated.hasError('pattern')">
                         Only numbers allowed
-                      </span>
+                    </span>
                 </div>
             </div>
         </form>
     </div>
     <div class="modal-footer">
-        <button class="btn btn-danger" (click)="modal.dismiss()">Cancel</button>
-        <button class="btn btn-primary" [disabled]="!allocateAnswersheetForm.valid"
+        <button class="btn btn-outline-primary" (click)="closeAllocationPopup()">Cancel</button>
+        <button class="btn btn-primary" [disabled]="!allocateAnswersheetForm.valid || allocateTransactionInprogress"
             (click)="saveAllocation()">Allocate</button>
     </div>
 </ng-template>

@@ -104,5 +104,15 @@ namespace SKCE.Examination.Services.Common
             return await helper.SaveAnswersheetMarkAsync(entity);
         }
 
+        public async Task<Boolean> AllocateAnswerSheetsToUser(AnswersheetAllocateInputModel inputData)
+        {
+            long loggedInUserId = 1;
+            var helper = new AnswersheetAllocateHelper(this._context);
+            return await helper.AllocateAnswersheetsToUserRandomly(inputData, loggedInUserId);
+        }
+
+
+        
+
     }
 }

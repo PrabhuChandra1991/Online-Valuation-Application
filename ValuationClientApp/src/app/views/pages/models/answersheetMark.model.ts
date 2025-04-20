@@ -7,3 +7,9 @@ export interface AnswersheetMark {
   createdById: number;
   modifiedById: number;
 }
+
+export interface AnswersheetAllocateInputModel {
+  examinationId: number;
+  userId: number;
+  noofsheets: number;
+}

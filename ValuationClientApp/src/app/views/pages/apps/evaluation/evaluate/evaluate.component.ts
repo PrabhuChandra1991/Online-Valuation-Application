@@ -53,6 +53,7 @@ export class EvaluateComponent implements OnInit {
     this.route.paramMap.subscribe(params => {
       let encodedPrimaryData = params.get('data') || "";
       this.primaryData = JSON.parse(decode(encodedPrimaryData));
+      console.log("primaryData: ", this.primaryData)
       if (this.primaryData.answersheetId) {
         this.getAnswersheetMark();
         this.getQuestionPaperAnswerKey(this.primaryData.answersheetId);
@@ -64,8 +65,13 @@ export class EvaluateComponent implements OnInit {
   getAnswersheetMark() {
     this.evaluationService.getAnswersheetMark(this.primaryData.answersheetId).subscribe(
       (data: any) => {
-        console.log("saved mark data: ", data)
-        this.answersheetMarkData = data;
+        if (data.length > 0) {
+          console.log("saved mark data: ", data)
+          this.answersheetMarkData = data;
+        }
+        else {
+          console.log('No saved mark data');
+        }
       },
       (error) => {
         console.error('Error getting mark data:', error);
@@ -75,7 +81,7 @@ export class EvaluateComponent implements OnInit {
   }
 
   getQuestionPaperAnswerKey(answerSheetId: number) {
-    console.log('loading questions............');
+    console.log('loading question and answer............');
     this.evaluationService.getQuestionAndAnswer(answerSheetId).subscribe(
       (data: any[]) => {
         if (data.length > 0) {
@@ -103,6 +109,9 @@ export class EvaluateComponent implements OnInit {
           this.obtainedMarks = this.qaList.reduce((sum, item) => sum + (item.obtainedMark || 0), 0);
           this.reduceChoiceQuestionMarks();
           
+        }
+        else {
+          console.log('No question and answer data');
         }
       },
       (error) => {

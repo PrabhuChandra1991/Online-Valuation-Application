@@ -240,7 +240,8 @@
     </div>
     <div class="modal-footer">
         <button class="btn btn-outline-primary" (click)="closeAllocationPopup()">Cancel</button>
-        <button class="btn btn-primary" [disabled]="!allocateAnswersheetForm.valid || allocateTransactionInprogress"
+        <button class="btn btn-primary"
+            [disabled]="!allocateAnswersheetForm.valid || allocateTransactionInprogress || !IsValidNoofScripts()"
             (click)="saveAllocation()">Allocate</button>
     </div>
 </ng-template>

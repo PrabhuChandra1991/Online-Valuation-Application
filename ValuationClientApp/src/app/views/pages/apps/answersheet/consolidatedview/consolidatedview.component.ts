@@ -181,8 +181,19 @@ export class ConsolidatedviewComponent {
     this.allocateTransactionInprogress = false;
   }
 
+
+  IsValidNoofScripts() {
+    if (parseInt(this.allocateAnswersheetForm.value.noOfAnswersheetsAllocated) > this.selectedElement.answerSheetNotAllocatedCount) {
+      return false;
+    }
+    return true;
+  }
+
   saveAllocation() {
-    this.allocateTransactionInprogress = true;
+
+    if (parseInt(this.allocateAnswersheetForm.value.noOfAnswersheetsAllocated) > this.selectedElement.answerSheetNotAllocatedCount)
+
+      this.allocateTransactionInprogress = true;
     this.answersheetService.AllocateAnswerSheetsToUser(
       this.selectedElement.examinationId,
       parseInt(this.allocateAnswersheetForm.value.userId),
@@ -192,6 +203,7 @@ export class ConsolidatedviewComponent {
           if (data.message.toLowerCase() == 'success') {
             // this.toastr.success("Mark auto saved.");
           }
+          this.loadGridData();
           this.closeAllocationPopup();
         },
         (error) => {
@@ -216,6 +228,7 @@ export class ConsolidatedviewComponent {
     this.selectedElement = entity;
     this.modalRef = this.modalService.open(this.allocateModal, { size: 'md', backdrop: 'static' });
     this.allocateTransactionInprogress = false;
+    this.allocateAnswersheetForm.reset();
   }
 
 }

@@ -190,10 +190,4 @@ export class ConsolidatedviewComponent {
     this.modalRef = this.modalService.open(this.allocateModal, { size: 'md', backdrop: 'static' });
   }
 
-  closeModal() {
-    if (this.modalRef) {
-      this.modalRef.close();
-    }
-  }
-
 }

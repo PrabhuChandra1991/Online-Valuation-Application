@@ -170,7 +170,7 @@
 <ng-template #allocateModal let-modal>
     <div class="modal-header">
         <h5 class="modal-title">Allocate answersheet</h5>
-        <button type="button" class="btn-close" (click)="closeModal()"></button>
+        <button type="button" class="btn-close" (click)="modal.dismiss()()"></button>
     </div>
     <div class="modal-body">
         <form [formGroup]="allocateAnswersheetForm">

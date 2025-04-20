@@ -60,6 +60,7 @@
     .table-responsive table tr,
     .table-responsive table td {
         border-top: 1px solid $disabled-border !important;
+        height: 2.5rem;
     }
 
     .table-responsive .mat-mdc-table {

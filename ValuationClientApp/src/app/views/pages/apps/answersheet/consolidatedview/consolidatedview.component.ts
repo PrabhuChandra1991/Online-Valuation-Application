@@ -10,6 +10,7 @@ import {
   NgbNavModule,
   NgbTooltip,
   NgbModal,
+  NgbModalRef
 } from '@ng-bootstrap/ng-bootstrap';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { CommonModule } from '@angular/common';
@@ -32,6 +33,7 @@ import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { AnswersheetService } from '../../../services/answersheet.service';
 import { InstituteService } from '../../../services/institute.service';
+import { TemplateManagementService } from '../../../services/template-management.service';
 
 
 @Component({
@@ -55,10 +57,15 @@ import { InstituteService } from '../../../services/institute.service';
   styleUrl: './consolidatedview.component.scss'
 })
 export class ConsolidatedviewComponent {
-  importHistoryForm!: FormGroup;
-
+  allocateAnswersheetForm!: FormGroup;
+  modalRef: NgbModalRef;
   gridDataItems: any[] = [];
-
+  dataSource = new MatTableDataSource<any>([]);
+  institutes: any[] = [];
+  selectedInstituteId: string = '';
+  selectedElement: any;
+  users: any[] = [];
+  enterAllocation: any;
   displayedColumns: string[] = [
     'institutionCode',
     'regulationYear',
@@ -68,7 +75,7 @@ export class ConsolidatedviewComponent {
     'semester',
     'courseCode',
     'examMonth',
-    'examYear', 
+    'examYear',
     'studentTotalCount',
     'answerSheetTotalCount',
     'answerSheetAllocatedCount',
@@ -76,23 +83,28 @@ export class ConsolidatedviewComponent {
     'actions'
   ];
 
+  @ViewChild('allocateModal') allocateModal: any;
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
-  dataSource = new MatTableDataSource<any>([]);
-
-  institutes: any[] = [];
-   
-  selectedInstituteId: string = ''; 
-
   constructor(
     private fb: FormBuilder,
+    private modalService: NgbModal,
     private answersheetService: AnswersheetService,
-    private instituteService: InstituteService
-  ) {}
+    private instituteService: InstituteService,
+    private templateService: TemplateManagementService
+  ) {
+
+    this.allocateAnswersheetForm = this.fb.group({
+      userId: ['', Validators.required],
+      noOfAnswersheetsAllocated: ['', Validators.required]
+    })
+
+  }
 
   ngOnInit(): void {
-    this.loadAllInstitues(); 
+    this.loadAllInstitues();
+    this.loadExperts();
   }
 
   applyFilter(event: Event) {
@@ -106,7 +118,7 @@ export class ConsolidatedviewComponent {
 
   loadGridData(): void {
     this.answersheetService
-      .getConsolidatedExamAnswersheets( parseInt( this.selectedInstituteId))  
+      .getConsolidatedExamAnswersheets(parseInt(this.selectedInstituteId))
       .subscribe({
         next: (data: any[]) => {
           this.gridDataItems = data;
@@ -124,7 +136,7 @@ export class ConsolidatedviewComponent {
   onInstituteChange(event: Event): void {
     this.selectedInstituteId = (event.target as HTMLSelectElement).value;
     this.loadGridData();
-  } 
+  }
 
   loadAllInstitues(): void {
     this.instituteService.getInstitutions().subscribe({
@@ -137,5 +149,51 @@ export class ConsolidatedviewComponent {
       },
     });
   }
-  
+
+  loadExperts(): void {
+    this.templateService.getExpertsForQPAssignment().subscribe({
+      next: (data) => {
+        this.users = data.filter((user: any) => user.userId != 1);
+        console.log('Users loaded:', this.users);
+      },
+      error: (error) => {
+        console.error('Error loading users:', error);
+      },
+    });
+  }
+
+  disableIfAdmin(userId: number) {
+    if (userId == 1) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
+  saveAllocation() {
+    console.log("save allocation")
+  }
+
+  updateAllocation(user: any) {
+    console.log(user.target?.value)
+    if (user.target?.value) {
+      this.enterAllocation = true;
+    }
+    else {
+      this.enterAllocation = false;
+    }
+  }
+
+  allocationDialog(entity: any) {
+    this.selectedElement = entity;
+    this.modalRef = this.modalService.open(this.allocateModal, { size: 'md', backdrop: 'static' });
+  }
+
+  closeModal() {
+    if (this.modalRef) {
+      this.modalRef.close();
+    }
+  }
+
 }

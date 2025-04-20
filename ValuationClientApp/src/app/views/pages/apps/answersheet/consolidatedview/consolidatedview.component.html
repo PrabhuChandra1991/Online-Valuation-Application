@@ -146,7 +146,7 @@
                     <ng-container matColumnDef="actions">
                         <th mat-header-cell *matHeaderCellDef> Actions </th>
                         <td mat-cell *matCellDef="let element">
-                            <a class="link-opacity-50-hover">Allocate</a>
+                            <a class="link-opacity-50-hover" (click)="allocationDialog(element)">Allocate</a>
                         </td>
                     </ng-container>
 
@@ -165,3 +165,76 @@
     </div>
 
 </div>
+
+<!-- User Modal -->
+<ng-template #allocateModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">Allocate answersheet</h5>
+        <button type="button" class="btn-close" (click)="closeModal()"></button>
+    </div>
+    <div class="modal-body">
+        <form [formGroup]="allocateAnswersheetForm">
+
+            <div class="row mb-3">
+                <div class="col-sm-6">
+                    <label>Student count</label>
+                </div>
+                <div class="col-sm-6">
+                    <label>{{selectedElement.studentTotalCount}}</label>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-6">
+                    <label>Total Answersheet</label>
+                </div>
+                <div class="col-sm-6">
+                    <label>{{selectedElement.answerSheetTotalCount}}</label>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-6">
+                    <label>Allocated Answersheets</label>
+                </div>
+                <div class="col-sm-6">
+                    <label>{{selectedElement.answerSheetAllocatedCount}}</label>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-6">
+                    <label>Not Allocated
+                        Answersheets</label>
+                </div>
+                <div class="col-sm-6">
+                    <label>{{selectedElement.answerSheetNotAllocatedCount}}</label>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-6">
+                    <label>Allocate to <span class="text-danger">*</span></label>
+                    <select class="form-select" formControlName="userId" (change)="updateAllocation($event)">
+                        <option value="">Select Expert</option>
+                        <option *ngFor="let user of users" [value]="user.userId"
+                        [disabled]="disableIfAdmin(user.userId)">
+                            {{ user.userName }}
+                        </option>
+                    </select>
+                </div>
+                <div class="col-sm-6" *ngIf="enterAllocation">
+                    <label>Number of answersheets <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" formControlName="noOfAnswersheetsAllocated"
+                        maxlength="4" pattern="[0-9]*" />
+                        <span class="text-danger"
+                        *ngIf="(allocateAnswersheetForm.controls.collegeName.touched) && 
+                        allocateAnswersheetForm.controls.collegeName.hasError('pattern')">
+                        Only numbers allowed
+                      </span>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-danger" (click)="modal.dismiss()">Cancel</button>
+        <button class="btn btn-primary" [disabled]="!allocateAnswersheetForm.valid"
+            (click)="saveAllocation()">Allocate</button>
+    </div>
+</ng-template>

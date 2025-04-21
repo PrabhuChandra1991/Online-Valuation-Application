@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SKCE.Examination.Models.DbModels.Common;
 using SKCE.Examination.Services.EntityHelpers;
+using SKCE.Examination.Services.ServiceContracts;
 using SKCE.Examination.Services.ViewModels.Common;
 using System;
 using System.Collections.Generic;
@@ -14,10 +15,13 @@ namespace SKCE.Examination.Services.Common
     public class AnswersheetService
     {
         private readonly ExaminationDbContext _context;
+        private readonly IUserService _userService;
+        private readonly EmailService _emailService;
 
-        public AnswersheetService(ExaminationDbContext context)
+        public AnswersheetService(ExaminationDbContext context, IUserService userService)
         {
             _context = context;
+            _userService = userService;
         }
 
         public async Task<IEnumerable<Answersheet>> GetAllAnswersheetsAsync()
@@ -108,11 +112,14 @@ namespace SKCE.Examination.Services.Common
         {
             long loggedInUserId = 1;
             var helper = new AnswersheetAllocateHelper(this._context);
-            return await helper.AllocateAnswersheetsToUserRandomly(inputData, loggedInUserId);
-        }
-
-
-        
+            var response = await helper.AllocateAnswersheetsToUserRandomly(inputData, loggedInUserId);
+            if (response)
+            {
+                var user = await _userService.GetUserByIdAsync(loggedInUserId);
+                _emailService.SendEmailAsync(user.Email, "SKCE Online Examination Platform: Answeersheets allocated", $"Hi {user.Name},\n\nYou have been allocated with {inputData.Noofsheets} answersheets for Evaluation.\n\n Please Evaluate. \n\n").Wait();
+            }
+            return response;
+        }        
 
     }
 }

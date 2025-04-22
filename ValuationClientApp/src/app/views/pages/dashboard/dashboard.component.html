@@ -1,15 +1,15 @@
-<div class="container">
-  <div class="row mt-5">
-    <div class="col-md-1"></div>
-    <div class="col-md-10 col-sm-12 stretch-card">
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-12">
       <div class="card">
         <div class="card-body">
-          <h6 class="card-title">Edit User Profile</h6>
-          <div>
-            <form [formGroup]="userForm">
-              <div class="row mb-4">
+          <form [formGroup]="userForm">
+
+            <div class="container-fluid">
+              <h4 class="mt-3 mb-2">Personal Information</h4>
+              <div class="row mb-2">
                 <!-- Salutation -->
-                <div class="col-sm-4">
+                <div class="col-sm-2">
                   <label class="form-label">Salutation<span class="text-danger">*</span></label>
                   <select class="form-select" #salutation formcontrolname="salutationId"
                     (change)="onSalutationChange($event)">
@@ -23,16 +23,17 @@
                   </span>
                 </div>
                 <!-- Name -->
-                <div class="col-sm-4">
+                <div class="col-sm-5">
                   <label class="form-label">Name <span class="text-danger"> *</span></label>
-                  <input type="text" class="form-control" formControlName="name" [readonly]="isUserEnabled" />
+                  <input type="text" formControlName="name" class="form-control readonly"
+                    [attr.readonly]='!isUserEnabled' />
                   <span class="text-danger"
                     *ngIf="(userForm.controls.name.touched) && userForm.controls.name.errors?.required">
                     Name is required
                   </span>
                 </div>
                 <!-- Gender -->
-                <div class="col-sm-4">
+                <div class="col-sm-2">
                   <label class="form-label">Gender<span class="text-danger"> *</span></label>
                   <select formcontrolname="genderId" #gender class="form-select" (change)="onGenderChange($event)">
                     <option [ngValue]="null" disabled>Select Gender</option>
@@ -43,10 +44,27 @@
                     Gender is required
                   </span>
                 </div>
+                <!-- Mobile -->
+                <div class="col-sm-3">
+                  <label class="form-label">Mobile Number <span class="text-danger">*</span></label>
+                  <input type="text" formControlName="mobileNumber" class="form-control readonly" readonly />
+                  <span class="text-danger"
+                    *ngIf="(userForm.controls.mobileNumber.touched) && userForm.controls.mobileNumber.errors?.required">
+                    Mobile Number is required
+                  </span>
+                </div>
               </div>
-
-              <!-- College Info -->
-              <div class="row mb-4">
+              <div class="row mb-2">
+                <!-- Email Address -->
+                <div class="col-sm-4">
+                  <label class="form-label">Email Address <span class="text-danger">*</span></label>
+                  <input type="text" formControlName="email" class="form-control readonly" readonly />
+                  <span class="text-danger"
+                    *ngIf="(userForm.controls.email.touched) && userForm.controls.email.errors?.required">
+                    Email is required
+                  </span>
+                </div>
+                <!-- College Info -->
                 <div class="col-sm-4">
                   <label class="form-label">College Name <span class="text-danger">*</span></label>
                   <input type="text" class="form-control" formControlName="collegeName" pattern="[a-zA-Z ]*" />
@@ -59,29 +77,8 @@
                     Numerics not allowed
                   </span>
                 </div>
-
+                <!-- Department and Academic Info -->
                 <div class="col-sm-4">
-                  <label class="form-label">Email Address <span class="text-danger">*</span></label>
-                  <input type="text" formControlName="email" class="form-control" [readonly]="isUserEnabled" />
-                  <span class="text-danger"
-                    *ngIf="(userForm.controls.email.touched) && userForm.controls.email.errors?.required">
-                    Email is required
-                  </span>
-                </div>
-
-                <div class="col-sm-4">
-                  <label class="form-label">Mobile Number <span class="text-danger">*</span></label>
-                  <input type="text" formControlName="mobileNumber" class="form-control" [readonly]="isUserEnabled"/>
-                  <span class="text-danger"
-                    *ngIf="(userForm.controls.mobileNumber.touched) && userForm.controls.mobileNumber.errors?.required">
-                    Mobile Number is required
-                  </span>
-                </div>
-              </div>
-
-              <!-- Department and Academic Info -->
-              <div class="row mb-4">
-                <div class="col-sm-6">
                   <label class="form-label">Department <span class="text-danger">*</span></label>
                   <input type="text" formControlName="departmentName" class="form-control" pattern="[a-zA-Z ]*" />
                   <span class="text-danger"
@@ -94,69 +91,73 @@
                   </span>
                 </div>
               </div>
-              <h6 class="mt-4 mb-2">Qualification
+            </div>
 
-              </h6>
-              <div *ngFor="let qualification of userQualifications" class="row mb-4">
-                <div *ngIf="qualification.title.includes('UG')">
-                  <div class="row mb-4">
-                    <div class="col-sm-4">
-                      <label class="form-label">{{qualification.title}}<span class="text-danger">*</span></label>
-                      <input type="text" id="ugName" #ugNameInput formControlname="ugName" [value]="qualification.name"
-                        class="form-control" (input)="onInput('ugName', $event)" (blur)="onBlur('ugName')" />
-                      <span class="text-danger" *ngIf="validationErrors.ugName">
-                        UG is required
-                      </span>
-                    </div>
-                    <div class="col-sm-4">
-                      <label class="form-label">Specialization<span class="text-danger">*</span></label>
-                      <input type="text" (input)="onInput('ugSpecialization', $event)"
-                        (blur)="onBlur('ugSpecialization')" #ugSpecializationInput formcontrolname="ugSpecialization"
-                        [value]="qualification.specialization" class="form-control" />
-                      <span class="text-danger" *ngIf="validationErrors.ugSpecialization">
-                        Specialization is required
-                      </span>
+            <div class="container-fluid">
+              <h4 class="mt-5 mb-2">Qualification</h4>
+
+              <div class="row mb-3">
+                <div *ngFor="let qualification of userQualifications">
+                  <div *ngIf="qualification.title.includes('UG')">
+                    <div class="row mb-2">
+                      <div class="col-md-4">
+                        <label class="form-label">{{qualification.title}}<span class="text-danger">*</span></label>
+                        <input type="text" id="ugName" #ugNameInput formControlname="ugName"
+                          [value]="qualification.name" class="form-control" (input)="onInput('ugName', $event)"
+                          (blur)="onBlur('ugName')" />
+                        <span class="text-danger" *ngIf="validationErrors.ugName">
+                          UG is required
+                        </span>
+                      </div>
+                      <div class="col-md-4">
+                        <label class="form-label">Specialization<span class="text-danger">*</span></label>
+                        <input type="text" (input)="onInput('ugSpecialization', $event)"
+                          (blur)="onBlur('ugSpecialization')" #ugSpecializationInput formcontrolname="ugSpecialization"
+                          [value]="qualification.specialization" class="form-control" />
+                        <span class="text-danger" *ngIf="validationErrors.ugSpecialization">
+                          Specialization is required
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div *ngIf="qualification.title.includes('PG')">
-                  <div class="row mb-4">
-                    <div class="col-sm-4">
-                      <label class="form-label">{{qualification.title}}<span class="text-danger">*</span></label>
-                      <input type="text" #pgNameInput formcontrolname="pgName" [value]="qualification.name"
-                        class="form-control" (input)="onInput('pgName', $event)" (blur)="onBlur('pgName')" />
-                      <span class="text-danger" *ngIf="validationErrors.pgName">
-                        PG Name is required
-                      </span>
-                    </div>
-
-                    <div class="col-sm-4">
-                      <label class="form-label">Specialization<span class="text-danger">*</span></label>
-                      <input type="text" #pgSpecializationInput formcontrolname="pgSpecialization"
-                        (input)="onInput('pgSpecialization', $event)" (blur)="onBlur('pgSpecialization')"
-                        [value]="qualification.specialization" class="form-control" />
-                      <span class="text-danger" *ngIf="validationErrors.pgSpecialization">
-                        Specialization is required
-                      </span>
+                  <div *ngIf="qualification.title.includes('PG')">
+                    <div class="row mb-2">
+                      <div class="col-sm-4">
+                        <label class="form-label">{{qualification.title}}<span class="text-danger">*</span></label>
+                        <input type="text" #pgNameInput formcontrolname="pgName" [value]="qualification.name"
+                          class="form-control" (input)="onInput('pgName', $event)" (blur)="onBlur('pgName')" />
+                        <span class="text-danger" *ngIf="validationErrors.pgName">
+                          PG Name is required
+                        </span>
+                      </div>
+                      <div class="col-sm-4">
+                        <label class="form-label">Specialization<span class="text-danger">*</span></label>
+                        <input type="text" #pgSpecializationInput formcontrolname="pgSpecialization"
+                          (input)="onInput('pgSpecialization', $event)" (blur)="onBlur('pgSpecialization')"
+                          [value]="qualification.specialization" class="form-control" />
+                        <span class="text-danger" *ngIf="validationErrors.pgSpecialization">
+                          Specialization is required
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div *ngIf="qualification.title.includes('Ph.D')">
-                  <!-- PhD Checkbox -->
-                  <div class="row mb-4">
-                    <div class="col-sm-4 mt-4">
-                      <label class="form-label">Have you completed PhD?<span class="text-danger"></span></label>
+                  <div *ngIf="qualification.title.includes('Ph.D')">
+                    <!-- PhD Checkbox -->
+                    <div class="row mb-2">
+                      <div class="col-sm-4">
+                        <label class="form-label">Have you completed PhD?<span class="text-danger"></span></label>
                       <mat-checkbox #hasPhdInput formControlName="hasPhd" (click)="OnPhDCheck()">(If Yes)</mat-checkbox>
-                    </div>
-                    <div class="col-sm-4" *ngIf="qualification.isCompleted">
-                      <label class="form-label">Specialization<span class="text-danger"> *</span></label>
-                      <input type="text" #phdSpecializationInput formcontrolname="phdSpecialization"
-                        (input)="onInput('phdSpecialization', $event)" (blur)="onBlur('phdSpecialization')"
-                        [value]="qualification.specialization" class="form-control" />
-                      <span class="text-danger" *ngIf="validationErrors.phdSpecialization">
-                        Specialization is required
-                      </span>
+                      </div>
+                      <div class="col-sm-4" *ngIf="qualification.isCompleted">
+                        <label class="form-label">Specialization<span class="text-danger"> *</span></label>
+                        <input type="text" #phdSpecializationInput formcontrolname="phdSpecialization"
+                          (input)="onInput('phdSpecialization', $event)" (blur)="onBlur('phdSpecialization')"
+                          [value]="qualification.specialization" class="form-control" />
+                        <span class="text-danger" *ngIf="validationErrors.phdSpecialization">
+                          Specialization is required
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -233,73 +234,165 @@
                 </tbody>
               </table>
 
-              <!-- Area of Specialization Section -->
-              <h6 class="mt-4">Area of Specialization
-                <button type="button" class="btn btn-link float-end" (click)="openSpecializationModal()">
-                  Add Specialization
-                </button>
-              </h6>
-              <table class="table table-striped">
-                <thead>
-                  <tr>
-                    <th>Area of Specialization</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let specialization of specializations; let i = index">
-                    <td>{{ specialization.areaOfSpecializationName }}</td>
-
-                    <!-- <td>{{ specialization.experience }}</td>
-                  <td>{{ specialization.handledLastTwoSemesters ? 'Yes' : 'No' }}</td> -->
-                    <td>
-                      <button (click)="editSpecialization(i)" mat-icon-button
-                        color="primary"><mat-icon>edit</mat-icon></button>
-                      <button (click)="deleteSpecialization(i)" mat-icon-button
-                        color="danger"><mat-icon>delete</mat-icon></button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-
-
-              <div mt-1>
-                <h6 class="mt-4 mb-2">Bank Account Details
-
-                </h6>
-                <div class="row mb-4 mt-5">
-                  <div class="col-sm-4">
-                    <label class="form-label">Bank Account Name <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" formControlName="bankAccountName" />
-                    <span class="text-danger"
-                      *ngIf="(userForm.controls.bankAccountName.touched) && userForm.controls.bankAccountName.errors?.required">
-                      Bank Account Name is required
-                    </span>
-                  </div>
-                  <div class="col-sm-4">
-                    <label class="form-label">Bank Account Number <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" formControlName="bankAccountNumber" />
-                    <span class="text-danger"
-                      *ngIf="(userForm.controls.bankAccountNumber.touched) && userForm.controls.bankAccountNumber.errors?.required">
-                      Bank Account Number is required
-                    </span>
-
-                  </div>
-                  <div class="col-sm-4">
-                    <label class="form-label">Bank Name <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" formControlName="bankName" pattern="[a-zA-Z ]*" />
-                    <span class="text-danger"
-                      *ngIf="(userForm.controls.bankName.touched) && userForm.controls.bankName.errors?.required">
-                      Bank Name is required
-                    </span>
-                    <span class="text-danger"
-                      *ngIf="(userForm.controls.bankName.touched) && userForm.controls.bankName.hasError('pattern')">
-                      Numerics not allowed
-                    </span>
-                  </div>
+              <div class="row mb-3">
+                <!-- Designation Section -->
+                <div class="col-md-6">
+                  <h6>Designation and Experience</h6>
+                </div>
+                <div class="col-md-6"><a class="link-opacity-50-hover float-end" (click)="openDesignationModal()"
+                    *ngIf="!isMaxReached">Add Designation</a></div>
+                <div class="col-md-12 px-3">
+                  <table class="table table-striped">
+                    <thead>
+                      <tr>
+                        <th>Designation</th>
+                        <th>Department</th>
+                        <th>College Name</th>
+                        <th>Experience</th>
+                        <th>Is Current</th>
+                        <th class="col-action">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let exp of designations; let i = index">
+                        <td>{{ getDesignationName(exp.designationId) }}</td>
+                        <td>{{ exp.departmentName }}</td>
+                        <td>{{ exp.collegeName }}</td>
+                        <td>{{ exp.experience }}</td>
+                        <!-- <td>{{ exp.isCurrent }}</td> -->
+                        <td>
+                          <span class="{{ exp.isCurrent ? 'text-success' : 'text-danger' }}">{{ exp.isCurrent ? 'Yes' :
+                            'No' }}</span>
+                        <td class="col-action">
+                          <a class="primary link-opacity-50-hover"
+                            (click)="editExperience(i)">Edit</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a
+                            class="primary link-opacity-50-hover" (click)="deleteExperience(i)">Delete</a>
+                          <!-- <button (click)="editExperience(i)" mat-icon-button
+                            color="primary"><mat-icon>edit</mat-icon></button>
+                          <button (click)="deleteExperience(i)" mat-icon-button
+                            color="danger"><mat-icon>delete</mat-icon></button> -->
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               </div>
-              <div class="row mb-4">
+
+              <div class="row mb-3">
+                <!-- User Courses Table -->
+                <div class="col-md-6">
+                  <h6>Course Handled</h6>
+                </div>
+                <div class="col-md-6"><a class="link-opacity-50-hover float-end" (click)="openUserCourseModal()">Add
+                    Course</a></div>
+                <div class="col-md-12 px-3">
+                  <table class="table table-striped">
+                    <thead>
+                      <tr>
+                        <th>Course Name</th>
+                        <th>Degree Type</th>
+                        <th>No. of Semesters Handled</th>
+                        <th>Handled in Last 2 Semesters</th>
+                        <th class="col-action">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let course of userCourses; let i = index">
+                        <td>{{ course.courseName }}</td>
+                        <td>{{ getDegreeTypeName(course.degreeTypeId) }}</td>
+                        <td>{{ course.numberOfYearsHandled }}</td>
+                        <td><span class="{{ course.isHandledInLast2Semester ? 'text-success' : 'text-danger' }}">{{
+                            course.isHandledInLast2Semester ? 'Yes' : 'No' }}</span>
+                        </td>
+                        <!-- <td><mat-icon [style.color]="course.isHandledInLast2Semester ? 'green' : 'red'">
+                            {{ course.isHandledInLast2Semester ? 'check_circle' : 'cancel' }}
+                          </mat-icon></td> -->
+                        <td class="col-action">
+                          <a class="primary link-opacity-50-hover"
+                            (click)="editUserCourse(i)">Edit</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a
+                            class="primary link-opacity-50-hover" (click)="deleteUserCourse(i)">Delete</a>
+                          <!-- <button (click)="editUserCourse(i)" mat-icon-button
+                            color="primary"><mat-icon>edit</mat-icon></button>
+                          <button (click)="deleteUserCourse(i)" mat-icon-button
+                            color="danger"><mat-icon>delete</mat-icon></button> -->
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="row mb-2">
+                <!-- Area of Specialization Section -->
+                <div class="col-md-6">
+                  <h6>Area of Specialization</h6>
+                </div>
+                <div class="col-md-6"><a class="link-opacity-50-hover float-end" (click)="openSpecializationModal()">Add
+                    Specialization</a></div>
+                <div class="col-md-12 px-3">
+                  <table class="table table-striped">
+                    <thead>
+                      <tr>
+                        <th>Area of Specialization</th>
+                        <th class="col-action">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let specialization of specializations; let i = index">
+                        <td>{{ specialization.areaOfSpecializationName }}</td>
+                        <!-- <td>{{ specialization.experience }}</td>
+                      <td>{{ specialization.handledLastTwoSemesters ? 'Yes' : 'No' }}</td> -->
+                        <td class="col-action">
+                          <a class="primary link-opacity-50-hover"
+                            (click)="editSpecialization(i)">Edit</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a
+                            class="primary link-opacity-50-hover" (click)="deleteSpecialization(i)">Delete</a>
+                          <!-- <button (click)="editSpecialization(i)" mat-icon-button
+                            color="primary"><mat-icon>edit</mat-icon></button>
+                          <button (click)="deleteSpecialization(i)" mat-icon-button
+                            color="danger"><mat-icon>delete</mat-icon></button> -->
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <div class="container-fluid">
+              <h4 class="mt-5 mb-2">Bank Account Details</h4>
+              <div class="row mb-2">
+                <div class="col-sm-4">
+                  <label class="form-label">Bank Account Name <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" formControlName="bankAccountName" />
+                  <span class="text-danger"
+                    *ngIf="(userForm.controls.bankAccountName.touched) && userForm.controls.bankAccountName.errors?.required">
+                    Bank Account Name is required
+                  </span>
+                </div>
+                <div class="col-sm-4">
+                  <label class="form-label">Bank Account Number <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" formControlName="bankAccountNumber" />
+                  <span class="text-danger"
+                    *ngIf="(userForm.controls.bankAccountNumber.touched) && userForm.controls.bankAccountNumber.errors?.required">
+                    Bank Account Number is required
+                  </span>
+
+                </div>
+                <div class="col-sm-4">
+                  <label class="form-label">Bank Name <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" formControlName="bankName" pattern="[a-zA-Z ]*" />
+                  <span class="text-danger"
+                    *ngIf="(userForm.controls.bankName.touched) && userForm.controls.bankName.errors?.required">
+                    Bank Name is required
+                  </span>
+                  <span class="text-danger"
+                    *ngIf="(userForm.controls.bankName.touched) && userForm.controls.bankName.hasError('pattern')">
+                    Numerics not allowed
+                  </span>
+                </div>
+              </div>
+
+              <div class="row mb-2">
                 <div class="col-sm-4">
                   <label class="form-label">Bank Branch Name <span class="text-danger">*</span></label>
                   <input type="text" class="form-control" formControlName="bankBranchName" pattern="[a-zA-Z ]*" />
@@ -321,39 +414,23 @@
                   </span>
                 </div>
               </div>
-              <button type="button" (click)="onSubmit()" class="btn btn-primary" style="float: right;">Submit</button>
-            </form>
-          </div>
+            </div>
+
+            <div class="container-fluid">
+              <div class="row mt-3">
+                <div class="col-md-10"></div>
+                <div class="col-md-2 col-sm-12 d-grid">
+                  <button type="button" (click)="onSubmit()" class="btn btn-primary">Submit</button>
+                </div>
+              </div>              
+            </div>
+
+          </form>
         </div>
       </div>
     </div>
-    <div class="col-md-1"></div>
   </div>
-
-  <!-- NgbModal for Editing Specialization -->
-  <ng-template #editSpecializationModal let-modal>
-    <div class="modal-header">
-      <h5 class="modal-title">Edit Specialization</h5>
-      <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
-    </div>
-    <div class="modal-body">
-      <form [formGroup]="specializationForm">
-        <div class="mb-3">
-          <label>Area of Specialization <span class="text-danger">*</span></label>
-          <input type="text" class="form-control" formControlName="areaOfSpecializationName" />
-          <span class="text-danger" *ngIf="specializationForm.controls.areaOfSpecializationName.touched &&
-        (specializationForm.controls.areaOfSpecializationName.errors?.['required'] )">
-            Area of specialization is required.
-          </span>
-        </div>
-      </form>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-danger" (click)="modal.dismiss()">Cancel</button>
-      <button class="btn btn-primary" [disabled]="!specializationForm.valid"
-        (click)="saveSpecialization()">Save</button>
-    </div>
-  </ng-template>
+</div>
 
   <!-- NgbModal for Editing Qualification -->
   <ng-template #editDesignationModal let-modal>
@@ -373,15 +450,15 @@
         (designationForm.controls.expName.errors?.['required'] )">
             Designation is required.
           </span>
-        </div>        
+        </div>
         <div class="mb-3">
           <label>Department</label>
           <input type="text" class="form-control" formControlName="departmentName" maxlength="100" />
-        </div>    
+        </div>
         <div class="mb-3">
           <label>College Name</label>
           <input type="text" class="form-control" formControlName="collegeName" maxlength="100" />
-        </div>    
+        </div>
         <div class="mb-3">
           <label>Experience in Years(decimal points allowed) <span class="text-danger">*</span></label>
           <input type="number" class="form-control" formControlName="experience" />
@@ -442,5 +519,30 @@
     <div class="modal-footer">
       <button class="btn btn-danger" (click)="modal.dismiss()">Cancel</button>
       <button class="btn btn-primary" (click)="saveUserCourse()">Save</button>
+    </div>
+  </ng-template>
+
+  <!-- NgbModal for Editing Specialization -->
+  <ng-template #editSpecializationModal let-modal>
+    <div class="modal-header">
+      <h5 class="modal-title">Edit Specialization</h5>
+      <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+    </div>
+    <div class="modal-body">
+      <form [formGroup]="specializationForm">
+        <div class="mb-3">
+          <label>Area of Specialization <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" formControlName="areaOfSpecializationName" />
+          <span class="text-danger" *ngIf="specializationForm.controls.areaOfSpecializationName.touched &&
+        (specializationForm.controls.areaOfSpecializationName.errors?.['required'] )">
+            Area of specialization is required.
+          </span>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-danger" (click)="modal.dismiss()">Cancel</button>
+      <button class="btn btn-primary" [disabled]="!specializationForm.valid"
+        (click)="saveSpecialization()">Save</button>
     </div>
   </ng-template>

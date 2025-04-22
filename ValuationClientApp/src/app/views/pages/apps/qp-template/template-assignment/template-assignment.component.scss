@@ -1,26 +1,8 @@
-input[type=text], input[type=number],input[type=text], input[type=date]
-    input[type=checkbox]input[type=email]  {
-        border: .25px solid #004da3;
-    }
-select{
-    border: .25px solid #004da3;
-}
+
 tr.no-hover:hover {
   background-color: #FFFFFF !important;
 }
  
- a.disabled,
- select.disabled,
- .checkbox.disabled,
- .mat-mdc-checkbox.disabled {
-     pointer-events: none;
-     cursor: not-allowed;
- }
-
- select.disabled {
-     background-color: #e9ecef;
- }
-
  div .background-color-green{
  background-color:rgba(155, 218, 155, 0.3);
  margin-left: 0px;

@@ -9,6 +9,7 @@
   -webkit-transition: width .1s ease, margin .1s ease-out;
   transition: width .1s ease, margin .1s ease-out;
   z-index: $zindex-sidebar;
+  box-shadow: 5px 0px 20px -5px rgb(199, 199, 199) !important;
 
   .sidebar-header {
     background: $card-bg;
@@ -23,6 +24,11 @@
     width: $sidebar-width-lg;
     -webkit-transition: width .1s ease;
     transition: width .1s ease;
+    height: 3.7rem;
+
+    img {
+      width: 13rem; 
+    }
 
     .sidebar-open & {
       border-bottom: 1px solid var(--#{$prefix}border-color);
@@ -34,11 +40,12 @@
       -webkit-transition: opacity .5s ease;
       transition: opacity .5s ease;
       font-weight: 700;
-      width: 40px;
+      //width: 40px;
       overflow: hidden;
       font-size: 25px;
       color: darken($primary, 50%);
       direction: ltr#{'/*rtl:ignore*/'};
+      width: auto;
 
       span {
         color: $primary;
@@ -131,7 +138,7 @@ position: absolute;
           }
 
           .link-title {
-            margin-left: 30px;
+            margin-left: 25px;
             font-size: 14px;
             -webkit-transition: all .2s ease-in-out;
             transition: all .2s ease-in-out;
@@ -178,7 +185,7 @@ position: absolute;
             color: $sidebar-nav-link-hover-color;
 
             .link-title {
-              margin-left: 31px;
+              margin-left: 26px;
             }
 
             .link-icon {
@@ -379,6 +386,31 @@ position: absolute;
   }
 }
 
+.sidebar .sidebar-body .sidebar-nav .nav-item {
+  position: relative;
+  padding: 5px 0 !important;
+}
+
+.sidebar .sidebar-body .sidebar-nav .nav-item > .nav-link{
+  margin: 8px 12px 0;
+  //color: #3c4858;
+  color: $gray-800;
+  text-transform: capitalize;
+  font-size: 13px;
+  padding: 10px 15px;
+  border-radius: 10rem;
+}
+
+.sidebar .sidebar-body .sidebar-nav .nav-item.mm-active > .nav-link, .sidebar .sidebar-body .sidebar-nav .nav-item:hover .nav-link {
+  background-color: $primary;
+  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgb(0 77 163 / 41%);
+  color: rgba(255, 255, 255);
+  border-radius: 10rem;
+}
+
+.sidebar .sidebar-body .sidebar-nav .nav-item > .nav-link{
+  height: unset !important    ;
+}
 
 @if $enable-dark-mode {
   @include color-mode(dark) {

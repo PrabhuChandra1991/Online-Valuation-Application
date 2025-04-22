@@ -1,4 +1,29 @@
-input[type=text], input[type=number],input[type=text], input[type=date]
-    input[type=checkbox]input[type=email]{
-        border: .25px solid #004da3;
+.card {
+    .card-body {
+        padding-top: 1.5rem !important;
     }
+
+    h4 {
+        text-transform: uppercase;
+    }
+
+    table th {
+        padding-bottom: 0.5rem !important;
+        padding-left: 0 !important;
+    }
+    
+    table td {
+        padding: 0.5rem;
+    }
+    
+    .col-action {
+        text-align: center;
+        width: 6rem;
+    }
+
+    .px-3 {
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+    }
+}
+

@@ -20,7 +20,7 @@
 	[IsEvaluateCompleted] BIT NULL,
 	[EvaluatedByUserId] BIGINT NULL,
 	[EvaluatedDateTime] DATETIME NULL,
-
+	[TotalObtainedMark] DECIMAL(7,2) NOT NULL DEFAULT 0,
 	[IsActive] BIT DEFAULT 1,
 	[CreatedDate] DATETIME DEFAULT GETDATE(),
 	[CreatedById] BIGINT NOT NULL,

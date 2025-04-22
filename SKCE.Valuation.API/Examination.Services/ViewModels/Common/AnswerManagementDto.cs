@@ -14,7 +14,7 @@ namespace SKCE.Examination.Services.ViewModels.Common
         public string RegulationYear { get; set; } = string.Empty;
         public string BatchYear { get; set; } = string.Empty;
         public string DegreeTypeName { get; set; } = string.Empty;
-        public string ExampType { get; set; } = string.Empty;
+        public string ExamType { get; set; } = string.Empty;
         public int Semester { get; set; }
         public long CourseId { get; set; } = 0;
         public string CourseCode { get; set; } = string.Empty;
@@ -23,5 +23,7 @@ namespace SKCE.Examination.Services.ViewModels.Common
         public string ExamYear { get; set; } = string.Empty;
         public string DummyNumber { get; set; } = string.Empty;
         public string? UploadedBlobStorageUrl { get; set; }= string.Empty;
+        public string? AllocatedUserName { get; set; }= string.Empty;
+        
     }
 }

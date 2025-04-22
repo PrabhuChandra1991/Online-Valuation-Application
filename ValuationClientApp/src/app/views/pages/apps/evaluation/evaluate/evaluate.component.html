@@ -1,0 +1,108 @@
+<div class="container-fluid">
+
+    <div class="row">
+        <div class="p-2 text-center">
+            <h5>
+                {{primaryData.institutionName}}&nbsp;&nbsp;<span class="text-secondary">|</span>&nbsp;&nbsp;
+                Regulation Year-{{primaryData.regulationYear}}&nbsp;&nbsp;<span
+                    class="text-secondary">|</span>&nbsp;&nbsp;
+                Batch Year-{{primaryData.regulationYear}}&nbsp;&nbsp;<span class="text-secondary">|</span>&nbsp;&nbsp;
+                Exam Year(Month)-{{primaryData.examYear}}({{primaryData.examMonth}})&nbsp;&nbsp;<span
+                    class="text-secondary">|</span>&nbsp;&nbsp;
+                {{primaryData.courseCode}}&nbsp;&nbsp;<span class="text-secondary">|</span>&nbsp;&nbsp;
+                {{primaryData.degreeTypeName}}&nbsp;&nbsp;<span class="text-secondary">|</span> &nbsp;&nbsp;
+                Semester-{{primaryData.semester}}&nbsp;&nbsp;<span class="text-secondary">|</span> &nbsp;&nbsp;                
+                {{primaryData.examType}}
+            </h5>
+        </div>
+    </div>
+
+    <!-- <div class="scroll mt-3">
+        <div class="q-container">
+            <div class="section" *ngFor="let sec of sectionList">
+                <div class="header">
+                    <span>Section {{sec.section}}</span>
+                </div>
+                <div class="q-list">
+                    <div class="question" *ngFor="let item of filter(sec.section); let i = index;">
+                        <button *ngIf="item.questionNumber != ''" class="btn btn-light" type="button" [attr.id]="'btn' + (i + 1)"
+                            (click)="getQuestionDetails($event)">{{item.questionNumber}}</button>
+                        <input *ngIf="item.questionNumber != ''" class="form-control border-0 text-center" type="text"
+                            maxlength="2" [attr.max]="item.mark" [attr.id]="'txt' + (i + 1)"
+                            (click)="highlightQuestion($event)" (keyup)="validateMark($event)">
+                            <label *ngIf="item.questionNumber == ''">OR</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> -->
+
+    <div *ngIf="qaList.length > 0">
+        <div class="row mt-3 table-responsive">
+            <table class="table table-bordered text-center">
+                <thead>
+                    <tr>
+                        <td *ngFor="let item of partList" [attr.colspan]="item.count">
+                            Part {{item.part}}
+                        </td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="question" *ngFor="let item of qaList; let i = index">
+                            <button *ngIf="item.questionNumberDisplay != ''" class="btn btn-light" type="button" [attr.id]="'btn' + (i + 1)"
+                                (click)="loadQuestionDetails($event, (i+1), item.questionNumberDisplay)" tabindex="-1">{{item.questionNumberDisplay}}</button>
+                            <input *ngIf="item.questionNumberDisplay != ''" class="form-control border-0 text-center" type="text" maxlength="2" [value]="(item.obtainedMark != 0) ? item.obtainedMark : ''"
+                                [attr.max]="item.mark" [attr.id]="'txt' + (i + 1)" (focus)="loadQuestionDetails($event, (i+1), item.questionNumberDisplay)" (keyup)="validateMark($event, item.questionNumber, item.questionNumberSubNum)">
+                                <label class="or" *ngIf="item.questionNumberDisplay == ''">OR</label>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    
+        <div class="row mt-3 p-0">
+            <div class="col-md-6 p-0 pt-2">
+                Maximum Mark for selected question:&nbsp;&nbsp;{{activeQuestionMark}}
+            </div>
+            <div class="col-md-6 p-0 pt-2 mb-2">
+                <h4 [ngClass]="obtainedMarks > totalMarks ? 'text-danger' : ''">Total marks obtained:&nbsp;&nbsp;{{obtainedMarks}}&nbsp;/&nbsp;{{totalMarks}}</h4>
+            </div>
+            <!-- <div class="col-md-2 p-0 d-grid">
+                <button class="btn btn-primary" (click)="submitEvaluation()">Submit Evaluation</button>
+            </div> -->
+        </div>
+    
+        <div class="row mt-3">
+            <div class="col-md-6 ps-0">
+                <div class="card p-3">
+                    <h5>Question:</h5>
+                    <div [innerHtml]="activeQuestion"></div>
+                    <div [innerHtml]="activeQuestionImg"></div>
+                </div>
+                <div class="card p-3 my-3">
+                    <h5>Answer:</h5>
+                    <div [innerHtml]="activeAnswerKey"></div>
+                </div>
+            </div>
+            <div class="col-md-6 p-0">
+                <div class="card p-3">
+                    <div class="pdf-container" [innerHtml]="activeAnswersheet">
+
+                        <!-- <pdf-viewer [src]="src" [rotation]="0" [original-size]="false" [show-all]="true"
+                            [fit-to-page]="true" [zoom]="1" [zoom-scale]="'page-width'" [stick-to-page]="false"
+                            [render-text]="true" [external-link-target]="'blank'" [autoresize]="true" [show-borders]="false"
+                            style="width: 100%; height: 100vh;" (error)="onError($event)"></pdf-viewer> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+    </div>
+    
+    <div *ngIf="qaList.length == 0">
+        <div class="row mt-5 d-grid text-center">
+            <div class="col-md-12"><h3>---------- Failed to load question and answer ----------</h3></div>
+        </div>        
+    </div>
+</div>

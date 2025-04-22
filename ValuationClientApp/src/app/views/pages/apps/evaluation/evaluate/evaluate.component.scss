@@ -1,0 +1,115 @@
+table {
+    border-color: #c7c7c7;
+}
+table thead td {
+    padding: 0.5rem 0;
+}
+table td {
+    padding: 0;    
+    width: 3rem;
+}
+table td label {
+    padding-top: 1.75rem;
+}
+table .btn {
+    width: 100%;
+    min-width: 3rem !important;
+    height: 2.5rem;
+    border-radius: 0;
+    border: 0;
+    background-color: #f8f9fa;
+}
+table .btn.active {
+    background-color: #cbd1db;
+    box-shadow: var(--bs-btn-active-shadow);
+}
+table .btn:hover {
+    background-color: #cbd1db; 
+}
+table .form-control {
+    width: 100%;
+    height: 2.5rem;
+    border-radius: 0;
+    border: 0;
+    border-top: 1px solid #c7c7c7 !important;
+}
+table .form-control.active {
+    background-color: #e5f3fb;
+}
+table .error {
+    background-color: #ffdcda;
+}
+
+
+
+.scroll {
+    overflow-x: scroll;
+    overflow-y: hidden;
+    background-color: white;
+}
+.q-container {
+    //width:1500px;    
+}
+.q-container .section {
+    width:auto;
+    float: left;
+    border:1px solid #c7c7c7;  
+    border-right: 0;
+}
+.q-container .section:last-child {
+    border-right: 1px solid #c7c7c7 ;
+}
+.q-container .header {
+    padding: 0.5rem;
+    text-align: center;
+}
+.q-container .q-list {
+    border-right: 1px solid #c7c7c7;
+}
+.q-container .question {
+    width: 3rem;
+    height: 5rem;
+    float: left;
+    border:1px solid #c7c7c7;
+    border-bottom: 0;    
+}
+.q-container .question:first-child {
+    border-left: 0 !important;
+}
+.section .question .btn, .section .question .form-control {
+    height: 2.5rem;
+    border-radius: 0;
+}
+
+
+.question {
+    //width: 3rem;
+    text-align: center;
+}
+.question label {
+    padding-top: 1.75rem;
+}
+.question .btn {
+    width: 100%;
+    border-radius: 0;
+    border: 0;
+    background-color: #f8f9fa;
+}
+table .btn.active {
+    background-color: #cbd1db;
+}
+.question .btn:hover {
+    background-color: #cbd1db; 
+}
+.question .form-control {
+    width: 100%;
+    border-radius: 0;
+    margin: 0;
+    border-top: 1px solid #c7c7c7 !important;
+}
+.question .form-control.active {
+    background-color: #e5f3fb;
+}
+.question .error {
+    background-color: #ffdcda;
+}

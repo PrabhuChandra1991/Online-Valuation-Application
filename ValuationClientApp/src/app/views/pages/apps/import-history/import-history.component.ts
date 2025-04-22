@@ -1,4 +1,4 @@
-import { AfterViewInit, OnInit, Component, TemplateRef, ViewChild} from '@angular/core';
+import { AfterViewInit, OnInit, Component, TemplateRef, ViewChild } from '@angular/core';
 import { NgbDropdownModule, NgbNavModule, NgbTooltip, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { CommonModule } from '@angular/common';
@@ -44,7 +44,8 @@ export class ImportHistoryComponent implements OnInit{
   @ViewChild(MatSort) sort: MatSort;
 
   constructor(private fb: FormBuilder,
-              private importHistoryService:ImportHistoryService
+              private importHistoryService:ImportHistoryService,
+              private router: Router
               ){}
 
   ngOnInit(): void {
@@ -79,13 +80,17 @@ export class ImportHistoryComponent implements OnInit{
         this.dataSource.data = this.importHistories;
         this.dataSource.paginator = this.paginator;
        this.dataSource.sort = this.sort;
-       console.log('history data:', this.importHistories);
+      //  console.log('history data:', this.importHistories);
       },
 
       error: (error) => {
         console.error('Error loading history:', error);
       }
     });
+  }
+
+  gotoImportMaster() {
+    this.router.navigate(['/apps/master']);
   }
 
 }

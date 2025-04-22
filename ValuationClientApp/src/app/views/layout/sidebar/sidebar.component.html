@@ -1,21 +1,19 @@
 <nav class="sidebar">
-  <div class="sidebar-header">
+  <div class="sidebar-header pt-2 border-bottom">
 
     <!--- Logo -->
-    <!-- <a routerLink="/" class="sidebar-brand">
-      <img src="https://skcet.ac.in/wp-content/uploads/2024/08/skcet-logo.png" alt="logo">
-    </a> -->
+    <img src="images/skcet-logo-lg.png" alt="logo">
 
     <!-- <a routerLink="/" class="sidebar-brand">
       <img src="images/logo.png" alt="logo">
     </a> -->
 
     <!--- Toggler -->
-    <div class="sidebar-toggler" #sidebarToggler (click)="toggleSidebar($event)">
+    <!-- <div class="sidebar-toggler" #sidebarToggler (click)="toggleSidebar($event)">
       <span></span>
       <span></span>
       <span></span>
-    </div>
+    </div> -->
 
   </div>
   <div class="sidebar-body py-4" (mouseenter)="operSidebarFolded()" (mouseleave)="closeSidebarFolded()">

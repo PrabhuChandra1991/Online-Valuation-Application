@@ -13,65 +13,75 @@ import { ImportService } from '../../services/import.service';
   selector: 'app-master',
   imports: [CommonModule, FormsModule, ReactiveFormsModule, HttpClientModule],
   templateUrl: './master.component.html',
-  styleUrl: './master.component.scss'
+  styleUrl: './master.component.scss',
 })
 export class MasterComponent {
-
   isSubmitting = false;
 
-  isCourseSylImported=false;
-  isMasImported=false;
-  isQpAkImported=false;
+  isCourseSylImported = false;
+  isMasImported = false;
+  isQpAkImported = false;
+  isDummyNumberImported = false;
 
   fileName = '';
-  syllabusDocsPending='';
+  syllabusDocsPending = '';
   duplicateImportAlert = '';
+
   masterDataForm = new FormGroup({
     name: new FormControl('', [Validators.required, Validators.minLength(3)]),
     file: new FormControl('', [Validators.required]),
-    fileSource: new FormControl('', [Validators.required])
+    fileSource: new FormControl('', [Validators.required]),
   });
 
   courseSyllabusDocumentsForm = new FormGroup({
     name: new FormControl('', [Validators.required, Validators.minLength(3)]),
     file: new FormControl([], [Validators.required]),
-    fileSource: new FormControl([], [Validators.required])
+    fileSource: new FormControl([], [Validators.required]),
   });
+
   qpDocumentsForm = new FormGroup({
     name: new FormControl('', [Validators.required, Validators.minLength(3)]),
     file: new FormControl([], [Validators.required]),
-    fileSource: new FormControl([], [Validators.required])
+    fileSource: new FormControl([], [Validators.required]),
   });
-  constructor(private toastr: ToastrService,private ImportService: ImportService,private spinnerService : SpinnerService) {
-  }
 
-  get f(){
+  dummyNumberImportForm = new FormGroup({
+    name: new FormControl('', [Validators.required, Validators.minLength(3)]),
+    file: new FormControl([], [Validators.required]),
+    fileSource: new FormControl([], [Validators.required]),
+  });
+
+  constructor(
+    private toastr: ToastrService,
+    private ImportService: ImportService,
+    private spinnerService: SpinnerService
+  ) {}
+
+  get f() {
     return this.masterDataForm.controls;
   }
 
-  onMasterDataFileChange(event:any) {
+  onMasterDataFileChange(event: any) {
     if (event.target.files.length > 0) {
       this.isMasImported = true;
       const file = event.target.files[0];
       this.masterDataForm.patchValue({
-        fileSource: file
+        fileSource: file,
       });
     }
   }
 
-  submitMasterQPData(){
-
+  submitMasterQPData() {
     this.spinnerService.toggleSpinnerState(true);
     const formData = new FormData();
 
     const fileSourceValue = this.masterDataForm.get('fileSource')?.value;
 
     if (fileSourceValue !== null && fileSourceValue !== undefined) {
-        formData.append('file', fileSourceValue);
+      formData.append('file', fileSourceValue);
     }
 
-    this.ImportService.importData(formData)
-    .subscribe({
+    this.ImportService.importData(formData).subscribe({
       next: (response) => {
         this.duplicateImportAlert = response.message;
         this.toastr.success(response.message);
@@ -83,39 +93,36 @@ export class MasterComponent {
       },
       complete: () => {
         this.spinnerService.toggleSpinnerState(false);
-       }
+      },
     });
-
   }
 
-  get courseSyllabusDocumentsFormF(){
+  get courseSyllabusDocumentsFormF() {
     return this.courseSyllabusDocumentsForm.controls;
   }
-  onCourseSyllabusDocumentFileChange(event:any) {
+  onCourseSyllabusDocumentFileChange(event: any) {
     if (event.target.files.length > 0) {
       this.isCourseSylImported = true;
       this.courseSyllabusDocumentsForm.patchValue({
-        fileSource: event.target.files
+        fileSource: event.target.files,
       });
     }
   }
 
-  submitSyllabusDocuments(){
-
+  submitSyllabusDocuments() {
     this.spinnerService.toggleSpinnerState(true);
     const formData = new FormData();
-    this.syllabusDocsPending ='';
-    const fileSourceValue = this.courseSyllabusDocumentsForm.get('fileSource')?.value;
+    this.syllabusDocsPending = '';
+    const fileSourceValue =
+      this.courseSyllabusDocumentsForm.get('fileSource')?.value;
 
     if (fileSourceValue !== null && fileSourceValue !== undefined) {
-      for(let i=0;i<fileSourceValue.length;i++){
+      for (let i = 0; i < fileSourceValue.length; i++) {
         formData.append('files', fileSourceValue[i]);
       }
-
     }
 
-    this.ImportService.importSyllabusDocuments(formData)
-    .subscribe({
+    this.ImportService.importSyllabusDocuments(formData).subscribe({
       next: (response) => {
         this.syllabusDocsPending = response.message;
         this.toastr.success('Data imported successfully!');
@@ -127,24 +134,38 @@ export class MasterComponent {
       },
       complete: () => {
         this.spinnerService.toggleSpinnerState(false);
-       }
+      },
     });
-
   }
 
-  get qpDocumentsformf(){
+  get qpDocumentsformf() {
     return this.qpDocumentsForm.controls;
   }
-  onQpDocumentFileChange(event:any) {
+
+  get gedDummyNumberformControls() {
+    return this.dummyNumberImportForm.controls;
+  }
+
+  onQpDocumentFileChange(event: any) {
     if (event.target.files.length > 0) {
       this.isQpAkImported = true;
       this.qpDocumentsForm.patchValue({
-        fileSource: event.target.files
+        fileSource: event.target.files,
       });
     }
   }
-  submitQPDocuments(){
 
+  onDummyNumberFileChange(event: any) {
+    if (event.target.files.length > 0) {
+      this.isDummyNumberImported = true;
+      const file = event.target.files[0];
+      this.dummyNumberImportForm.patchValue({
+        fileSource: file,
+      });
+    }
+  }
+
+  submitQPDocuments() {
     this.spinnerService.toggleSpinnerState(true);
     const formData = new FormData();
 
@@ -156,8 +177,7 @@ export class MasterComponent {
       }
     }
 
-    this.ImportService.importQPDocuments(formData)
-    .subscribe({
+    this.ImportService.importQPDocuments(formData).subscribe({
       next: () => {
         this.toastr.success('Data imported successfully!');
         this.qpDocumentsformf['file'].setValue([]);
@@ -168,8 +188,34 @@ export class MasterComponent {
       },
       complete: () => {
         this.spinnerService.toggleSpinnerState(false);
-       }
+      },
     });
-
   }
-}
+
+  submitDummyNumberImport() {
+    this.spinnerService.toggleSpinnerState(true);
+    const formData = new FormData();
+
+    const fileSource: any = this.dummyNumberImportForm.get('fileSource')?.value;
+
+    if (fileSource !== null && fileSource !== undefined) {
+      formData.append('file', fileSource);
+    }
+
+    this.ImportService.importAnswerSheetDummyNumbers(formData).subscribe({
+      next: (response) => {
+        this.toastr.success(response.message);
+        this.qpDocumentsformf['file'].setValue([]);
+      },
+      error: (errorResponse) => {
+        this.toastr.error('Failed to import data. Please try again.');
+        this.spinnerService.toggleSpinnerState(false);
+      },
+      complete: () => {
+        this.spinnerService.toggleSpinnerState(false);
+      },
+    });
+  }
+
+  //--
+} // END - CLASS

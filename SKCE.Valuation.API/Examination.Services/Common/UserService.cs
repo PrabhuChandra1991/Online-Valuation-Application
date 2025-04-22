@@ -61,9 +61,10 @@ namespace SKCE.Examination.Services.Common
                 _emailService.SendEmailAsync(user.Email, "Profile Update - Question Paper Setter/Evaluator – Sri Krishna Institutions, Coimbatore",
                   $"Dear {user.Name}," +
                   $"\n\nGreetings from Sri Krishna Institutions, Coimbatore!" +
-                  $"\n\nFurther to our previous communication, we are pleased to share with you the link {_configuration["LoginUrl"]} for updating your profile on our online platform. We request you to complete the update at your earliest convenience. Additionally, you will receive a separate notification via email regarding your appointment for the role of Question Paper Setter/Evaluator."+
-                  $"\n\nIf you require any further clarification, please do not hesitate to contact us. We will be happy to assist you." +
-                  $"\n\nContact Details:\nName:\nContact Number:\n\nThank you for your cooperation. We look forward to your valuable contribution to our institution.\n\nWarm regards,\nSri Krishna College of Engineering and Technology").Wait();
+                  $"\n\nWe are pleased to share the link below for updating your profile on our online platform: {_configuration["LoginUrl"]}"+
+                  $"\n\nKindly complete the update at your earliest convenience. Upon completion and acceptance by you, a separate email will be sent regarding your appointment as a Question Paper Setter/Evaluator." +
+                  $"\n\nIf you require any assistance, please feel free to contact us." +
+                  $"\n\nWarm regards,\nDr. Ramesh Kumar R,\nDean – Examinations,\nSri Krishna Institutions,\n8300034477.").Wait();
             }
             catch (Exception ex)
             {

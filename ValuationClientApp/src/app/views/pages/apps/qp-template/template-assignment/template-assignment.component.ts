@@ -180,13 +180,26 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
     // this.isEditMode = false;
     // this.selectedAssignment = null;
     // this.modalRef = this.modalService.open(this.assignmentModal, { size: 'lg', backdrop: 'static' });
-    this.modalService
-      .open(content, { size: 'lg' })
-      .result.then((result) => {
-        console.log('Modal closed' + result);
-      })
-      .catch((res) => {});
-  }
+      this.modalService.open(content, {size: 'lg'}).result.then((result) => {
+        console.log("Modal closed" + result);
+      }).catch((res) => {});
+    }
+
+    openDocUploadModal(content: TemplateRef<any>, qpTemplateId: number) {
+      this.qpTemplateId = qpTemplateId;
+     
+    this.qpDocDataForm = new FormGroup({
+      name: new FormControl('', [Validators.required, Validators.minLength(3)]),
+      file: new FormControl('', [Validators.required]),
+      fileSource: new FormControl('', [Validators.required])
+    });
+    this.qpValidationMessage = "";
+      this.isQPDocValidated  = false;
+      this.isQPDocUploaded  = false;
+      this.isInvalidDoc = false
+        this.modalService.open(content, {size: 'lg'}).result.then((result) => {
+          console.log("Modal closed" + result);
+        }).catch((res) => {});
 
   openDocUploadModal(content: TemplateRef<any>, qpTemplateId: number) {
     this.qpTemplateId = qpTemplateId;
@@ -632,6 +645,7 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
           this.toasterService.success('Qp Template assigned successfully')
           this.modalService.dismissAll();
           this.loadTemplateaForInstitute(0);
+          window.location.reload(); 
         },
         error: (error) => {
           console.error('Save failed:', error);
@@ -650,23 +664,23 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
 
     //this.isSubmitting = true;
 
-    this.templateService
-      .updateAssignment(assignmentData.get('qpDocumentId'), assignmentData)
-      .subscribe({
-        next: () => {
-          this.toastr.success('User updated successfully!');
-          this.loadAssignedTemplates();
-          this.modalRef.close();
-        },
-        error: (res) => {
-          this.toastr.error(res['error']['message']);
-          this.spinnerService.toggleSpinnerState(false);
-        },
-        complete: () => {
-          // this.isSubmitting = false;
-          this.spinnerService.toggleSpinnerState(false);
-        },
-      });
+    this.templateService.updateAssignment(assignmentData.get('qpDocumentId'), assignmentData).subscribe({
+      next: () => {
+        this.toastr.success('User updated successfully!');
+        this.loadAssignedTemplates();
+        this.modalRef.close();
+        window.location.reload(); 
+      },
+      error: (res) => {
+        this.toastr.error(res['error']['message']);
+        this.spinnerService.toggleSpinnerState(false);
+      },
+      complete: () => {
+       // this.isSubmitting = false;
+        this.spinnerService.toggleSpinnerState(false);
+      }
+    });
+
   }
 
   closeModal() {
@@ -698,11 +712,17 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
     window.open(blobUrl, '_blank');
   }
   printQPDocument(userqpTemplateId:number,isForPrint:boolean){
+    this.spinnerService.toggleSpinnerState(true);
     this.templateService.printQPTemplate(userqpTemplateId,isForPrint).subscribe({
       next: (response) => {
         if(response.base64Content != ""){
           this.openPdfInTab(response.base64Content,response.fileName);
           this.toastr.success('File downloaded successfully!');
+          if(isForPrint){
+            this.close()
+            window.location.reload();  
+          }
+         
         }else{
           this.toastr.error('No file found to print!');
         }
@@ -720,25 +740,22 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
 
   assignScrutinity(assignedScrutinyUser: any) {
     this.spinnerService.toggleSpinnerState(true);
-    this.templateService
-      .assignScrutinity(
-        assignedScrutinyUser.userId,
-        assignedScrutinyUser.parentUserQPTemplateId
-      )
-      .subscribe({
-        next: () => {
-          this.close();
-          this.spinnerService.toggleSpinnerState(false);
-        },
-        error: (res) => {
-          this.close();
-          this.spinnerService.toggleSpinnerState(false);
-        },
-        complete: () => {
-          this.close();
-          this.spinnerService.toggleSpinnerState(false);
-        },
-      });
+    this.templateService.assignScrutinity(assignedScrutinyUser.userId, assignedScrutinyUser.parentUserQPTemplateId).subscribe({
+      next: () => {
+        this.close();
+        this.spinnerService.toggleSpinnerState(false);
+        window.location.reload(); 
+      },
+      error: (res) => {
+        this.close();
+        this.spinnerService.toggleSpinnerState(false);
+      },
+      complete: () => {
+       this.close();
+       this.spinnerService.toggleSpinnerState(false);
+      }
+    });
+
   }
 
   clearSelection(docIndex: number, userIndex: number) {
@@ -827,7 +844,37 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
     }
   }
 
-  submit(qpDocumentId: number) {
+  previewGeneratedDcument(userqpTemplateId:number){
+    this.spinnerService.toggleSpinnerState(true);
+    const formData = new FormData();
+    const fileSourceValue = this.qpDocDataForm.get('fileSource')?.value;
+
+    if (fileSourceValue !== null && fileSourceValue !== undefined) {
+        formData.append('file', fileSourceValue);
+    }
+
+    this.qpDocumentService.generatedQPPreview(formData,userqpTemplateId).subscribe({
+      next: (response) => {
+        if(response.base64Content != ""){
+          this.openPdfInTab(response.base64Content,response.fileName);
+          this.toastr.success('File downloaded successfully!');
+        }else{
+          this.toastr.error('No file found to print!');
+        }
+        this.spinnerService.toggleSpinnerState(false);
+      },
+      error: (response) => {
+        this.toastr.error('No file found to print!');
+        this.spinnerService.toggleSpinnerState(false);
+      },
+      complete: () => {
+       // this.isSubmitting = false;
+        this.spinnerService.toggleSpinnerState(false);
+      }
+    });
+  }
+
+  submit(qpDocumentId:number) {
     this.spinnerService.toggleSpinnerState(true);
     const formData = new FormData();
     const fileSourceValue = this.qpDocDataForm.get('fileSource')?.value;
@@ -849,31 +896,24 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
     //console.log('submitted...');
     //console.log(this.isGraphsRequired + ': ' + graphName);
     //console.log(this.isTablesAllowed + ': ' + tableName);
-    this.qpDocumentService
-      .submitGeneratedQP(
-        formData,
-        qpDocumentId,
-        this.isGraphsRequired,
-        graphName,
-        this.isTablesAllowed,
-        tableName
-      )
-      .subscribe({
-        next: (response) => {
-          //console.log(response)
-          if (response) {
-            this.toastr.success('Data submitted successfully!');
-            this.close();
-          }
-        },
-        error: (response) => {
-          //console.log(response);
-          this.toastr.error('Invalid data. Please try again.');
-          this.spinnerService.toggleSpinnerState(false);
-        },
-        complete: () => {
-          this.spinnerService.toggleSpinnerState(false);
-        },
-      });
+    this.qpDocumentService.submitGeneratedQP(formData, qpDocumentId, this.isGraphsRequired, graphName, this.isTablesAllowed, tableName)
+    .subscribe({
+      next: (response) => {
+        //console.log(response)
+        if(response) {
+          this.toastr.success('Data submitted successfully!');
+          this.close(); 
+          window.location.reload();         
+        }
+      },
+      error: (response) => {
+        //console.log(response);
+        this.toastr.error('Invalid data. Please try again.');
+        this.spinnerService.toggleSpinnerState(false);
+      },
+      complete: () => {
+        this.spinnerService.toggleSpinnerState(false);
+       }
+    });  
   }
 }

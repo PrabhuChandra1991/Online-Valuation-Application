@@ -126,9 +126,26 @@ namespace SKCE.Examination.API.Controllers.QPSettings
                 // Load Word document from stream
                 var documentId = _azureBlobStorageHelper.UploadFileAsync(stream, file.FileName, file.ContentType).Result;
                 // Get and validate bookmarks
-                var validationResult = await _qpTemplateService.PreviewGeneratedQP(userQPTemplateId, documentId);
+                var filePath = await _qpTemplateService.PreviewGeneratedQP(userQPTemplateId, documentId);
 
-                return Ok();
+                if (filePath != string.Empty)
+                {
+                    byte[] fileBytes = System.IO.File.ReadAllBytes(filePath);
+                    string base64Pdf = Convert.ToBase64String(fileBytes);
+
+                    return Ok(new
+                    {
+                        FileName = filePath.Split("\\")[filePath.Split("\\").Length - 1],
+                        ContentType = "application/pdf",
+                        Base64Content = base64Pdf
+                    });
+                }
+                return Ok(new
+                {
+                    FileName = string.Empty,
+                    ContentType = "application/pdf",
+                    Base64Content = string.Empty
+                });
             }
             catch (Exception ex)
             {

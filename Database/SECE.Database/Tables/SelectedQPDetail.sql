@@ -12,6 +12,7 @@
 	[ExamYear] NVARCHAR(50) NOT NULL,
 	[QPPrintedDocumentId] BIGINT NULL,
 	[QPPrintedWordDocumentId] BIGINT NULL,
+	[FinalQPPrintedWordDocumentId] BIGINT NULL,
 	[QPPrintedDate] DATETIME NULL,
 	[QPPrintedById] BIGINT NULL,
 	[UserQPTemplateId] BIGINT NULL,

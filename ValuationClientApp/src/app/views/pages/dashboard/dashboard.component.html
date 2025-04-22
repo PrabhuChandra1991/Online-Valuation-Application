@@ -120,6 +120,7 @@
                       </div>
                     </div>
                   </div>
+
                   <div *ngIf="qualification.title.includes('PG')">
                     <div class="row mb-2">
                       <div class="col-sm-4">
@@ -145,8 +146,8 @@
                     <!-- PhD Checkbox -->
                     <div class="row mb-2">
                       <div class="col-sm-4">
-                        <mat-checkbox #hasPhdInput formControlName="hasPhd" (click)="OnPhDCheck()">Have you completed a
-                          PhD?</mat-checkbox>
+                        <label class="form-label">Have you completed PhD?<span class="text-danger"></span></label>
+                      <mat-checkbox #hasPhdInput formControlName="hasPhd" (click)="OnPhDCheck()">(If Yes)</mat-checkbox>
                       </div>
                       <div class="col-sm-4" *ngIf="qualification.isCompleted">
                         <label class="form-label">Specialization<span class="text-danger"> *</span></label>
@@ -160,7 +161,78 @@
                     </div>
                   </div>
                 </div>
-              </div>              
+              </div>
+              <!-- Designation Section -->
+              <h6 class="mt-4">Designation and Experience </h6>
+              <button type="button" class="btn btn-link float-end" (click)="openDesignationModal()"
+                *ngIf="!isMaxReached">
+                Add Designation
+              </button>
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Designation</th>
+                    <th>Department</th>
+                    <th>College Name</th>
+                    <th>Experience</th>
+                    <th>Current Position</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let exp of designations; let i = index">
+                    <td>{{ getDesignationName(exp.designationId) }}</td>
+                    <td>{{ exp.departmentName }}</td>
+                    <td>{{ exp.collegeName }}</td>
+                    <td>{{ exp.experience }}</td>
+                    <!-- <td>{{ exp.isCurrent }}</td> -->
+                    <td><mat-icon [style.color]="exp.isCurrent ? 'green' : 'red'">
+                        {{ exp.isCurrent ? 'check_circle' : 'cancel' }}
+                      </mat-icon></td>
+                    <td>
+                      <button (click)="editExperience(i)" mat-icon-button
+                        color="primary"><mat-icon>edit</mat-icon></button>
+                      <button (click)="deleteExperience(i)" mat-icon-button
+                        color="danger"><mat-icon>delete</mat-icon></button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <!-- User Courses Table -->
+              <h6 class="mt-4"> Courses Handled
+                <button type="button" class="btn btn-link float-end" (click)="openUserCourseModal()">
+                  Add Course
+                </button>
+              </h6>
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Course Name</th>
+                    <th>Degree Type</th>
+                    <th>No. of Semesters Handled</th>
+                    <th>Whether Handled in Last 2 Semesters?</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let course of userCourses; let i = index">
+                    <td>{{ course.courseName }}</td>
+                    <td>{{ getDegreeTypeName(course.degreeTypeId) }}</td>
+                    <td>{{ course.numberOfYearsHandled }}</td>
+                    <!-- <td>{{ course.isHandledInLast2Semester ? 'Yes' : 'No' }} -->
+
+                    <td><mat-icon [style.color]="course.isHandledInLast2Semester ? 'green' : 'red'">
+                        {{ course.isHandledInLast2Semester ? 'check_circle' : 'cancel' }}
+                      </mat-icon></td>
+                    <td>
+                      <button (click)="editUserCourse(i)" mat-icon-button
+                        color="primary"><mat-icon>edit</mat-icon></button>
+                      <button (click)="deleteUserCourse(i)" mat-icon-button
+                        color="danger"><mat-icon>delete</mat-icon></button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
 
               <div class="row mb-3">
                 <!-- Designation Section -->
@@ -439,9 +511,8 @@
           <input type="number" class="form-control" formControlName="numberOfYearsHandled" />
         </div>
         <div class="mb-3">
-          <mat-checkbox formControlName="isHandledInLast2Semester">Whether Handled in Last 2 Semesters?</mat-checkbox>
-          <!-- <input type="checkbox" formControlName="isHandledInLast2Semester" />
-          <label>&nbsp;Whether Handled in Last 2 Semesters?</label> -->
+          <label>&nbsp;Whether Handled in Last 2 Semesters?</label>&nbsp;&nbsp;
+          <input type="checkbox" formControlName="isHandledInLast2Semester"/> &nbsp; (If Yes)
         </div>
       </form>
     </div>

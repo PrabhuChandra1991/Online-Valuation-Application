@@ -263,15 +263,15 @@
                           *ngIf="assignedUser.statusTypeId === 9">
                     Print
                   </button>
-                </div> 
-                <br>   
-                </div> 
-                <div class="row" *ngIf="assignedUser.isQPSelected" [ngClass]="assignedUser.isQPSelected == true ? 'background-color-green' : ''">
-                  <div class="col-sm-4">
-                    <a target="_blank" href="{{assignedUser.finalQPPrintedWordDocumentUrl}}">{{assignedUser.finalQPPrintedWordDocumentName}}</a>
-                  </div>
                 </div>
-                <div class="row" ><br></div>           
+                </div>
+              <br>  
+              <div class="row" *ngIf="assignedUser.isQPSelected" [ngClass]="assignedUser.isQPSelected == true ? 'background-color-green' : ''">
+                <div class="col-sm-4">
+                  <a target="_blank" href="{{assignedUser.finalQPPrintedWordDocumentUrl}}">{{assignedUser.finalQPPrintedWordDocumentName}}</a>
+                </div>
+              </div>
+              <div class="row" ><br></div>           
               </div>
             </div>
             <div class="row" ><br></div> 
@@ -328,7 +328,6 @@
             </div>
             </div>
           </div>
-        </div>
       </div>
     </form>
   </div>

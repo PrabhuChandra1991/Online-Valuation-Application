@@ -230,7 +230,7 @@ export class EvaluateComponent implements OnInit {
 
   }
 
-  validateMark(event: any, qno: number, qsno: number) {
+  validateMark(event: any, item: any) {
     if (event.target.value) {
 
       if (event.target.value.match(/[^0-9]/g)) {
@@ -245,7 +245,8 @@ export class EvaluateComponent implements OnInit {
         return;
       }
       else {
-        this.saveMark(qno, qsno, parseInt(event.srcElement.max), parseFloat(event.target.value));
+        this.saveMark(item, parseFloat(event.target.value));
+        //this.saveMark(qno, qsno, parseInt(event.srcElement.max), parseFloat(event.target.value));
       }
 
       this.obtainedMarks = 0;
@@ -258,15 +259,17 @@ export class EvaluateComponent implements OnInit {
 
     }
   }
-
-  saveMark(qno: number, qsno: number, maxMark: number, obtainedMark: number) {
+  
+  saveMark(item: any, obtainedMark: number) {
     this.answersheetMark = {
       "createdById": this.loggedinUserId,
       "modifiedById": this.loggedinUserId,
       "answersheetId": this.primaryData.answersheetId,
-      "questionNumber": qno,
-      "questionNumberSubNum": qsno,
-      "maximumMark": maxMark,
+      "questionPartName": item.questionPart,
+      "questionGroupName": item.questionGroup,
+      "questionNumber": item.questionNumber,
+      "questionNumberSubNum": item.questionNumberSubNum,
+      "maximumMark": item.mark,
       "obtainedMark": obtainedMark
     }
 

@@ -1,5 +1,7 @@
 export interface AnswersheetMark {
   answersheetId: number;
+  questionPartName: string;
+  questionGroupName: string;
   questionNumber: number;
   questionNumberSubNum: number;
   maximumMark: number;

@@ -19,7 +19,7 @@ import { Router } from '@angular/router';
 export class EvaluateComponent implements OnInit {
   loggedinUserId: number = 0;
   primaryData: any;
-  answersheetMarkData: any[] = []; // pull if Marks entered already
+  answersheetMarkData: any[] = [];
   qaList: any[] = [];
   partList: any[] = [];
   groupList: any[] = [];
@@ -31,10 +31,7 @@ export class EvaluateComponent implements OnInit {
   answersheet: string = '---------- Answersheet loads here ----------';
   activeQuestionMark: string = '';
   sasToken: string = "sp=r&st=2025-04-23T08:48:04Z&se=2025-04-23T16:48:04Z&sv=2024-11-04&sr=c&sig=M%2F90Dwk7LJjwQPE%2FTsYmGnIKl1gpgk%2Fvtbp63LNU5qs%3D"
-
   answersheetMark: AnswersheetMark;
-  //src = "https://vadimdez.github.io/ng2-pdf-viewer/assets/pdf-test.pdf";
-  //src = 'https://iris.who.int/bitstream/handle/10665/137592/roadmapsitrep_7Nov2014_eng.pdf';
 
   constructor(
     private route: ActivatedRoute,
@@ -61,7 +58,7 @@ export class EvaluateComponent implements OnInit {
         this.getAnswersheetMark();
         this.getQuestionPaperAnswerKey(this.primaryData.answersheetId);
         this.answersheet = `${this.primaryData.uploadedBlobStorageUrl}`; //?${this.sasToken}
-        console.log(this.answersheet)
+        this.obtainedMarks = this.primaryData.totalObtainedMark;
       }
     });
 
@@ -111,7 +108,7 @@ export class EvaluateComponent implements OnInit {
           this.getPartList(data);
           this.getGroupList(data);
 
-          this.obtainedMarks = this.qaList.reduce((sum, item) => sum + (item.obtainedMark || 0), 0);
+          //this.obtainedMarks = this.qaList.reduce((sum, item) => sum + (item.obtainedMark || 0), 0);
           this.reduceChoiceQuestionMarks();
 
         }
@@ -232,10 +229,9 @@ export class EvaluateComponent implements OnInit {
 
   validateMark(event: any, item: any) {
     if (event.target.value) {
-
-      if (event.target.value.match(/[^0-9]/g)) {
+      if (event.target.value.match(/[^0-9.]/g)) {
         this.toastr.error('Please add only numbers.');
-        event.target.value = event.target.value.replace(/[^\d]/g, '');
+        event.target.value = ''; //event.target.value.replace(/[^\d]/g, '');        
         return;
       }
       else if ((parseFloat(event.target.value) > parseInt(event.srcElement.max))) {
@@ -246,16 +242,15 @@ export class EvaluateComponent implements OnInit {
       }
       else {
         this.saveMark(item, parseFloat(event.target.value));
-        //this.saveMark(qno, qsno, parseInt(event.srcElement.max), parseFloat(event.target.value));
-      }
+      }    
 
-      this.obtainedMarks = 0;
-      let txtList = document.querySelectorAll(".question .form-control") as NodeListOf<HTMLInputElement>;
-      txtList.forEach((item: HTMLInputElement) => {
-        if (item.value) {
-          this.obtainedMarks += parseFloat(item.value); // sum all text box marks
-        }
-      });
+      // this.obtainedMarks = 0;
+      // let txtList = document.querySelectorAll(".question .form-control") as NodeListOf<HTMLInputElement>;
+      // txtList.forEach((item: HTMLInputElement) => {
+      //   if (item.value) {
+      //     this.obtainedMarks += parseFloat(item.value); // sum all text box marks
+      //   }
+      // });
 
     }
   }
@@ -280,6 +275,7 @@ export class EvaluateComponent implements OnInit {
         console.log("save data: ", data)
         if (data.message.toLowerCase() == 'success') {
           this.toastr.success("Mark auto saved.");
+          this.obtainedMarks = data.totalMarksObtained;
         }
       },
       (error) => {
@@ -287,18 +283,6 @@ export class EvaluateComponent implements OnInit {
         this.toastr.error('Failed to save mark.');
       }
     )
-  }
-
-  submitEvaluation() {
-    if (this.obtainedMarks == 0) {
-      this.toastr.warning('Obained Marks is 0. Please evaluate.');
-    }
-    else if (this.obtainedMarks > this.totalMarks) {
-      this.toastr.error('Obtained Marks are more than Total marks. Please verify.');
-    }
-    else {
-      this.toastr.success("Evaluation submitted successfully");
-    }
   }
 
   completeEvaluation() {

@@ -44,11 +44,11 @@
                                     (click)="loadQuestionDetails($event, (i+1), item.questionNumberDisplay)"
                                     tabindex="-1">{{item.questionNumberDisplay}}</button>
                                 <input *ngIf="item.questionNumberDisplay != ''"
-                                    class="form-control border-0 text-center" type="text" maxlength="2"
+                                    class="form-control border-0 text-center" type="text" maxlength="5"
                                     [value]="(item.obtainedMark != 0) ? item.obtainedMark : ''" [attr.max]="item.mark"
                                     [attr.id]="'txt' + (i + 1)"
                                     (focus)="loadQuestionDetails($event, (i+1), item.questionNumberDisplay)"
-                                    (keyup)="validateMark($event, item)">
+                                    (blur)="validateMark($event, item)">
                                 <label class="or" *ngIf="item.questionNumberDisplay == ''">OR</label>
                             </td>
                         </tr>

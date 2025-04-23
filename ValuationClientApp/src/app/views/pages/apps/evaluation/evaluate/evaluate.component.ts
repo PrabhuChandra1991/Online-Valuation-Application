@@ -7,6 +7,7 @@ import { EvaluationService } from '../../../services/evaluation.service';
 import { encode, decode } from 'js-base64';
 import { ActivatedRoute } from '@angular/router'
 import { AnswersheetMark } from '../../../models/answersheetMark.model';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-evaluate',
@@ -29,6 +30,7 @@ export class EvaluateComponent implements OnInit {
   activeAnswerKey: string = '---------- Answerkey loads here ----------';
   answersheet: string = '---------- Answersheet loads here ----------';
   activeQuestionMark: string = '';
+  sasToken: string = "sp=r&st=2025-04-23T08:48:04Z&se=2025-04-23T16:48:04Z&sv=2024-11-04&sr=c&sig=M%2F90Dwk7LJjwQPE%2FTsYmGnIKl1gpgk%2Fvtbp63LNU5qs%3D"
 
   answersheetMark: AnswersheetMark;
   //src = "https://vadimdez.github.io/ng2-pdf-viewer/assets/pdf-test.pdf";
@@ -37,7 +39,8 @@ export class EvaluateComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private toastr: ToastrService,
-    private evaluationService: EvaluationService
+    private evaluationService: EvaluationService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -57,7 +60,8 @@ export class EvaluateComponent implements OnInit {
       if (this.primaryData.answersheetId) {
         this.getAnswersheetMark();
         this.getQuestionPaperAnswerKey(this.primaryData.answersheetId);
-        this.answersheet = this.primaryData.uploadedBlobStorageUrl;
+        this.answersheet = `${this.primaryData.uploadedBlobStorageUrl}?${this.sasToken}`;
+        console.log(this.answersheet)
       }
     });
 
@@ -292,6 +296,10 @@ export class EvaluateComponent implements OnInit {
     else {
       this.toastr.success("Evaluation submitted successfully");
     }
+  }
+
+  backToList() {
+    this.router.navigate(['/apps/evaluationlist']);
   }
 
   filter(part: string) {

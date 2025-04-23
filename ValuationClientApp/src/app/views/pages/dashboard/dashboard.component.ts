@@ -82,7 +82,7 @@ export class DashboardComponent implements OnInit   {
   isMaxReached: boolean = false;
   maxAllowedCount:number = 10;
 
-  isUserEnabled = false;
+  isUserEnabled = true;
 
   validationErrors: { [key: string]: boolean } = {
     ugName: false,
@@ -316,12 +316,6 @@ export class DashboardComponent implements OnInit   {
     if (loggedData) {
       const userData = JSON.parse(loggedData);
 
-      if(userData.isEnabled)
-        this.isUserEnabled = true;
-        //this.userForm.controls['name'].disable();
-
-
-      console.log("localstoreUserData",userData);
     }
   }
 
@@ -389,15 +383,13 @@ export class DashboardComponent implements OnInit   {
 
         this.userForm.updateValueAndValidity();
 
-        if(selectedUser.isEnabled){
           const loggedData = localStorage.getItem('userData');
           if (loggedData) {
             const loggedInuserData = JSON.parse(loggedData);
 
-            if(selectedUser.isEnabled && loggedInuserData.roleId != 1)
-              this.isUserEnabled = true;
+            if(loggedInuserData.roleId == 1)
+              this.isUserEnabled = false;
           }
-        }
        }
       },
       error: (err) => {

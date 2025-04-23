@@ -96,8 +96,8 @@ namespace SKCE.Examination.API.Controllers.Common
         {
             try
             {
-                var response = await _answersheetService.SaveAnswersheetMarkAsync(entity);
-                return Ok(new { Message = (response) ? "Success" : "Failed" });
+                var result = await _answersheetService.SaveAnswersheetMarkAsync(entity);
+                return Ok(new { Message = "Success", TotalMarksObtained = result });
             }
             catch (Exception ex)
             {
@@ -105,18 +105,18 @@ namespace SKCE.Examination.API.Controllers.Common
             }
         }
 
-        // POST: /api/Answersheet/EvaluationCompleted
-        [HttpPost("EvaluationCompleted")]
-        public async Task<IActionResult> EvaluationCompleted(long answersheetId, long evaluatedByUserId)
+        // POST: /api/Answersheet/CompleteEvaluation
+        [HttpPost("CompleteEvaluation")]
+        public async Task<IActionResult> CompleteEvaluation(long answersheetId, long evaluatedByUserId)
         {
             try
             {
-                var response = await _answersheetService.EvaluationCompletedSync(answersheetId, evaluatedByUserId);
+                var response = await _answersheetService.CompleteEvaluationSync(answersheetId, evaluatedByUserId);
                 return Ok(new { Message = (response) ? "Success" : "Failed" });
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResultModel() { Message = "Error on AllocateAnswerSheetsToUser." });
+                return BadRequest(new ResultModel() { Message = "Error on CompleteEvaluationSync." });
             }
         }
 

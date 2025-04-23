@@ -31,7 +31,7 @@ namespace SKCE.Examination.Services.EntityHelpers
             return markRecord;
         }
 
-        public async Task<Boolean> SaveAnswersheetMarkAsync(AnswersheetQuestionwiseMark entity)
+        public async Task<decimal> SaveAnswersheetMarkAsync(AnswersheetQuestionwiseMark entity)
         {
             if (entity is null)
             {
@@ -71,12 +71,12 @@ namespace SKCE.Examination.Services.EntityHelpers
             }
 
             var totalMarkHelper = new AnswersheetTotalMarkHelper(this._context);
-            await totalMarkHelper.UpdateTotalMarks(entity.AnswersheetId, entity.ModifiedById);
+            var totalObtainedMarks= await totalMarkHelper.UpdateTotalMarks(entity.AnswersheetId, entity.ModifiedById);
 
-            return true;
+            return totalObtainedMarks;
         }
 
-        public async Task<Boolean> EvaluationCompletedSync(long answersheetId, long evaluatedByUserId)
+        public async Task<Boolean> CompleteEvaluationSync(long answersheetId, long evaluatedByUserId)
         {
             var existingEntity = await _context.Answersheets.FirstOrDefaultAsync(e =>
                 e.AnswersheetId == answersheetId &&

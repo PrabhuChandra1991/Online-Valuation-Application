@@ -105,16 +105,16 @@ namespace SKCE.Examination.Services.Common
             return await helper.GetAnswersheetMarkAsync(answersheetId);
         }
 
-        public async Task<Boolean> SaveAnswersheetMarkAsync(AnswersheetQuestionwiseMark entity)
+        public async Task<decimal> SaveAnswersheetMarkAsync(AnswersheetQuestionwiseMark entity)
         {
             var helper = new AnswersheetMarkTransHelper(this._context);
             return await helper.SaveAnswersheetMarkAsync(entity);
         }
 
-        public async Task<Boolean> EvaluationCompletedSync(long answersheetId, long evaluatedByUserId)
+        public async Task<Boolean> CompleteEvaluationSync(long answersheetId, long evaluatedByUserId)
         {
             var helper = new AnswersheetMarkTransHelper(this._context);
-            return await helper.EvaluationCompletedSync(answersheetId, evaluatedByUserId);
+            return await helper.CompleteEvaluationSync(answersheetId, evaluatedByUserId);
         }
 
         public async Task<Boolean> AllocateAnswerSheetsToUser(AnswersheetAllocateInputModel inputData)

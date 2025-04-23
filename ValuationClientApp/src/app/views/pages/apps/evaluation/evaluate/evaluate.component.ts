@@ -90,7 +90,7 @@ export class EvaluateComponent implements OnInit {
     this.evaluationService.getQuestionAndAnswer(answerSheetId).subscribe(
       (data: any[]) => {
         if (data.length > 0) {
-          
+
           data.forEach((item) => {
             this.qaList.push({
               "questionNumber": item.questionNumber,
@@ -113,7 +113,7 @@ export class EvaluateComponent implements OnInit {
 
           this.obtainedMarks = this.qaList.reduce((sum, item) => sum + (item.obtainedMark || 0), 0);
           this.reduceChoiceQuestionMarks();
-          
+
         }
         else {
           console.log('No question and answer data');
@@ -221,18 +221,18 @@ export class EvaluateComponent implements OnInit {
 
     let matchedItem = this.qaList.filter(x => x.questionNumberDisplay == qusetionNo)[0];
 
-    if(matchedItem) {
+    if (matchedItem) {
       this.activeQuestion = matchedItem.questionDescription;
       this.activeQuestionImg = matchedItem.questionImage;
       this.activeAnswerKey = matchedItem.answerDescription;
       this.activeQuestionMark = matchedItem.mark;
     }
-    
+
   }
 
   validateMark(event: any, qno: number, qsno: number) {
     if (event.target.value) {
-      
+
       if (event.target.value.match(/[^0-9]/g)) {
         this.toastr.error('Please add only numbers.');
         event.target.value = event.target.value.replace(/[^\d]/g, '');
@@ -275,7 +275,7 @@ export class EvaluateComponent implements OnInit {
     this.evaluationService.saveAnswersheetMark(this.answersheetMark).subscribe(
       (data: any) => {
         console.log("save data: ", data)
-        if (data.message.toLowerCase() == 'success') {          
+        if (data.message.toLowerCase() == 'success') {
           this.toastr.success("Mark auto saved.");
         }
       },
@@ -296,6 +296,31 @@ export class EvaluateComponent implements OnInit {
     else {
       this.toastr.success("Evaluation submitted successfully");
     }
+  }
+
+  evaluationCompleted() {
+    if (this.obtainedMarks == 0) {
+      this.toastr.warning('Obained Marks is 0. Please evaluate.');
+    }
+    else {
+      this.evaluationService.evaluationCompleted(this.primaryData.answersheetId, this.loggedinUserId).subscribe(
+        (data: any) => {
+          console.log("respo", data)
+          if (data.message.toLowerCase() == 'success') {
+            this.toastr.success("Evaluation completed successfully");
+            this.backToList();
+          }
+          else {
+            console.error('Failed to complete evaluation');
+            this.toastr.error('Failed to complete evaluation.');
+          }
+        },
+        (error) => {
+          console.error('Error while saving evaluation:', error);
+          this.toastr.error('Failed to complete evaluation.');
+        }
+      ) 
+    }       
   }
 
   backToList() {

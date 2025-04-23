@@ -25,6 +25,7 @@ namespace SKCE.Examination.Services.ViewModels.Common
         public string? UploadedBlobStorageUrl { get; set; }= string.Empty;
         public string? AllocatedUserName { get; set; }= string.Empty;
         public decimal TotalObtainedMark { get; set; }
+        public Boolean? IsEvaluateCompleted { get; set; }
 
     }
 }

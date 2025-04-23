@@ -105,8 +105,22 @@ namespace SKCE.Examination.API.Controllers.Common
             }
         }
 
+        // POST: /api/Answersheet/EvaluationCompleted
+        [HttpPost("EvaluationCompleted")]
+        public async Task<IActionResult> EvaluationCompleted(long answersheetId, long evaluatedByUserId)
+        {
+            try
+            {
+                var response = await _answersheetService.EvaluationCompletedSync(answersheetId, evaluatedByUserId);
+                return Ok(new { Message = (response) ? "Success" : "Failed" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResultModel() { Message = "Error on AllocateAnswerSheetsToUser." });
+            }
+        }
 
-        // POST: /api/Answersheet/SaveAnswersheetMark
+        // POST: /api/Answersheet/AllocateAnswerSheetsToUser
         [HttpPost("AllocateAnswerSheetsToUser")]
         public async Task<IActionResult> AllocateAnswerSheetsToUser(AnswersheetAllocateInputModel inputData)
         {
@@ -120,7 +134,6 @@ namespace SKCE.Examination.API.Controllers.Common
                 return BadRequest(new ResultModel() { Message = "Error on AllocateAnswerSheetsToUser." });
             }
         }
-
 
     }
 }

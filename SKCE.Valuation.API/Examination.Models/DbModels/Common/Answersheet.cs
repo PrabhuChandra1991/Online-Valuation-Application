@@ -31,7 +31,6 @@ namespace SKCE.Examination.Models.DbModels.Common
         public bool? IsEvaluateCompleted { get; set; }
         public long? EvaluatedByUserId { get; set; }
         public DateTime? EvaluatedDateTime { get; set; }
-
         public decimal TotalObtainedMark { get; set; }
 
     }

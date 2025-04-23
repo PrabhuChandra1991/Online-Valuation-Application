@@ -37,4 +37,8 @@ export class EvaluationService {
     return this.http.post(url, JSON.stringify(answersheetMark), this.httpOptions);
   }
 
+  evaluationCompleted(answersheetId: number, evaluatedByUserId: number): Observable<any> {    
+    return this.http.post(`${this.apiUrl}/api/Answersheet/EvaluationCompleted?answersheetId=${answersheetId}&evaluatedByUserId=${evaluatedByUserId}`, {}, this.httpOptions);
+  }
+
 }

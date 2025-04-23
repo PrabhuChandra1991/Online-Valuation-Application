@@ -73,7 +73,29 @@ namespace SKCE.Examination.Services.EntityHelpers
             var totalMarkHelper = new AnswersheetTotalMarkHelper(this._context);
             await totalMarkHelper.UpdateTotalMarks(entity.AnswersheetId, entity.ModifiedById);
 
-            return true; 
+            return true;
+        }
+
+        public async Task<Boolean> EvaluationCompletedSync(long answersheetId, long evaluatedByUserId)
+        {
+            var existingEntity = await _context.Answersheets.FirstOrDefaultAsync(e =>
+                e.AnswersheetId == answersheetId &&
+                e.IsActive == true);
+
+            if (existingEntity != null)
+            {
+                existingEntity.IsEvaluateCompleted = true;
+                existingEntity.EvaluatedByUserId = evaluatedByUserId;
+                existingEntity.EvaluatedDateTime = DateTime.Now;
+
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                return false;
+            }
+
+            return true;
         }
 
 

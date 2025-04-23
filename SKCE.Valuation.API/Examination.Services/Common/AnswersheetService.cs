@@ -72,6 +72,7 @@ namespace SKCE.Examination.Services.Common
                            UploadedBlobStorageUrl = answersheet.UploadedBlobStorageUrl,
                            AllocatedUserName = (allocatedUserResult != null ? allocatedUserResult.Name : string.Empty),
                            TotalObtainedMark = answersheet.TotalObtainedMark,
+                           IsEvaluateCompleted = answersheet.IsEvaluateCompleted
                        }).ToListAsync();
 
             return resultItems;
@@ -108,6 +109,12 @@ namespace SKCE.Examination.Services.Common
         {
             var helper = new AnswersheetMarkTransHelper(this._context);
             return await helper.SaveAnswersheetMarkAsync(entity);
+        }
+
+        public async Task<Boolean> EvaluationCompletedSync(long answersheetId, long evaluatedByUserId)
+        {
+            var helper = new AnswersheetMarkTransHelper(this._context);
+            return await helper.EvaluationCompletedSync(answersheetId, evaluatedByUserId);
         }
 
         public async Task<Boolean> AllocateAnswerSheetsToUser(AnswersheetAllocateInputModel inputData)

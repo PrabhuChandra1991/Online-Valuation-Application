@@ -18,10 +18,11 @@ namespace SKCE.Examination.Services.Common
         private readonly IUserService _userService;
         private readonly EmailService _emailService;
 
-        public AnswersheetService(ExaminationDbContext context, IUserService userService)
+        public AnswersheetService(ExaminationDbContext context, IUserService userService, EmailService emailService)
         {
             _context = context;
             _userService = userService;
+            _emailService = emailService;
         }
 
         public async Task<IEnumerable<Answersheet>> GetAllAnswersheetsAsync()
@@ -115,8 +116,15 @@ namespace SKCE.Examination.Services.Common
             var response = await helper.AllocateAnswersheetsToUserRandomly(inputData, loggedInUserId);
             if (response)
             {
-                var user = await _userService.GetUserByIdAsync(loggedInUserId);
-                _emailService.SendEmailAsync(user.Email, "SKCE Online Examination Platform: Answeersheets allocated", $"Hi {user.Name},\n\nYou have been allocated with {inputData.Noofsheets} answersheets for Evaluation.\n\n Please Evaluate. \n\n").Wait();
+                var user = await _userService.GetUserOnlyByIdAsync(inputData.UserId);
+                if (user != null)
+                {
+                    await _emailService.SendEmailAsync(
+                        user.Email,
+                        "SKCE Online Examination Platform: Answeersheets allocated", $"Hi {user.Name
+                        },\n\nYou have been allocated with {inputData.Noofsheets
+                        } answersheets for Evaluation.\n\n Please Evaluate. \n\n");
+                }
             }
             return response;
         }        

@@ -10,7 +10,7 @@ import {
   NgbNavModule,
   NgbTooltip,
   NgbModal,
-  NgbModalRef
+  NgbModalRef,
 } from '@ng-bootstrap/ng-bootstrap';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { CommonModule } from '@angular/common';
@@ -35,7 +35,7 @@ import { AnswersheetService } from '../../../services/answersheet.service';
 import { InstituteService } from '../../../services/institute.service';
 import { TemplateManagementService } from '../../../services/template-management.service';
 import { ThirdPartyDraggable } from '@fullcalendar/interaction/index.js';
-
+import { SpinnerService } from '../../../services/spinner.service';
 
 @Component({
   selector: 'app-consolidatedview',
@@ -55,10 +55,9 @@ import { ThirdPartyDraggable } from '@fullcalendar/interaction/index.js';
     MatCheckboxModule,
   ],
   templateUrl: './consolidatedview.component.html',
-  styleUrl: './consolidatedview.component.scss'
+  styleUrl: './consolidatedview.component.scss',
 })
 export class ConsolidatedviewComponent {
-
   allocateAnswersheetForm!: FormGroup;
   allocateTransactionInprogress: boolean = false;
 
@@ -84,7 +83,7 @@ export class ConsolidatedviewComponent {
     'answerSheetTotalCount',
     'answerSheetAllocatedCount',
     'answerSheetNotAllocatedCount',
-    'actions'
+    'actions',
   ];
 
   @ViewChild('allocateModal') allocateModal: any;
@@ -96,14 +95,13 @@ export class ConsolidatedviewComponent {
     private modalService: NgbModal,
     private answersheetService: AnswersheetService,
     private instituteService: InstituteService,
-    private templateService: TemplateManagementService
+    private templateService: TemplateManagementService,
+    private spinnerService: SpinnerService
   ) {
-
     this.allocateAnswersheetForm = this.fb.group({
       userId: ['0', Validators.required],
-      noOfAnswersheetsAllocated: ['0', Validators.required]
-    })
-
+      noOfAnswersheetsAllocated: ['0', Validators.required],
+    });
   }
 
   ngOnInit(): void {
@@ -169,66 +167,69 @@ export class ConsolidatedviewComponent {
   disableIfAdmin(userId: number) {
     if (userId == 1) {
       return true;
-    }
-    else {
+    } else {
       return false;
     }
   }
-
 
   closeAllocationPopup() {
     this.modalRef.dismiss();
     this.allocateTransactionInprogress = false;
   }
 
-
   IsValidNoofScripts() {
-    if (parseInt(this.allocateAnswersheetForm.value.noOfAnswersheetsAllocated) > this.selectedElement.answerSheetNotAllocatedCount) {
+    if (
+      parseInt(this.allocateAnswersheetForm.value.noOfAnswersheetsAllocated) >
+      this.selectedElement.answerSheetNotAllocatedCount
+    ) {
       return false;
     }
     return true;
   }
 
   saveAllocation() {
-
-    if (parseInt(this.allocateAnswersheetForm.value.noOfAnswersheetsAllocated) > this.selectedElement.answerSheetNotAllocatedCount)
-
+    if (
+      parseInt(this.allocateAnswersheetForm.value.noOfAnswersheetsAllocated) <=
+      this.selectedElement.answerSheetNotAllocatedCount
+    ) {
+      this.spinnerService.toggleSpinnerState(true);
       this.allocateTransactionInprogress = true;
-    this.answersheetService.AllocateAnswerSheetsToUser(
-      this.selectedElement.examinationId,
-      parseInt(this.allocateAnswersheetForm.value.userId),
-      parseInt(this.allocateAnswersheetForm.value.noOfAnswersheetsAllocated)).subscribe(
-        (data: any) => {
-          console.log("save data: ", data)
-          if (data.message.toLowerCase() == 'success') {
-            // this.toastr.success("Mark auto saved.");
+      this.answersheetService
+        .AllocateAnswerSheetsToUser(
+          this.selectedElement.examinationId,
+          parseInt(this.allocateAnswersheetForm.value.userId),
+          parseInt(this.allocateAnswersheetForm.value.noOfAnswersheetsAllocated)
+        )
+        .subscribe(
+          (data: any) => {
+            this.spinnerService.toggleSpinnerState(false);
+            this.loadGridData();
+            this.closeAllocationPopup();
+          },
+          (error) => {
+            this.spinnerService.toggleSpinnerState(false);
+            this.closeAllocationPopup();
           }
-          this.loadGridData();
-          this.closeAllocationPopup();
-        },
-        (error) => {
-          console.error('Error saving mark:', error);
-          // this.toastr.error('Failed to save mark.');
-          this.closeAllocationPopup();
-        }
-      )
+        );
+    }
   }
 
   updateAllocation(user: any) {
-    console.log(user.target?.value)
+    console.log(user.target?.value);
     if (user.target?.value) {
       this.enterAllocation = true;
-    }
-    else {
+    } else {
       this.enterAllocation = false;
     }
   }
 
   allocationDialog(entity: any) {
     this.selectedElement = entity;
-    this.modalRef = this.modalService.open(this.allocateModal, { size: 'md', backdrop: 'static' });
+    this.modalRef = this.modalService.open(this.allocateModal, {
+      size: 'md',
+      backdrop: 'static',
+    });
     this.allocateTransactionInprogress = false;
     this.allocateAnswersheetForm.reset();
   }
-
 }

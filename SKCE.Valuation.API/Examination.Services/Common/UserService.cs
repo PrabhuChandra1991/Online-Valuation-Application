@@ -31,6 +31,12 @@ namespace SKCE.Examination.Services.Common
             .ToListAsync();
         }
 
+        public async Task<User?> GetUserOnlyByIdAsync(long id)
+        {
+            return await _context.Users 
+            .FirstOrDefaultAsync(u => u.UserId == id);
+        }
+
         public async Task<User?> GetUserByIdAsync(long id)
         {
             return await _context.Users

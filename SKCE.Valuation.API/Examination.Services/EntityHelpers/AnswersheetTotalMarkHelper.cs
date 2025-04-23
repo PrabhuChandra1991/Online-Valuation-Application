@@ -20,7 +20,7 @@ namespace SKCE.Examination.Services.EntityHelpers
             _dbContext = context;
         }
 
-        public async Task UpdateTotalMarks(long answersheetId, long loggedInUserId)
+        public async Task<decimal> UpdateTotalMarks(long answersheetId, long loggedInUserId)
         {
             var answersheet =
                 this._dbContext.Answersheets
@@ -61,10 +61,11 @@ namespace SKCE.Examination.Services.EntityHelpers
 
                 await this._dbContext.SaveChangesAsync();
 
+
+                return totalObtainedMarks;
             }
 
-
-
+            return 0;
         }
 
 

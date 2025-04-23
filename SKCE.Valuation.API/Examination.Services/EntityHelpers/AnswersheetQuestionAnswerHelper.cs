@@ -23,68 +23,69 @@ namespace SKCE.Examination.Services.EntityHelpers
 
         public async Task<List<AnswersheetQuestionAnswerDto>> GetQuestionAndAnswersByAnswersheetId(long answersheetId)
         {
-            var resultItems = new List<AnswersheetQuestionAnswerDto>();
+             
+                var resultItems = new List<AnswersheetQuestionAnswerDto>();
 
-            var answersheet = await _dbContext.Answersheets
-                .FirstOrDefaultAsync(x => x.AnswersheetId == answersheetId && x.IsActive);
+                var answersheet = await _dbContext.Answersheets
+                    .FirstOrDefaultAsync(x => x.AnswersheetId == answersheetId && x.IsActive);
 
-            if (answersheet == null)
-                return resultItems;
+                if (answersheet == null)
+                    return resultItems;
 
-            var selectedQP = await _dbContext.SelectedQPDetails
-                .Where(x =>
-                x.InstitutionId == answersheet.InstitutionId && x.CourseId == answersheet.CourseId
-                && x.RegulationYear == answersheet.RegulationYear && x.BatchYear == answersheet.BatchYear
-                && x.DegreeTypeId == answersheet.DegreeTypeId && x.ExamType == answersheet.ExamType
-                && x.Semester == answersheet.Semester && x.ExamMonth == answersheet.ExamMonth
-                && x.ExamYear == answersheet.ExamYear && x.IsActive).FirstOrDefaultAsync();
+                var selectedQP = await _dbContext.SelectedQPDetails
+                    .Where(x =>
+                    x.InstitutionId == answersheet.InstitutionId && x.CourseId == answersheet.CourseId
+                    && x.RegulationYear == answersheet.RegulationYear && x.BatchYear == answersheet.BatchYear
+                    && x.DegreeTypeId == answersheet.DegreeTypeId && x.ExamType == answersheet.ExamType
+                    && x.Semester == answersheet.Semester && x.ExamMonth == answersheet.ExamMonth
+                    && x.ExamYear == answersheet.ExamYear && x.IsActive).FirstOrDefaultAsync();
 
-            if (selectedQP == null)
-                return resultItems;
+                if (selectedQP == null)
+                    return resultItems;
 
-            var selectedQPMarks = await _dbContext.SelectedQPBookMarkDetails
-                .Where(x => x.SelectedQPDetailId == selectedQP.SelectedQPDetailId && x.IsActive).ToListAsync();
+                var selectedQPMarks = await _dbContext.SelectedQPBookMarkDetails
+                    .Where(x => x.SelectedQPDetailId == selectedQP.SelectedQPDetailId && x.IsActive).ToListAsync();
 
-            var degreeType = await _dbContext.DegreeTypes.FirstAsync(x => x.DegreeTypeId == selectedQP.DegreeTypeId);
+                var degreeType = await _dbContext.DegreeTypes.FirstAsync(x => x.DegreeTypeId == selectedQP.DegreeTypeId);
 
-            if (selectedQPMarks.Count != 0)
-            {
-                int questionNumber = 0;
-                while (questionNumber < 50)
+                if (selectedQPMarks.Count != 0)
                 {
-                    questionNumber++;
-
-                    string qnNoStr = questionNumber.ToString();
-                    string bkQuestionNo = "Q" + qnNoStr;
-                    string bkQuestionNo1 = "Q" + qnNoStr + "I";
-                    string bkQuestionNo2 = "Q" + qnNoStr + "II";
-
-                    var newItem = GetQuestionAnswerItem(selectedQPMarks, bkQuestionNo, questionNumber, 0, degreeType.Code);
-                    if (newItem != null)
+                    int questionNumber = 0;
+                    while (questionNumber < 50)
                     {
-                        resultItems.Add(newItem);
-                    }
+                        questionNumber++;
 
-                    var newItem1 = GetQuestionAnswerItem(selectedQPMarks, bkQuestionNo1, questionNumber, 1, degreeType.Code);
-                    if (newItem1 != null)
-                    {
-                        resultItems.Add(newItem1);
-                    }
+                        string qnNoStr = questionNumber.ToString();
+                        string bkQuestionNo = "Q" + qnNoStr;
+                        string bkQuestionNo1 = "Q" + qnNoStr + "I";
+                        string bkQuestionNo2 = "Q" + qnNoStr + "II";
 
-                    var newItem2 = GetQuestionAnswerItem(selectedQPMarks, bkQuestionNo2, questionNumber, 2, degreeType.Code);
-                    if (newItem1 != null)
-                        if (newItem2 != null)
+                        var newItem = GetQuestionAnswerItem(selectedQPMarks, bkQuestionNo, questionNumber, 0, degreeType.Code);
+                        if (newItem != null)
                         {
-                            resultItems.Add(newItem2);
+                            resultItems.Add(newItem);
                         }
 
-                }//While 
-            }//If
+                        var newItem1 = GetQuestionAnswerItem(selectedQPMarks, bkQuestionNo1, questionNumber, 1, degreeType.Code);
+                        if (newItem1 != null)
+                        {
+                            resultItems.Add(newItem1);
+                        }
+
+                        var newItem2 = GetQuestionAnswerItem(selectedQPMarks, bkQuestionNo2, questionNumber, 2, degreeType.Code);
+                        if (newItem1 != null)
+                            if (newItem2 != null)
+                            {
+                                resultItems.Add(newItem2);
+                            }
+
+                    }//While 
+                }//If
 
 
-            return resultItems;
+                return resultItems;
 
-
+                 
 
 
 

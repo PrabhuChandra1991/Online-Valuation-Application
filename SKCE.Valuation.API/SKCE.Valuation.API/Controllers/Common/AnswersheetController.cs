@@ -96,8 +96,8 @@ namespace SKCE.Examination.API.Controllers.Common
         {
             try
             {
-                var response = await _answersheetService.SaveAnswersheetMarkAsync(entity);
-                return Ok(new { Message = (response) ? "Success" : "Failed" });
+                var result = await _answersheetService.SaveAnswersheetMarkAsync(entity);
+                return Ok(new { Message = "Success", TotalMarksObtained = result });
             }
             catch (Exception ex)
             {

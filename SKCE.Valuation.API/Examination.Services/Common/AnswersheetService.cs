@@ -105,7 +105,7 @@ namespace SKCE.Examination.Services.Common
             return await helper.GetAnswersheetMarkAsync(answersheetId);
         }
 
-        public async Task<Boolean> SaveAnswersheetMarkAsync(AnswersheetQuestionwiseMark entity)
+        public async Task<decimal> SaveAnswersheetMarkAsync(AnswersheetQuestionwiseMark entity)
         {
             var helper = new AnswersheetMarkTransHelper(this._context);
             return await helper.SaveAnswersheetMarkAsync(entity);

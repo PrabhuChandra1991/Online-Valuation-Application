@@ -60,7 +60,7 @@ export class EvaluateComponent implements OnInit {
       if (this.primaryData.answersheetId) {
         this.getAnswersheetMark();
         this.getQuestionPaperAnswerKey(this.primaryData.answersheetId);
-        this.answersheet = `${this.primaryData.uploadedBlobStorageUrl}?${this.sasToken}`;
+        this.answersheet = `${this.primaryData.uploadedBlobStorageUrl}`; //?${this.sasToken}
         console.log(this.answersheet)
       }
     });

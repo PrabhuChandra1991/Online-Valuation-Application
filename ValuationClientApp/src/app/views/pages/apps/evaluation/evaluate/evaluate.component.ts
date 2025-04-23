@@ -298,12 +298,12 @@ export class EvaluateComponent implements OnInit {
     }
   }
 
-  evaluationCompleted() {
+  completeEvaluation() {
     if (this.obtainedMarks == 0) {
       this.toastr.warning('Obained Marks is 0. Please evaluate.');
     }
     else {
-      this.evaluationService.evaluationCompleted(this.primaryData.answersheetId, this.loggedinUserId).subscribe(
+      this.evaluationService.completeEvaluation(this.primaryData.answersheetId, this.loggedinUserId).subscribe(
         (data: any) => {
           console.log("respo", data)
           if (data.message.toLowerCase() == 'success') {

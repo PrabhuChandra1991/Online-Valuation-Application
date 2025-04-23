@@ -76,7 +76,7 @@ namespace SKCE.Examination.Services.EntityHelpers
             return true;
         }
 
-        public async Task<Boolean> EvaluationCompletedSync(long answersheetId, long evaluatedByUserId)
+        public async Task<Boolean> CompleteEvaluationSync(long answersheetId, long evaluatedByUserId)
         {
             var existingEntity = await _context.Answersheets.FirstOrDefaultAsync(e =>
                 e.AnswersheetId == answersheetId &&

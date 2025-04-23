@@ -1,7 +1,7 @@
 <div class="container-fluid">
 
     <div class="row">
-        <div class="col-md-2">
+        <div class="col-md-2 pt-1">
             <h4><a class="link-opacity-50-hover" (click)="backToList()">
                     <img src="https://cdn0.iconfinder.com/data/icons/social-messaging-ui-color-shapes/128/arrow-left-circle-blue-512.png"
                         height="28px" />&nbsp;&nbsp;Back to List</a></h4>
@@ -9,18 +9,18 @@
         <div class="col-md-8 p-2 text-center">
             <h5>
                 {{primaryData.institutionName}}&nbsp;&nbsp;<span class="text-secondary">|</span>&nbsp;&nbsp;
+                Course-{{primaryData.courseCode}}&nbsp;&nbsp;<span class="text-secondary">|</span>&nbsp;&nbsp;
                 Regulation-{{primaryData.regulationYear}}&nbsp;&nbsp;<span class="text-secondary">|</span>&nbsp;&nbsp;
                 Batch-{{primaryData.regulationYear}}&nbsp;&nbsp;<span class="text-secondary">|</span>&nbsp;&nbsp;
-                Exam Year(Month)-{{primaryData.examYear}}({{primaryData.examMonth}})&nbsp;&nbsp;<span
-                    class="text-secondary">|</span>&nbsp;&nbsp;
-                {{primaryData.courseCode}}&nbsp;&nbsp;<span class="text-secondary">|</span>&nbsp;&nbsp;
+                Exam-{{primaryData.examYear}}({{primaryData.examMonth}})&nbsp;&nbsp;<span
+                    class="text-secondary">|</span>&nbsp;&nbsp;                
                 {{primaryData.degreeTypeName}}&nbsp;&nbsp;<span class="text-secondary">|</span> &nbsp;&nbsp;
                 Semester-{{primaryData.semester}}&nbsp;&nbsp;<span class="text-secondary">|</span> &nbsp;&nbsp;
                 {{primaryData.examType}}
             </h5>
         </div>
         <div class="col-md-2">
-            <button class="btn btn-primary float-end me-1" (click)="evaluationCompleted()">Evaluation Completed</button>
+            <button class="btn btn-primary float-end me-1" (click)="completeEvaluation()">Complete Evaluation</button>
         </div>
     </div>
 

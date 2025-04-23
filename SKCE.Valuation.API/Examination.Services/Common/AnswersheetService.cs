@@ -70,7 +70,8 @@ namespace SKCE.Examination.Services.Common
                            ExamYear = answersheet.ExamYear,
                            DummyNumber = answersheet.DummyNumber,
                            UploadedBlobStorageUrl = answersheet.UploadedBlobStorageUrl,
-                           AllocatedUserName = (allocatedUserResult != null ? allocatedUserResult.Name : string.Empty)
+                           AllocatedUserName = (allocatedUserResult != null ? allocatedUserResult.Name : string.Empty),
+                           TotalObtainedMark = answersheet.TotalObtainedMark,
                        }).ToListAsync();
 
             return resultItems;

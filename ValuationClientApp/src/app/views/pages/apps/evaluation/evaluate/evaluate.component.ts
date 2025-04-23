@@ -27,11 +27,11 @@ export class EvaluateComponent implements OnInit {
   activeQuestion: string = '---------- Please select the question above to load here ----------';
   activeQuestionImg: string = '';
   activeAnswerKey: string = '---------- Answerkey loads here ----------';
-  activeAnswersheet: string = '---------- Answersheet loads here ----------';
+  answersheet: string = '---------- Answersheet loads here ----------';
   activeQuestionMark: string = '';
 
   answersheetMark: AnswersheetMark;
-  src = "https://vadimdez.github.io/ng2-pdf-viewer/assets/pdf-test.pdf";
+  //src = "https://vadimdez.github.io/ng2-pdf-viewer/assets/pdf-test.pdf";
   //src = 'https://iris.who.int/bitstream/handle/10665/137592/roadmapsitrep_7Nov2014_eng.pdf';
 
   constructor(
@@ -57,6 +57,7 @@ export class EvaluateComponent implements OnInit {
       if (this.primaryData.answersheetId) {
         this.getAnswersheetMark();
         this.getQuestionPaperAnswerKey(this.primaryData.answersheetId);
+        this.answersheet = this.primaryData.uploadedBlobStorageUrl;
       }
     });
 

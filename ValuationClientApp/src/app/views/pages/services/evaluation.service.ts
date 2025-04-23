@@ -34,8 +34,7 @@ export class EvaluationService {
 
   saveAnswersheetMark(answersheetMark: AnswersheetMark): Observable<any> {
     let url = `${this.apiUrl}/api/Answersheet/SaveAnswersheetMark/`;
-    var headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.post(url, JSON.stringify(answersheetMark), { headers });
+    return this.http.post(url, JSON.stringify(answersheetMark), this.httpOptions);
   }
 
 }

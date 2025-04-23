@@ -153,7 +153,7 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
       if (this.isAdmin) {
         // console.log('selected institute',this.selectedInstituteId);
 
-        this.loadTemplateaForInstitute(this.selectedInstituteId);
+        this.loadTemplateaForInstitute(0);
       } else this.loadAssignedTemplates();
     }
   }
@@ -309,7 +309,7 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
   }
 
   onInstituteChange(event: Event): void {
-    this.selectedInstituteId = (event.target as HTMLSelectElement).value;
+    this.selectedInstituteId = 0
     this.loadTemplateaForInstitute(this.selectedInstituteId);
   }
 

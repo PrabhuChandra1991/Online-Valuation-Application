@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SKCE.Examination.Models.DbModels.Common;
 using SKCE.Examination.Services.Common;
+using SKCE.Examination.Services.Helpers;
 using SKCE.Examination.Services.ViewModels.Common;
 using SKCE.Examination.Services.ViewModels.QPSettings;
 
@@ -27,7 +28,7 @@ namespace SKCE.Examination.API.Controllers.Common
 
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Answersheet>> GetAnswersheet(long id )
+        public async Task<ActionResult<Answersheet>> GetAnswersheet(long id)
         {
             var result = await _answersheetService.GetAnswersheetAsync(id);
             if (result == null)
@@ -135,5 +136,15 @@ namespace SKCE.Examination.API.Controllers.Common
             }
         }
 
+        [HttpGet("ExportMarks")]
+        public async Task<IActionResult> ExportMarks([FromQuery] long institutionId, [FromQuery] string examYear, [FromQuery] string examMonth, [FromQuery] string programType)
+        {
+            var stream = await _answersheetService.ExportMarksAsync(institutionId, examYear, examMonth, programType);
+            var institution = await _answersheetService.GetInstitutionByIdAsync(institutionId);
+            var fileName = $"MarksReport_{institution}_{examYear}_{examMonth}_{programType}.xlsx";
+            return File(stream.ToArray(),
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                fileName);
+        }
     }
 }

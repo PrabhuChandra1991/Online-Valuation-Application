@@ -1,6 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DocumentFormat.OpenXml.InkML;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SKCE.Examination.Models.DbModels.Common;
 using SKCE.Examination.Services.EntityHelpers;
+using SKCE.Examination.Services.Helpers;
 using SKCE.Examination.Services.ServiceContracts;
 using SKCE.Examination.Services.ViewModels.Common;
 using System;
@@ -135,7 +138,59 @@ namespace SKCE.Examination.Services.Common
                 }
             }
             return response;
-        }        
+        }
+        public Task<MemoryStream> ExportMarksAsync(long institutionId, string examYear, string examMonth,  string degreeType) 
+        {
+            //var data = (from e in _context.Examinations
+            //            join a in _context.Answersheets on e.ExaminationId equals a.ExaminationId
+            //            join qm in _context.AnswersheetQuestionwiseMarks on a.AnswersheetId equals qm.AnswersheetId
+            //            where e.InstitutionId == institutionId &&
+            //                  e.ExamYear == examYear &&
+            //                  e.ExamMonth == examMonth &&
+            //                  e.DegreeType == degreeType
+            //            group qm by new { a.DummyNumber, e.DegreeType } into g
+            //            select new
+            //            {
+            //                DummyNumber = g.Key.DummyNumber,
+            //                DegreeType = g.Key.DegreeType,
 
+            //                // Part A: Questions 1–10
+            //                PartA_Total = g.Where(x => x.Part == "A" && x.QuestionNumber >= 1 && x.QuestionNumber <= 10)
+            //                               .Sum(x => x.Marks),
+
+            //                // Part B
+            //                PartB_Total = g.Key.DegreeType == "UG"
+            //                    ? g.Where(x => x.Part == "B" && x.QuestionNumber >= 11 && x.QuestionNumber <= 20)
+            //                         .Sum(x => x.Marks)
+            //                    : g.Where(x => x.Part == "B" && x.QuestionNumber >= 11 && x.QuestionNumber <= 18)
+            //                         .Sum(x => x.Marks),
+
+            //                // Part C only for PG
+            //                PartC_Total = g.Key.DegreeType == "PG"
+            //                    ? g.Where(x => x.Part == "C" && x.QuestionNumber == 19).Sum(x => x.Marks)
+            //                    : 0,
+
+            //                GrandTotal = g.Sum(x => x.Marks),
+
+            //                // Include marks for each question
+            //                QuestionMarks = g.ToDictionary(
+            //                    x => x.SubPart != null
+            //                        ? $"{x.QuestionNumber}.{x.SubPart}"
+            //                        : x.QuestionNumber.ToString(),
+            //                    x => x.Marks
+            //                )
+            //            }).ToList();
+
+            //return ExcelExportHelper.GenerateExcel(data, degreeType);
+            return Task.FromResult(new MemoryStream());
+        }
+
+        public async Task<string?> GetInstitutionByIdAsync(long institutionId)
+        {
+            return await _context.Institutions
+                .Where(i => i.InstitutionId == institutionId)
+                .Select(i => i.Code)
+                .FirstOrDefaultAsync();
+        }
     }
 }

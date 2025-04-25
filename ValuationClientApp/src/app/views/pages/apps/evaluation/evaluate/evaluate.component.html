@@ -1,26 +1,27 @@
 <div class="container-fluid">
 
     <div class="row">
-        <div class="col-md-2 pt-1">
-            <h4><a class="link-opacity-50-hover" (click)="backToList()">
-                    <img src="https://cdn0.iconfinder.com/data/icons/social-messaging-ui-color-shapes/128/arrow-left-circle-blue-512.png"
-                        height="28px" />&nbsp;&nbsp;Back to List</a></h4>
+        <div class="col-md-2 back-btn">
+            <a class="link-opacity-50-hover" (click)="backToList()">
+                <img src="https://cdn0.iconfinder.com/data/icons/social-messaging-ui-color-shapes/128/arrow-left-circle-blue-512.png"
+                    height="24px" />&nbsp;&nbsp;Back to List</a>
         </div>
         <div class="col-md-8 p-2 text-center">
-            <h5>
-                {{primaryData.institutionName}}&nbsp;&nbsp;<span class="text-secondary">|</span>&nbsp;&nbsp;
+            <h5 *ngIf="primaryData">
+                <!-- {{primaryData.institutionName}}&nbsp;&nbsp;<span class="text-secondary">|</span>&nbsp;&nbsp; -->
                 Course-{{primaryData.courseCode}}&nbsp;&nbsp;<span class="text-secondary">|</span>&nbsp;&nbsp;
-                Regulation-{{primaryData.regulationYear}}&nbsp;&nbsp;<span class="text-secondary">|</span>&nbsp;&nbsp;
+                {{primaryData.courseName}}&nbsp;&nbsp;<span class="text-secondary">|</span>&nbsp;&nbsp;
+                <!-- Regulation-{{primaryData.regulationYear}}&nbsp;&nbsp;<span class="text-secondary">|</span>&nbsp;&nbsp;
                 Batch-{{primaryData.regulationYear}}&nbsp;&nbsp;<span class="text-secondary">|</span>&nbsp;&nbsp;
-                Exam-{{primaryData.examYear}}({{primaryData.examMonth}})&nbsp;&nbsp;<span
-                    class="text-secondary">|</span>&nbsp;&nbsp;                
+                Exam-{{primaryData.examYear}}({{primaryData.examMonth}})&nbsp;&nbsp;<span class="text-secondary">|</span>&nbsp;&nbsp; -->
                 {{primaryData.degreeTypeName}}&nbsp;&nbsp;<span class="text-secondary">|</span> &nbsp;&nbsp;
                 Semester-{{primaryData.semester}}&nbsp;&nbsp;<span class="text-secondary">|</span> &nbsp;&nbsp;
                 {{primaryData.examType}}
             </h5>
         </div>
-        <div class="col-md-2">
-            <button class="btn btn-primary float-end me-1" (click)="completeEvaluation()">Complete Evaluation</button>
+        <div class="col-md-2 d-grid">
+            <button class="btn btn-primary float-end me-1" (click)="promptBeforeCompletion()">Complete
+                Evaluation</button>
         </div>
     </div>
 
@@ -53,17 +54,29 @@
                             </td>
                         </tr>
                     </tbody>
+                    <tfoot>
+                        <tr>
+                            <td *ngFor="let item of partList" [attr.colspan]="item.count">
+                                Obtained Marks
+                            </td>
+                        </tr>
+                    </tfoot>
                 </table>
             </div>
         </div>
 
-        <div class="row mt-3 p-0 mb-2">
+        <div class="row mt-4 p-0 mb-2">
             <div class="col-md-6 mb-2">
-                Maximum Mark for selected question:&nbsp;&nbsp;{{activeQuestionMark}}
+                <h5>Maximum Mark for selected question:&nbsp;&nbsp;{{activeQuestionMark}}</h5>
             </div>
             <div class="col-md-6">
+                <!-- <h4>Total marks obtained:&nbsp;&nbsp;
+                    <span class="{{ (obtainedMarks < 40) ? 'text-danger' : (obtainedMarks < 45) ? 'text-warning' : 'text-success' }}">
+                        {{obtainedMarks}}&nbsp;/&nbsp;{{totalMarks}}
+                    </span>
+                </h4> -->
                 <h4
-                    [ngClass]="(obtainedMarks > totalMarks) ? 'text-danger' : (obtainedMarks == totalMarks) ? 'text-success' : ''">
+                    [ngClass]="(obtainedMarks < 40) ? 'text-danger' : (obtainedMarks < 45) ? 'text-warning' : 'text-success'">
                     Total marks obtained:&nbsp;&nbsp;{{obtainedMarks}}&nbsp;/&nbsp;{{totalMarks}}</h4>
             </div>
         </div>
@@ -96,3 +109,18 @@
     </div>
 
 </div>
+
+<!-- Confirmation Modal -->
+<ng-template #confirmModule let-modal>
+    <div class="modal-body">
+        <div class="row mb-4">
+            <div class="col-md-12 mt-4">
+                <h3>Do you want to complete evaluation?</h3>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-danger px-4" (click)="modal.close('by: no button')">No</button>
+        <button type="button" class="btn btn-primary px-4" (click)="completeEvaluation()">Yes</button>
+    </div>
+</ng-template>

@@ -1,3 +1,15 @@
+.back-btn {
+    padding-top: 0.3rem;
+
+    a {
+        font-size: 1.2rem;
+    }
+    img {
+        margin-top: -2px;
+    }
+}
+
+
 table {
     border-color: #c7c7c7;
 }
@@ -7,6 +19,9 @@ table thead td {
 table td {
     padding: 0;    
     width: 3rem;
+}
+table tfoot td {
+    padding: 0.5rem 0;
 }
 table td label {
     padding-top: 1.75rem;

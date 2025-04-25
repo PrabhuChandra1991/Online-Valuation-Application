@@ -20,8 +20,8 @@ export class EvaluationService {
 
   constructor(private http: HttpClient) { }
 
-  getAnswerSheetDetails(userId: number): Observable<any> {
-    return this.http.get(`${this.apiUrl}/api/Answersheet/GetAnswersheetDetails?allocatedToUserId=${userId}`);
+  getAnswerSheetDetails(userId: number, answersheetId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/api/Answersheet/GetAnswersheetDetails?allocatedToUserId=${(userId != 0) ? userId : ''}&answersheetId=${(answersheetId != 0) ? answersheetId : ''}`);
   }
 
   getQuestionAndAnswer(answersheetId: number): Observable<any> {

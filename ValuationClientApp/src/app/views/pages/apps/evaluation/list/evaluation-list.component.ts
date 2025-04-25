@@ -25,7 +25,7 @@ import { encode } from 'js-base64';
 
 export class EvaluationListComponent implements OnInit {
   answerSheetList: any[] = [];
-  displayedColumns: string[] = ['institutionName', 'courseCode', 'courseName', 'regulationYear', 'batchYear', 'examYear', 'examMonth', 'degreeTypeName','semester', 'examType', 'totalObtainedMark', 'actions'];
+  displayedColumns: string[] = ['courseCode', 'courseName', 'degreeTypeName','semester', 'examType', 'totalObtainedMark', 'actions'];
   dataSource = new MatTableDataSource<any>([]);
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -48,7 +48,7 @@ export class EvaluationListComponent implements OnInit {
   }
 
   loadPrimaryDetails(userId: number) {
-    this.evaluationService.getAnswerSheetDetails(userId).subscribe(
+    this.evaluationService.getAnswerSheetDetails(userId, 0).subscribe(
       (data: any[]) => {
         console.log('API Data:', data);
         this.answerSheetList = data;
@@ -63,14 +63,18 @@ export class EvaluationListComponent implements OnInit {
     );
   }
 
+  beautifyMark() {
+    
+  }
+
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
   evaluate(answerSheetId: number) {
-    let primaryData = this.answerSheetList.filter(x => x.answersheetId == answerSheetId)[0];
-    this.router.navigate(['/apps/evaluate', encode(JSON.stringify(primaryData))]);
+    //let primaryData = this.answerSheetList.filter(x => x.answersheetId == answerSheetId)[0];
+    this.router.navigate(['/apps/evaluate', encode(String(answerSheetId))]);
   }
 
 }

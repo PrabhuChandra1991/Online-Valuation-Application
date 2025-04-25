@@ -1,5 +1,6 @@
 import { NgClass, NgFor } from '@angular/common';
-import { OnInit, Component } from '@angular/core';
+import { NgbModalRef, NgbModal  } from '@ng-bootstrap/ng-bootstrap';
+import { OnInit, Component, ViewChild  } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PdfViewerModule } from 'ng2-pdf-viewer';
 import { ToastrService } from 'ngx-toastr';
@@ -17,7 +18,9 @@ import { Router } from '@angular/router';
 })
 
 export class EvaluateComponent implements OnInit {
+  modalRef: NgbModalRef;
   loggedinUserId: number = 0;
+  answersheetId: number = 0;
   primaryData: any;
   answersheetMarkData: any[] = [];
   qaList: any[] = [];
@@ -33,39 +36,65 @@ export class EvaluateComponent implements OnInit {
   sasToken: string = "sp=r&st=2025-04-23T08:48:04Z&se=2025-04-23T16:48:04Z&sv=2024-11-04&sr=c&sig=M%2F90Dwk7LJjwQPE%2FTsYmGnIKl1gpgk%2Fvtbp63LNU5qs%3D"
   answersheetMark: AnswersheetMark;
 
+    @ViewChild('confirmModule') confirmModule: any;
+
   constructor(
+    private modalService: NgbModal,
     private route: ActivatedRoute,
     private toastr: ToastrService,
     private evaluationService: EvaluationService,
     private router: Router
   ) { }
 
-  ngOnInit(): void {
+  ngOnInit() {
     console.log("ngOnInit.................");
 
     const loggedInUser = localStorage.getItem('userData');
     if (loggedInUser) {
       const userData = JSON.parse(loggedInUser);
       this.loggedinUserId = userData.userId;
+      console.log("loggedin user id: ", this.loggedinUserId)
     }
-    console.log("Loggedin user ID: ", this.loggedinUserId)
 
-    this.route.paramMap.subscribe(params => {
-      let encodedPrimaryData = params.get('data') || "";
-      this.primaryData = JSON.parse(decode(encodedPrimaryData));
-      console.log("primaryData: ", this.primaryData)
-      if (this.primaryData.answersheetId) {
-        this.getAnswersheetMark();
-        this.getQuestionPaperAnswerKey(this.primaryData.answersheetId);
-        this.answersheet = `${this.primaryData.uploadedBlobStorageUrl}`; //?${this.sasToken}
-        this.obtainedMarks = this.primaryData.totalObtainedMark;
+    this.route.paramMap.subscribe(async params => {
+      let encodedId = params.get('id') || "";
+      if (encodedId) {
+        this.answersheetId = JSON.parse(decode(encodedId));
+        console.log("answersheet id: ", this.answersheetId)
+        if (this.answersheetId) {
+          await this.getPrimaryData();
+          await this.getAnswersheetMark();
+          await this.getQuestionPaperAnswerKey();
+        }
       }
     });
 
   }
 
-  getAnswersheetMark() {
-    this.evaluationService.getAnswersheetMark(this.primaryData.answersheetId).subscribe(
+  async getPrimaryData() {
+    //console.log('loading primary data............');
+    await this.evaluationService.getAnswerSheetDetails(0, this.answersheetId).subscribe(
+      (data: any) => {
+        if (data[0]) {
+          console.log("primary data: ", data[0])
+          this.primaryData = data[0];
+          this.answersheet = `${this.primaryData.uploadedBlobStorageUrl}`; //?${this.sasToken}
+          this.obtainedMarks = this.primaryData.totalObtainedMark;
+        }
+        else {
+          console.log('No answersheet data');
+        }
+      },
+      (error) => {
+        console.error('Error getting answersheet data:', error);
+        this.toastr.error('Failed to get answersheet data.');
+      }
+    )
+  }
+
+  async getAnswersheetMark() {
+    //console.log('loading saved mark data............');
+    await this.evaluationService.getAnswersheetMark(this.answersheetId).subscribe(
       (data: any) => {
         if (data.length > 0) {
           console.log("saved mark data: ", data)
@@ -82,9 +111,9 @@ export class EvaluateComponent implements OnInit {
     )
   }
 
-  getQuestionPaperAnswerKey(answerSheetId: number) {
-    console.log('loading question and answer............');
-    this.evaluationService.getQuestionAndAnswer(answerSheetId).subscribe(
+  async getQuestionPaperAnswerKey() {
+    //console.log('loading question and answer............');
+    await this.evaluationService.getQuestionAndAnswer(this.answersheetId).subscribe(
       (data: any[]) => {
         if (data.length > 0) {
 
@@ -106,7 +135,7 @@ export class EvaluateComponent implements OnInit {
           console.log("qaList: ", this.qaList);
 
           this.getPartList(data);
-          this.getGroupList(data);
+          //this.getGroupList(data);
 
           //this.obtainedMarks = this.qaList.reduce((sum, item) => sum + (item.obtainedMark || 0), 0);
           this.reduceChoiceQuestionMarks();
@@ -122,6 +151,29 @@ export class EvaluateComponent implements OnInit {
       }
     );
   }
+
+  getPartList(data: any[]) {
+    //console.log("getPartList...............");
+    const partMap = new Map();
+    data.forEach(({ questionPartName }) => {
+      partMap.set(questionPartName, (partMap.get(questionPartName) || 0) + 1);
+    });
+    this.partList = Array.from(partMap, ([part, count]) => ({ part, count }));
+    console.log("partList:", this.partList);
+  }
+
+  // getGroupList(data: any[]) {
+  //   //console.log("getGroupList...............");
+  //   const groupMap = new Map();
+  //   data.forEach(({ questionGroupName }) => {
+  //     groupMap.set(questionGroupName, (groupMap.get(questionGroupName) || 0) + 1);
+  //   });
+    
+  //   console.log(groupMap);
+  //   this.groupList = Array.from(groupMap, ([group, count]) => ({ group, count }));
+  //     //.filter(({ count }) => count > 1);
+  //   console.log("groupList:", this.groupList);
+  // }
 
   savedMarks(questionNumber: number, questionSubNum: number) {
     let questionRow = this.answersheetMarkData.filter(x => x.questionNumber == questionNumber && x.questionNumberSubNum == questionSubNum)[0];
@@ -169,27 +221,6 @@ export class EvaluateComponent implements OnInit {
         }
       }
     });
-  }
-
-  getPartList(data: any[]) {
-    console.log("getPartList...............");
-    const partMap = new Map();
-    data.forEach(({ questionPartName }) => {
-      partMap.set(questionPartName, (partMap.get(questionPartName) || 0) + 1);
-    });
-    this.partList = Array.from(partMap, ([part, count]) => ({ part, count }));
-    console.log("partList:", this.partList);
-  }
-
-  getGroupList(data: any[]) {
-    console.log("getGroupList...............");
-    const groupMap = new Map();
-    data.forEach(({ questionGroupName }) => {
-      groupMap.set(questionGroupName, (groupMap.get(questionGroupName) || 0) + 1);
-    });
-    this.groupList = Array.from(groupMap, ([group, count]) => ({ group, count }))
-      .filter(({ count }) => count > 1);
-    console.log("groupList:", this.groupList);
   }
 
   loadQuestionDetails(event: any, id: number, qusetionNo: string) {
@@ -242,7 +273,7 @@ export class EvaluateComponent implements OnInit {
       }
       else {
         this.saveMark(item, parseFloat(event.target.value));
-      }    
+      }
 
       // this.obtainedMarks = 0;
       // let txtList = document.querySelectorAll(".question .form-control") as NodeListOf<HTMLInputElement>;
@@ -254,7 +285,7 @@ export class EvaluateComponent implements OnInit {
 
     }
   }
-  
+
   saveMark(item: any, obtainedMark: number) {
     this.answersheetMark = {
       "createdById": this.loggedinUserId,
@@ -285,29 +316,38 @@ export class EvaluateComponent implements OnInit {
     )
   }
 
-  completeEvaluation() {
-    if (this.obtainedMarks == 0) {
-      this.toastr.warning('Obained Marks is 0. Please evaluate.');
+  promptBeforeCompletion() {
+      this.modalRef = this.modalService.open(this.confirmModule, { size: 'md', backdrop: 'static' });
     }
-    else {
-      this.evaluationService.completeEvaluation(this.primaryData.answersheetId, this.loggedinUserId).subscribe(
-        (data: any) => {
-          console.log("respo", data)
-          if (data.message.toLowerCase() == 'success') {
-            this.toastr.success("Evaluation completed successfully");
-            this.backToList();
-          }
-          else {
-            console.error('Failed to complete evaluation');
-            this.toastr.error('Failed to complete evaluation.');
-          }
-        },
-        (error) => {
-          console.error('Error while saving evaluation:', error);
-          this.toastr.error('Failed to complete evaluation.');
-        }
-      ) 
-    }       
+
+  completeEvaluation() {
+    // if (confirm("Are you sure you want to complete evaluation? \nYou cannot re-evaluate once submitted.")) {
+    //   if (this.obtainedMarks == 0) {
+    //     this.toastr.warning('Obained Marks is 0. Please evaluate.');
+    //   }
+    //   else {
+    //     this.evaluationService.completeEvaluation(this.primaryData.answersheetId, this.loggedinUserId).subscribe(
+    //       (data: any) => {
+    //         console.log("respo", data)
+    //         if (data.message.toLowerCase() == 'success') {
+    //           this.toastr.success("Evaluation completed successfully");
+    //           this.backToList();
+    //         }
+    //         else {
+    //           console.error('Failed to complete evaluation');
+    //           this.toastr.error('Failed to complete evaluation.');
+    //         }
+    //       },
+    //       (error) => {
+    //         console.error('Error while saving evaluation:', error);
+    //         this.toastr.error('Failed to complete evaluation.');
+    //       }
+    //     )
+    //   }
+    // } else {
+    //   // User clicked Cancel or closed the dialog
+    //   // Handle cancellation
+    // }    
   }
 
   backToList() {

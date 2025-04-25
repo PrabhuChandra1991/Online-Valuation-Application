@@ -36,7 +36,7 @@ namespace SKCE.Examination.Services.Common
         }
 
         public async Task<IEnumerable<AnswerManagementDto>> GetAnswersheetDetailsAsync(
-            long? institutionId = null, long? courseId = null, long? allocatedToUserId = null)
+            long? institutionId = null, long? courseId = null, long? allocatedToUserId = null, long? answersheetId = null)
         {
             var resultItems =
                 await (from answersheet in _context.Answersheets
@@ -52,6 +52,7 @@ namespace SKCE.Examination.Services.Common
                        && (answersheet.InstitutionId == institutionId || institutionId == null)
                        && (answersheet.CourseId == courseId || courseId == null)
                        && (answersheet.AllocatedToUserId == allocatedToUserId || allocatedToUserId == null)
+                       && (answersheet.AnswersheetId == answersheetId || answersheetId == null)
 
                        select new AnswerManagementDto
                        {

@@ -37,9 +37,9 @@ namespace SKCE.Examination.API.Controllers.Common
 
         [HttpGet("GetAnswersheetDetails")]
         public async Task<ActionResult<IEnumerable<AnswerManagementDto>>> GetAnswersheetDetails(
-            [FromQuery] long? institutionId, [FromQuery] long? courseId, [FromQuery] long? allocatedToUserId)
+            [FromQuery] long? institutionId, [FromQuery] long? courseId, [FromQuery] long? allocatedToUserId, [FromQuery] long? answersheetId)
         {
-            var result = await _answersheetService.GetAnswersheetDetailsAsync(institutionId, courseId, allocatedToUserId);
+            var result = await _answersheetService.GetAnswersheetDetailsAsync(institutionId, courseId, allocatedToUserId, answersheetId);
             return Ok(result);
         }
 

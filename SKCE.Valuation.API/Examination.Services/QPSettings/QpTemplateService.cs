@@ -148,7 +148,7 @@ namespace SKCE.Examination.Services.QPSettings
             var pdfFileName = qPTemplate.CourseCode + ".pdf";
             var docFileName = qPTemplate.CourseCode + ".docx";
 
-            var documentId = _context.courseSyllabusMasters.FirstOrDefault()?.DocumentId;
+            var documentId = _context.CourseSyllabusMasters.FirstOrDefault()?.DocumentId;
             var syllabusDocumentMaster = _context.Documents.FirstOrDefault(d => d.DocumentId == documentId);
 
             // 🔹 Step 1: Download Excel from Azure Blob Storage

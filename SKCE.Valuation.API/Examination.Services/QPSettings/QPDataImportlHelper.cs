@@ -246,7 +246,7 @@ public class QPDataImportHelper
     {
         var documentMissingCourses = "Syllabus documents are missing for total ";
         var courses = _dbContext.Courses.ToList();
-        var courseSyllabusMasters = _dbContext.courseSyllabusMasters.ToList();
+        var courseSyllabusMasters = _dbContext.CourseSyllabusMasters.ToList();
         List<string> missingCourses = new List<string>();
         files.ForEach(file =>
         {
@@ -258,11 +258,11 @@ public class QPDataImportHelper
                     DocumentId = documentId.Result,
                 };
                 AuditHelper.SetAuditPropertiesForInsert(courseSyllabusMaster, 1);
-                _dbContext.courseSyllabusMasters.AddAsync(courseSyllabusMaster);
+                _dbContext.CourseSyllabusMasters.AddAsync(courseSyllabusMaster);
             }
             else
             {
-                var existingCourseSyllabusDocument = _dbContext.courseSyllabusMasters.FirstOrDefault();
+                var existingCourseSyllabusDocument = _dbContext.CourseSyllabusMasters.FirstOrDefault();
                 if (existingCourseSyllabusDocument != null)
                 {
                     existingCourseSyllabusDocument.DocumentId = documentId.Result;

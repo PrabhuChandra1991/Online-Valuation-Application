@@ -27,20 +27,13 @@ namespace SKCE.Examination.Services.EntityHelpers
             if (examination == null)
                 return false;
 
-            var UnallocatedAnswersheets =
+            var unallocatedAnswersheets =
                 await this._dbContext.Answersheets
-                            .Where(x => x.InstitutionId == examination.InstitutionId && x.IsActive
-                                        && x.CourseId == examination.CourseId
-                                        && x.BatchYear == examination.BatchYear
-                                        && x.RegulationYear == examination.RegulationYear
-                                        && x.Semester == examination.Semester
-                                        && x.DegreeTypeId == examination.DegreeTypeId
-                                        && x.ExamType == examination.ExamType
-                                        && x.ExamMonth == examination.ExamMonth
-                                        && x.ExamYear == examination.ExamYear
-                                        && x.AllocatedToUserId == null).ToListAsync();
+                            .Where(x => x.IsActive 
+                            && x.ExaminationId == examination.ExaminationId 
+                            && x.AllocatedToUserId == null).ToListAsync();
 
-            if (UnallocatedAnswersheets.Count < inputModel.Noofsheets)
+            if (unallocatedAnswersheets.Count < inputModel.Noofsheets)
             {
                 return false;
             }
@@ -49,7 +42,7 @@ namespace SKCE.Examination.Services.EntityHelpers
 
             Random random = new Random();
 
-            foreach ( var item in UnallocatedAnswersheets)
+            foreach ( var item in unallocatedAnswersheets)
             {
                 answersheetWithRandom.Add(
                     new AnswersheetRandomNo

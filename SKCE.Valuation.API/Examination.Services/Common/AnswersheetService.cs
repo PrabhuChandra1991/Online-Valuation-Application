@@ -43,35 +43,36 @@ namespace SKCE.Examination.Services.Common
         {
             var resultItems =
                 await (from answersheet in _context.Answersheets
-                       join institute in _context.Institutions on answersheet.InstitutionId equals institute.InstitutionId
-                       join course in _context.Courses on answersheet.CourseId equals course.CourseId
-                       join dtype in _context.DegreeTypes on answersheet.DegreeTypeId equals dtype.DegreeTypeId
+                       join examination in this._context.Examinations on answersheet.ExaminationId equals examination.ExaminationId
+                       join institute in _context.Institutions on examination.InstitutionId equals institute.InstitutionId
+                       join course in _context.Courses on examination.CourseId equals course.CourseId
+                       join dtype in _context.DegreeTypes on examination.DegreeTypeId equals dtype.DegreeTypeId
 
                        join allocatedUser in this._context.Users on answersheet.AllocatedToUserId equals allocatedUser.UserId into allocatedUserResults
                        from allocatedUserResult in allocatedUserResults.DefaultIfEmpty()
 
                        where
                        answersheet.IsActive == true
-                       && (answersheet.InstitutionId == institutionId || institutionId == null)
-                       && (answersheet.CourseId == courseId || courseId == null)
+                       && (examination.InstitutionId == institutionId || institutionId == null)
+                       && (examination.CourseId == courseId || courseId == null)
                        && (answersheet.AllocatedToUserId == allocatedToUserId || allocatedToUserId == null)
                        && (answersheet.AnswersheetId == answersheetId || answersheetId == null)
 
                        select new AnswerManagementDto
                        {
                            AnswersheetId = answersheet.AnswersheetId,
-                           InstitutionId = answersheet.InstitutionId,
+                           InstitutionId = examination.InstitutionId,
                            InstitutionName = institute.Name,
-                           RegulationYear = answersheet.RegulationYear,
-                           BatchYear = answersheet.BatchYear,
+                           RegulationYear = examination.RegulationYear,
+                           BatchYear = examination.BatchYear,
                            DegreeTypeName = dtype.Name,
-                           ExamType = answersheet.ExamType,
-                           Semester = answersheet.Semester,
-                           CourseId = answersheet.CourseId,
+                           ExamType = examination.ExamType,
+                           Semester = (int)examination.Semester,
+                           CourseId = examination.CourseId,
                            CourseCode = course.Code,
                            CourseName = course.Name,
-                           ExamMonth = answersheet.ExamMonth,
-                           ExamYear = answersheet.ExamYear,
+                           ExamMonth = examination.ExamMonth,
+                           ExamYear = examination.ExamYear,
                            DummyNumber = answersheet.DummyNumber,
                            UploadedBlobStorageUrl = answersheet.UploadedBlobStorageUrl,
                            AllocatedUserName = (allocatedUserResult != null ? allocatedUserResult.Name : string.Empty),

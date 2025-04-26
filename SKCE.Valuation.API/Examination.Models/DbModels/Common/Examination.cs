@@ -27,7 +27,7 @@ namespace SKCE.Examination.Models.DbModels.Common
         public required long StudentCount { get; set; }
         public bool IsQPPrinted { get; set; }
         public long? QPPrintedById { get; set; }
-        public DateTime? QPPrintedDate { get; set; }
-
+        public DateTime? QPPrintedDate { get; set; }        
+        public virtual ICollection<Answersheet> Answersheets { get; set; } = new List<Answersheet>();
     }
 }

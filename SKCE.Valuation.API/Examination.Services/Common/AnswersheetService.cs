@@ -1,4 +1,6 @@
 ﻿using DocumentFormat.OpenXml.InkML;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SKCE.Examination.Models.DbModels.Common;
@@ -141,50 +143,100 @@ namespace SKCE.Examination.Services.Common
             }
             return response;
         }
-        public Task<MemoryStream> ExportMarksAsync(long institutionId, string examYear, string examMonth,  string degreeType) 
+        public async Task<MemoryStream> ExportMarksAsync(long institutionId, string examYear, string examMonth, string degreeType)
         {
-            //var data = (from e in _context.Examinations
-            //            join a in _context.Answersheets on e.ExaminationId equals a.ExaminationId
-            //            join qm in _context.AnswersheetQuestionwiseMarks on a.AnswersheetId equals qm.AnswersheetId
-            //            where e.InstitutionId == institutionId &&
-            //                  e.ExamYear == examYear &&
-            //                  e.ExamMonth == examMonth &&
-            //                  e.DegreeType == degreeType
-            //            group qm by new { a.DummyNumber, e.DegreeType } into g
-            //            select new
-            //            {
-            //                DummyNumber = g.Key.DummyNumber,
-            //                DegreeType = g.Key.DegreeType,
+            var degreeTypeId = _context.DegreeTypes
+                .Where(x => x.Name == degreeType)
+                .Select(x => x.DegreeTypeId)
+                .FirstOrDefault();
+            var groupedData = (from e in _context.Examinations
+                               join a in _context.Answersheets on e.ExaminationId equals a.ExaminationId
+                               join qm in _context.AnswersheetQuestionwiseMarks on a.AnswersheetId equals qm.AnswersheetId
+                               join dg in _context.DegreeTypes on e.DegreeTypeId equals dg.DegreeTypeId
+                               where a.IsActive == true &&
+                                     a.IsEvaluateCompleted == true &&
+                                     e.InstitutionId == institutionId &&
+                                     e.ExamYear == examYear &&
+                                     e.ExamMonth == examMonth &&
+                                     e.DegreeTypeId == degreeTypeId
+                               group qm by new { a.DummyNumber } into g
+                               select new
+                               {
+                                   DummyNumber = g.Key.DummyNumber,
 
-            //                // Part A: Questions 1–10
-            //                PartA_Total = g.Where(x => x.Part == "A" && x.QuestionNumber >= 1 && x.QuestionNumber <= 10)
-            //                               .Sum(x => x.Marks),
+                                   // Part A: Questions 1–10
+                                   PartA_Total = g.Where(x => x.QuestionPartName == "A" && x.QuestionNumber >= 1 && x.QuestionNumber <= 10)
+                                                  .Sum(x => x.ObtainedMark),
 
-            //                // Part B
-            //                PartB_Total = g.Key.DegreeType == "UG"
-            //                    ? g.Where(x => x.Part == "B" && x.QuestionNumber >= 11 && x.QuestionNumber <= 20)
-            //                         .Sum(x => x.Marks)
-            //                    : g.Where(x => x.Part == "B" && x.QuestionNumber >= 11 && x.QuestionNumber <= 18)
-            //                         .Sum(x => x.Marks),
+                                   // Part B
+                                   PartB_Total = degreeType == "UG"
+                                       ? g.Where(x => x.QuestionPartName == "B" && x.QuestionNumber >= 11 && x.QuestionNumber <= 20)
+                                            .Sum(x => x.ObtainedMark)
+                                       : g.Where(x => x.QuestionPartName == "B" && x.QuestionNumber >= 11 && x.QuestionNumber <= 18)
+                                            .Sum(x => x.ObtainedMark),
 
-            //                // Part C only for PG
-            //                PartC_Total = g.Key.DegreeType == "PG"
-            //                    ? g.Where(x => x.Part == "C" && x.QuestionNumber == 19).Sum(x => x.Marks)
-            //                    : 0,
+                                   // Part C only for PG
+                                   PartC_Total = degreeType == "PG"
+                                       ? g.Where(x => x.QuestionPartName == "C" && x.QuestionNumber == 19).Sum(x => x.ObtainedMark)
+                                       : 0,
 
-            //                GrandTotal = g.Sum(x => x.Marks),
+                                   GrandTotal = g.Sum(x => x.ObtainedMark),
 
-            //                // Include marks for each question
-            //                QuestionMarks = g.ToDictionary(
-            //                    x => x.SubPart != null
-            //                        ? $"{x.QuestionNumber}.{x.SubPart}"
-            //                        : x.QuestionNumber.ToString(),
-            //                    x => x.Marks
-            //                )
-            //            }).ToList();
+                                   // Include marks for each question
+                                   QuestionMarks = g.ToDictionary(
+                                       x => x.QuestionNumberSubNum != null
+                                           ? $"{x.QuestionNumber}.{x.QuestionNumberSubNum}"
+                                           : x.QuestionNumber.ToString(),
+                                       x => x.ObtainedMark
+                                   )
+                               }).ToList();
 
-            //return ExcelExportHelper.GenerateExcel(data, degreeType);
-            return Task.FromResult(new MemoryStream());
+            string templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Templates",
+                degreeType == "PG" ? "Export_Format_PG.xlsx" : "Export_Format_UG.xlsx");
+
+            using var fileStream = new FileStream(templatePath, FileMode.Open, FileAccess.Read);
+            var memoryStream = new MemoryStream();
+            fileStream.CopyTo(memoryStream);
+            memoryStream.Position = 0;
+
+            using (var document = SpreadsheetDocument.Open(memoryStream, true))
+            {
+                var workbookPart = document.WorkbookPart;
+                var worksheetPart = workbookPart.WorksheetParts.First();
+                var sheetData = worksheetPart.Worksheet.GetFirstChild<SheetData>();
+
+                int startRow = 2; // Assuming header is in Row 1
+
+                foreach (var item in groupedData)
+                {
+                    var row = new Row();
+                    row.Append(CreateStringCell(item.DummyNumber.ToString()));
+
+                    int totalQuestions = 20;
+                    for (int i = 1; i <= totalQuestions; i++)
+                    {
+                        if (item.QuestionMarks is Dictionary<string, decimal> questionMarks)
+                        {
+                            questionMarks.TryGetValue(i.ToString(), out decimal mark);
+                            row.Append(CreateCell(mark));
+                        }
+                    }
+
+                    row.Append(CreateCell(item.PartA_Total));
+                    row.Append(CreateCell(item.PartB_Total));
+                    if (degreeType == "PG")
+                        row.Append(CreateCell(item.PartC_Total));
+
+                    row.Append(CreateCell(item.GrandTotal));
+                    sheetData.Append(row);
+                }
+
+                worksheetPart.Worksheet.Save();
+                workbookPart.Workbook.Save();
+            }
+
+            memoryStream.Position = 0;
+            return await Task.FromResult(memoryStream);
         }
 
         public async Task<string?> GetInstitutionByIdAsync(long institutionId)
@@ -193,6 +245,22 @@ namespace SKCE.Examination.Services.Common
                 .Where(i => i.InstitutionId == institutionId)
                 .Select(i => i.Code)
                 .FirstOrDefaultAsync();
+        }
+        private static Cell CreateStringCell(string value)
+        {
+            return new Cell
+            {
+                DataType = CellValues.String,
+                CellValue = new CellValue(value)
+            };
+        }
+        private static Cell CreateCell(decimal value)
+        {
+            return new Cell
+            {
+                DataType = CellValues.Number,
+                CellValue = new CellValue(value)
+            };
         }
     }
 }

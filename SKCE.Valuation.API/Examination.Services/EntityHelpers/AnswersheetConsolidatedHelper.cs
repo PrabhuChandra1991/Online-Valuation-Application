@@ -15,7 +15,8 @@ namespace SKCE.Examination.Services.EntityHelpers
 
         public async Task<List<AnswersheetConsolidatedDto>> GetConsolidatedItems(long institutionId)
         {
-            var resultItems = await (from exam in _dbContext.Examinations
+            var resultItems = await (from asheet in _dbContext.Answersheets
+                                     join exam in _dbContext.Examinations on asheet.ExaminationId equals exam.ExaminationId
                                      join institution in _dbContext.Institutions on exam.InstitutionId equals institution.InstitutionId
                                      join course in _dbContext.Courses on exam.CourseId equals course.CourseId
                                      join dept in _dbContext.Departments on exam.DepartmentId equals dept.DepartmentId

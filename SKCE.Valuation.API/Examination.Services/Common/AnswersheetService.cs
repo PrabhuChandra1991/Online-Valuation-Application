@@ -149,49 +149,57 @@ namespace SKCE.Examination.Services.Common
                 .Where(x => x.Name == degreeType)
                 .Select(x => x.DegreeTypeId)
                 .FirstOrDefault();
-            var groupedData = (from e in _context.Examinations
-                               join a in _context.Answersheets on e.ExaminationId equals a.ExaminationId
-                               join qm in _context.AnswersheetQuestionwiseMarks on a.AnswersheetId equals qm.AnswersheetId
-                               join dg in _context.DegreeTypes on e.DegreeTypeId equals dg.DegreeTypeId
-                               where a.IsActive == true &&
-                                     a.IsEvaluateCompleted == true &&
-                                     e.InstitutionId == institutionId &&
-                                     e.ExamYear == examYear &&
-                                     e.ExamMonth == examMonth &&
-                                     e.DegreeTypeId == degreeTypeId
-                               group qm by new { a.DummyNumber } into g
-                               select new
-                               {
-                                   DummyNumber = g.Key.DummyNumber,
+            var query = (from e in _context.Examinations
+                         join a in _context.Answersheets on e.ExaminationId equals a.ExaminationId
+                         join qm in _context.AnswersheetQuestionwiseMarks on a.AnswersheetId equals qm.AnswersheetId
+                         join dg in _context.DegreeTypes on e.DegreeTypeId equals dg.DegreeTypeId
+                         where a.IsActive == true &&
+                               a.IsEvaluateCompleted == true &&
+                               e.InstitutionId == institutionId &&
+                               e.ExamYear == examYear &&
+                               e.ExamMonth == examMonth &&
+                               e.DegreeTypeId == degreeTypeId
+                         select new
+                         {
+                             DummyNumber = a.DummyNumber,
+                             qm.QuestionPartName,
+                             qm.QuestionNumber,
+                             qm.QuestionNumberSubNum,
+                             qm.ObtainedMark,
+                             DegreeTypeName = dg.Name
+                         }).ToList();
 
-                                   // Part A: Questions 1–10
-                                   PartA_Total = g.Where(x => x.QuestionPartName == "A" && x.QuestionNumber >= 1 && x.QuestionNumber <= 10)
-                                                  .Sum(x => x.ObtainedMark),
+            var groupedData = query
+                .GroupBy(x => x.DummyNumber)
+                .Select(g => new
+                {
+                    DummyNumber = g.Key,
 
-                                   // Part B
-                                   PartB_Total = degreeType == "UG"
-                                       ? g.Where(x => x.QuestionPartName == "B" && x.QuestionNumber >= 11 && x.QuestionNumber <= 20)
-                                            .Sum(x => x.ObtainedMark)
-                                       : g.Where(x => x.QuestionPartName == "B" && x.QuestionNumber >= 11 && x.QuestionNumber <= 18)
-                                            .Sum(x => x.ObtainedMark),
+                    PartA_Total = g.Where(x => x.QuestionPartName == "PART A" && x.QuestionNumber >= 1 && x.QuestionNumber <= 10)
+                                   .Sum(x => x.ObtainedMark),
 
-                                   // Part C only for PG
-                                   PartC_Total = degreeType == "PG"
-                                       ? g.Where(x => x.QuestionPartName == "C" && x.QuestionNumber == 19).Sum(x => x.ObtainedMark)
-                                       : 0,
+                    PartB_Total = g.First().DegreeTypeName == "UG"
+                        ? g.Where(x => x.QuestionPartName == "PART B" && x.QuestionNumber >= 11 && x.QuestionNumber <= 20)
+                             .Sum(x => x.ObtainedMark)
+                        : g.Where(x => x.QuestionPartName == "PART B" && x.QuestionNumber >= 11 && x.QuestionNumber <= 18)
+                             .Sum(x => x.ObtainedMark),
 
-                                   GrandTotal = g.Sum(x => x.ObtainedMark),
+                    PartC_Total = g.First().DegreeTypeName == "PG"
+                        ? g.Where(x => x.QuestionPartName == "PART C" && x.QuestionNumber == 19)
+                             .Sum(x => x.ObtainedMark)
+                        : 0,
 
-                                   // Include marks for each question
-                                   QuestionMarks = g.ToDictionary(
-                                       x => x.QuestionNumberSubNum != null
-                                           ? $"{x.QuestionNumber}.{x.QuestionNumberSubNum}"
-                                           : x.QuestionNumber.ToString(),
-                                       x => x.ObtainedMark
-                                   )
-                               }).ToList();
+                    GrandTotal = g.Sum(x => x.ObtainedMark),
 
-            string templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Templates",
+                    QuestionMarks = g.ToDictionary(
+                        x => x.QuestionNumberSubNum != null
+                            ? $"{x.QuestionNumber}.{x.QuestionNumberSubNum}"
+                            : x.QuestionNumber.ToString(),
+                        x => x.ObtainedMark
+                    )
+                }).ToList();
+
+            string templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Export Templates",
                 degreeType == "PG" ? "Export_Format_PG.xlsx" : "Export_Format_UG.xlsx");
 
             using var fileStream = new FileStream(templatePath, FileMode.Open, FileAccess.Read);
@@ -206,29 +214,76 @@ namespace SKCE.Examination.Services.Common
                 var sheetData = worksheetPart.Worksheet.GetFirstChild<SheetData>();
 
                 int startRow = 2; // Assuming header is in Row 1
-
+                int partAQuestions = 10;
+                int partBQuestions = (degreeType == "UG")? 20:18;
+                int partCQuestions = (degreeType == "UG") ? 0 : 19;
+                int sno = 1;
                 foreach (var item in groupedData)
                 {
+                    int Qno = 0;
                     var row = new Row();
+                    row.Append(CreateCell(sno));
                     row.Append(CreateStringCell(item.DummyNumber.ToString()));
-
-                    int totalQuestions = 20;
-                    for (int i = 1; i <= totalQuestions; i++)
+                    for (int i = 1; i <= partAQuestions; i++)
                     {
+                        Qno = i;
                         if (item.QuestionMarks is Dictionary<string, decimal> questionMarks)
                         {
-                            questionMarks.TryGetValue(i.ToString(), out decimal mark);
+                            questionMarks.TryGetValue(Qno.ToString()+".0", out decimal mark);
                             row.Append(CreateCell(mark));
                         }
                     }
-
                     row.Append(CreateCell(item.PartA_Total));
+
+                    for (int i = 11; i <= partBQuestions; i++)
+                    {
+                        Qno = i;
+                        decimal totalMarks = 0;
+                        if (item.QuestionMarks is Dictionary<string, decimal> questionSub1Marks)
+                        {
+                            questionSub1Marks.TryGetValue(Qno.ToString()+".1", out decimal mark);
+                            row.Append(CreateCell(mark));
+                            totalMarks = totalMarks + mark;
+                        }
+                        if (item.QuestionMarks is Dictionary<string, decimal> questionSub2Marks)
+                        {
+                            questionSub2Marks.TryGetValue(Qno.ToString() + ".2", out decimal mark);
+                            row.Append(CreateCell(mark));
+                            totalMarks = totalMarks + mark;
+                        }
+                        row.Append(CreateCell(totalMarks));
+                    }
+
                     row.Append(CreateCell(item.PartB_Total));
                     if (degreeType == "PG")
-                        row.Append(CreateCell(item.PartC_Total));
-
+                    {
+                        decimal totalMarks = 0;
+                        for (int i = 19; i <= partCQuestions; i++)
+                        {
+                            Qno = i;
+                            
+                            if (item.QuestionMarks is Dictionary<string, decimal> questionPartCSub1Marks)
+                            {
+                                questionPartCSub1Marks.TryGetValue(Qno.ToString() + ".1", out decimal mark);
+                                row.Append(CreateCell(mark));
+                                totalMarks = totalMarks + mark;
+                            }
+                            if (item.QuestionMarks is Dictionary<string, decimal> questionPartCSub2Marks)
+                            {
+                                questionPartCSub2Marks.TryGetValue(Qno.ToString() + ".2", out decimal mark);
+                                row.Append(CreateCell(mark));
+                                totalMarks = totalMarks + mark;
+                            }
+                        }
+                        if(item.PartC_Total == 0)
+                            row.Append(CreateCell(totalMarks));
+                        else
+                            row.Append(CreateCell(item.PartC_Total));
+                        
+                    }
                     row.Append(CreateCell(item.GrandTotal));
                     sheetData.Append(row);
+                    sno++;
                 }
 
                 worksheetPart.Worksheet.Save();

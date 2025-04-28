@@ -23,7 +23,7 @@ namespace SKCE.Examination.Models.DbModels.Common
         public DateTime? AllocatedDateTime { get; set; }
         public bool? IsAllocationMailSent { get; set; }
         
-        public bool? IsEvaluateCompleted { get; set; }
+        public bool IsEvaluateCompleted { get; set; }
         public long? EvaluatedByUserId { get; set; }
         public DateTime? EvaluatedDateTime { get; set; }
 

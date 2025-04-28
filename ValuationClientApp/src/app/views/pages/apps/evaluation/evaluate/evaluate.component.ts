@@ -1,6 +1,6 @@
 import { NgClass, NgFor } from '@angular/common';
-import { NgbModalRef, NgbModal  } from '@ng-bootstrap/ng-bootstrap';
-import { OnInit, Component, ViewChild  } from '@angular/core';
+import { NgbModalRef, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { OnInit, Component, ViewChild, ChangeDetectorRef, AfterViewChecked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PdfViewerModule } from 'ng2-pdf-viewer';
 import { ToastrService } from 'ngx-toastr';
@@ -17,7 +17,7 @@ import { Router } from '@angular/router';
   styleUrl: './evaluate.component.scss'
 })
 
-export class EvaluateComponent implements OnInit {
+export class EvaluateComponent implements OnInit, AfterViewChecked {
   modalRef: NgbModalRef;
   loggedinUserId: number = 0;
   answersheetId: number = 0;
@@ -26,7 +26,10 @@ export class EvaluateComponent implements OnInit {
   qaList: any[] = [];
   partList: any[] = [];
   groupList: any[] = [];
-  totalMarks: number = 0;
+  partAMark: number = 0;
+  partBMark: number = 0;
+  partCMark: number = 0;
+  //totalMarks: number = 0;
   obtainedMarks: number = 0;
   activeQuestion: string = '---------- Please select the question above to load here ----------';
   activeQuestionImg: string = '';
@@ -36,14 +39,15 @@ export class EvaluateComponent implements OnInit {
   sasToken: string = "sp=r&st=2025-04-23T08:48:04Z&se=2025-04-23T16:48:04Z&sv=2024-11-04&sr=c&sig=M%2F90Dwk7LJjwQPE%2FTsYmGnIKl1gpgk%2Fvtbp63LNU5qs%3D"
   answersheetMark: AnswersheetMark;
 
-    @ViewChild('confirmModule') confirmModule: any;
+  @ViewChild('confirmModule') confirmModule: any;
 
   constructor(
     private modalService: NgbModal,
     private route: ActivatedRoute,
     private toastr: ToastrService,
     private evaluationService: EvaluationService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit() {
@@ -69,6 +73,80 @@ export class EvaluateComponent implements OnInit {
       }
     });
 
+  }
+
+  ngAfterViewChecked(): void {
+    //this.cdr.detectChanges();
+    this.calculateSubTotalMarks();
+  }
+
+  calculateSubTotalMarks() {
+    this.partAMark = 0;
+    this.partBMark = 0;
+    this.partCMark = 0;
+    var partBarray: any[] = [];
+    var partCarray: any[] = [];
+
+    let partAList = document.querySelectorAll("[part]") as NodeListOf<HTMLInputElement>;
+    partAList.forEach((item: HTMLInputElement) => {
+      if (item.getAttribute('part') == 'A') {
+        if (item.value) {
+          this.partAMark += parseFloat(item.value);
+        }
+      }
+      else if (item.getAttribute('part') == 'B') {
+        if (item.value) {
+          this.getTotalMarkFromGroup(item, partBarray);
+        }
+      }
+      else if (item.getAttribute('part') == 'C') {
+        if (item.value) {
+          this.getTotalMarkFromGroup(item, partCarray);
+        }
+      }
+    });
+  }
+
+  getTotalMarkFromGroup(item: HTMLInputElement, partArray: any[]) {
+    partArray.push({
+      "qno": item.getAttribute('qno'),
+      "group": item.getAttribute('group'),
+      "mark": item.value,
+    })
+
+    // Step 1: Sum marks by (qno + group)
+    const summed: any[] = Object.values(
+      partArray.reduce((acc, item) => {
+        const key = `${item.qno}_${item.group}`;
+        const mark = Number(item.mark);
+
+        if (!acc[key]) {
+          acc[key] = { qno: item.qno, group: item.group, totalMark: mark };
+        } else {
+          acc[key].totalMark += mark;
+        }
+
+        return acc;
+      }, {} as { [key: string]: { qno: string, group: string, totalMark: number } })
+    );
+
+    // Step 2: From each group, pick the one with highest totalMark
+    const finalResult = Object.values(
+      summed.reduce((acc, item) => {
+        const group = item.group;
+
+        if (!acc[group] || item.totalMark > acc[group].totalMark) {
+          acc[group] = item;
+        }
+
+        return acc;
+      }, {} as { [group: string]: { qno: string, group: string, totalMark: number } })
+    );
+
+    // Step 3: Sum of all totalMarks
+    const sumTotalMarks: any = finalResult.reduce((acc, item: any) => acc + item.totalMark, 0);
+
+    this.partBMark = parseFloat(sumTotalMarks);
   }
 
   async getPrimaryData() {
@@ -138,7 +216,6 @@ export class EvaluateComponent implements OnInit {
           //this.getGroupList(data);
 
           //this.obtainedMarks = this.qaList.reduce((sum, item) => sum + (item.obtainedMark || 0), 0);
-          this.reduceChoiceQuestionMarks();
 
         }
         else {
@@ -168,7 +245,7 @@ export class EvaluateComponent implements OnInit {
   //   data.forEach(({ questionGroupName }) => {
   //     groupMap.set(questionGroupName, (groupMap.get(questionGroupName) || 0) + 1);
   //   });
-    
+
   //   console.log(groupMap);
   //   this.groupList = Array.from(groupMap, ([group, count]) => ({ group, count }));
   //     //.filter(({ count }) => count > 1);
@@ -198,7 +275,7 @@ export class EvaluateComponent implements OnInit {
       }
     });
 
-    this.totalMarks = this.totalMarks + mark;
+    //this.totalMarks = this.totalMarks + mark;
 
     return mark;
   }
@@ -209,14 +286,14 @@ export class EvaluateComponent implements OnInit {
       if (group.count == 2) {
         let item = this.qaList.find(e => e.questionGroup === group.group);
         if (item) {
-          this.totalMarks = this.totalMarks - item.mark;
+          //this.totalMarks = this.totalMarks - item.mark;
           return;
         }
       }
       if (group.count == 4) {
         let item = this.qaList.find(e => e.questionGroup === group.group);
         if (item) {
-          this.totalMarks = this.totalMarks - (item.mark * 2);
+          //this.totalMarks = this.totalMarks - (item.mark * 2);
           return;
         }
       }
@@ -263,13 +340,13 @@ export class EvaluateComponent implements OnInit {
       if (event.target.value.match(/[^0-9.]/g)) {
         this.toastr.error('Please add only numbers.');
         event.target.value = ''; //event.target.value.replace(/[^\d]/g, '');        
-        return;
+        //return;
       }
       else if ((parseFloat(event.target.value) > parseInt(event.srcElement.max))) {
         let msg = `Maximum marks allowed is ${event.srcElement.max}`
         this.toastr.error(msg);
         event.target.value = '';
-        return;
+        //return;
       }
       else {
         this.saveMark(item, parseFloat(event.target.value));
@@ -282,7 +359,6 @@ export class EvaluateComponent implements OnInit {
       //     this.obtainedMarks += parseFloat(item.value); // sum all text box marks
       //   }
       // });
-
     }
   }
 
@@ -317,37 +393,33 @@ export class EvaluateComponent implements OnInit {
   }
 
   promptBeforeCompletion() {
-      this.modalRef = this.modalService.open(this.confirmModule, { size: 'md', backdrop: 'static' });
-    }
+    this.modalRef = this.modalService.open(this.confirmModule, { size: 'md', backdrop: 'static' });
+  }
 
   completeEvaluation() {
-    // if (confirm("Are you sure you want to complete evaluation? \nYou cannot re-evaluate once submitted.")) {
-    //   if (this.obtainedMarks == 0) {
-    //     this.toastr.warning('Obained Marks is 0. Please evaluate.');
-    //   }
-    //   else {
-    //     this.evaluationService.completeEvaluation(this.primaryData.answersheetId, this.loggedinUserId).subscribe(
-    //       (data: any) => {
-    //         console.log("respo", data)
-    //         if (data.message.toLowerCase() == 'success') {
-    //           this.toastr.success("Evaluation completed successfully");
-    //           this.backToList();
-    //         }
-    //         else {
-    //           console.error('Failed to complete evaluation');
-    //           this.toastr.error('Failed to complete evaluation.');
-    //         }
-    //       },
-    //       (error) => {
-    //         console.error('Error while saving evaluation:', error);
-    //         this.toastr.error('Failed to complete evaluation.');
-    //       }
-    //     )
-    //   }
-    // } else {
-    //   // User clicked Cancel or closed the dialog
-    //   // Handle cancellation
-    // }    
+    this.modalRef.close();
+    if (this.obtainedMarks == 0) {
+      this.toastr.warning('Obained Marks is 0. Please evaluate.');
+    }
+    else {
+      this.evaluationService.completeEvaluation(this.primaryData.answersheetId, this.loggedinUserId).subscribe(
+        (data: any) => {
+          console.log("respo", data)
+          if (data.message.toLowerCase() == 'success') {
+            this.toastr.success("Evaluation completed successfully");
+            this.backToList();
+          }
+          else {
+            console.error('Failed to complete evaluation');
+            this.toastr.error('Failed to complete evaluation.');
+          }
+        },
+        (error) => {
+          console.error('Error while saving evaluation:', error);
+          this.toastr.error('Failed to complete evaluation.');
+        }
+      )
+    }
   }
 
   backToList() {

@@ -8,7 +8,7 @@
 	[AllocatedToUserId] BIGINT NULL,
 	[AllocatedDateTime] DATETIME NULL,
 	[IsAllocationMailSent] BIT NULL,
-	[IsEvaluateCompleted] BIT NULL,
+	[IsEvaluateCompleted] BIT NOT NULL DEFAULT 0,
 	[EvaluatedByUserId] BIGINT NULL,
 	[EvaluatedDateTime] DATETIME NULL,
 	[TotalObtainedMark] DECIMAL(7,2) NOT NULL DEFAULT 0,

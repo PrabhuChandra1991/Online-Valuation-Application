@@ -76,7 +76,7 @@ namespace SKCE.Examination.Services.Common
                            CourseName = course.Name,
                            ExamMonth = examination.ExamMonth,
                            ExamYear = examination.ExamYear,
-                           DummyNumber = answersheet.DummyNumber,
+                           DummyNumber = new String('X', answersheet.DummyNumber.Trim().Length - 6) + answersheet.DummyNumber.Trim().Substring(answersheet.DummyNumber.Trim().Length - 6),
                            UploadedBlobStorageUrl = answersheet.UploadedBlobStorageUrl,
                            AllocatedUserName = (allocatedUserResult != null ? allocatedUserResult.Name : string.Empty),
                            TotalObtainedMark = answersheet.TotalObtainedMark,

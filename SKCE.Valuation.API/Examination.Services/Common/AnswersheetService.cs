@@ -1,4 +1,5 @@
-﻿using DocumentFormat.OpenXml.InkML;
+﻿using DocumentFormat.OpenXml.Bibliography;
+using DocumentFormat.OpenXml.InkML;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Mvc;
@@ -143,12 +144,28 @@ namespace SKCE.Examination.Services.Common
             }
             return response;
         }
-        public async Task<MemoryStream> ExportMarksAsync(long institutionId, string examYear, string examMonth, string degreeType)
+        public async Task<(MemoryStream,string)> ExportMarksAsync(long institutionId, string examYear, string examMonth, long courseId)
         {
-            var degreeTypeId = _context.DegreeTypes
-                .Where(x => x.Name == degreeType)
+            var degreeTypeId = _context.Examinations
+                .Where(x => x.InstitutionId == institutionId && x.ExamYear == examYear && x.ExamMonth == examMonth && x.CourseId == courseId)
                 .Select(x => x.DegreeTypeId)
                 .FirstOrDefault();
+
+            var degreeType = _context.DegreeTypes
+                .Where(x => x.DegreeTypeId == degreeTypeId)
+                .Select(x => x.Name)
+                .FirstOrDefault();
+
+            var institutionCode = _context.Institutions
+                .Where(x => x.InstitutionId == institutionId)
+                .Select(x => x.Code)
+                .FirstOrDefault();
+
+            var courseCode = _context.Courses
+                .Where(x => x.CourseId == courseId)
+                .Select(x => x.Code)
+                .FirstOrDefault();
+
             var query = (from e in _context.Examinations
                          join a in _context.Answersheets on e.ExaminationId equals a.ExaminationId
                          join qm in _context.AnswersheetQuestionwiseMarks on a.AnswersheetId equals qm.AnswersheetId
@@ -161,7 +178,7 @@ namespace SKCE.Examination.Services.Common
                                e.DegreeTypeId == degreeTypeId
                          select new
                          {
-                             DummyNumber = a.DummyNumber,
+                             a.DummyNumber,
                              qm.QuestionPartName,
                              qm.QuestionNumber,
                              qm.QuestionNumberSubNum,
@@ -223,6 +240,8 @@ namespace SKCE.Examination.Services.Common
                     int Qno = 0;
                     var row = new Row();
                     row.Append(CreateCell(sno));
+                    row.Append(CreateStringCell(institutionCode));
+                    row.Append(CreateStringCell(courseCode));
                     row.Append(CreateStringCell(item.DummyNumber.ToString()));
                     for (int i = 1; i <= partAQuestions; i++)
                     {
@@ -291,15 +310,7 @@ namespace SKCE.Examination.Services.Common
             }
 
             memoryStream.Position = 0;
-            return await Task.FromResult(memoryStream);
-        }
-
-        public async Task<string?> GetInstitutionByIdAsync(long institutionId)
-        {
-            return await _context.Institutions
-                .Where(i => i.InstitutionId == institutionId)
-                .Select(i => i.Code)
-                .FirstOrDefaultAsync();
+            return await Task.FromResult((memoryStream, $"MarksReport_{institutionCode}_{examYear}_{examMonth}_{courseCode}.xlsx"));
         }
         private static Cell CreateStringCell(string value)
         {

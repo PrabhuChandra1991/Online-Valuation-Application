@@ -137,11 +137,9 @@ namespace SKCE.Examination.API.Controllers.Common
         }
 
         [HttpGet("ExportMarks")]
-        public async Task<IActionResult> ExportMarks([FromQuery] long institutionId, [FromQuery] string examYear, [FromQuery] string examMonth, [FromQuery] string programType)
+        public async Task<IActionResult> ExportMarks([FromQuery] long institutionId, [FromQuery] string examYear, [FromQuery] string examMonth, [FromQuery] long courseId)
         {
-            var stream = await _answersheetService.ExportMarksAsync(institutionId, examYear, examMonth, programType);
-            var institution = await _answersheetService.GetInstitutionByIdAsync(institutionId);
-            var fileName = $"MarksReport_{institution}_{examYear}_{examMonth}_{programType}.xlsx";
+            var (stream,fileName) = await _answersheetService.ExportMarksAsync(institutionId, examYear, examMonth, courseId);
             return File(stream.ToArray(),
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 fileName);

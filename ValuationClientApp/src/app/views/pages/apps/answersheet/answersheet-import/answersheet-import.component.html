@@ -1,0 +1,83 @@
+<div class="container-fluid">
+  <h3>Import Answersheet List with Dummy Numbers</h3>
+  <div class="row">
+    <div class="col-md-2">
+      <select
+        id="institutionId"
+        class="form-select"
+        (change)="onInstituteChange($event)"
+      >
+        <option [value]="0">Institution</option>
+        <option
+          *ngFor="let inst of dataSourceInstitutes"
+          [value]="inst.institutionId"
+        >
+          {{ inst.name }}
+        </option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <select
+        id="examYearId"
+        class="form-select"
+        (change)="onExamYearChange($event)"
+      >
+        <option [value]="0">Exam Year</option>
+        <option *ngFor="let item of dataSourceExamYears" [value]="item">
+          {{ item }}
+        </option>
+      </select>
+    </div>
+
+    <div class="col-md-2">
+      <select
+        id="examMonthId"
+        class="form-select"
+        (change)="onExamMonthChange($event)"
+      >
+        <option [value]="0">Exam Month</option>
+        <option *ngFor="let item of dataSourceExamMonths" [value]="item">
+          {{ item }}
+        </option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <select
+        id="courseId"
+        class="form-select"
+        (change)="onExaminationChange($event)"
+      >
+        <option [value]="0">Examination/Course</option>
+        <option *ngFor="let item of dataSourceExaminations" [value]="item">
+          {{ item.courseCode }} | {{ item.departmentCode }}
+        </option>
+      </select>
+    </div>
+    <div class="col-md-10">
+      <form
+        [formGroup]="dummyNumberImportForm"
+        (ngSubmit)="submitDummyNumberImport()"
+      >
+        <div class="col-md-2">
+          <input
+            class="form-control"
+            value="gedDummyNumberformControls['file']"
+            type="file"
+            id="masterfile"
+            formControlName="file"
+            (change)="onDummyNumberFileChange($event)"
+          />
+        </div>
+        <div class="col-md-2">
+          <button
+            type="submit"
+            class="btn btn-primary"
+            *ngIf="isDummyNumberImported"
+          >
+            Import
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

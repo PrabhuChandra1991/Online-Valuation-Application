@@ -54,7 +54,6 @@ import { InstituteService } from '../../../services/institute.service';
   styleUrl: './answersheet-management.component.scss',
 })
 export class AnswersheetManagementComponent {
- 
   answersheets: any[] = [];
 
   displayedColumns: string[] = [
@@ -68,7 +67,7 @@ export class AnswersheetManagementComponent {
     'examMonth',
     'examYear',
     'dummyNumber',
-    'allocatedUserName'
+    'allocatedUserName',
   ];
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -120,7 +119,9 @@ export class AnswersheetManagementComponent {
   }
 
   onInstituteChange(event: Event): void {
-    this.selectedInstituteId =parseInt( (event.target as HTMLSelectElement).value);
+    this.selectedInstituteId = parseInt(
+      (event.target as HTMLSelectElement).value
+    );
     this.loadData();
   }
   onCourseChange(event: Event): void {

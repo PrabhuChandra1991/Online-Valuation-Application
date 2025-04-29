@@ -1,30 +1,29 @@
 import { MenuItem } from './menu.model';
 
 export const MENU: MenuItem[] = [
-
   {
     label: 'User Management',
     icon: 'users',
     link: '/apps/user',
-    role: [1]
+    role: [1],
   },
   {
     label: 'Master Data',
     icon: 'folder',
     link: '/apps/master',
-    role: [1]
+    role: [1],
   },
   {
     label: 'Import History',
     icon: 'list',
     link: '/apps/importhistory',
-    role: [1]
+    role: [1],
   },
   {
     label: 'Question Paper Management',
     icon: 'check-square',
     link: '/apps/assigntemplate',
-    role: [1]
+    role: [1],
   },
   // {
   //   label: 'Question Paper Status',
@@ -36,25 +35,31 @@ export const MENU: MenuItem[] = [
     label: 'Answersheet Management',
     icon: 'clipboard',
     link: '/apps/answersheet',
-    role: [1]
+    role: [1],
   },
   {
     label: 'Answersheet consolidated view',
     icon: 'clipboard',
     link: '/apps/answersheet/consolidatedview',
-    role: [1]
+    role: [1],
+  },
+  {
+    label: 'Answersheet import',
+    icon: 'clipboard',
+    link: '/apps/answersheet/import',
+    role: [1],
   },
   {
     label: 'Assigned Question Papers',
     icon: 'list',
     link: '/apps/assigntemplate',
-    role: [2]
+    role: [2],
   },
   {
     label: 'Evaluation Assigned',
     icon: 'clipboard',
     link: '/apps/evaluationlist',
-    role: [2]
+    role: [2],
   },
   {
     label: 'Export Marks',

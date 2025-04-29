@@ -1,5 +1,5 @@
-import { Routes } from "@angular/router";
-import { authGuard } from "../services/auth.guard";
+import { Routes } from '@angular/router';
+import { authGuard } from '../services/auth.guard';
 
 export default [
     { path: '', redirectTo: 'calendar', pathMatch: 'full' },
@@ -99,6 +99,15 @@ export default [
         loadComponent: () => import('./answersheet/consolidatedview/consolidatedview.component')
             .then(c => c.ConsolidatedviewComponent),
         canActivate: [authGuard]
+    },
+
+    {
+        path: 'answersheet/import',
+        loadComponent: () =>
+            import(
+                './answersheet/answersheet-import/answersheet-import.component'
+            ).then((c) => c.AnswersheetImportComponent),
+        canActivate: [authGuard],
     },
    
 ] as Routes;

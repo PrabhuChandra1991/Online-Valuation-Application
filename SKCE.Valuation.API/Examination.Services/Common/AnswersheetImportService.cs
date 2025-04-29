@@ -18,10 +18,12 @@ namespace SKCE.Examination.Services.Common
     public class AnswersheetImportService
     {
         private readonly ExaminationDbContext _context;
+        private readonly BlobStorageHelper _blobStorageHelper;
 
-        public AnswersheetImportService(ExaminationDbContext context)
+        public AnswersheetImportService(ExaminationDbContext context, BlobStorageHelper blobStorageHelper)
         {
             _context = context;
+            _blobStorageHelper = blobStorageHelper;
 
         }
 
@@ -44,6 +46,14 @@ namespace SKCE.Examination.Services.Common
                                     DepartmentName = dept.Name
                                 }).ToListAsync();
             return result.OrderBy(x => x.CourseCode).ThenBy(x => x.DepartmentCode).ToList();
+        }
+
+
+        public async Task<string> ImportDummyNumberByExcel(Stream excelStream, long examinationId)
+        {
+            var helper = new AnswersheetImportHelper(this._context, this._blobStorageHelper );
+            var result = await helper.ImportDummyNumberByExcel(excelStream, examinationId, "xlsx");
+            return result.ToString();
         }
 
     }

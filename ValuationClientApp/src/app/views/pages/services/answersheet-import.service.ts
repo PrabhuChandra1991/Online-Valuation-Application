@@ -33,4 +33,26 @@ export class AnswersheetImportService {
       `${this.apiUrl}/api/Answersheet/GetConsolidatedExamAnswersheets?institutionId=${institutionId}`
     );
   }
+
+  importAnswerSheetDummyNumbers(
+    formData: FormData,
+    examinationId: number
+  ): Observable<any> {
+    //-----
+    const url: string = `${this.apiUrl}/api/AnswersheetImport/ImportDummyNumberByExcel`;
+    //
+
+    const httpOptions = {
+      headers: new HttpHeaders({
+        examinationId: examinationId,
+      }),
+    };
+    //--
+    const response = this.http.post(url, formData, httpOptions);
+
+    return response;
+  }
+  //
+  //
+  //
 }

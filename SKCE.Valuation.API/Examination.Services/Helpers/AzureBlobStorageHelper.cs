@@ -14,6 +14,7 @@ namespace SKCE.Examination.Services.Helpers
         public readonly string _containerName;
         public readonly string _connectionString;
         private readonly ExaminationDbContext _context;
+
         public AzureBlobStorageHelper(IConfiguration configuration, ExaminationDbContext context)
         {
              _connectionString = configuration["AzureBlobStorage:ConnectionString"];

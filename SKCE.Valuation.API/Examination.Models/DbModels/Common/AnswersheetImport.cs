@@ -17,5 +17,6 @@ namespace SKCE.Examination.Models.DbModels.Common
         public required string ExamMonth { get; set; }
         public required string ExamYear { get; set; }
         public required long ExaminationId { get; set; } = 0;
+        public virtual ICollection<AnswersheetImportDetail> AnswersheetImportDetails { get; set; } = [];
     }
 }

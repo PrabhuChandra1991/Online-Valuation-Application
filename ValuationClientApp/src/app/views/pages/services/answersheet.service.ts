@@ -62,10 +62,14 @@ export class AnswersheetService {
 
     return this.http.post(url, JSON.stringify(inputData), { headers });
   }
-  exportMarks(institutionId: number, courseId: number,examYear:string,examMonth:string): Observable<any> {
+  exportMarks(
+    institutionId: number,
+    courseId: number,
+    examYear: string,
+    examMonth: string
+  ): Observable<any> {
     return this.http.get(
       `${this.apiUrl}/api/Answersheet/ExportMarks?institutionId=${institutionId}&courseId=${courseId}&examYear=${examYear}&examMonth=${examMonth}`
-);
+    );
   }
-
 }

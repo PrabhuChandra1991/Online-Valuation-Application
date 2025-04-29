@@ -45,6 +45,13 @@ namespace SKCE.Examination.Models.DbModels.Common
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder
+                .Entity<AnswersheetImportDetail>()
+                .HasOne(x => x.AnswersheetImport)
+                .WithMany(x => x.AnswersheetImportDetails)
+                .HasForeignKey(x => x.AnswersheetImportId);
+
         }
 
 

@@ -33,6 +33,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { AnswersheetService } from '../../../services/answersheet.service';
 import { AnswersheetImportService } from '../../../services/answersheet-import.service';
 import { InstituteService } from '../../../services/institute.service';
+import { SpinnerService } from '../../../services/spinner.service';
 
 @Component({
   selector: 'app-answersheet-import',
@@ -79,7 +80,9 @@ export class AnswersheetImportComponent implements OnInit {
     private fb: FormBuilder,
     private answersheetService: AnswersheetService,
     private instituteService: InstituteService,
-    private answersheetImportService: AnswersheetImportService
+    private answersheetImportService: AnswersheetImportService,
+    private toasterService: ToastrService,
+    private spinnerService: SpinnerService
   ) {}
 
   ngOnInit(): void {
@@ -125,6 +128,8 @@ export class AnswersheetImportComponent implements OnInit {
   }
 
   loadExaminationItems(): void {
+    this.resetExaminationAndForFile();
+
     if (
       this.selectedInstituteId !== 0 &&
       this.selectedExamYear !== '0' &&
@@ -174,6 +179,7 @@ export class AnswersheetImportComponent implements OnInit {
 
   onExaminationChange(event: Event): void {
     this.selectedExaminationId = parseInt(this.getValue(event));
+    this.isDummyNumberImported = false;
   }
 
   onDummyNumberFileChange(event: any) {
@@ -186,30 +192,38 @@ export class AnswersheetImportComponent implements OnInit {
     }
   }
 
+  resetExaminationAndForFile() {
+    this.selectedExaminationId = 0;
+    this.dummyNumberImportForm.controls['file'].setValue([]);
+    this.isDummyNumberImported = false;
+  }
+
   get gedDummyNumberformControls() {
     return this.dummyNumberImportForm.controls;
   }
 
   submitDummyNumberImport() {
     // this.spinnerService.toggleSpinnerState(true);
-    // const formData = new FormData();
-    // const fileSource: any = this.dummyNumberImportForm.get('fileSource')?.value;
-    // if (fileSource !== null && fileSource !== undefined) {
-    //   formData.append('file', fileSource);
-    // }
-    // this.ImportService.importAnswerSheetDummyNumbers(formData).subscribe({
-    //   next: (response) => {
-    //     this.toastr.success(response.message);
-    //     this.qpDocumentsformf['file'].setValue([]);
-    //   },
-    //   error: (errorResponse) => {
-    //     this.toastr.error('Failed to import data. Please try again.');
-    //     this.spinnerService.toggleSpinnerState(false);
-    //   },
-    //   complete: () => {
-    //     this.spinnerService.toggleSpinnerState(false);
-    //   },
-    // });
+    const formData = new FormData();
+    const fileSource: any = this.dummyNumberImportForm.get('fileSource')?.value;
+    if (fileSource !== null && fileSource !== undefined) {
+      formData.append('file', fileSource);
+    }
+    this.answersheetImportService
+      .importAnswerSheetDummyNumbers(formData, this.selectedExaminationId)
+      .subscribe({
+        next: (response) => {
+          this.toasterService.success('Imported successfully.');
+          this.resetExaminationAndForFile();
+        },
+        error: (errorResponse) => {
+          //this.toastr.error('Failed to import data. Please try again.');
+          //this.spinnerService.toggleSpinnerState(false);
+        },
+        complete: () => {
+          //this.spinnerService.toggleSpinnerState(false);
+        },
+      });
   }
 
   ////

@@ -25,5 +25,27 @@ namespace SKCE.Examination.API.Controllers.Common
             return Ok(result);
         }
 
+        /// <summary>
+        /// Upload an Excel file and import QP data.
+        /// </summary>
+        [HttpPost("ImportDummyNumberByExcel")]
+        public async Task<IActionResult> ImportDummyNumberByExcel(IFormFile file)
+        {
+            string examinationId = Request.Headers["examinationId"].ToString();
+
+            if (examinationId == "" || examinationId == null)
+                return BadRequest("Examination data not selected.");
+
+
+            if (file == null || file.Length == 0)
+                return BadRequest("No file uploaded.");
+
+            
+            using var stream = file.OpenReadStream();
+            var importedInfo = await _answersheetImportService.ImportDummyNumberByExcel(stream,long.Parse(examinationId));
+
+            return Ok(new { Message = importedInfo });
+        }
+
     }
 }

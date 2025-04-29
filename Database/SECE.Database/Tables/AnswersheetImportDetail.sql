@@ -7,6 +7,7 @@
 	[BatchYear] NVARCHAR(5) NOT NULL,
 	[DegreeType] NVARCHAR(10) NOT NULL,
 	[ExamType] NVARCHAR(20) NOT NULL,
+	[Semester] INT NOT NULL,
 	[CourseCode] NVARCHAR(20) NOT NULL,
 	[ExamYear] NVARCHAR(5) NOT NULL,
 	[ExamMonth] NVARCHAR(20) NOT NULL,

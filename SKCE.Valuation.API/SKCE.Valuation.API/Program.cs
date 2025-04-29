@@ -29,9 +29,12 @@ builder.Services.AddScoped<CourseService>();
 builder.Services.AddAutoMapper(typeof(QPTemplateMappingProfile));
 // Add services to the container
 builder.Services.AddScoped<AzureBlobStorageHelper>();
+builder.Services.AddScoped<BlobStorageHelper>();
 builder.Services.AddScoped<BookmarkProcessor>();
 builder.Services.AddScoped<InstitutionService>();
 builder.Services.AddScoped<AnswersheetService>();
+builder.Services.AddScoped<AnswersheetImportService>();
+builder.Services.AddScoped<DropdownService>();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers()

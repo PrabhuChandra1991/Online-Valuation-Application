@@ -147,7 +147,7 @@ namespace SKCE.Examination.Services.Common
         public async Task<(MemoryStream,string)> ExportMarksAsync(long institutionId, string examYear, string examMonth, long courseId)
         {
             var degreeTypeId = _context.Examinations
-                .Where(x => x.InstitutionId == institutionId && x.ExamYear == examYear && x.ExamMonth == examMonth && x.CourseId == courseId)
+                .Where(x => x.InstitutionId == institutionId && x.ExamYear == examYear && x.ExamMonth.ToUpper() == examMonth && x.CourseId == courseId)
                 .Select(x => x.DegreeTypeId)
                 .FirstOrDefault();
 
@@ -310,7 +310,7 @@ namespace SKCE.Examination.Services.Common
             }
 
             memoryStream.Position = 0;
-            return await Task.FromResult((memoryStream, $"MarksReport_{institutionCode}_{examYear}_{examMonth}_{courseCode}.xlsx"));
+            return await Task.FromResult((memoryStream, $"MarksReport_{institutionCode}_{examYear}_{examMonth}_{courseCode}_{degreeType}.xlsx"));
         }
         private static Cell CreateStringCell(string value)
         {

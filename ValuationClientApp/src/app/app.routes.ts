@@ -24,6 +24,12 @@ export const routes: Routes = [
         loadChildren: () => import('./views/pages/apps/apps.routes')
       },
       {
+        path: 'exportmarks',
+        loadComponent: () => import('./views/pages/apps/answersheet/export-marks/export-marks.component')
+            .then(c => c.ExportMarksComponent),
+        canActivate: [authGuard]
+      },
+      {
         path: 'ui-components',
         loadChildren: () => import('./views/pages/ui-components/ui-components.routes')
       },

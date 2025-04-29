@@ -1,0 +1,40 @@
+<div class="container-fluid">
+    <h3>Export marks</h3>
+    <div class="row mt-4">
+      <div class="col-md-2">
+        <select id="institutionId" class="form-select" (change)="onInstituteChange($event)">
+          <option [value]="0">Select Institution</option>
+          <option *ngFor="let inst of institutes" [value]="inst.institutionId">
+            {{ inst.name }}
+          </option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <select id="courseId" class="form-select" (change)="onCourseChange($event)">
+          <option [value]="0">Select Course</option>
+          <option *ngFor="let course of courses" [value]="course.courseId">
+            {{ course.code }} - {{ course.name }}
+          </option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <select id="examYearId" class="form-select" (change)="onExamYearChange($event)">
+          <option [value]="0">Select Exam Year</option>
+          <option *ngFor="let examYear of examYears" [value]="examYear">
+            {{ examYear }}
+          </option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <select id="examMonthId" class="form-select" (change)="onExamMonthChange($event)">
+          <option [value]="0">Select Exam Month</option>
+          <option *ngFor="let examMonth of examMonths" [value]="examMonth">
+            {{ examMonth }}
+          </option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <button type="button" class="btn btn-primary" [disabled]="(selectedInstituteId == 0 || selectedCourseId == 0 || selectedExamYear == '' || selectedExamMonth == '' )" (click)="exportMarks()">Export</button>
+      </div>
+    </div>
+</div>

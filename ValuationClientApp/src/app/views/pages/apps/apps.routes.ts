@@ -100,4 +100,5 @@ export default [
             .then(c => c.ConsolidatedviewComponent),
         canActivate: [authGuard]
     },
+   
 ] as Routes;

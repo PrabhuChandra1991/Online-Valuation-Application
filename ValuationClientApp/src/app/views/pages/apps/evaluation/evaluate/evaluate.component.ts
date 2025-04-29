@@ -145,7 +145,7 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
           console.log("qaList: ", this.qaList);
 
           this.getPartList(data);
-          //this.getGroupList(data);
+          this.getGroupList(this.qaList);
 
           //this.obtainedMarks = this.qaList.reduce((sum, item) => sum + (item.obtainedMark || 0), 0);
         }
@@ -170,18 +170,38 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
     console.log("partList:", this.partList);
   }
 
-  // getGroupList(data: any[]) {
-  //   //console.log("getGroupList...............");
-  //   const groupMap = new Map();
-  //   data.forEach(({ questionGroupName }) => {
-  //     groupMap.set(questionGroupName, (groupMap.get(questionGroupName) || 0) + 1);
-  //   });
+  getGroupList(data: any[]) {
+    //console.log("getGroupList...............");    
 
-  //   console.log(groupMap);
-  //   this.groupList = Array.from(groupMap, ([group, count]) => ({ group, count }));
-  //     //.filter(({ count }) => count > 1);
-  //   console.log("groupList:", this.groupList);
-  // }
+    var markArray: any[] = []
+
+    data.forEach(item => {
+      if (item.questionNumber >= 10) {
+        markArray.push({
+          "group": item.questionNumber,
+          "count": item.questionNumber == 10 ? 10 : 1,
+          "mark": item.obtainedMark
+        })
+      }
+    })
+
+    //console.log("markArray: ", JSON.stringify(markArray))
+
+    const groupMap = new Map<number, { group: number, count: number, mark: number }>();
+
+    markArray.forEach(item => {
+      if (!groupMap.has(item.group)) {
+        groupMap.set(item.group, { group: item.group, count: 0, mark: 0 });
+      }
+      const current = groupMap.get(item.group)!;
+      current.count += item.count;
+      current.mark += item.mark;
+    });
+
+    this.groupList = Array.from(groupMap.values());
+
+    console.log("groupList:", (this.groupList));
+  }
 
   // reduceChoiceQuestionMarks() {
   //   // Remove marks if choice question
@@ -228,7 +248,7 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
           this.partAMark += parseFloat(item.value);
         }
       }
-      else if (item.getAttribute('part') == 'B') {
+      else if (item.getAttribute('part') == 'B') {              
         if (item.value) {
           this.getTotalMarkFromGroup(item, partBarray);
         }
@@ -263,6 +283,16 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
         return acc;
       }, {} as { [key: string]: { qno: string, group: string, totalMark: number } })
     );
+
+    // 
+    let subTotalList = document.querySelectorAll("span.subtotal");
+    subTotalList.forEach((item) => {
+      summed.forEach((itm: { qno: string | null; totalMark: string; }) => {
+        if (item.getAttribute('qno') == itm.qno) {
+          item.innerHTML = itm.totalMark;
+        }
+      });
+    });
 
     // Step 2: From each group, pick the one with highest totalMark
     const finalResult = Object.values(
@@ -340,7 +370,7 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
       if (event.target.value.match(/[^0-9.]/g)) {
         this.toastr.error('Please add only numbers.');
         event.target.value = ''; //event.target.value.replace(/[^\d]/g, '');
-        this.saveMark(item, 0);     
+        this.saveMark(item, 0);
         //return;
       }
       else if ((parseFloat(event.target.value) > parseInt(event.srcElement.max))) {

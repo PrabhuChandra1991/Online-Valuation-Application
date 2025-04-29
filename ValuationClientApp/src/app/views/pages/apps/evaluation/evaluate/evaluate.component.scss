@@ -21,7 +21,12 @@ table td {
     width: 3rem;
 }
 table tfoot td {
-    padding: 0.5rem 0;
+    padding: 0.5rem;
+    background-color: white;
+    border: 1px solid #c7c7c7;
+    span {
+        padding: 0;
+    }
 }
 table td label {
     padding-top: 1.75rem;
@@ -54,4 +59,7 @@ table .form-control.active {
 }
 table .error {
     background-color: #ffdcda;
+}
+table .sub-total {
+    padding: 0.5rem;
 }

@@ -1,16 +1,16 @@
 <div class="container-fluid">
     <h3>Evaluation Assigned</h3>
     <div class="row mt-4">
-        <div class="col-lg-4 col-md-5">
-            <h5>Filter by:
+        <div class="col-lg-5 col-md-5">
+            <h5>Filter by status:
                 <mat-radio-group (change)="evaluationFilter($event)" value="all">
                     <mat-radio-button value="all">All</mat-radio-button>
-                    <mat-radio-button value="false"><span class="text-primary">Yet to Evaluate</span></mat-radio-button>
+                    <mat-radio-button value="false"><span class="text-primary">Evaluation Pending</span></mat-radio-button>
                     <mat-radio-button value="true"><span class="text-secondary">Evaluation Completed</span></mat-radio-button>
                 </mat-radio-group>
             </h5>
         </div>
-        <div class="col-lg-8 col-md-5">
+        <div class="col-lg-7 col-md-5">
             <h5>Filter by mark:
                 <mat-radio-group (change)="markFilter($event)" value="allmarks">
                     <mat-radio-button value="allmarks">All</mat-radio-button>

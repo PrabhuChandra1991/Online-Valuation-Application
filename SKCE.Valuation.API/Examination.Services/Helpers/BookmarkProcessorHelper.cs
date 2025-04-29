@@ -249,14 +249,14 @@ namespace SKCE.Examination.Services.Helpers
 
                 // Save the modified document as PDF
                 var previewPdfPath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}_{2}.pdf", bookmarkUpdates["COURSECODE"], qPTemplate.QPCode, DateTime.Now.ToString("ddMMyyyyhhmmss")));
-                ConvertToPdfBySyncfusion(previewdocPath, previewPdfPath);
+                //ConvertToPdfBySyncfusion(previewdocPath, previewPdfPath);
 
-                if (!isForPrint) return previewPdfPath;
+                if (!isForPrint) return previewdocPath;
 
-                var pdfDocumentId = await _azureBlobStorageHelper.UploadFileToBlob(previewPdfPath, string.Format("{0}_{1}_{2}_{3}_{4}.pdf", qPTemplate.QPTemplateName, qPTemplate.QPCode, qPTemplate.ExamYear, bookmarkUpdates["COURSECODE"], DateTime.UtcNow.ToShortDateString()));
+                //var pdfDocumentId =  await _azureBlobStorageHelper.UploadFileToBlob(previewPdfPath, string.Format("{0}_{1}_{2}_{3}_{4}.pdf", qPTemplate.QPTemplateName, qPTemplate.QPCode, qPTemplate.ExamYear, bookmarkUpdates["COURSECODE"], DateTime.UtcNow.ToShortDateString()));
                 var wordDocumentId = await _azureBlobStorageHelper.UploadDocxFileToBlob(previewdocPath, string.Format("{0}_{1}_{2}_{3}_{4}.docx", qPTemplate.QPTemplateName, qPTemplate.QPCode, qPTemplate.ExamYear, bookmarkUpdates["COURSECODE"], DateTime.UtcNow.ToShortDateString()));
 
-               await SaveSelectedQPDetail(qPTemplate, userQPTemplate, printedWordDocumentId, pdfDocumentId);
+               await SaveSelectedQPDetail(qPTemplate, userQPTemplate, printedWordDocumentId, wordDocumentId);
                return await PrintQP(updatedSourcedoc, bookmarkUpdates,qPTemplate,userQPTemplate);
             }
             catch (Exception ex)
@@ -307,7 +307,7 @@ namespace SKCE.Examination.Services.Helpers
 
             // Save the modified document as PDF
             var previewPdfPath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}_{2}_QP.pdf", bookmarkUpdates["COURSECODE"], qPTemplate.QPCode, DateTime.Now.ToString("ddMMyyyyhhmmss")));
-            ConvertToPdfBySyncfusion(previewdocPath, previewPdfPath);
+            //ConvertToPdfBySyncfusion(previewdocPath, previewPdfPath);
             var wordDocumentId = await _azureBlobStorageHelper.UploadDocxFileToBlob(previewdocPath, string.Format("{0}_{1}_{2}_{3}_FinalPrinted.docx", qPTemplate.QPTemplateName, qPTemplate.QPCode, qPTemplate.ExamYear, DateTime.UtcNow.ToShortDateString()));
             var selectedQPDetail = _context.SelectedQPDetails.FirstOrDefault(sqp => sqp.UserQPTemplateId == userQPTemplate.UserQPTemplateId);
             if(selectedQPDetail != null)
@@ -315,7 +315,7 @@ namespace SKCE.Examination.Services.Helpers
                 selectedQPDetail.FinalQPPrintedWordDocumentId = wordDocumentId;
                 _context.SaveChanges();
             }
-            return previewPdfPath;
+            return previewdocPath;
         }
         private string GetQPCode(QPTemplate qPTemplate)
         {

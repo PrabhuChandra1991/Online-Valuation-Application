@@ -136,14 +136,14 @@ namespace SKCE.Examination.API.Controllers.QPSettings
                     return Ok(new
                     {
                         FileName = filePath.Split("\\")[filePath.Split("\\").Length - 1],
-                        ContentType = "application/pdf",
+                        ContentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                         Base64Content = base64Pdf
                     });
                 }
                 return Ok(new
                 {
                     FileName = string.Empty,
-                    ContentType = "application/pdf",
+                    ContentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                     Base64Content = string.Empty
                 });
             }
@@ -205,14 +205,14 @@ namespace SKCE.Examination.API.Controllers.QPSettings
                 return Ok(new
                 {
                     FileName = filePath.Split("\\")[filePath.Split("\\").Length - 1],
-                    ContentType = "application/pdf",
+                    ContentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                     Base64Content = base64Pdf
                 });
             }
             return Ok(new
             {
                 FileName = string.Empty,
-                ContentType = "application/pdf",
+                ContentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                 Base64Content = string.Empty
             });
         }

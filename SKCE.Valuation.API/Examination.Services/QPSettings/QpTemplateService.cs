@@ -2022,18 +2022,19 @@ namespace SKCE.Examination.Services.QPSettings
                 if (user != null && !_context.UserQPTemplates.Any(u => u.UserId == userQPTemplate.UserId && (u.QPTemplateStatusTypeId == 8 || u.QPTemplateStatusTypeId == 10)))
                     user.IsActive = false;
                 await _context.SaveChangesAsync();
-                _emailService.SendEmailAsync(user.Email, "Thanks for submitting generated QP",
+                var courseDetails = _context.Courses.FirstOrDefault(c => c.CourseId == qpTemplate.CourseId);
+                _emailService.SendEmailAsync(user.Email, "Subject-CONFIDENTIAL-Sri Krishna Institutions",
                                   $"Dear {user.Name}," +
-                                  $"\n\nGreetings from Sri Krishna Institutions!" +
-                                  $"\n\nThanks for submitting generated QP" +
-                                  $"\n\nThank you for your valued contribution." +
+                                  $"\n\nWe are expressing our sincere gratitude to you on receiving your QP for the upcoming End Semester Theory Examinations scheduled in {qpTemplate.ExamMonth}, {qpTemplate.ExamYear} under the autonomous scheme of our institution." +
+                                  $"\n\nCourse Details\n\n Course Code:{courseDetails.Code}\n Course Name:{courseDetails.Name}" +
+                                  $"\n\nYour expertise and contribution in setting a well-structured QP is highly appreciable."+
+                                  $"\n\nThank you once again for your time and commitment to academic Excellence." +
                                   $"\n\nWarm regards,\nDr. Ramesh Kumar R,\nDean – Examinations,\nSri Krishna Institutions,\n8300034477.").Wait();
                 var adminuser = await _context.Users.FirstOrDefaultAsync(u => u.UserId == 1);
-                _emailService.SendEmailAsync(adminuser.Email, "Submitted generated QP",
+                _emailService.SendEmailAsync(adminuser.Email, $"Submitted generated QP by {user.Name} for Course Code:{courseDetails.Code}\n Course Name:{courseDetails.Name}",
                                  $"Dear {adminuser.Name}," +
-                                 $"\n\nGreetings from Sri Krishna Institutions!" +
-                                 $"\n\nThanks for submitting generated QP" +
-                                 $"\n\nThank you for your valued contribution." +
+                                 $"\n\nPlease find attached submitted QP by {user.Name}." +
+                                 $"\n\nCourse Details\n\n Course Code:{courseDetails.Code}\n Course Name:{courseDetails.Name}" +
                                  $"\n\nWarm regards,\nDr. Ramesh Kumar R,\nDean – Examinations,\nSri Krishna Institutions,\n8300034477.", userQPTemplate.SubmittedQPDocumentId).Wait();
                 return true;
             }
@@ -2104,18 +2105,19 @@ namespace SKCE.Examination.Services.QPSettings
             if (user != null && !_context.UserQPTemplates.Any(u => u.UserId == userQPTemplate.UserId && (u.QPTemplateStatusTypeId == 8 || u.QPTemplateStatusTypeId == 10)))
                 user.IsActive = false;
             await _context.SaveChangesAsync();
-            _emailService.SendEmailAsync(user.Email, "Thanks for submitting generated QP",
-                                  $"Dear {user.Name}," +
-                                  $"\n\nGreetings from Sri Krishna Institutions!" +
-                                  $"\n\nThanks for submitting generated QP" +
-                                  $"\n\nThank you for your valued contribution." +
-                                  $"\n\nWarm regards,\nDr. Ramesh Kumar R,\nDean – Examinations,\nSri Krishna Institutions,\n8300034477.").Wait();
+            var courseDetails = _context.Courses.FirstOrDefault(c => c.CourseId == qpTemplate.CourseId);
+            _emailService.SendEmailAsync(user.Email, "Subject-CONFIDENTIAL-Sri Krishna Institutions",
+                              $"Dear {user.Name}," +
+                              $"\n\nWe are expressing our sincere gratitude to you on receiving your QP for the upcoming End Semester Theory Examinations scheduled in {qpTemplate.ExamMonth}, {qpTemplate.ExamYear} under the autonomous scheme of our institution." +
+                              $"\n\nCourse Details\n\n Course Code:{courseDetails.Code}\n Course Name:{courseDetails.Name}" +
+                              $"\n\nYour expertise and contribution in setting a well-structured QP is highly appreciable." +
+                              $"\n\nThank you once again for your time and commitment to academic Excellence." +
+                              $"\n\nWarm regards,\nDr. Ramesh Kumar R,\nDean – Examinations,\nSri Krishna Institutions,\n8300034477.").Wait();
             var adminuser = await _context.Users.FirstOrDefaultAsync(u => u.UserId == 1);
-            _emailService.SendEmailAsync(adminuser.Email, "Submitted generated QP",
+            _emailService.SendEmailAsync(adminuser.Email, $"Submitted generated QP by {user.Name} for Course Code:{courseDetails.Code}\n Course Name:{courseDetails.Name}",
                              $"Dear {adminuser.Name}," +
-                             $"\n\nGreetings from Sri Krishna Institutions!" +
-                             $"\n\nThanks for submitting generated QP" +
-                             $"\n\nThank you for your valued contribution." +
+                             $"\n\nPlease find attached submitted QP by {user.Name}." +
+                             $"\n\nCourse Details\n\n Course Code:{courseDetails.Code}\n Course Name:{courseDetails.Name}" +
                              $"\n\nWarm regards,\nDr. Ramesh Kumar R,\nDean – Examinations,\nSri Krishna Institutions,\n8300034477.", userQPTemplate.SubmittedQPDocumentId).Wait();
             return true;
         }

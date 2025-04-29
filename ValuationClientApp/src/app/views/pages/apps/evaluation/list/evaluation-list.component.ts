@@ -9,6 +9,7 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { encode } from 'js-base64';
+import { MatRadioModule } from '@angular/material/radio';
 
 @Component({
   selector: 'app-evaluate',
@@ -18,14 +19,19 @@ import { encode } from 'js-base64';
     PdfViewerModule,
     MatTableModule,
     MatPaginatorModule,
-    MatSortModule,],
+    MatSortModule,
+    MatRadioModule],
   templateUrl: './evaluation-list.component.html',
   styleUrl: './evaluation-list.component.scss'
 })
 
 export class EvaluationListComponent implements OnInit {
+
+  filterValue: string = '';
   answerSheetList: any[] = [];
-  displayedColumns: string[] = ['courseCode', 'courseName', 'degreeTypeName','semester', 'examType', 'totalObtainedMark', 'actions'];
+  evaluationFilterValue: string = "all";
+  markFilterValue: string = "allmarks";
+  displayedColumns: string[] = ['courseCode', 'courseName', 'dummyNumber', 'totalObtainedMark', 'actions'];
   dataSource = new MatTableDataSource<any>([]);
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -35,7 +41,69 @@ export class EvaluationListComponent implements OnInit {
     private toastr: ToastrService,
     private evaluationService: EvaluationService,
     private router: Router
-  ) { }
+
+  ) {
+    this.dataSource.filterPredicate = (data: any, filter: string) => {
+      if(this.evaluationFilterValue == 'all') {
+        console.log("helso all")
+        switch (this.markFilterValue) {
+          case "below40": {
+            return data.totalObtainedMark < 40;
+          }
+          case "40to44": {
+            return data.totalObtainedMark >= 40 && data.totalObtainedMark < 45;
+          }
+          case "above44": {
+            return data.totalObtainedMark > 44;
+          }
+          default: {
+            return data;
+          }
+        }
+      }
+      else if(this.evaluationFilterValue == 'true') {
+        switch (this.markFilterValue) {
+          case "below40": {
+            return data.isEvaluateCompleted === true
+            && data.totalObtainedMark < 40;
+          }
+          case "40to44": {
+            return data.isEvaluateCompleted === true
+            && data.totalObtainedMark >= 40 && data.totalObtainedMark < 45;
+          }
+          case "above44": {
+            return data.isEvaluateCompleted === true
+            && data.totalObtainedMark > 44;
+          }
+          default: {
+            return data.isEvaluateCompleted === true
+            && data;
+          }
+        }
+      }
+      else if(this.evaluationFilterValue == 'false') {
+        switch (this.markFilterValue) {
+          case "below40": {
+            return data.isEvaluateCompleted === false
+            && data.totalObtainedMark < 40;
+          }
+          case "40to44": {
+            return data.isEvaluateCompleted === false
+            && data.totalObtainedMark >= 40 && data.totalObtainedMark < 45;
+          }
+          case "above44": {
+            return data.isEvaluateCompleted === false
+            && data.totalObtainedMark > 44;
+          }
+          default: {
+            return data.isEvaluateCompleted === false
+            && data;
+          }
+        }
+      }
+      
+    };
+  }
 
   ngOnInit(): void {
     console.log("ngOnInit.................");
@@ -45,6 +113,7 @@ export class EvaluationListComponent implements OnInit {
       const userData = JSON.parse(loggedInUser);
       this.loadPrimaryDetails(userData.userId);
     }
+    this.evaluationFilterValue = "all"
   }
 
   loadPrimaryDetails(userId: number) {
@@ -63,13 +132,19 @@ export class EvaluationListComponent implements OnInit {
     );
   }
 
-  beautifyMark() {
-    
-  }
-
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
+  }
+
+  evaluationFilter(event: any) {
+    this.evaluationFilterValue = event.value
+    this.dataSource.filter = event.value.trim().toLowerCase();
+  }
+
+  markFilter(event: any) {
+    this.markFilterValue = event.value
+    this.dataSource.filter = event.value.trim().toLowerCase();
   }
 
   evaluate(answerSheetId: number) {

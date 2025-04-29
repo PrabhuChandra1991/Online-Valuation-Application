@@ -9,14 +9,15 @@
         <div class="col-md-8 p-2 text-center">
             <h5 *ngIf="primaryData">
                 <!-- {{primaryData.institutionName}}&nbsp;&nbsp;<span class="text-secondary">|</span>&nbsp;&nbsp; -->
-                Course-{{primaryData.courseCode}}&nbsp;&nbsp;<span class="text-secondary">|</span>&nbsp;&nbsp;
+                {{primaryData.courseCode}}&nbsp;&nbsp;<span class="text-secondary">|</span>&nbsp;&nbsp;
                 {{primaryData.courseName}}&nbsp;&nbsp;<span class="text-secondary">|</span>&nbsp;&nbsp;
                 <!-- Regulation-{{primaryData.regulationYear}}&nbsp;&nbsp;<span class="text-secondary">|</span>&nbsp;&nbsp;
                 Batch-{{primaryData.regulationYear}}&nbsp;&nbsp;<span class="text-secondary">|</span>&nbsp;&nbsp;
-                Exam-{{primaryData.examYear}}({{primaryData.examMonth}})&nbsp;&nbsp;<span class="text-secondary">|</span>&nbsp;&nbsp; -->
+                Exam-{{primaryData.examYear}}({{primaryData.examMonth}})&nbsp;&nbsp;<span class="text-secondary">|</span>&nbsp;&nbsp;
                 {{primaryData.degreeTypeName}}&nbsp;&nbsp;<span class="text-secondary">|</span> &nbsp;&nbsp;
                 Semester-{{primaryData.semester}}&nbsp;&nbsp;<span class="text-secondary">|</span> &nbsp;&nbsp;
-                {{primaryData.examType}}
+                {{primaryData.examType}} -->
+                {{primaryData.dummyNumber}}
             </h5>
         </div>
         <div class="col-md-2 d-grid">
@@ -45,7 +46,11 @@
                                     (click)="loadQuestionDetails($event, (i+1), item.questionNumberDisplay)"
                                     tabindex="-1">{{item.questionNumberDisplay}}</button>
                                 <input *ngIf="item.questionNumberDisplay != ''"
-                                    class="form-control border-0 text-center" type="text" maxlength="5"
+                                    [attr.part]="item.questionPart"
+                                    [attr.qno]="item.questionNumber"
+                                    [attr.group]="item.questionGroup"
+                                    [attr.savedMark]="item.questionGroup"
+                                    class="form-control border-0 text-center" type="text" maxlength="5"                                    
                                     [value]="(item.obtainedMark != 0) ? item.obtainedMark : ''" [attr.max]="item.mark"
                                     [attr.id]="'txt' + (i + 1)"
                                     (focus)="loadQuestionDetails($event, (i+1), item.questionNumberDisplay)"
@@ -54,30 +59,27 @@
                             </td>
                         </tr>
                     </tbody>
-                    <tfoot>
-                        <tr>
-                            <td *ngFor="let item of partList" [attr.colspan]="item.count">
-                                Obtained Marks
-                            </td>
-                        </tr>
-                    </tfoot>
                 </table>
             </div>
         </div>
 
         <div class="row mt-4 p-0 mb-2">
-            <div class="col-md-6 mb-2">
+            <div class="col-md-6">
                 <h5>Maximum Mark for selected question:&nbsp;&nbsp;{{activeQuestionMark}}</h5>
             </div>
-            <div class="col-md-6">
-                <!-- <h4>Total marks obtained:&nbsp;&nbsp;
-                    <span class="{{ (obtainedMarks < 40) ? 'text-danger' : (obtainedMarks < 45) ? 'text-warning' : 'text-success' }}">
-                        {{obtainedMarks}}&nbsp;/&nbsp;{{totalMarks}}
-                    </span>
-                </h4> -->
-                <h4
+            <div class="col-md-1">
+                <h5>Part A: {{ partAMark }}</h5>
+            </div>
+            <div class="col-md-1">
+                <h5>Part B: {{ partBMark }}</h5>
+            </div>
+            <div class="col-md-1" >
+                <h5 *ngIf="primaryData.degreeTypeName == 'PG'">Part C: {{ partCMark }}</h5>
+            </div>
+            <div class="col-md-3">
+                <h4 class="float-end"
                     [ngClass]="(obtainedMarks < 40) ? 'text-danger' : (obtainedMarks < 45) ? 'text-warning' : 'text-success'">
-                    Total marks obtained:&nbsp;&nbsp;{{obtainedMarks}}&nbsp;/&nbsp;{{totalMarks}}</h4>
+                    Grand total:&nbsp;&nbsp;{{obtainedMarks}}&nbsp;/&nbsp;100</h4>
             </div>
         </div>
 

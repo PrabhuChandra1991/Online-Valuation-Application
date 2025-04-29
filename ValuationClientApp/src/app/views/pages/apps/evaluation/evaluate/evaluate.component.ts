@@ -75,9 +75,143 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
 
   }
 
+  // called after dom is loaded to calclate the marks
   ngAfterViewChecked(): void {
     //this.cdr.detectChanges();
     this.calculateSubTotalMarks();
+  }
+
+  async getPrimaryData() {
+    //console.log('loading primary data............');
+    await this.evaluationService.getAnswerSheetDetails(0, this.answersheetId).subscribe(
+      (data: any) => {
+        if (data[0]) {
+          console.log("primary data: ", data[0])
+          this.primaryData = data[0];
+          this.answersheet = `${this.primaryData.uploadedBlobStorageUrl}`; //?${this.sasToken}
+          this.obtainedMarks = this.primaryData.totalObtainedMark;
+        }
+        else {
+          console.log('No answersheet data');
+        }
+      },
+      (error) => {
+        console.error('Error getting answersheet data:', error);
+        this.toastr.error('Failed to get answersheet data.');
+      }
+    )
+  }
+
+  async getAnswersheetMark() {
+    //console.log('loading saved mark data............');
+    await this.evaluationService.getAnswersheetMark(this.answersheetId).subscribe(
+      (data: any) => {
+        if (data.length > 0) {
+          console.log("saved mark data: ", data)
+          this.answersheetMarkData = data;
+        }
+        else {
+          console.log('No saved mark data');
+        }
+      },
+      (error) => {
+        console.error('Error getting mark data:', error);
+        this.toastr.error('Failed to get mark data.');
+      }
+    )
+  }
+
+  async getQuestionPaperAnswerKey() {
+    //console.log('loading question and answer............');
+    await this.evaluationService.getQuestionAndAnswer(this.answersheetId).subscribe(
+      (data: any[]) => {
+        if (data.length > 0) {
+
+          data.forEach((item) => {
+            this.qaList.push({
+              "questionNumber": item.questionNumber,
+              "questionPart": item.questionPartName,
+              "questionGroup": item.questionGroupName,
+              "questionNumberDisplay": item.questionNumberDisplay,
+              "questionNumberSubNum": item.questionNumberSubNum,
+              "questionDescription": decode(item.questionDescription),
+              "questionImage": decode(item.questionImage),
+              "answerDescription": decode(item.answerDescription),
+              "mark": this.getMark(item.questionMark),
+              "obtainedMark": this.getSavedMarks(item.questionNumber, item.questionNumberSubNum)
+            });
+          });
+
+          console.log("qaList: ", this.qaList);
+
+          this.getPartList(data);
+          //this.getGroupList(data);
+
+          //this.obtainedMarks = this.qaList.reduce((sum, item) => sum + (item.obtainedMark || 0), 0);
+        }
+        else {
+          console.log('No question and answer data');
+        }
+      },
+      (error) => {
+        console.error('Error fetching question and answer:', error);
+        this.toastr.error('Failed to load question and answer.');
+      }
+    );
+  }
+
+  getPartList(data: any[]) {
+    //console.log("getPartList...............");
+    const partMap = new Map();
+    data.forEach(({ questionPartName }) => {
+      partMap.set(questionPartName, (partMap.get(questionPartName) || 0) + 1);
+    });
+    this.partList = Array.from(partMap, ([part, count]) => ({ part, count }));
+    console.log("partList:", this.partList);
+  }
+
+  // getGroupList(data: any[]) {
+  //   //console.log("getGroupList...............");
+  //   const groupMap = new Map();
+  //   data.forEach(({ questionGroupName }) => {
+  //     groupMap.set(questionGroupName, (groupMap.get(questionGroupName) || 0) + 1);
+  //   });
+
+  //   console.log(groupMap);
+  //   this.groupList = Array.from(groupMap, ([group, count]) => ({ group, count }));
+  //     //.filter(({ count }) => count > 1);
+  //   console.log("groupList:", this.groupList);
+  // }
+
+  // reduceChoiceQuestionMarks() {
+  //   // Remove marks if choice question
+  //   this.groupList.forEach((group) => {
+  //     if (group.count == 2) {
+  //       let item = this.qaList.find(e => e.questionGroup === group.group);
+  //       if (item) {
+  //         //this.totalMarks = this.totalMarks - item.mark;
+  //         return;
+  //       }
+  //     }
+  //     if (group.count == 4) {
+  //       let item = this.qaList.find(e => e.questionGroup === group.group);
+  //       if (item) {
+  //         //this.totalMarks = this.totalMarks - (item.mark * 2);
+  //         return;
+  //       }
+  //     }
+  //   });
+  // }
+
+  getSavedMarks(questionNumber: number, questionSubNum: number) {
+    let questionRow = this.answersheetMarkData.filter(x => x.questionNumber == questionNumber && x.questionNumberSubNum == questionSubNum)[0];
+    if (questionRow) {
+      //console.log(questionRow.obtainedMark);
+      return questionRow.obtainedMark;
+    }
+    else {
+      return 0;
+    }
   }
 
   calculateSubTotalMarks() {
@@ -149,120 +283,6 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
     this.partBMark = parseFloat(sumTotalMarks);
   }
 
-  async getPrimaryData() {
-    //console.log('loading primary data............');
-    await this.evaluationService.getAnswerSheetDetails(0, this.answersheetId).subscribe(
-      (data: any) => {
-        if (data[0]) {
-          console.log("primary data: ", data[0])
-          this.primaryData = data[0];
-          this.answersheet = `${this.primaryData.uploadedBlobStorageUrl}`; //?${this.sasToken}
-          this.obtainedMarks = this.primaryData.totalObtainedMark;
-        }
-        else {
-          console.log('No answersheet data');
-        }
-      },
-      (error) => {
-        console.error('Error getting answersheet data:', error);
-        this.toastr.error('Failed to get answersheet data.');
-      }
-    )
-  }
-
-  async getAnswersheetMark() {
-    //console.log('loading saved mark data............');
-    await this.evaluationService.getAnswersheetMark(this.answersheetId).subscribe(
-      (data: any) => {
-        if (data.length > 0) {
-          console.log("saved mark data: ", data)
-          this.answersheetMarkData = data;
-        }
-        else {
-          console.log('No saved mark data');
-        }
-      },
-      (error) => {
-        console.error('Error getting mark data:', error);
-        this.toastr.error('Failed to get mark data.');
-      }
-    )
-  }
-
-  async getQuestionPaperAnswerKey() {
-    //console.log('loading question and answer............');
-    await this.evaluationService.getQuestionAndAnswer(this.answersheetId).subscribe(
-      (data: any[]) => {
-        if (data.length > 0) {
-
-          data.forEach((item) => {
-            this.qaList.push({
-              "questionNumber": item.questionNumber,
-              "questionPart": item.questionPartName,
-              "questionGroup": item.questionGroupName,
-              "questionNumberDisplay": item.questionNumberDisplay,
-              "questionNumberSubNum": item.questionNumberSubNum,
-              "questionDescription": decode(item.questionDescription),
-              "questionImage": decode(item.questionImage),
-              "answerDescription": decode(item.answerDescription),
-              "mark": this.getMark(item.questionMark),
-              "obtainedMark": this.savedMarks(item.questionNumber, item.questionNumberSubNum)
-            });
-          });
-
-          console.log("qaList: ", this.qaList);
-
-          this.getPartList(data);
-          //this.getGroupList(data);
-
-          //this.obtainedMarks = this.qaList.reduce((sum, item) => sum + (item.obtainedMark || 0), 0);
-
-        }
-        else {
-          console.log('No question and answer data');
-        }
-      },
-      (error) => {
-        console.error('Error fetching question and answer:', error);
-        this.toastr.error('Failed to load question and answer.');
-      }
-    );
-  }
-
-  getPartList(data: any[]) {
-    //console.log("getPartList...............");
-    const partMap = new Map();
-    data.forEach(({ questionPartName }) => {
-      partMap.set(questionPartName, (partMap.get(questionPartName) || 0) + 1);
-    });
-    this.partList = Array.from(partMap, ([part, count]) => ({ part, count }));
-    console.log("partList:", this.partList);
-  }
-
-  // getGroupList(data: any[]) {
-  //   //console.log("getGroupList...............");
-  //   const groupMap = new Map();
-  //   data.forEach(({ questionGroupName }) => {
-  //     groupMap.set(questionGroupName, (groupMap.get(questionGroupName) || 0) + 1);
-  //   });
-
-  //   console.log(groupMap);
-  //   this.groupList = Array.from(groupMap, ([group, count]) => ({ group, count }));
-  //     //.filter(({ count }) => count > 1);
-  //   console.log("groupList:", this.groupList);
-  // }
-
-  savedMarks(questionNumber: number, questionSubNum: number) {
-    let questionRow = this.answersheetMarkData.filter(x => x.questionNumber == questionNumber && x.questionNumberSubNum == questionSubNum)[0];
-    if (questionRow) {
-      //console.log(questionRow.obtainedMark);
-      return questionRow.obtainedMark;
-    }
-    else {
-      return 0;
-    }
-  }
-
   getMark(questionMark: string) {
     let mark = 0;
     const dom = new DOMParser().parseFromString(decode(questionMark), 'text/html');
@@ -278,26 +298,6 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
     //this.totalMarks = this.totalMarks + mark;
 
     return mark;
-  }
-
-  reduceChoiceQuestionMarks() {
-    // Remove marks if choice question
-    this.groupList.forEach((group) => {
-      if (group.count == 2) {
-        let item = this.qaList.find(e => e.questionGroup === group.group);
-        if (item) {
-          //this.totalMarks = this.totalMarks - item.mark;
-          return;
-        }
-      }
-      if (group.count == 4) {
-        let item = this.qaList.find(e => e.questionGroup === group.group);
-        if (item) {
-          //this.totalMarks = this.totalMarks - (item.mark * 2);
-          return;
-        }
-      }
-    });
   }
 
   loadQuestionDetails(event: any, id: number, qusetionNo: string) {
@@ -339,13 +339,15 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
     if (event.target.value) {
       if (event.target.value.match(/[^0-9.]/g)) {
         this.toastr.error('Please add only numbers.');
-        event.target.value = ''; //event.target.value.replace(/[^\d]/g, '');        
+        event.target.value = ''; //event.target.value.replace(/[^\d]/g, '');
+        this.saveMark(item, 0);     
         //return;
       }
       else if ((parseFloat(event.target.value) > parseInt(event.srcElement.max))) {
         let msg = `Maximum marks allowed is ${event.srcElement.max}`
         this.toastr.error(msg);
         event.target.value = '';
+        this.saveMark(item, 0);
         //return;
       }
       else {
@@ -426,10 +428,10 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
     this.router.navigate(['/apps/evaluationlist']);
   }
 
-  filter(part: string) {
-    let list = this.qaList.filter(e => e.part === part);
-    return list;
-  }
+  // filter(part: string) {
+  //   let list = this.qaList.filter(e => e.part === part);
+  //   return list;
+  // }
 
   onError(error: any) {
     console.error('PDF error: ', error);

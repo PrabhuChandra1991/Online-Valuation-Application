@@ -49,6 +49,7 @@
                                     [attr.part]="item.questionPart"
                                     [attr.qno]="item.questionNumber"
                                     [attr.group]="item.questionGroup"
+                                    [attr.savedMark]="item.questionGroup"
                                     class="form-control border-0 text-center" type="text" maxlength="5"                                    
                                     [value]="(item.obtainedMark != 0) ? item.obtainedMark : ''" [attr.max]="item.mark"
                                     [attr.id]="'txt' + (i + 1)"
@@ -76,11 +77,6 @@
                 <h5 *ngIf="primaryData.degreeTypeName == 'PG'">Part C: {{ partCMark }}</h5>
             </div>
             <div class="col-md-3">
-                <!-- <h4>Total marks obtained:&nbsp;&nbsp;
-                    <span class="{{ (obtainedMarks < 40) ? 'text-danger' : (obtainedMarks < 45) ? 'text-warning' : 'text-success' }}">
-                        {{obtainedMarks}}&nbsp;/&nbsp;{{totalMarks}}
-                    </span>
-                </h4> -->
                 <h4 class="float-end"
                     [ngClass]="(obtainedMarks < 40) ? 'text-danger' : (obtainedMarks < 45) ? 'text-warning' : 'text-success'">
                     Grand total:&nbsp;&nbsp;{{obtainedMarks}}&nbsp;/&nbsp;100</h4>

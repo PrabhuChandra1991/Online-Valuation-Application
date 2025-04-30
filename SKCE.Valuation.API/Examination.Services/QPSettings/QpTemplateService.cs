@@ -1353,6 +1353,17 @@ namespace SKCE.Examination.Services.QPSettings
 
                 if (totalMarks != 16) errors.Add($"❌ Q{qNo} Total Marks = {totalMarks} (should be 16).");
 
+                if (qNo == 12 || qNo == 14 || qNo == 16 || qNo == 18 || qNo == 20)
+                {
+                    string subPreQ1CO = ExtractBookmarkText(doc, $"Q{qNo - 1}ICO");
+                    string subPreQ1BT = ExtractBookmarkText(doc, $"Q{qNo - 1}IBT");
+                    string subPreQ2CO = ExtractBookmarkText(doc, $"Q{qNo - 1}IICO");
+                    string subPreQ2BT = ExtractBookmarkText(doc, $"Q{qNo - 1}IIBT");
+                    if (subQ1CO != subPreQ1CO || subQ1BT != subPreQ1BT || subQ2CO != subPreQ2CO || subQ2BT != subPreQ2BT)
+                    {
+                        errors.Add($"❌ Q{qNo - 1} BT and CO, Q{qNo} BT and CO distributions are mismatch.");
+                    }
+                }
                 // Add to table
                 //htmlTable.Append($"<tr><td>Q{qNo}</td><td>{subQ1Text}</td><td>{subQ1CO}</td><td>{subQ1BT}</td><td>{subQ1Marks}</td><td>{subQ2Text}</td><td>{subQ2CO}</td><td>{subQ2BT}</td><td>{subQ2Marks}</td><td>{totalMarks}</td></tr>");
             }
@@ -1708,6 +1719,17 @@ namespace SKCE.Examination.Services.QPSettings
 
                 if (totalMarks != 15) errors.Add($"❌ Q{qNo} Total Marks = {totalMarks} (should be 15).");
 
+                if (qNo == 12 || qNo == 14 || qNo == 16 || qNo == 18)
+                {
+                    string subPreQ1CO = ExtractBookmarkText(doc, $"Q{qNo - 1}ICO");
+                    string subPreQ1BT = ExtractBookmarkText(doc, $"Q{qNo - 1}IBT");
+                    string subPreQ2CO = ExtractBookmarkText(doc, $"Q{qNo - 1}IICO");
+                    string subPreQ2BT = ExtractBookmarkText(doc, $"Q{qNo - 1}IIBT");
+                    if (subQ1CO != subPreQ1CO || subQ1BT != subPreQ1BT || subQ2CO != subPreQ2CO || subQ2BT != subPreQ2BT)
+                    {
+                        errors.Add($"❌ Q{qNo - 1} BT and CO, Q{qNo} BT and CO distributions are mismatch.");
+                    }
+                }
                 // Add to table
                 //htmlTable.Append($"<tr><td>Q{qNo}</td><td>{subQ1Text}</td><td>{subQ1CO}</td><td>{subQ1BT}</td><td>{subQ1Marks}</td><td>{subQ2Text}</td><td>{subQ2CO}</td><td>{subQ2BT}</td><td>{subQ2Marks}</td><td>{totalMarks}</td></tr>");
             }

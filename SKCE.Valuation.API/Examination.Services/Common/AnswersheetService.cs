@@ -81,7 +81,7 @@ namespace SKCE.Examination.Services.Common
                            AllocatedUserName = (allocatedUserResult != null ? allocatedUserResult.Name : string.Empty),
                            TotalObtainedMark = answersheet.TotalObtainedMark,
                            IsEvaluateCompleted = answersheet.IsEvaluateCompleted
-                       }).ToListAsync();
+                       }).OrderBy(x => x.IsEvaluateCompleted).ToListAsync();
 
             return resultItems;
         }

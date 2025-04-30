@@ -28,7 +28,7 @@ export default [
         canActivate: [authGuard]
     },
     {
-        path: 'evaluate/:data',
+        path: 'evaluate/:id',
         loadComponent: () => import('./evaluation/evaluate/evaluate.component').then(c => c.EvaluateComponent),
         canActivate: [authGuard]
     },

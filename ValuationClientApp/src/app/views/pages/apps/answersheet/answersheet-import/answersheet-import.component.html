@@ -74,8 +74,6 @@
             formControlName="file"
             (change)="onDummyNumberFileChange($event)"
           />
-        </div>
-        <div class="col-md-2">
           <button
             type="submit"
             class="btn btn-primary"
@@ -91,13 +89,17 @@
     <div class="col-md-4">
       <b>Imported Excel documents</b>
       <br />
-      <i>Please click below link to see dummy numbers</i>
+      <i>Please click below link to review dummy numbers</i>
       <br />
       <br />
       <ul>
         <li
           *ngFor="let item of dataSourceAnswerSheetImports"
           [value]="item.answersheetImportId"
+          [ngStyle]="{
+            color:
+              item.documentName == selectedAnswersheetName ? 'blue' : 'black'
+          }"
           (click)="
             loadAnswersheetImportDetails(
               item.answersheetImportId,
@@ -110,8 +112,18 @@
       </ul>
     </div>
     <div class="col-md-8">
-      <b>Dummy Numbers blongs : {{ selectedAnswersheetName }}</b>
-      Count : {{ dataSourceAnswerSheetImportDetails.length }}
+      <b>Dummy Numbers blongs:</b>
+      {{ selectedAnswersheetName.split("\\")[2] }}
+      <b> Count:</b>
+      {{ dataSourceAnswerSheetImportDetails.length }}
+
+      <button
+        [disabled]="selectedAnswersheetName === ''"
+        class="btn btn-primary float-end"
+        (click)="promptBeforeReviewCompletion()"
+      >
+        Complete Review
+      </button>
 
       <div class="row mt-4">
         <div class="col-lg-12 custom-table-style">
@@ -166,3 +178,27 @@
     </div>
   </div>
 </div>
+<!-- Confirmation Modal -->
+<ng-template #confirmModule let-modal>
+  <div class="modal-body">
+    <div class="row col-md-20">
+      <h6>Please confirm, dummy numbers are reviewed and completed?</h6>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button
+      type="button"
+      class="btn btn-danger px-4"
+      (click)="modal.close('by: no button')"
+    >
+      No
+    </button>
+    <button
+      type="button"
+      class="btn btn-primary px-4"
+      (click)="completeDummyNumberReview()"
+    >
+      Yes
+    </button>
+  </div>
+</ng-template>

@@ -10,6 +10,7 @@ import {
   NgbNavModule,
   NgbTooltip,
   NgbModal,
+  NgbModalRef,
 } from '@ng-bootstrap/ng-bootstrap';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { CommonModule } from '@angular/common';
@@ -81,8 +82,13 @@ export class AnswersheetImportComponent implements OnInit {
 
   displayedColumns: string[] = ['dummyNumber', 'isValid', 'errorMessage'];
 
+  modalRef: NgbModalRef;
+
+  @ViewChild('confirmModule') confirmModule: any;
+
   constructor(
     private fb: FormBuilder,
+    private modalService: NgbModal,
     private answersheetService: AnswersheetService,
     private instituteService: InstituteService,
     private answersheetImportService: AnswersheetImportService,
@@ -168,8 +174,11 @@ export class AnswersheetImportComponent implements OnInit {
   }
 
   loadAnswersheetImports() {
+    //----------
     this.dataSourceAnswerSheetImports = [];
     this.dataSourceAnswerSheetImportDetails = [];
+    this.selectedAnswersheetName = '';
+    //----------
     this.answersheetImportService
       .GetAnswersheetImports(this.selectedExaminationId)
       .subscribe({
@@ -276,6 +285,39 @@ export class AnswersheetImportComponent implements OnInit {
         },
         complete: () => {},
       });
+  }
+
+  promptBeforeReviewCompletion() {
+    this.modalRef = this.modalService.open(this.confirmModule, {
+      size: 'md',
+      backdrop: 'static',
+    });
+  }
+
+  completeDummyNumberReview() {
+    this.modalRef.close();
+    // if (this.obtainedMarks == 0) {
+    //   this.toastr.warning('Obained Marks is 0. Please evaluate.');
+    // } else {
+    //   this.evaluationService
+    //     .completeEvaluation(this.primaryData.answersheetId, this.loggedinUserId)
+    //     .subscribe(
+    //       (data: any) => {
+    //         console.log('respo', data);
+    //         if (data.message.toLowerCase() == 'success') {
+    //           this.toastr.success('Evaluation completed successfully');
+    //           this.backToList();
+    //         } else {
+    //           console.error('Failed to complete evaluation');
+    //           this.toastr.error('Failed to complete evaluation.');
+    //         }
+    //       },
+    //       (error) => {
+    //         console.error('Error while saving evaluation:', error);
+    //         this.toastr.error('Failed to complete evaluation.');
+    //       }
+    //     );
+    // }
   }
 
   ////

@@ -6,10 +6,18 @@
         <div class="row">
           <div class="col-md-12">
             <div class="mb-2">
-              <label class="form-label" for="filename">Upload Master Data from Eval Pro <span class="text-danger">
-                  *</span> </label>
-              <input class="form-control " value="f['file']" type="file" id="masterfile" formControlName="file"
-                (change)="onMasterDataFileChange($event)">
+              <label class="form-label" for="filename"
+                >Upload Master Data from Eval Pro
+                <span class="text-danger"> *</span>
+              </label>
+              <input
+                class="form-control"
+                value="f['file']"
+                type="file"
+                id="masterfile"
+                formControlName="file"
+                (change)="onMasterDataFileChange($event)"
+              />
               <!-- <div *ngIf="f['file'].touched && f['file'].invalid" class="alert alert-danger">
                   <div *ngIf="f['file'].errors && f['file'].errors['required']">
                   File is required.
@@ -17,59 +25,82 @@
               </div> -->
               <div class="row color-red">
                 <div class="col-md-12">
-                  <div>{{duplicateImportAlert}}</div>
+                  <div>{{ duplicateImportAlert }}</div>
                 </div>
               </div>
             </div>
-          </div>          
+          </div>
           <div class="col-md-6 d-grid">
             <button type="submit" class="btn btn-primary" *ngIf="isMasImported">
               Import Master Data from Eval Pro
             </button>
           </div>
-          <div class="col-md-6">
-          </div>
+          <div class="col-md-6"></div>
         </div>
       </form>
-      <br>
-      <form [formGroup]="courseSyllabusDocumentsForm" (ngSubmit)="submitSyllabusDocuments()">
+      <br />
+      <form
+        [formGroup]="courseSyllabusDocumentsForm"
+        (ngSubmit)="submitSyllabusDocuments()"
+      >
         <div class="row">
           <div class="col-md-12">
             <div class="mb-2">
-              <label class="form-label" for="filename">Upload course syllabus templates <span class="text-danger">
-                  *</span> </label>
-              <input class="form-control " multiple value="courseSyllabusDocumentsFormF['file']" type="file"
-                id="masterfile" formControlName="file" (change)="onCourseSyllabusDocumentFileChange($event)">
+              <label class="form-label" for="filename"
+                >Upload course syllabus templates
+                <span class="text-danger"> *</span>
+              </label>
+              <input
+                class="form-control"
+                multiple
+                value="courseSyllabusDocumentsFormF['file']"
+                type="file"
+                id="masterfile"
+                formControlName="file"
+                (change)="onCourseSyllabusDocumentFileChange($event)"
+              />
               <!-- <div *ngIf="courseSyllabusDocumentsFormF['file'].touched && courseSyllabusDocumentsFormF['file'].invalid" class="alert alert-danger">
                   <div *ngIf="courseSyllabusDocumentsFormF['file'].errors && courseSyllabusDocumentsFormF['file'].errors['required']">
                   File is required.
                   </div>
               </div> -->
               <div class="row">
-                <div class="col-md-12 ">
-                  <div>{{syllabusDocsPending}}</div>
+                <div class="col-md-12">
+                  <div>{{ syllabusDocsPending }}</div>
                 </div>
               </div>
             </div>
           </div>
           <div class="col-md-6 d-grid">
-            <button type="submit" class="btn btn-primary" *ngIf="isCourseSylImported">
+            <button
+              type="submit"
+              class="btn btn-primary"
+              *ngIf="isCourseSylImported"
+            >
               Import Course syllabus templates
             </button>
           </div>
-          <div class="col-md-6">
-          </div>
+          <div class="col-md-6"></div>
         </div>
       </form>
-      <br>
+      <br />
       <form [formGroup]="qpDocumentsForm" (ngSubmit)="submitQPDocuments()">
         <div class="row">
           <div class="col-md-12">
             <div class="mb-2">
-              <label class="form-label" for="filename">Upload QP and QP Answer Key templates <span class="text-danger">
-                  *</span> </label>
-              <input class="form-control " multiple value="qpDocumentsformf['file']" type="file" id="masterfile"
-                formControlName="file" (change)="onQpDocumentFileChange($event)">
+              <label class="form-label" for="filename"
+                >Upload QP and QP Answer Key templates
+                <span class="text-danger"> *</span>
+              </label>
+              <input
+                class="form-control"
+                multiple
+                value="qpDocumentsformf['file']"
+                type="file"
+                id="masterfile"
+                formControlName="file"
+                (change)="onQpDocumentFileChange($event)"
+              />
               <!-- <div *ngIf="qpDocumentsformf['file'].touched && qpDocumentsformf['file'].invalid" class="alert alert-danger">
                     <div *ngIf="qpDocumentsformf['file'].errors && qpDocumentsformf['file'].errors['required']">
                     File is required.
@@ -78,34 +109,15 @@
             </div>
           </div>
           <div class="col-md-6 d-grid">
-            <button type="submit" class="btn btn-primary" *ngIf="isQpAkImported">
+            <button
+              type="submit"
+              class="btn btn-primary"
+              *ngIf="isQpAkImported"
+            >
               Import QP and QP Answer Key templates
             </button>
           </div>
-          <div class="col-md-6">
-          </div>
-        </div>
-      </form>
-      <br>
-      <form [formGroup]="dummyNumberImportForm" (ngSubmit)="submitDummyNumberImport()">
-        <div class="row">
-          <div class="col-md-12">
-            <div class="mb-2">
-            <label class="form-label" for="filename">
-              Upload Dummy Numbers
-              <span class="text-danger"> *</span>
-            </label>
-              <input class="form-control" value="gedDummyNumberformControls['file']" type="file" id="masterfile"
-                formControlName="file" (change)="onDummyNumberFileChange($event)" />
-            </div>
-          </div>
-          <div class="col-md-6 d-grid">
-            <button type="submit" class="btn btn-primary" *ngIf="isDummyNumberImported">
-              Import Dummy Number List
-            </button>
-          </div>
-          <div class="col-md-6">
-          </div>
+          <div class="col-md-6"></div>
         </div>
       </form>
     </div>

@@ -32,9 +32,9 @@ export const MENU: MenuItem[] = [
   //   role: [1]
   // },
   {
-    label: 'Answersheet Management',
+    label: 'Answersheet import',
     icon: 'clipboard',
-    link: '/apps/answersheet',
+    link: '/apps/answersheet/import',
     role: [1],
   },
   {
@@ -44,9 +44,9 @@ export const MENU: MenuItem[] = [
     role: [1],
   },
   {
-    label: 'Answersheet import',
+    label: 'Answersheet Management',
     icon: 'clipboard',
-    link: '/apps/answersheet/import',
+    link: '/apps/answersheet',
     role: [1],
   },
   {
@@ -65,7 +65,7 @@ export const MENU: MenuItem[] = [
     label: 'Export Marks',
     icon: 'clipboard',
     link: '/exportmarks',
-    role: [1]
+    role: [1],
   },
   // {
   //   label: 'Valuation',

@@ -28,6 +28,13 @@ namespace SKCE.Examination.API.Controllers.Common
             var result = await _dropdownService.GetExamMonthsAsync();
             return Ok(result);
         }
-         
+
+        [HttpGet("GetExamTypes")]
+        public async Task<ActionResult<List<string>>> GetExamTypes()
+        {
+            var result = await _dropdownService.GetExamTypesAsync();
+            return Ok(result);
+        }
+
     }
 }

@@ -56,29 +56,30 @@ import { InstituteService } from '../../../services/institute.service';
 export class AnswersheetManagementComponent {
   answersheets: any[] = [];
 
-  displayedColumns: string[] = [
-    'institutionName',
-    'regulationYear',
-    'batchYear',
-    'degreeTypeName',
-    'examType',
-    'semester',
-    'courseCode',
-    'examMonth',
-    'examYear',
+  displayedColumns: string[] = [    
     'dummyNumber',
     'allocatedUserName',
+    'isEvaluateCompleted',
+    'totalObtainedMark'
   ];
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
+  ddlCourses = new FormControl('');
+
   dataSource = new MatTableDataSource<any>([]);
+
+  dataSourceExamYears: any[] = [];
+  dataSourceExamMonths: any[] = [];
+  dataSourceExamTypes: any[] = [];
 
   institutes: any[] = [];
   courses: any[] = [];
 
-  selectedInstituteId: number = 0;
+  selectedExamYear: string = '';
+  selectedExamMonth: string = '';
+  selectedExamType: string = '';
   selectedCourseId: number = 0;
 
   constructor(
@@ -88,8 +89,60 @@ export class AnswersheetManagementComponent {
   ) {}
 
   ngOnInit(): void {
+    this.loadAllExamYears();
+    this.loadAllExamMonths();
+    this.loadAllExamTypes();
     this.loadAllInstitues();
     this.loadAllCourses();
+  }
+
+  loadAllExamYears(): void {
+    this.answersheetService.getExamYears().subscribe({
+      next: (data) => {
+        this.dataSourceExamYears = data;
+        console.log('ExamYears loaded:', this.dataSourceExamYears);
+      },
+      error: (err) => {
+        console.error('Error loading ExamYears:', err);
+      },
+    });
+  }
+
+  loadAllExamMonths(): void {
+    this.answersheetService.getExamMonths().subscribe({
+      next: (data: any) => {
+        this.dataSourceExamMonths = data;
+        console.log('ExamMonths loaded:', this.dataSourceExamMonths);
+      },
+      error: (err: any) => {
+        console.error('Error loading ExamMonths:', err);
+      },
+    });
+  }
+
+  loadAllExamTypes(): void {
+    this.answersheetService.getExamTypes().subscribe({
+      next: (data: any) => {
+        this.dataSourceExamTypes = data;
+        console.log('ExamTypes loaded:', this.dataSourceExamMonths);
+      },
+      error: (err: any) => {
+        console.error('Error loading ExamTypes:', err);
+      },
+    });
+  }
+
+  loadAllCourses(): void {
+    this.answersheetService.getCourses().subscribe({
+      next: (data) => {
+        this.courses = data;
+        console.log('Course loaded:', this.courses);
+      },
+      error: (error) => {
+        console.error('Error loading Course:', error);
+      },
+    });
+    this.ddlCourses.setValue('0');
   }
 
   applyFilter(event: Event) {
@@ -101,29 +154,21 @@ export class AnswersheetManagementComponent {
     }
   }
 
-  loadAnswersheets(institutionId: number, courseId: number): void {
-    this.answersheetService
-      .getAnswersheetDetails(institutionId, courseId)
-      .subscribe({
-        next: (data: any[]) => {
-          this.answersheets = data;
-          this.dataSource.data = this.answersheets;
-          this.dataSource.paginator = this.paginator;
-          this.dataSource.sort = this.sort;
-          // console.log('history data:', this.answersheets);
-        },
-        error: (errRes: any) => {
-          console.error('Error loading history:', errRes);
-        },
-      });
+  onExamYearChange(event: Event): void {
+    this.selectedExamYear = (event.target as HTMLSelectElement).value;
+    this.ddlCourses.setValue('0');
   }
 
-  onInstituteChange(event: Event): void {
-    this.selectedInstituteId = parseInt(
-      (event.target as HTMLSelectElement).value
-    );
-    this.loadData();
+  onExamMonthChange(event: Event): void {
+    this.selectedExamMonth = (event.target as HTMLSelectElement).value;
+    this.ddlCourses.setValue('0');
   }
+
+  onExamTypeChange(event: Event): void {
+    this.selectedExamType = (event.target as HTMLSelectElement).value;
+    this.ddlCourses.setValue('0');
+  }
+
   onCourseChange(event: Event): void {
     this.selectedCourseId = parseInt((event.target as HTMLSelectElement).value);
     this.loadData();
@@ -141,20 +186,25 @@ export class AnswersheetManagementComponent {
     });
   }
 
-  loadAllCourses(): void {
-    this.answersheetService.getCourses().subscribe({
-      next: (data) => {
-        this.courses = data;
-        console.log('Course loaded:', this.courses);
-      },
-      error: (error) => {
-        console.error('Error loading Course:', error);
-      },
-    });
+  loadData(): void {
+    this.loadAnswersheets(this.selectedCourseId);
   }
 
-  loadData(): void {
-    this.loadAnswersheets(this.selectedInstituteId, this.selectedCourseId);
+  loadAnswersheets(courseId: number): void {
+    this.answersheetService
+      .getAnswersheetDetails(this.selectedExamYear, this.selectedExamMonth, this.selectedExamType, courseId)
+      .subscribe({
+        next: (data: any[]) => {
+          this.answersheets = data;
+          this.dataSource.data = this.answersheets;
+          this.dataSource.paginator = this.paginator;
+          this.dataSource.sort = this.sort;
+          // console.log('history data:', this.answersheets);
+        },
+        error: (errRes: any) => {
+          console.error('Error loading history:', errRes);
+        },
+      });
   }
 
   //---------

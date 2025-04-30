@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Utilities;
 using SKCE.Examination.Models.DbModels.Common;
 using System.Threading.Tasks;
 
@@ -29,6 +30,11 @@ namespace SKCE.Examination.Services.Common
                 .Select(x => x.ExamMonth).Distinct().ToListAsync();
         }
 
+        public Task<List<string>> GetExamTypesAsync()
+        {
+            List<string> examTypes = new List<string> { "Regular", "Arrear" };
+            return Task.FromResult(examTypes);
+        }
 
         public async Task<List<string>> GetExamYearMonthsAsync()
         {

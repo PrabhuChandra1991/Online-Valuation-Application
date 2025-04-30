@@ -61,24 +61,26 @@ export class ConsolidatedviewComponent {
   allocateAnswersheetForm!: FormGroup;
   allocateTransactionInprogress: boolean = false;
 
+  dataSourceExamYears: any[] = [];
+  dataSourceExamMonths: any[] = [];
+  dataSourceExamTypes: any[] = [];
+
+  selectedExamYear: string = '';
+  selectedExamMonth: string = '';
+  selectedExamType: string = '';
+
+  ddlType = new FormControl('');
+
   modalRef: NgbModalRef;
   gridDataItems: any[] = [];
   dataSource = new MatTableDataSource<any>([]);
   institutes: any[] = [];
-  selectedInstituteId: string = '';
   selectedElement: any;
   users: any[] = [];
   enterAllocation: any;
   displayedColumns: string[] = [
-    'institutionCode',
-    'regulationYear',
-    'batchYear',
-    'degreeType',
-    'examType',
-    'semester',
     'courseCode',
-    'examMonth',
-    'examYear',
+    'courseName',
     'studentTotalCount',
     'answerSheetTotalCount',
     'answerSheetAllocatedCount',
@@ -94,7 +96,6 @@ export class ConsolidatedviewComponent {
     private fb: FormBuilder,
     private modalService: NgbModal,
     private answersheetService: AnswersheetService,
-    private instituteService: InstituteService,
     private templateService: TemplateManagementService,
     private spinnerService: SpinnerService
   ) {
@@ -105,8 +106,48 @@ export class ConsolidatedviewComponent {
   }
 
   ngOnInit(): void {
-    this.loadAllInstitues();
+    this.loadAllExamYears();
+    this.loadAllExamMonths();
+    this.loadAllExamTypes();
     this.loadExperts();
+    this.gridDataItems = [];
+  }
+
+  loadAllExamYears(): void {
+    this.answersheetService.getExamYears().subscribe({
+      next: (data) => {
+        this.dataSourceExamYears = data;
+        console.log('ExamYears loaded:', this.dataSourceExamYears);
+      },
+      error: (err) => {
+        console.error('Error loading ExamYears:', err);
+      },
+    });
+  }
+
+  loadAllExamMonths(): void {
+    this.answersheetService.getExamMonths().subscribe({
+      next: (data: any) => {
+        this.dataSourceExamMonths = data;
+        console.log('ExamMonths loaded:', this.dataSourceExamMonths);
+      },
+      error: (err: any) => {
+        console.error('Error loading ExamMonths:', err);
+      },
+    });
+  }
+
+  loadAllExamTypes(): void {
+    this.answersheetService.getExamTypes().subscribe({
+      next: (data: any) => {
+        this.dataSourceExamTypes = data;
+        console.log('ExamTypes loaded:', this.dataSourceExamMonths);
+      },
+      error: (err: any) => {
+        console.error('Error loading ExamTypes:', err);
+      },
+    });
+    this.ddlType.setValue('0');
   }
 
   applyFilter(event: Event) {
@@ -120,7 +161,7 @@ export class ConsolidatedviewComponent {
 
   loadGridData(): void {
     this.answersheetService
-      .getConsolidatedExamAnswersheets(parseInt(this.selectedInstituteId))
+      .getConsolidatedExamAnswersheets(this.selectedExamYear, this.selectedExamMonth, this.selectedExamType, 0)
       .subscribe({
         next: (data: any[]) => {
           this.gridDataItems = data;
@@ -135,21 +176,19 @@ export class ConsolidatedviewComponent {
       });
   }
 
-  onInstituteChange(event: Event): void {
-    this.selectedInstituteId = (event.target as HTMLSelectElement).value;
-    this.loadGridData();
+  onExamYearChange(event: Event): void {
+    this.selectedExamYear = (event.target as HTMLSelectElement).value;
+    this.ddlType.setValue('0');
   }
 
-  loadAllInstitues(): void {
-    this.instituteService.getInstitutions().subscribe({
-      next: (data) => {
-        this.institutes = data;
-        console.log('Institutes loaded:', this.institutes);
-      },
-      error: (error) => {
-        console.error('Error loading Institutes:', error);
-      },
-    });
+  onExamMonthChange(event: Event): void {
+    this.selectedExamMonth = (event.target as HTMLSelectElement).value;
+    this.ddlType.setValue('0');
+  }
+
+  onExamTypeChange(event: Event): void {
+    this.selectedExamType = (event.target as HTMLSelectElement).value;
+    this.loadGridData();
   }
 
   loadExperts(): void {

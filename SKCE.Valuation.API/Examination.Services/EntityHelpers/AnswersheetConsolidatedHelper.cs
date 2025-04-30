@@ -13,7 +13,8 @@ namespace SKCE.Examination.Services.EntityHelpers
             _dbContext = context;
         }
 
-        public async Task<List<AnswersheetConsolidatedDto>> GetConsolidatedItems(long institutionId)
+        public async Task<List<AnswersheetConsolidatedDto>> GetConsolidatedItems(
+            string? examYear = null, string? examMonth = null, string? examType = null, long? institutionId = null)
         {
             var resultItems = await (from asheet in _dbContext.Answersheets
                                      join exam in _dbContext.Examinations on asheet.ExaminationId equals exam.ExaminationId
@@ -21,12 +22,19 @@ namespace SKCE.Examination.Services.EntityHelpers
                                      join course in _dbContext.Courses on exam.CourseId equals course.CourseId
                                      join dept in _dbContext.Departments on exam.DepartmentId equals dept.DepartmentId
                                      join degType in _dbContext.DegreeTypes on exam.DegreeTypeId equals degType.DegreeTypeId
-                                     where exam.InstitutionId == institutionId && exam.IsActive == true
+                                     
+                                     where exam.IsActive == true
+                                     && (exam.ExamYear == examYear || examYear == null)
+                                     && (exam.ExamMonth == examMonth || examMonth == null)
+                                     && (exam.ExamType == examType || examType == null)
+                                     && (exam.InstitutionId == institutionId || institutionId == null)
+
                                      select new AnswersheetConsolidatedDto
                                      {
                                          ExaminationId = exam.ExaminationId,
                                          InstitutionCode = institution.Code,
                                          CourseCode = course.Code,
+                                         CourseName = course.Name,
                                          DepartmentShortName = dept.ShortName,
                                          RegulationYear = exam.RegulationYear,
                                          BatchYear = exam.BatchYear,

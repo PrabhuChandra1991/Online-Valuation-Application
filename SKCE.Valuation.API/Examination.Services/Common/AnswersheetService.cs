@@ -42,7 +42,7 @@ namespace SKCE.Examination.Services.Common
         }
 
         public async Task<IEnumerable<AnswerManagementDto>> GetAnswersheetDetailsAsync(
-            long? institutionId = null, long? courseId = null, long? allocatedToUserId = null, long? answersheetId = null)
+            string? examYear = null, string? examMonth = null, string? examType = null, long? courseId = null, long? allocatedToUserId = null, long? answersheetId = null)
         {
             var resultItems =
                 await (from answersheet in _context.Answersheets
@@ -56,7 +56,9 @@ namespace SKCE.Examination.Services.Common
 
                        where
                        answersheet.IsActive == true
-                       && (examination.InstitutionId == institutionId || institutionId == null)
+                       && (examination.ExamYear == examYear || examYear == null)
+                       && (examination.ExamMonth == examMonth || examMonth == null)
+                       && (examination.ExamType == examType || examType == null)
                        && (examination.CourseId == courseId || courseId == null)
                        && (answersheet.AllocatedToUserId == allocatedToUserId || allocatedToUserId == null)
                        && (answersheet.AnswersheetId == answersheetId || answersheetId == null)
@@ -81,9 +83,9 @@ namespace SKCE.Examination.Services.Common
                            AllocatedUserName = (allocatedUserResult != null ? allocatedUserResult.Name : string.Empty),
                            TotalObtainedMark = answersheet.TotalObtainedMark,
                            IsEvaluateCompleted = answersheet.IsEvaluateCompleted
-                       }).OrderBy(x => x.IsEvaluateCompleted).ToListAsync();
+                       }).ToListAsync();
 
-            return resultItems;
+            return resultItems.OrderByDescending(x => x.TotalObtainedMark).OrderBy(x => x.IsEvaluateCompleted).ToList();
         }
 
         public async Task<string> ImportDummyNumberByExcel(Stream excelStream, long loggedInUserId)
@@ -101,10 +103,11 @@ namespace SKCE.Examination.Services.Common
             return result.ToList();
         }
 
-        public async Task<List<AnswersheetConsolidatedDto>> GetExamConsolidatedAnswersheetsAsync(long institutionId)
+        public async Task<List<AnswersheetConsolidatedDto>> GetExamConsolidatedAnswersheetsAsync(
+            string? examYear = null, string? examMonth = null, string? examType = null, long? institutionId = null)
         {
             var helper = new AnswersheetConsolidatedHelper(this._context);
-            return await helper.GetConsolidatedItems(institutionId);
+            return await helper.GetConsolidatedItems(examYear, examMonth, examType, institutionId);
         }
 
         public async Task<List<AnswersheetQuestionwiseMark>> GetAnswersheetMarkAsync(long answersheetId)

@@ -19,11 +19,13 @@ export class AnswersheetService {
   constructor(private http: HttpClient) {}
 
   getAnswersheetDetails(
-    institutionId: number,
+    examYear: string,
+    examMonth: string,
+    examType: string,
     courseId: number
   ): Observable<any> {
     return this.http.get(
-      `${this.apiUrl}/api/Answersheet/GetAnswersheetDetails?institutionId=${institutionId}&courseId=${courseId}`
+      `${this.apiUrl}/api/Answersheet/GetAnswersheetDetails?examYear=${(examYear != '0') ? examYear : ''}&examMonth=${(examMonth != '0') ? examMonth : ''}&examType=${(examType != '0') ? examType : ''}&courseId=${(courseId != 0) ? courseId : ''}`
     );
   }
 
@@ -39,9 +41,17 @@ export class AnswersheetService {
     return this.http.get(`${this.apiUrl}/api/Dropdown/GetExamYears`);
   }
 
-  getConsolidatedExamAnswersheets(institutionId: number): Observable<any> {
+  getExamTypes(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/api/Dropdown/GetExamTypes`);
+  }
+
+  getConsolidatedExamAnswersheets(
+    examYear: string,
+    examMonth: string,
+    examType: string,
+    institutionId: number): Observable<any> {
     return this.http.get(
-      `${this.apiUrl}/api/Answersheet/GetConsolidatedExamAnswersheets?institutionId=${institutionId}`
+      `${this.apiUrl}/api/Answersheet/GetConsolidatedExamAnswersheets?examYear=${(examYear != '0') ? examYear : ''}&examMonth=${(examMonth != '0') ? examMonth : ''}&examType=${(examType != '0') ? examType : ''}&institutionId=${(institutionId != 0) ? institutionId : ''}`
     );
   }
 

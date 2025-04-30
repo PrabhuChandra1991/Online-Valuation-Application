@@ -11,6 +11,7 @@ namespace SKCE.Examination.Services.ViewModels.Common
         public required long ExaminationId { get; set; }
         public required string InstitutionCode { get; set; }
         public required string CourseCode { get; set; }
+        public required string CourseName { get; set; }
         public required string DepartmentShortName { get; set; }
         public required string RegulationYear { get; set; }
         public required string BatchYear { get; set; }

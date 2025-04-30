@@ -38,9 +38,9 @@ namespace SKCE.Examination.API.Controllers.Common
 
         [HttpGet("GetAnswersheetDetails")]
         public async Task<ActionResult<IEnumerable<AnswerManagementDto>>> GetAnswersheetDetails(
-            [FromQuery] long? institutionId, [FromQuery] long? courseId, [FromQuery] long? allocatedToUserId, [FromQuery] long? answersheetId)
+            [FromQuery] string? examYear, [FromQuery] string? examMonth, [FromQuery] string? examType, [FromQuery] long? courseId, [FromQuery] long? allocatedToUserId, [FromQuery] long? answersheetId)
         {
-            var result = await _answersheetService.GetAnswersheetDetailsAsync(institutionId, courseId, allocatedToUserId, answersheetId);
+            var result = await _answersheetService.GetAnswersheetDetailsAsync(examYear, examMonth, examType, courseId, allocatedToUserId, answersheetId);
             return Ok(result);
         }
 
@@ -69,10 +69,11 @@ namespace SKCE.Examination.API.Controllers.Common
         }
 
         [HttpGet("GetConsolidatedExamAnswersheets")]
-        public async Task<ActionResult<List<AnswersheetQuestionAnswerDto>>> GetExamConsolidatedAnswersheets(long institutionId)
+        public async Task<ActionResult<List<AnswersheetQuestionAnswerDto>>> GetExamConsolidatedAnswersheets(
+            string? examYear = null, string? examMonth = null, string? examType = null, long? institutionId = null)
         {
 
-            var result = await _answersheetService.GetExamConsolidatedAnswersheetsAsync(institutionId);
+            var result = await _answersheetService.GetExamConsolidatedAnswersheetsAsync(examYear, examMonth, examType, institutionId);
             return Ok(result);
         }
 

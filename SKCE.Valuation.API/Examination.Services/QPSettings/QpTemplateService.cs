@@ -1359,7 +1359,13 @@ namespace SKCE.Examination.Services.QPSettings
                     string subPreQ1BT = ExtractBookmarkText(doc, $"Q{qNo - 1}IBT");
                     string subPreQ2CO = ExtractBookmarkText(doc, $"Q{qNo - 1}IICO");
                     string subPreQ2BT = ExtractBookmarkText(doc, $"Q{qNo - 1}IIBT");
-                    if (subQ1CO != subPreQ1CO || subQ1BT != subPreQ1BT || subQ2CO != subPreQ2CO || subQ2BT != subPreQ2BT)
+
+                    if ((!string.IsNullOrEmpty(subQ2CO) && subQ2CO != "Select" && subQ1CO != subQ2CO) ||
+                        (!string.IsNullOrEmpty(subQ2BT) && subQ2BT != "Select" && subQ1BT != subQ2BT) ||
+                        (!string.IsNullOrEmpty(subPreQ1CO) && subPreQ1CO != "Select" && subQ1CO != subPreQ1CO) ||
+                        (!string.IsNullOrEmpty(subPreQ1BT) && subPreQ1BT != "Select" && subQ1BT != subPreQ1BT) ||
+                        (!string.IsNullOrEmpty(subPreQ2CO) && subPreQ2CO != "Select" && subQ1CO != subPreQ2CO) ||
+                        (!string.IsNullOrEmpty(subPreQ2BT) && subPreQ2BT != "Select" && subQ1BT != subPreQ2BT))
                     {
                         errors.Add($"❌ Q{qNo - 1} BT and CO, Q{qNo} BT and CO distributions are mismatch.");
                     }
@@ -1719,13 +1725,19 @@ namespace SKCE.Examination.Services.QPSettings
 
                 if (totalMarks != 15) errors.Add($"❌ Q{qNo} Total Marks = {totalMarks} (should be 15).");
 
-                if (qNo == 12 || qNo == 14 || qNo == 16 || qNo == 18)
+                if (qNo == 12 || qNo == 14 || qNo == 16 || qNo == 18 )
                 {
                     string subPreQ1CO = ExtractBookmarkText(doc, $"Q{qNo - 1}ICO");
                     string subPreQ1BT = ExtractBookmarkText(doc, $"Q{qNo - 1}IBT");
                     string subPreQ2CO = ExtractBookmarkText(doc, $"Q{qNo - 1}IICO");
                     string subPreQ2BT = ExtractBookmarkText(doc, $"Q{qNo - 1}IIBT");
-                    if (subQ1CO != subPreQ1CO || subQ1BT != subPreQ1BT || subQ2CO != subPreQ2CO || subQ2BT != subPreQ2BT)
+
+                    if ((!string.IsNullOrEmpty(subQ2CO) && subQ2CO != "Select" && subQ1CO != subQ2CO) ||
+                        (!string.IsNullOrEmpty(subQ2BT) && subQ2BT != "Select" && subQ1BT != subQ2BT) ||
+                        (!string.IsNullOrEmpty(subPreQ1CO) && subPreQ1CO != "Select" && subQ1CO != subPreQ1CO) ||
+                        (!string.IsNullOrEmpty(subPreQ1BT) && subPreQ1BT != "Select" && subQ1BT != subPreQ1BT) ||
+                        (!string.IsNullOrEmpty(subPreQ2CO) && subPreQ2CO != "Select" && subQ1CO != subPreQ2CO) ||
+                        (!string.IsNullOrEmpty(subPreQ2BT) && subPreQ2BT != "Select" && subQ1BT != subPreQ2BT))
                     {
                         errors.Add($"❌ Q{qNo - 1} BT and CO, Q{qNo} BT and CO distributions are mismatch.");
                     }

@@ -39,7 +39,7 @@ export class AnswersheetImportService {
     examinationId: number
   ): Observable<any> {
     //-----
-    const url: string = `${this.apiUrl}/api/AnswersheetImport/ImportDummyNumberByExcel`;
+    const url: string = `${this.apiUrl}/api/AnswersheetImport/ImportDummyNoFromExcelByCourse`;
     //
 
     const httpOptions = {
@@ -52,6 +52,19 @@ export class AnswersheetImportService {
 
     return response;
   }
+
+  public GetAnswersheetImports(examinationId: number): Observable<any> {
+    const ulr = `${this.apiUrl}/api/AnswersheetImport/GetAnswersheetImports?examinationId=${examinationId}`;
+    return this.http.get(ulr);
+  }
+
+  public GetAnswersheetImportDetails(
+    answersheetImportId: number
+  ): Observable<any> {
+    const ulr = `${this.apiUrl}/api/AnswersheetImport/GetAnswersheetImportDetails?answersheetImportId=${answersheetImportId}`;
+    return this.http.get(ulr);
+  }
+
   //
   //
   //

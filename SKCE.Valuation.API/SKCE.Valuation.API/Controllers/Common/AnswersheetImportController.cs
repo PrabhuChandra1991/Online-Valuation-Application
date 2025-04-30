@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SKCE.Examination.Models.DbModels.Common;
 using SKCE.Examination.Services.Common;
 using SKCE.Examination.Services.ViewModels.Common;
 
@@ -15,6 +16,18 @@ namespace SKCE.Examination.API.Controllers.Common
             _answersheetImportService = answersheetImportService;
         }
 
+        [HttpGet("GetAnswersheetImports")]
+        public async Task<List<AnswersheetImport>> GetAnswersheetImports(long examinationId)
+        {
+            return await this._answersheetImportService.GetAnswersheetImports(examinationId);
+        }
+
+        [HttpGet("GetAnswersheetImportDetails")]
+        public async Task<List<AnswersheetImportDetail>> GetAnswersheetImportDetails(long answersheetImportId)
+        {
+            return await this._answersheetImportService.GetAnswersheetImportDetails(answersheetImportId);
+        }
+
         [HttpGet("GetExaminationInfo")]
         public async Task<ActionResult<IEnumerable<AnswersheetImportCourseDptDto>>>
             GetExaminationInfo([FromQuery] long institutionId,
@@ -28,8 +41,8 @@ namespace SKCE.Examination.API.Controllers.Common
         /// <summary>
         /// Upload an Excel file and import QP data.
         /// </summary>
-        [HttpPost("ImportDummyNumberByExcel")]
-        public async Task<IActionResult> ImportDummyNumberByExcel(IFormFile file)
+        [HttpPost("ImportDummyNoFromExcelByCourse")]
+        public async Task<IActionResult> ImportDummyNoFromExcelByCourse(IFormFile file)
         {
             string examinationId = Request.Headers["examinationId"].ToString();
 
@@ -40,12 +53,15 @@ namespace SKCE.Examination.API.Controllers.Common
             if (file == null || file.Length == 0)
                 return BadRequest("No file uploaded.");
 
-            
+
             using var stream = file.OpenReadStream();
-            var importedInfo = await _answersheetImportService.ImportDummyNumberByExcel(stream,long.Parse(examinationId));
+            var importedInfo = await _answersheetImportService
+                .ImportDummyNoFromExcelByCourse(stream, long.Parse(examinationId));
 
             return Ok(new { Message = importedInfo });
         }
+
+
 
     }
 }

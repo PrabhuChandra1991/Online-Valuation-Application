@@ -8,6 +8,7 @@ using SKCE.Examination.Services.ServiceContracts;
 using SKCE.Examination.Services.ViewModels.Common;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -36,25 +37,40 @@ namespace SKCE.Examination.Services.Common
                                 where exam.IsActive
                                 && exam.InstitutionId == institutionId
                                 && exam.ExamYear == examYear
-                                && exam.ExamMonth == examMonth 
+                                && exam.ExamMonth == examMonth
                                 select new AnswersheetImportCourseDptDto
                                 {
                                     ExaminationId = exam.ExaminationId,
                                     CourseCode = course.Code,
                                     CourseName = course.Name,
                                     DepartmentCode = dept.ShortName,
-                                    DepartmentName = dept.Name
+                                    DepartmentName = dept.Name,
+                                    StudentCount = (int)exam.StudentCount
                                 }).ToListAsync();
             return result.OrderBy(x => x.CourseCode).ThenBy(x => x.DepartmentCode).ToList();
         }
 
 
-        public async Task<string> ImportDummyNumberByExcel(Stream excelStream, long examinationId)
+        //POST
+        public async Task<List<AnswersheetImportDetail>> ImportDummyNoFromExcelByCourse(Stream excelStream, long examinationId)
         {
-            var helper = new AnswersheetImportHelper(this._context, this._blobStorageHelper );
-            var result = await helper.ImportDummyNumberByExcel(excelStream, examinationId, "xlsx");
-            return result.ToString();
+            var helper = new AnswersheetImportHelper(this._context, this._blobStorageHelper);
+            var result = await helper.ImportDummyNoFromExcelByCourse(excelStream, examinationId, "xlsx");
+            return result;
         }
+
+
+        public async Task<List<AnswersheetImport>> GetAnswersheetImports(long examinationId)
+        {
+            return await this._context.AnswersheetImports.Where(x => x.ExaminationId == examinationId).ToListAsync();
+        }
+
+        public async Task<List<AnswersheetImportDetail>> GetAnswersheetImportDetails(long answersheetImportId)
+        {
+            return await this._context.AnswersheetImportDetails.Where(x => x.AnswersheetImportId == answersheetImportId).ToListAsync();
+        }
+
+
 
     }
 }

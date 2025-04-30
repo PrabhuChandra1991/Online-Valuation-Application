@@ -12,5 +12,6 @@
 	[CreatedById] BIGINT NOT NULL,
 	[ModifiedDate] DATETIME DEFAULT GETDATE(),
 	[ModifiedById] BIGINT NOT NULL,
-	CONSTRAINT [PK_AnswersheetImport] PRIMARY KEY (AnswersheetImportId)
+	CONSTRAINT [PK_AnswersheetImport] PRIMARY KEY (AnswersheetImportId),
+	CONSTRAINT [FK_AnswersheetImport_Examination] FOREIGN KEY ([ExaminationId]) REFERENCES [dbo].[Examination]([ExaminationId])
 )

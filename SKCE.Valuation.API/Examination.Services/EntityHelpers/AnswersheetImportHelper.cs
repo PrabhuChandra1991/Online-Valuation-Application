@@ -29,14 +29,14 @@ namespace SKCE.Examination.Services.EntityHelpers
             var strDate = curTime.Year.ToString() + curTime.Month.ToString() + curTime.Day.ToString()
                 + curTime.Hour.ToString() + curTime.Minute.ToString() + curTime.Second.ToString();
 
-            return "AnswersheetList\\" + examYear + examMonth.Replace('/', '-').Trim() +"\\"+ courseCode + "_" + strDate + ".xlsx";
+            return "AnswersheetList\\" + examYear + examMonth.Replace('/', '-').Trim() + "\\" + courseCode + "_" + strDate + ".xlsx";
 
         }
 
-        public async Task<DummyNumberImportResponse> ImportDummyNumberByExcel(
-            Stream excelStream, long examinationId, string contentType)
+        public async Task<List<AnswersheetImportDetail>>
+            ImportDummyNoFromExcelByCourse(Stream excelStream, long examinationId, string contentType)
         {
-            var response = new DummyNumberImportResponse();
+            var result = new List<AnswersheetImportDetail>();
 
             try
             {
@@ -44,6 +44,7 @@ namespace SKCE.Examination.Services.EntityHelpers
                 var examination =
                     await (from exam in this._dbContext.Examinations
                            join course in this._dbContext.Courses on exam.CourseId equals course.CourseId
+                           join inst in this._dbContext.Institutions on exam.InstitutionId equals inst.InstitutionId
                            where exam.ExaminationId == examinationId
                            select new
                            {
@@ -51,29 +52,31 @@ namespace SKCE.Examination.Services.EntityHelpers
                                exam.ExamYear,
                                exam.ExamMonth,
                                CourseCode = course.Code,
-                               exam.InstitutionId
+                               exam.InstitutionId,
+                               InstitutionCode = inst.Code,
                            }).FirstOrDefaultAsync();
 
                 if (examination == null)
                 {
-                    return response;
+                    return result;
                 }
 
-                var fileNameToUpload= FileNameWithLocation(examination.ExamYear, examination.ExamMonth, examination.CourseCode);
+                var fileNameToUpload = FileNameWithLocation(examination.ExamYear, examination.ExamMonth, examination.CourseCode);
 
-              var uploadedURL =   await this._blobStorageHelper.UploadFileAsync(excelStream, fileNameToUpload, contentType);
+                var uploadedURL = await this._blobStorageHelper.UploadFileAsync(excelStream, fileNameToUpload, contentType);
 
                 if (uploadedURL == null)
-                    return null;
+                    return result;
 
                 var answersheetImport =
-                    new AnswersheetImport {
+                    new AnswersheetImport
+                    {
                         DocumentName = fileNameToUpload,
                         DocumentUrl = uploadedURL,
                         InstitutionId = examination.InstitutionId,
                         ExamMonth = examination.ExamMonth,
                         ExamYear = examination.ExamYear,
-                        ExaminationId = examination.ExaminationId, 
+                        ExaminationId = examination.ExaminationId,
                         IsActive = true,
                         CreatedById = 1,
                         CreatedDate = DateTime.Now,
@@ -105,40 +108,69 @@ namespace SKCE.Examination.Services.EntityHelpers
                     string cellRegulation = GetCellValue(workbookPart, cells[1]);
                     string cellBatch = GetCellValue(workbookPart, cells[2]);
                     string cellDegreeType = GetCellValue(workbookPart, cells[3]);
-                    string cellExamType = GetCellValue(workbookPart, cells[4]);
+                    string cellDepartment = GetCellValue(workbookPart, cells[4]);
                     int cellSemester = int.Parse(GetCellValue(workbookPart, cells[5]).ToString());
                     string cellCourseCode = GetCellValue(workbookPart, cells[6]);
                     string cellExamYear = GetCellValue(workbookPart, cells[7]);
                     string cellExamMonth = GetCellValue(workbookPart, cells[8]);
-                    string cellDummyNo = GetCellValue(workbookPart, cells[9]);
+                    string cellExamType = GetCellValue(workbookPart, cells[9]);
+                    string cellDummyNo = GetCellValue(workbookPart, cells[10]);
 
-                    answersheetImport.AnswersheetImportDetails.Add(
+                    bool isValid = true;
+                    List<string> errors = new();  
+
+                    if (cellCourseCode != examination.CourseCode)
+                    {
+                        errors.Add("Course Code");
+                        isValid = false;
+                    }
+
+                    if (cellExamYear != examination.ExamYear)
+                    {
+
+                        errors.Add("Exam Year");
+                        isValid = false;
+                    }
+
+                    if (cellExamMonth != examination.ExamMonth)
+                    {
+                        errors.Add("Exam Month");
+                        isValid = false;
+                    }
+
+                    if(cellInstCode != examination.InstitutionCode)
+                    {
+                        errors.Add("College Code");
+                        isValid = false;
+                    }
+
+                        answersheetImport.AnswersheetImportDetails.Add(
                         new AnswersheetImportDetail
                         {
                             InstitutionCode = cellInstCode,
                             RegulationYear = cellRegulation,
                             BatchYear = cellBatch,
                             DegreeType = cellDegreeType,
+                            DepartmentShortName= cellDepartment,
                             ExamType = cellExamType,
                             Semester = cellSemester,
                             CourseCode = cellCourseCode,
                             ExamMonth = cellExamMonth,
                             ExamYear = cellExamYear,
                             DummyNumber = cellDummyNo,
+                            IsValid = isValid,
+                            ErrorMessage = string.Join(", ", errors),
                             IsActive = true,
                             CreatedById = 1,
                             CreatedDate = DateTime.Now,
                             ModifiedById = 1,
                             ModifiedDate = DateTime.Now,
-                        });
-
-
-
+                        }); 
                 }
 
                 await _dbContext.SaveChangesAsync();
 
-                return response;
+                return answersheetImport.AnswersheetImportDetails.ToList();
 
             }
             catch (Exception ex)

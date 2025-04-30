@@ -13,5 +13,7 @@ namespace SKCE.Examination.Services.ViewModels.Common
         public required string CourseName { get; set; }
         public required string DepartmentCode { get; set; }
         public required string DepartmentName { get; set; }
+        public required int StudentCount { get; set; }
     }
+     
 }

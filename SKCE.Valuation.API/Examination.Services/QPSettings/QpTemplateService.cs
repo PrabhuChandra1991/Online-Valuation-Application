@@ -1352,7 +1352,24 @@ namespace SKCE.Examination.Services.QPSettings
                 if (!string.IsNullOrEmpty(qpakAssigned) && string.IsNullOrEmpty(subQ2AnswerKey)) errors.Add($"❌ Q{qNo} Answer key is missing for SubQ2 (QPAK assigned).");
 
                 if (totalMarks != 16) errors.Add($"❌ Q{qNo} Total Marks = {totalMarks} (should be 16).");
-
+                
+                if (qNo == 12 || qNo == 14 || qNo == 16 || qNo == 18 || qNo == 20)
+                {
+                    string subPreQ1CO = ExtractBookmarkText(doc, $"Q{qNo - 1}ICO");
+                    string subPreQ1BT = ExtractBookmarkText(doc, $"Q{qNo - 1}IBT");
+                    string subPreQ2CO = ExtractBookmarkText(doc, $"Q{qNo - 1}IICO");
+                    string subPreQ2BT = ExtractBookmarkText(doc, $"Q{qNo - 1}IIBT");
+                    
+                    if((!string.IsNullOrEmpty(subQ2CO) && subQ2CO != "Select" && subQ1CO != subQ2CO) || 
+                        (!string.IsNullOrEmpty(subQ2BT) && subQ2BT != "Select" && subQ1BT != subQ2BT ) || 
+                        (!string.IsNullOrEmpty(subPreQ1CO) && subPreQ1CO != "Select" && subQ1CO != subPreQ1CO) ||
+                        (!string.IsNullOrEmpty(subPreQ1BT) && subPreQ1BT != "Select" && subQ1BT != subPreQ1BT) || 
+                        (!string.IsNullOrEmpty(subPreQ2CO) && subPreQ2CO != "Select" && subQ1CO != subPreQ2CO) || 
+                        (!string.IsNullOrEmpty(subPreQ2BT) && subPreQ2BT != "Select" && subQ1BT != subPreQ2BT))
+                    {
+                        errors.Add($"❌ Q{qNo - 1} BT and CO, Q{qNo} BT and CO distributions are mismatch.");
+                    }
+                }
                 // Add to table
                 //htmlTable.Append($"<tr><td>Q{qNo}</td><td>{subQ1Text}</td><td>{subQ1CO}</td><td>{subQ1BT}</td><td>{subQ1Marks}</td><td>{subQ2Text}</td><td>{subQ2CO}</td><td>{subQ2BT}</td><td>{subQ2Marks}</td><td>{totalMarks}</td></tr>");
             }
@@ -1708,6 +1725,23 @@ namespace SKCE.Examination.Services.QPSettings
 
                 if (totalMarks != 15) errors.Add($"❌ Q{qNo} Total Marks = {totalMarks} (should be 15).");
 
+                if (qNo == 12 || qNo == 14 || qNo == 16 || qNo == 18)
+                {
+                    string subPreQ1CO = ExtractBookmarkText(doc, $"Q{qNo - 1}ICO");
+                    string subPreQ1BT = ExtractBookmarkText(doc, $"Q{qNo - 1}IBT");
+                    string subPreQ2CO = ExtractBookmarkText(doc, $"Q{qNo - 1}IICO");
+                    string subPreQ2BT = ExtractBookmarkText(doc, $"Q{qNo - 1}IIBT");
+
+                    if ((!string.IsNullOrEmpty(subQ2CO) && subQ2CO != "Select" && subQ1CO != subQ2CO) ||
+                        (!string.IsNullOrEmpty(subQ2BT) && subQ2BT != "Select" && subQ1BT != subQ2BT) ||
+                        (!string.IsNullOrEmpty(subPreQ1CO) && subPreQ1CO != "Select" && subQ1CO != subPreQ1CO) ||
+                        (!string.IsNullOrEmpty(subPreQ1BT) && subPreQ1BT != "Select" && subQ1BT != subPreQ1BT) ||
+                        (!string.IsNullOrEmpty(subPreQ2CO) && subPreQ2CO != "Select" && subQ1CO != subPreQ2CO) ||
+                        (!string.IsNullOrEmpty(subPreQ2BT) && subPreQ2BT != "Select" && subQ1BT != subPreQ2BT))
+                    {
+                        errors.Add($"❌ Q{qNo - 1} BT and CO, Q{qNo} BT and CO distributions are mismatch.");
+                    }
+                }
                 // Add to table
                 //htmlTable.Append($"<tr><td>Q{qNo}</td><td>{subQ1Text}</td><td>{subQ1CO}</td><td>{subQ1BT}</td><td>{subQ1Marks}</td><td>{subQ2Text}</td><td>{subQ2CO}</td><td>{subQ2BT}</td><td>{subQ2Marks}</td><td>{totalMarks}</td></tr>");
             }
@@ -2022,6 +2056,20 @@ namespace SKCE.Examination.Services.QPSettings
                 if (user != null && !_context.UserQPTemplates.Any(u => u.UserId == userQPTemplate.UserId && (u.QPTemplateStatusTypeId == 8 || u.QPTemplateStatusTypeId == 10)))
                     user.IsActive = false;
                 await _context.SaveChangesAsync();
+                var courseDetails = _context.Courses.FirstOrDefault(c => c.CourseId == qpTemplate.CourseId);
+                _emailService.SendEmailAsync(user.Email, "Subject-CONFIDENTIAL-Sri Krishna Institutions",
+                                  $"Dear {user.Name}," +
+                                  $"\n\nWe are expressing our sincere gratitude to you on receiving your QP for the upcoming End Semester Theory Examinations scheduled in {qpTemplate.ExamMonth}, {qpTemplate.ExamYear} under the autonomous scheme of our institution." +
+                                  $"\n\nCourse Details\n\n Course Code:{courseDetails.Code}\n Course Name:{courseDetails.Name}" +
+                                  $"\n\nYour expertise and contribution in setting a well-structured QP is highly appreciable." +
+                                  $"\n\nThank you once again for your time and commitment to academic Excellence." +
+                                  $"\n\nWarm regards,\nDr. Ramesh Kumar R,\nDean – Examinations,\nSri Krishna Institutions,\n8300034477.").Wait();
+                var adminuser = await _context.Users.FirstOrDefaultAsync(u => u.UserId == 1);
+                _emailService.SendEmailAsync(adminuser.Email, $"Submitted generated QP by {user.Name} for Course Code:{courseDetails.Code}\n Course Name:{courseDetails.Name}",
+                                 $"Dear {adminuser.Name}," +
+                                 $"\n\nPlease find attached submitted QP by {user.Name}." +
+                                 $"\n\nCourse Details\n\n Course Code:{courseDetails.Code}\n Course Name:{courseDetails.Name}" +
+                                 $"\n\nWarm regards,\nDr. Ramesh Kumar R,\nDean – Examinations,\nSri Krishna Institutions,\n8300034477.", userQPTemplate.SubmittedQPDocumentId).Wait();
                 return true;
             }
         }
@@ -2089,7 +2137,21 @@ namespace SKCE.Examination.Services.QPSettings
             var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId == userQPTemplate.UserId);
             if (user != null && !_context.UserQPTemplates.Any(u => u.UserId == userQPTemplate.UserId && (u.QPTemplateStatusTypeId == 8 || u.QPTemplateStatusTypeId == 10)))
                 user.IsActive = false;
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(); 
+            var courseDetails = _context.Courses.FirstOrDefault(c => c.CourseId == qpTemplate.CourseId);
+            _emailService.SendEmailAsync(user.Email, "Subject-CONFIDENTIAL-Sri Krishna Institutions",
+                              $"Dear {user.Name}," +
+                              $"\n\nWe are expressing our sincere gratitude to you on receiving your QP for the upcoming End Semester Theory Examinations scheduled in {qpTemplate.ExamMonth}, {qpTemplate.ExamYear} under the autonomous scheme of our institution." +
+                              $"\n\nCourse Details\n\n Course Code:{courseDetails.Code}\n Course Name:{courseDetails.Name}" +
+                              $"\n\nYour expertise and contribution in setting a well-structured QP is highly appreciable." +
+                              $"\n\nThank you once again for your time and commitment to academic Excellence." +
+                              $"\n\nWarm regards,\nDr. Ramesh Kumar R,\nDean – Examinations,\nSri Krishna Institutions,\n8300034477.").Wait();
+            var adminuser = await _context.Users.FirstOrDefaultAsync(u => u.UserId == 1);
+            _emailService.SendEmailAsync(adminuser.Email, $"Submitted generated QP by {user.Name} for Course Code:{courseDetails.Code}\n Course Name:{courseDetails.Name}",
+                             $"Dear {adminuser.Name}," +
+                             $"\n\nPlease find attached submitted QP by {user.Name}." +
+                             $"\n\nCourse Details\n\n Course Code:{courseDetails.Code}\n Course Name:{courseDetails.Name}" +
+                             $"\n\nWarm regards,\nDr. Ramesh Kumar R,\nDean – Examinations,\nSri Krishna Institutions,\n8300034477.", userQPTemplate.SubmittedQPDocumentId).Wait();
             return true;
         }
         private async Task<List<UserQPTemplateVM>> GetUserQPTemplatesAsync(long userId)

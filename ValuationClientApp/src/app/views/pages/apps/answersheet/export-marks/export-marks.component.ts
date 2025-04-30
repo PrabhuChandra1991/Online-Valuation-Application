@@ -81,10 +81,25 @@ institutes: any[] = [];
     this.loadExamMonths();
   }
   loadExamYears(): void {
-    this.examYears = ['2025','2026','2027','2028','2029','2030','2031','2032','2033','2034','2035'];
+    this.answersheetService.getExamYears().subscribe({
+      next: (data) => {
+        this.examYears = data;      },
+      error: (err) => {
+        console.error('Error loading ExamYears:', err);
+      },
+    });
+    //this.examYears = ['2025','2026','2027','2028','2029','2030','2031','2032','2033','2034','2035'];
   }
   loadExamMonths(): void {
-    this.examMonths = ['APRIL/MAY', 'NOV/DEC'];
+    this.answersheetService.getExamMonths().subscribe({
+      next: (data: any) => {
+        this.examMonths = data;
+      },
+      error: (err: any) => {
+        console.error('Error loading ExamMonths:', err);
+      },
+    });
+    //this.examMonths = ['APRIL/MAY', 'NOV/DEC'];
   }
 
   loadAllInstitues(): void {

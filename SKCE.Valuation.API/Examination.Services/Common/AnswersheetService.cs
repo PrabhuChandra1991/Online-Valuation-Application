@@ -150,7 +150,7 @@ namespace SKCE.Examination.Services.Common
         public async Task<(MemoryStream,string)> ExportMarksAsync(long institutionId, string examYear, string examMonth, long courseId)
         {
             var degreeTypeId = _context.Examinations
-                .Where(x => x.InstitutionId == institutionId && x.ExamYear == examYear && x.ExamMonth.ToUpper() == examMonth && x.CourseId == courseId)
+                .Where(x => x.InstitutionId == institutionId && x.ExamYear == examYear && x.ExamMonth.ToUpper() == examMonth.ToUpper() && x.CourseId == courseId)
                 .Select(x => x.DegreeTypeId)
                 .FirstOrDefault();
 

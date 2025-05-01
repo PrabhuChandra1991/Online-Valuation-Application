@@ -16,9 +16,7 @@ namespace SKCE.Examination.Models.DbModels.Common
         public long ExaminationId { get; set; }     
         
         public required string DummyNumber { get; set; }
-        public string? UploadedBlobStorageUrl { get; set; }
-
-        public string? ScriptIdentity { get; set; }
+         
         public long? AllocatedToUserId { get; set; }
         public DateTime? AllocatedDateTime { get; set; }
         public bool? IsAllocationMailSent { get; set; }

@@ -70,8 +70,9 @@ export class AnswersheetImportComponent implements OnInit {
   selectedExamMonth: string = '0';
   selectedExamYear: string = '0';
   selectedExaminationId: number = 0;
-  selectedanswersheetImportId: number = 0;
-  selectedAnswersheetName: string = '';
+  selectedAnswersheetImportId: number = 0;
+  selectedAnswersheetImportName: string = '';
+  selectedAnswersheetImportIsReviewCompleted: boolean = false;
 
   isDummyNumberImported = false;
 
@@ -105,7 +106,7 @@ export class AnswersheetImportComponent implements OnInit {
     this.dataSourceExaminations = [];
     this.dataSourceAnswerSheetImports = [];
     this.dataSourceAnswerSheetImportDetails = [];
-    this.selectedAnswersheetName = '';
+    this.selectedAnswersheetImportName  = '';
   }
 
   loadAllInstitues(): void {
@@ -178,45 +179,37 @@ export class AnswersheetImportComponent implements OnInit {
     //----------
     this.dataSourceAnswerSheetImports = [];
     this.dataSourceAnswerSheetImportDetails = [];
-    this.selectedAnswersheetName = '';
+    this.selectedAnswersheetImportName = '';
     //----------
     this.answersheetImportService
       .GetAnswersheetImports(this.selectedExaminationId)
       .subscribe({
         next: (data: any) => {
-          this.dataSourceAnswerSheetImports = data;
-          console.log(
-            'AnswerSheetImports loaded:',
-            this.dataSourceAnswerSheetImports
-          );
+          this.dataSourceAnswerSheetImports = data; 
         },
         error: (err: any) => {
-          this.dataSourceAnswerSheetImports = [];
-          console.error('Error loading ExamMonths:', err);
+          this.dataSourceAnswerSheetImports = []; 
         },
       });
   }
 
   loadAnswersheetImportDetails(
     answerSheetImportId: number,
-    documentName: string
+    documentName: string,
+    isReviewCompleted:boolean
   ) {
-    this.selectedanswersheetImportId = answerSheetImportId;
-    this.selectedAnswersheetName = documentName;
+    this.selectedAnswersheetImportId = answerSheetImportId;
+    this.selectedAnswersheetImportName = documentName;
+    this.selectedAnswersheetImportIsReviewCompleted = isReviewCompleted;
     this.dataSourceAnswerSheetImportDetails = [];
     this.answersheetImportService
       .GetAnswersheetImportDetails(answerSheetImportId)
       .subscribe({
         next: (data: any) => {
-          this.dataSourceAnswerSheetImportDetails = data;
-          console.log(
-            'dataSourceAnswerSheetImportDetails loaded:',
-            this.dataSourceAnswerSheetImportDetails
-          );
+          this.dataSourceAnswerSheetImportDetails = data;          
         },
         error: (err: any) => {
-          this.dataSourceAnswerSheetImportDetails = [];
-          console.error('Error-GetAnswersheetImportDetails:', err);
+          this.dataSourceAnswerSheetImportDetails = []; 
         },
       });
   }
@@ -243,8 +236,7 @@ export class AnswersheetImportComponent implements OnInit {
   onExaminationChange(event: Event): void {
     this.selectedExaminationId = parseInt(this.getValue(event));
     this.isDummyNumberImported = false;
-    this.loadAnswersheetImports();
-    console.log('this.selectedExaminationId ' + this.selectedExaminationId);
+    this.loadAnswersheetImports(); 
   }
 
   onDummyNumberFileChange(event: any) {
@@ -268,7 +260,6 @@ export class AnswersheetImportComponent implements OnInit {
 
   submitDummyNumberImport() {
     this.spinnerService.toggleSpinnerState(true);
-    console.log("submit")
     const formData = new FormData();
     const fileSource: any = this.dummyNumberImportForm.get('fileSource')?.value;
     if (fileSource !== null && fileSource !== undefined) {
@@ -303,29 +294,26 @@ export class AnswersheetImportComponent implements OnInit {
   }
 
   completeDummyNumberReview() {
-    this.modalRef.close();
-    // if (this.obtainedMarks == 0) {
-    //   this.toastr.warning('Obained Marks is 0. Please evaluate.');
-    // } else {
-    //   this.evaluationService
-    //     .completeEvaluation(this.primaryData.answersheetId, this.loggedinUserId)
-    //     .subscribe(
-    //       (data: any) => {
-    //         console.log('respo', data);
-    //         if (data.message.toLowerCase() == 'success') {
-    //           this.toastr.success('Evaluation completed successfully');
-    //           this.backToList();
-    //         } else {
-    //           console.error('Failed to complete evaluation');
-    //           this.toastr.error('Failed to complete evaluation.');
-    //         }
-    //       },
-    //       (error) => {
-    //         console.error('Error while saving evaluation:', error);
-    //         this.toastr.error('Failed to complete evaluation.');
-    //       }
-    //     );
-    // }
+    this.modalRef.close();     
+    this.answersheetImportService
+      .ReviewCompletedAndApproving(this.selectedAnswersheetImportId)
+      .subscribe(
+          (data: any) => {
+            console.log('respo', data);
+            if (data.message.toLowerCase() == 'success') {
+              this.toasterService.success('Review completed successfully.');
+              this.loadAnswersheetImports();
+            } else {
+              this.toasterService.error('Failed on Review Ccompletion.');
+            }
+          },
+        (error) => {
+          if (error.error.message == "UNIQUE-KEY-VIOLATION")
+            this.toasterService.error('Some Dummy Numbers are already exists in database..Please check..');
+          else
+            this.toasterService.error('Failed to complete review.');
+          }
+        );
   }
 
   ////

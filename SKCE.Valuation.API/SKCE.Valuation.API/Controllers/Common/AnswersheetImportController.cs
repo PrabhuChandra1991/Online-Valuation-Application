@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Models;
 using SKCE.Examination.Models.DbModels.Common;
 using SKCE.Examination.Services.Common;
 using SKCE.Examination.Services.ViewModels.Common;
@@ -17,7 +18,7 @@ namespace SKCE.Examination.API.Controllers.Common
         }
 
         [HttpGet("GetAnswersheetImports")]
-        public async Task<List<AnswersheetImport>> GetAnswersheetImports(long examinationId)
+        public async Task<List<AnswersheetImportDto>> GetAnswersheetImports(long examinationId)
         {
             return await this._answersheetImportService.GetAnswersheetImports(examinationId);
         }
@@ -55,12 +56,35 @@ namespace SKCE.Examination.API.Controllers.Common
 
 
             using var stream = file.OpenReadStream();
-            var importedInfo = await _answersheetImportService
-                .ImportDummyNoFromExcelByCourse(stream, long.Parse(examinationId));
+            var importedInfo = await _answersheetImportService.ImportDummyNoFromExcelByCourse(stream, long.Parse(examinationId));
 
             return Ok(new { Message = importedInfo });
         }
 
+        [HttpGet("ReviewedAndApproveDummyNumbers")]
+        public async Task<IActionResult> ReviewedAndApproveDummyNumbers(long answersheetImportId)
+        {
+            try
+            {
+                long loggedInUserId = long.Parse(Request.Headers["loggedInUserId"].ToString());
+
+                var result = await _answersheetImportService
+                    .CreateAnswerSheetsAndApproveImportedData(answersheetImportId, loggedInUserId);
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException.ToString().Contains("UC_Answersheet"))
+                {
+                    return BadRequest(new ResultModel() { Message = "UNIQUE-KEY-VIOLATION" });
+                }
+                else{
+                    return BadRequest(new ResultModel() { Message = "Error on ReviewedAndApproveDummyNumbers" });
+                }
+                
+            }
+        }
 
 
     }

@@ -1,9 +1,12 @@
-﻿using DocumentFormat.OpenXml.Bibliography;
+﻿using Amazon.Runtime.EventStreams.Internal;
+using DocumentFormat.OpenXml.Bibliography;
 using DocumentFormat.OpenXml.InkML;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.Vml;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using SKCE.Examination.Models.DbModels.Common;
 using SKCE.Examination.Services.EntityHelpers;
 using SKCE.Examination.Services.Helpers;
@@ -23,12 +26,18 @@ namespace SKCE.Examination.Services.Common
         private readonly ExaminationDbContext _context;
         private readonly IUserService _userService;
         private readonly EmailService _emailService;
+        //-------------
+        public readonly string _blobBaseUrl;
+        public readonly string _containerName;
 
-        public AnswersheetService(ExaminationDbContext context, IUserService userService, EmailService emailService)
+        public AnswersheetService(ExaminationDbContext context, IUserService userService, EmailService emailService, IConfiguration configuration)
         {
             _context = context;
             _userService = userService;
             _emailService = emailService;
+            _blobBaseUrl = configuration["AzureBlobStorage:BaseUrl"]; ;
+            _containerName = configuration["AzureBlobStorage:ContainerName"];
+
         }
 
         public async Task<IEnumerable<Answersheet>> GetAllAnswersheetsAsync()
@@ -42,50 +51,90 @@ namespace SKCE.Examination.Services.Common
         }
 
         public async Task<IEnumerable<AnswerManagementDto>> GetAnswersheetDetailsAsync(
-            string? examYear = null, string? examMonth = null, string? examType = null, long? courseId = null, long? allocatedToUserId = null, long? answersheetId = null)
+            string? examYear = null, string? examMonth = null, string? examType = null, long? courseId = null,
+            long? allocatedToUserId = null, long? answersheetId = null)
         {
-            var resultItems =
-                await (from answersheet in _context.Answersheets
-                       join examination in this._context.Examinations on answersheet.ExaminationId equals examination.ExaminationId
-                       join institute in _context.Institutions on examination.InstitutionId equals institute.InstitutionId
-                       join course in _context.Courses on examination.CourseId equals course.CourseId
-                       join dtype in _context.DegreeTypes on examination.DegreeTypeId equals dtype.DegreeTypeId
+            try
+            {
+                var resultItems = await (from answersheet in _context.Answersheets
 
-                       join allocatedUser in this._context.Users on answersheet.AllocatedToUserId equals allocatedUser.UserId into allocatedUserResults
-                       from allocatedUserResult in allocatedUserResults.DefaultIfEmpty()
+                                         join examination in this._context.Examinations
+                                         on answersheet.ExaminationId equals examination.ExaminationId
 
-                       where
-                       answersheet.IsActive == true
-                       && (examination.ExamYear == examYear || examYear == null)
-                       && (examination.ExamMonth == examMonth || examMonth == null)
-                       && (examination.ExamType == examType || examType == null)
-                       && (examination.CourseId == courseId || courseId == null)
-                       && (answersheet.AllocatedToUserId == allocatedToUserId || allocatedToUserId == null)
-                       && (answersheet.AnswersheetId == answersheetId || answersheetId == null)
+                                         join institute in _context.Institutions
+                                         on examination.InstitutionId equals institute.InstitutionId
 
-                       select new AnswerManagementDto
-                       {
-                           AnswersheetId = answersheet.AnswersheetId,
-                           InstitutionId = examination.InstitutionId,
-                           InstitutionName = institute.Name,
-                           RegulationYear = examination.RegulationYear,
-                           BatchYear = examination.BatchYear,
-                           DegreeTypeName = dtype.Name,
-                           ExamType = examination.ExamType,
-                           Semester = (int)examination.Semester,
-                           CourseId = examination.CourseId,
-                           CourseCode = course.Code,
-                           CourseName = course.Name,
-                           ExamMonth = examination.ExamMonth,
-                           ExamYear = examination.ExamYear,
-                           DummyNumber = new String('X', answersheet.DummyNumber.Trim().Length - 6) + answersheet.DummyNumber.Trim().Substring(answersheet.DummyNumber.Trim().Length - 6),
-                           UploadedBlobStorageUrl = answersheet.UploadedBlobStorageUrl,
-                           AllocatedUserName = (allocatedUserResult != null ? allocatedUserResult.Name : string.Empty),
-                           TotalObtainedMark = answersheet.TotalObtainedMark,
-                           IsEvaluateCompleted = answersheet.IsEvaluateCompleted
-                       }).ToListAsync();
+                                         join course in _context.Courses
+                                         on examination.CourseId equals course.CourseId
 
-            return resultItems.OrderByDescending(x => x.TotalObtainedMark).OrderBy(x => x.IsEvaluateCompleted).ToList();
+                                         join dtype in _context.DegreeTypes
+                                         on examination.DegreeTypeId equals dtype.DegreeTypeId
+
+                                         join allocatedUser in this._context.Users
+                                         on answersheet.AllocatedToUserId equals allocatedUser.UserId into allocatedUserResults
+                                         from allocatedUserResult in allocatedUserResults.DefaultIfEmpty()
+
+                                         where
+                                         answersheet.IsActive == true
+                                         && (examination.ExamYear == examYear || examYear == null)
+                                         && (examination.ExamMonth == examMonth || examMonth == null)
+                                         && (examination.ExamType == examType || examType == null)
+                                         && (examination.CourseId == courseId || courseId == null)
+                                         && (answersheet.AllocatedToUserId == allocatedToUserId || allocatedToUserId == null)
+                                         && (answersheet.AnswersheetId == answersheetId || answersheetId == null)
+
+                                         select new AnswerManagementDto
+                                         {
+                                             AnswersheetId = answersheet.AnswersheetId,
+                                             InstitutionId = examination.InstitutionId,
+                                             InstitutionName = institute.Name,
+                                             RegulationYear = examination.RegulationYear,
+                                             BatchYear = examination.BatchYear,
+                                             DegreeTypeName = dtype.Name,
+                                             ExamType = examination.ExamType,
+                                             Semester = (int)examination.Semester,
+                                             CourseId = examination.CourseId,
+                                             CourseCode = course.Code,
+                                             CourseName = course.Name,
+                                             ExamMonth = examination.ExamMonth,
+                                             ExamYear = examination.ExamYear,
+                                             DummyNumber = answersheet.DummyNumber,
+                                             UploadedBlobStorageUrl = null,
+                                             AllocatedUserName = (allocatedUserResult != null ? allocatedUserResult.Name : string.Empty),
+                                             TotalObtainedMark = answersheet.TotalObtainedMark,
+                                             IsEvaluateCompleted = answersheet.IsEvaluateCompleted
+                                         }).ToListAsync();
+
+
+                foreach (var item in resultItems)
+                {
+                    if (allocatedToUserId != null)
+                    {
+                        item.DummyNumber = GetDummyNumberMasked(item.DummyNumber.Trim());
+                    }
+                    item.UploadedBlobStorageUrl = GetDummyNumberBlobStorageUrl(item.CourseCode, item.DummyNumber);
+                }
+
+                return resultItems.OrderByDescending(x => x.TotalObtainedMark).OrderBy(x => x.IsEvaluateCompleted).ToList();
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        private static string GetDummyNumberMasked(string dummyNo)
+        {
+            return string.Concat(new String('x', 10), dummyNo.AsSpan(dummyNo.Length - 6));
+        }
+
+        private string GetDummyNumberBlobStorageUrl(string courseCode, string dummyNumber)
+        {
+            //Sample url
+            //https://skceuatdocuments.blob.core.windows.net/skcedocumentcontainerdev/ANSWERSHEET/23AD201/833825040813032020q52224315223.pdf
+
+            return $"{this._blobBaseUrl}//{this._containerName}//ANSWERSHEET//{courseCode}//{dummyNumber}.pdf";
         }
 
         public async Task<string> ImportDummyNumberByExcel(Stream excelStream, long loggedInUserId)
@@ -104,10 +153,10 @@ namespace SKCE.Examination.Services.Common
         }
 
         public async Task<List<AnswersheetConsolidatedDto>> GetExamConsolidatedAnswersheetsAsync(
-            string? examYear = null, string? examMonth = null, string? examType = null, long? institutionId = null)
+            string examYear, string examMonth, string examType)
         {
             var helper = new AnswersheetConsolidatedHelper(this._context);
-            return await helper.GetConsolidatedItems(examYear, examMonth, examType, institutionId);
+            return await helper.GetConsolidatedItems(examYear, examMonth, examType);
         }
 
         public async Task<List<AnswersheetQuestionwiseMark>> GetAnswersheetMarkAsync(long answersheetId)
@@ -140,14 +189,12 @@ namespace SKCE.Examination.Services.Common
                 {
                     await _emailService.SendEmailAsync(
                         user.Email,
-                        "SKCE Online Examination Platform: Answeersheets allocated", $"Hi {user.Name
-                        },\n\nYou have been allocated with {inputData.Noofsheets
-                        } answersheets for Evaluation.\n\n Please Evaluate. \n\n");
+                        "SKCE Online Examination Platform: Answeersheets allocated", $"Hi {user.Name},\n\nYou have been allocated with {inputData.Noofsheets} answersheets for Evaluation.\n\n Please Evaluate. \n\n");
                 }
             }
             return response;
         }
-        public async Task<(MemoryStream,string)> ExportMarksAsync(long institutionId, string examYear, string examMonth, long courseId)
+        public async Task<(MemoryStream, string)> ExportMarksAsync(long institutionId, string examYear, string examMonth, long courseId)
         {
             var degreeTypeId = _context.Examinations
                 .Where(x => x.InstitutionId == institutionId && x.ExamYear == examYear && x.ExamMonth.ToUpper() == examMonth.ToUpper() && x.CourseId == courseId)
@@ -219,7 +266,7 @@ namespace SKCE.Examination.Services.Common
                     )
                 }).ToList();
 
-            string templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Export Templates",
+            string templatePath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "Export Templates",
                 degreeType == "PG" ? "Export_Format_PG.xlsx" : "Export_Format_UG.xlsx");
 
             using var fileStream = new FileStream(templatePath, FileMode.Open, FileAccess.Read);
@@ -235,7 +282,7 @@ namespace SKCE.Examination.Services.Common
 
                 int startRow = 2; // Assuming header is in Row 1
                 int partAQuestions = 10;
-                int partBQuestions = (degreeType == "UG")? 20:18;
+                int partBQuestions = (degreeType == "UG") ? 20 : 18;
                 int partCQuestions = (degreeType == "UG") ? 0 : 19;
                 int sno = 1;
                 foreach (var item in groupedData)
@@ -251,7 +298,7 @@ namespace SKCE.Examination.Services.Common
                         Qno = i;
                         if (item.QuestionMarks is Dictionary<string, decimal> questionMarks)
                         {
-                            questionMarks.TryGetValue(Qno.ToString()+".0", out decimal mark);
+                            questionMarks.TryGetValue(Qno.ToString() + ".0", out decimal mark);
                             row.Append(CreateCell(mark));
                         }
                     }
@@ -263,7 +310,7 @@ namespace SKCE.Examination.Services.Common
                         decimal totalMarks = 0;
                         if (item.QuestionMarks is Dictionary<string, decimal> questionSub1Marks)
                         {
-                            questionSub1Marks.TryGetValue(Qno.ToString()+".1", out decimal mark);
+                            questionSub1Marks.TryGetValue(Qno.ToString() + ".1", out decimal mark);
                             row.Append(CreateCell(mark));
                             totalMarks = totalMarks + mark;
                         }
@@ -283,7 +330,7 @@ namespace SKCE.Examination.Services.Common
                         for (int i = 19; i <= partCQuestions; i++)
                         {
                             Qno = i;
-                            
+
                             if (item.QuestionMarks is Dictionary<string, decimal> questionPartCSub1Marks)
                             {
                                 questionPartCSub1Marks.TryGetValue(Qno.ToString() + ".1", out decimal mark);
@@ -297,11 +344,11 @@ namespace SKCE.Examination.Services.Common
                                 totalMarks = totalMarks + mark;
                             }
                         }
-                        if(item.PartC_Total == 0)
+                        if (item.PartC_Total == 0)
                             row.Append(CreateCell(totalMarks));
                         else
                             row.Append(CreateCell(item.PartC_Total));
-                        
+
                     }
                     row.Append(CreateCell(item.GrandTotal));
                     sheetData.Append(row);

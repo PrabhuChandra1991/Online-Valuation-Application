@@ -65,11 +65,11 @@ export class ConsolidatedviewComponent {
   dataSourceExamMonths: any[] = [];
   dataSourceExamTypes: any[] = [];
 
-  selectedExamYear: string = '';
-  selectedExamMonth: string = '';
-  selectedExamType: string = '';
+  selectedExamYear: string = '0';
+  selectedExamMonth: string = '0';
+  selectedExamType: string = '0';
 
-  ddlType = new FormControl('');
+  ddlType = new FormControl('0');
 
   modalRef: NgbModalRef;
   gridDataItems: any[] = [];
@@ -161,17 +161,19 @@ export class ConsolidatedviewComponent {
 
   loadGridData(): void {
     this.answersheetService
-      .getConsolidatedExamAnswersheets(this.selectedExamYear, this.selectedExamMonth, this.selectedExamType, 0)
+      .getConsolidatedExamAnswersheets(
+        this.selectedExamYear,
+        this.selectedExamMonth,
+        this.selectedExamType)
       .subscribe({
         next: (data: any[]) => {
           this.gridDataItems = data;
           this.dataSource.data = this.gridDataItems;
           this.dataSource.paginator = this.paginator;
-          this.dataSource.sort = this.sort;
-          // console.log('history data:', this.answersheets);
+          this.dataSource.sort = this.sort; 
         },
         error: (errRes: any) => {
-          console.error('Error loading history:', errRes);
+          console.error('Error on getConsolidatedExamAnswersheets:', errRes);
         },
       });
   }

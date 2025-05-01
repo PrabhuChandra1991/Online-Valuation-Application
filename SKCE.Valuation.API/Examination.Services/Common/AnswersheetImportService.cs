@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -60,9 +61,24 @@ namespace SKCE.Examination.Services.Common
         }
 
 
-        public async Task<List<AnswersheetImport>> GetAnswersheetImports(long examinationId)
+        public async Task<List<AnswersheetImportDto>> GetAnswersheetImports(long examinationId)
         {
-            return await this._context.AnswersheetImports.Where(x => x.ExaminationId == examinationId).ToListAsync();
+            return await this._context.AnswersheetImports
+                .Where(x => x.ExaminationId == examinationId)
+                .OrderByDescending(x => x.AnswersheetImportId)
+                .Select(x => new AnswersheetImportDto
+                {
+                    AnswersheetImportId = x.AnswersheetImportId,
+                    DocumentName = x.DocumentName,
+                    DocumentUrl = x.DocumentUrl,
+                    ExamMonth = x.ExamMonth,
+                    ExamYear = x.ExamYear,
+                    ExaminationId = x.ExaminationId,
+                    RecordCount = x.AnswersheetImportDetails.Count(),
+                    IsReviewCompleted = x.IsReviewCompleted,
+                    ReviewCompletedOn = x.ReviewCompletedOn,
+                    ReviewCompletedBy = x.ReviewCompletedBy
+                }).ToListAsync();
         }
 
         public async Task<List<AnswersheetImportDetail>> GetAnswersheetImportDetails(long answersheetImportId)
@@ -70,7 +86,12 @@ namespace SKCE.Examination.Services.Common
             return await this._context.AnswersheetImportDetails.Where(x => x.AnswersheetImportId == answersheetImportId).ToListAsync();
         }
 
-
+        public async Task<bool> CreateAnswerSheetsAndApproveImportedData(
+            long answersheetImportId, long loggedInUserId)
+        {
+            var helper = new AnswersheetImportApproveHelper(this._context);
+            return await helper.CreateAnswerSheetsAndApproveImportedData(answersheetImportId, loggedInUserId);
+        }
 
     }
 }

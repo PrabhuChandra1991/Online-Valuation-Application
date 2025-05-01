@@ -27,13 +27,7 @@ export class AnswersheetImportService {
       `${this.apiUrl}/api/AnswersheetImport/GetExaminationInfo?institutionId=${institutionId}&examYear=${examYear}&examMonth=${examMonth}`
     );
   }
-
-  getConsolidatedExamAnswersheets(institutionId: number): Observable<any> {
-    return this.http.get(
-      `${this.apiUrl}/api/Answersheet/GetConsolidatedExamAnswersheets?institutionId=${institutionId}`
-    );
-  }
-
+ 
   importAnswerSheetDummyNumbers(
     formData: FormData,
     examinationId: number
@@ -63,6 +57,22 @@ export class AnswersheetImportService {
   ): Observable<any> {
     const ulr = `${this.apiUrl}/api/AnswersheetImport/GetAnswersheetImportDetails?answersheetImportId=${answersheetImportId}`;
     return this.http.get(ulr);
+  }
+
+  
+  ReviewCompletedAndApproving(answersheetImportId: number): Observable<any> {
+    const loggedData = localStorage.getItem('userData');
+    let userData: any;
+    if (loggedData) {
+       userData = JSON.parse(loggedData);
+    }
+    const url: string = `${this.apiUrl}/api/AnswersheetImport/ReviewedAndApproveDummyNumbers?answersheetImportId=${answersheetImportId}`;
+    const httpOptions = {
+      headers: new HttpHeaders({
+        loggedInUserId: parseInt(userData.userId),
+      }),
+    }; 
+    return this.http.get(url, httpOptions);
   }
 
   //

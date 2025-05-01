@@ -98,12 +98,13 @@
               class="list-group-item d-flex justify-content-between align-items-center"
               *ngFor="let item of dataSourceAnswerSheetImports"
               [value]="item.answersheetImportId"
-              [ngClass]="(item.answersheetImportId == selectedanswersheetImportId) ? 'active' : ''"
-              [ngStyle]="{ color: item.documentName == selectedAnswersheetName ? 'blue' : 'black' }"
-              (click)=" loadAnswersheetImportDetails( item.answersheetImportId, item.documentName ) "
+              [ngClass]="(item.answersheetImportId == selectedAnswersheetImportId) ? 'active' : ''"
+              [ngStyle]="{ color: item.documentName == selectedAnswersheetImportName ? 'blue' : 'black' }"
+              (click)=" loadAnswersheetImportDetails( item.answersheetImportId, item.documentName, item.isReviewCompleted)"
             >
-              {{ item.documentName.split("\\")[2] }}
-              <span class="badge text-bg-primary rounded-pill">0</span>
+              <b>{{ item.documentName.split("\\")[2] }}</b> &nbsp;
+              {{item.isReviewCompleted ? 'Review completed':'Review pending'}}
+              <span class="badge text-bg-primary rounded-pill">{{item.recordCount}}</span>
             </button>
           </div>
         </div>
@@ -112,14 +113,15 @@
     <div class="col-md-8">
       <div class="row">
         <div class="col-md-8">
-          <h4>Dummy Numbers in file:&nbsp;{{ selectedAnswersheetName.split("\\")[2] }}&nbsp;</h4>
+          <h4>Dummy Numbers in file:&nbsp;{{ selectedAnswersheetImportName.split("\\")[2] }}&nbsp;</h4>
         </div>
         <div class="col-md-2">
           <h4>Count:&nbsp;{{ dataSourceAnswerSheetImportDetails.length }}</h4>
         </div>
         <div class="col-md-2">
           <button
-            [disabled]="selectedAnswersheetName === ''"
+            *ngIf="selectedAnswersheetImportIsReviewCompleted !== true"
+            [disabled]="selectedAnswersheetImportName === ''"
             class="btn btn-primary float-end"
             (click)="promptBeforeReviewCompletion()"
           >

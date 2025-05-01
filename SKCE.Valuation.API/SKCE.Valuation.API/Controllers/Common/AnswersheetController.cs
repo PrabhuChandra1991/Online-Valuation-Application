@@ -69,11 +69,10 @@ namespace SKCE.Examination.API.Controllers.Common
         }
 
         [HttpGet("GetConsolidatedExamAnswersheets")]
-        public async Task<ActionResult<List<AnswersheetQuestionAnswerDto>>> GetExamConsolidatedAnswersheets(
-            string? examYear = null, string? examMonth = null, string? examType = null, long? institutionId = null)
+        public async Task<ActionResult<List<AnswersheetQuestionAnswerDto>>> 
+            GetExamConsolidatedAnswersheets(string examYear, string examMonth, string examType)
         {
-
-            var result = await _answersheetService.GetExamConsolidatedAnswersheetsAsync(examYear, examMonth, examType, institutionId);
+            var result = await _answersheetService.GetExamConsolidatedAnswersheetsAsync(examYear, examMonth, examType);
             return Ok(result);
         }
 
@@ -140,7 +139,7 @@ namespace SKCE.Examination.API.Controllers.Common
         [HttpGet("ExportMarks")]
         public async Task<IActionResult> ExportMarks([FromQuery] long institutionId, [FromQuery] long courseId, [FromQuery] string examYear, [FromQuery] string examMonth)
         {
-            var (stream,fileName) = await _answersheetService.ExportMarksAsync(institutionId, examYear, examMonth, courseId);
+            var (stream, fileName) = await _answersheetService.ExportMarksAsync(institutionId, examYear, examMonth, courseId);
 
             return Ok(new
             {

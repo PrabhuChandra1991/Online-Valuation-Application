@@ -3,8 +3,6 @@
 	[AnswersheetId] BIGINT NOT NULL PRIMARY KEY IDENTITY(1,1),
 	[ExaminationId] BIGINT NOT NULL,	 
 	[DummyNumber] NVARCHAR(100) NOT NULL,
-	[UploadedBlobStorageUrl] NVARCHAR(1000) NULL,	
-	[ScriptIdentity] NVARCHAR(50) NULL,	
 	[AllocatedToUserId] BIGINT NULL,
 	[AllocatedDateTime] DATETIME NULL,
 	[IsAllocationMailSent] BIT NULL,

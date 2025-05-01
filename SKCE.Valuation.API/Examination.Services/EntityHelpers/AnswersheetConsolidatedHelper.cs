@@ -14,20 +14,21 @@ namespace SKCE.Examination.Services.EntityHelpers
         }
 
         public async Task<List<AnswersheetConsolidatedDto>> GetConsolidatedItems(
-            string? examYear = null, string? examMonth = null, string? examType = null, long? institutionId = null)
+            string examYear, string examMonth, string examType)
         {
-            var resultItems = await (from asheet in _dbContext.Answersheets
-                                     join exam in _dbContext.Examinations on asheet.ExaminationId equals exam.ExaminationId
+            var resultItems = await (from exam in _dbContext.Examinations
                                      join institution in _dbContext.Institutions on exam.InstitutionId equals institution.InstitutionId
                                      join course in _dbContext.Courses on exam.CourseId equals course.CourseId
                                      join dept in _dbContext.Departments on exam.DepartmentId equals dept.DepartmentId
                                      join degType in _dbContext.DegreeTypes on exam.DegreeTypeId equals degType.DegreeTypeId
-                                     
+
                                      where exam.IsActive == true
-                                     && (exam.ExamYear == examYear || examYear == null)
-                                     && (exam.ExamMonth == examMonth || examMonth == null)
-                                     && (exam.ExamType == examType || examType == null)
-                                     && (exam.InstitutionId == institutionId || institutionId == null)
+                                     && exam.ExamYear == examYear
+                                     && exam.ExamMonth == examMonth
+                                     && exam.ExamType == examType
+                                     //&& (exam.InstitutionId == institutionId || institutionId == null)
+
+                                     orderby course.Code
 
                                      select new AnswersheetConsolidatedDto
                                      {
@@ -47,7 +48,7 @@ namespace SKCE.Examination.Services.EntityHelpers
                                          AnswerSheetTotalCount = exam.Answersheets.Count(x => x.IsActive),
                                          AnswerSheetAllocatedCount = exam.Answersheets.Count(x => x.IsActive && x.AllocatedToUserId != null),
                                          AnswerSheetNotAllocatedCount = exam.Answersheets.Count(x => x.IsActive && x.AllocatedToUserId == null),
-                                     }).ToListAsync(); 
+                                     }).ToListAsync();
             return resultItems;
         }
 

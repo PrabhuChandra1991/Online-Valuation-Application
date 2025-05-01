@@ -70,6 +70,7 @@ export class AnswersheetImportComponent implements OnInit {
   selectedExamMonth: string = '0';
   selectedExamYear: string = '0';
   selectedExaminationId: number = 0;
+  selectedanswersheetImportId: number = 0;
   selectedAnswersheetName: string = '';
 
   isDummyNumberImported = false;
@@ -200,6 +201,7 @@ export class AnswersheetImportComponent implements OnInit {
     answerSheetImportId: number,
     documentName: string
   ) {
+    this.selectedanswersheetImportId = answerSheetImportId;
     this.selectedAnswersheetName = documentName;
     this.dataSourceAnswerSheetImportDetails = [];
     this.answersheetImportService
@@ -265,21 +267,27 @@ export class AnswersheetImportComponent implements OnInit {
   }
 
   submitDummyNumberImport() {
+    this.spinnerService.toggleSpinnerState(true);
+    console.log("submit")
     const formData = new FormData();
     const fileSource: any = this.dummyNumberImportForm.get('fileSource')?.value;
     if (fileSource !== null && fileSource !== undefined) {
       formData.append('file', fileSource);
     }
+    console.log(formData)
+    console.log(this.selectedExaminationId)
     this.answersheetImportService
       .importAnswerSheetDummyNumbers(formData, this.selectedExaminationId)
       .subscribe({
         next: (response) => {
+          this.spinnerService.toggleSpinnerState(false);
           this.toasterService.success('Imported successfully.');
           this.resetImportFormControls();
           this.loadAnswersheetImports();
         },
         error: (errorResponse) => {
-          this.toasterService.success('Error on Import process.');
+          this.spinnerService.toggleSpinnerState(false);
+          this.toasterService.error('Error on Import process.');
           this.resetImportFormControls();
           this.loadAnswersheetImports();
         },

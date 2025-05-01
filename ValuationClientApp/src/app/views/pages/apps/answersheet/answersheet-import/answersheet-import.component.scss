@@ -1,0 +1,11 @@
+.hr {
+    margin: 2rem 0;
+}
+.list-group-item:hover {
+    background-color: #2a9df4;
+    color: white !important;
+}
+.list-group-item.active {
+    background-color: #cfe2ff;
+    color: #052c65 !important;
+}

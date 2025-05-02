@@ -1749,23 +1749,6 @@ namespace SKCE.Examination.Services.QPSettings
 
                 if (totalMarks != 15) errors.Add($"❌ Q{qNo} Total Marks = {totalMarks} (should be 15).");
 
-                if (qNo == 12 || qNo == 14 || qNo == 16 || qNo == 18)
-                {
-                    string subPreQ1CO = ExtractBookmarkText(doc, $"Q{qNo - 1}ICO");
-                    string subPreQ1BT = ExtractBookmarkText(doc, $"Q{qNo - 1}IBT");
-                    string subPreQ2CO = ExtractBookmarkText(doc, $"Q{qNo - 1}IICO");
-                    string subPreQ2BT = ExtractBookmarkText(doc, $"Q{qNo - 1}IIBT");
-
-                    if ((!string.IsNullOrEmpty(subQ2CO) && subQ2CO != "Select" && subQ1CO != subQ2CO) ||
-                        (!string.IsNullOrEmpty(subQ2BT) && subQ2BT != "Select" && subQ1BT != subQ2BT) ||
-                        (!string.IsNullOrEmpty(subPreQ1CO) && subPreQ1CO != "Select" && subQ1CO != subPreQ1CO) ||
-                        (!string.IsNullOrEmpty(subPreQ1BT) && subPreQ1BT != "Select" && subQ1BT != subPreQ1BT) ||
-                        (!string.IsNullOrEmpty(subPreQ2CO) && subPreQ2CO != "Select" && subQ1CO != subPreQ2CO) ||
-                        (!string.IsNullOrEmpty(subPreQ2BT) && subPreQ2BT != "Select" && subQ1BT != subPreQ2BT))
-                    {
-                        errors.Add($"❌ Q{qNo - 1} BT and CO, Q{qNo} BT and CO distributions are mismatch.");
-                    }
-                }
                 partBData.Add((qNo, subQs));
                 // Add to table
                 //htmlTable.Append($"<tr><td>Q{qNo}</td><td>{subQ1Text}</td><td>{subQ1CO}</td><td>{subQ1BT}</td><td>{subQ1Marks}</td><td>{subQ2Text}</td><td>{subQ2CO}</td><td>{subQ2BT}</td><td>{subQ2Marks}</td><td>{totalMarks}</td></tr>");
@@ -1890,7 +1873,7 @@ namespace SKCE.Examination.Services.QPSettings
             int totalPartCMarks = 0;
             int expectedPartCMarks = 20;
             // Store question pair details
-            List<(int QNo, List<(string CO, string BT, int Marks)> SubQs)> partBData = new();
+            List<(int QNo, List<(string CO, string BT, int Marks)> SubQs)> partCData = new();
 
             for (int qNo = 19; qNo <= 19; qNo++)
             {
@@ -1978,16 +1961,16 @@ namespace SKCE.Examination.Services.QPSettings
                 if (!string.IsNullOrEmpty(qpakAssigned) && string.IsNullOrEmpty(subQ2AnswerKey)) errors.Add($"❌ Q{qNo} Answer key is missing for SubQ2 (QPAK assigned).");
 
                 if (totalMarks != 20) errors.Add($"❌ Q{qNo} Total Marks = {totalMarks} (should be 20).");
-                partBData.Add((qNo, subQs));
+                partCData.Add((qNo, subQs));
                 // Add to table
                 //htmlTable.Append($"<tr><td>Q{qNo}</td><td>{subQ1Text}</td><td>{subQ1CO}</td><td>{subQ1BT}</td><td>{subQ1Marks}</td><td>{subQ2Text}</td><td>{subQ2CO}</td><td>{subQ2BT}</td><td>{subQ2Marks}</td><td>{totalMarks}</td></tr>");
             }
 
             // Validation for either-or pair rules
-            for (int i = 0; i < partBData.Count; i += 2)
+            for (int i = 0; i < partCData.Count; i += 2)
             {
-                var q1 = partBData[i];
-                var q2 = partBData[i + 1];
+                var q1 = partCData[i];
+                var q2 = partCData[i + 1];
 
                 bool sameBTCOinQ1 = q1.SubQs.All(sq => sq.CO == q1.SubQs[0].CO && sq.BT == q1.SubQs[0].BT);
                 bool sameBTCOinQ2 = q2.SubQs.All(sq => sq.CO == q2.SubQs[0].CO && sq.BT == q2.SubQs[0].BT);

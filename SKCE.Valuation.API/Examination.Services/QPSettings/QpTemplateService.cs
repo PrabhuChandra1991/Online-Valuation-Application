@@ -1967,8 +1967,8 @@ namespace SKCE.Examination.Services.QPSettings
             // Validation for either-or pair rules
             for (int i = 0; i < partCData.Count; i += 2)
             {
-                var q1 = partBData[i];
-                var q2 = partBData[i + 1];
+                var q1 = partCData[i];
+                var q2 = partCData[i + 1];
 
                 bool sameBTCOinQ1 = q1.SubQs.All(sq => sq.CO == q1.SubQs[0].CO && sq.BT == q1.SubQs[0].BT);
                 bool sameBTCOinQ2 = q2.SubQs.All(sq => sq.CO == q2.SubQs[0].CO && sq.BT == q2.SubQs[0].BT);

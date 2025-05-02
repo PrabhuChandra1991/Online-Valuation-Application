@@ -21,7 +21,6 @@ namespace SKCE.Examination.API.Controllers.Common
             return Ok(result);
         }
 
-
         [HttpGet("GetExamMonths")]
         public async Task<ActionResult<List<string>>> GetExamMonths()
         {

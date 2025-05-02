@@ -53,6 +53,5 @@ namespace SKCE.Examination.Services.EntityHelpers
         }
 
 
-
     } // Class
 }

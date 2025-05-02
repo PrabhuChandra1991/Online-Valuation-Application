@@ -2,61 +2,33 @@
   <h3>Import Answersheet List with Dummy Numbers</h3>
   <div class="row mt-4">
     <div class="col-md-2">
-      <select
-        id="institutionId"
-        class="form-select"
-        (change)="onInstituteChange($event)"
-      >
+      <select id="institutionId" class="form-select" (change)="onInstituteChange($event)">
         <option [value]="0">Institution</option>
-        <option
-          *ngFor="let inst of dataSourceInstitutes"
-          [value]="inst.institutionId"
-        >
+        <option *ngFor="let inst of dataSourceInstitutes" [value]="inst.institutionId">
           {{ inst.name }}
         </option>
       </select>
     </div>
     <div class="col-md-1">
-      <select
-        id="examYearId"
-        class="form-select"
-        (change)="onExamYearChange($event)"
-      >
+      <select id="examYearId" class="form-select" (change)="onExamYearChange($event)">
         <option [value]="0">Year</option>
-        <option
-          *ngFor="let item of dataSourceExamYears"
-          [value]="item"
-        >
+        <option *ngFor="let item of dataSourceExamYears" [value]="item">
           {{ item }}
         </option>
       </select>
     </div>
     <div class="col-md-1">
-      <select
-        id="examMonthId"
-        class="form-select"
-        (change)="onExamMonthChange($event)"
-      >
+      <select id="examMonthId" class="form-select" (change)="onExamMonthChange($event)">
         <option [value]="0">Month</option>
-        <option
-          *ngFor="let item of dataSourceExamMonths"
-          [value]="item"
-        >
+        <option *ngFor="let item of dataSourceExamMonths" [value]="item">
           {{ item }}
         </option>
       </select>
     </div>
     <div class="col-md-4">
-      <select
-        id="courseId"
-        class="form-select"
-        (change)="onExaminationChange($event)"
-      >
+      <select id="courseId" class="form-select" (change)="onExaminationChange($event)">
         <option [value]="0">Examination/Course</option>
-        <option
-          *ngFor="let item of dataSourceExaminations"
-          [value]="item.examinationId"
-        >
+        <option *ngFor="let item of dataSourceExaminations" [value]="item.examinationId">
           {{ item.courseCode }} ----- {{ item.departmentCode }} ----- ({{
           item.studentCount
           }})
@@ -65,23 +37,13 @@
     </div>
     <div class="col-md-3">
       <form [formGroup]="dummyNumberImportForm">
-        <input
-          class="form-control"
-          value="gedDummyNumberformControls['file']"
-          type="file"
-          id="masterfile"
-          formControlName="file"
-          (change)="onDummyNumberFileChange($event)"
-        />
+        <input class="form-control" value="gedDummyNumberformControls['file']" type="file" id="masterfile"
+          formControlName="file" (change)="onDummyNumberFileChange($event)" />
       </form>
     </div>
     <div class="col-md-1 d-grid">
-      <button
-        type="submit"
-        class="btn btn-primary"
-        [disabled]="!isDummyNumberImported"
-        (click)="submitDummyNumberImport()"
-      >
+      <button type="submit" class="btn btn-primary" [disabled]="!isDummyNumberImported"
+        (click)="submitDummyNumberImport()">
         Import
       </button>
     </div>
@@ -90,150 +52,115 @@
   <div class="row mt-4">
     <div class="col-md-4">
       <div class="row">
-        <h4>Imported Excel documents</h4>
-        <i>Please click below file to review</i>
+        <div>
+          <h4>Imported Excel documents</h4>
+          <i>Please click below file to review</i>
+        </div>
         <div class="row">
-          <div class="list-group mt-4 ms-2">
-            <button
-              class="list-group-item d-flex justify-content-between align-items-center"
-              *ngFor="let item of dataSourceAnswerSheetImports"
-              [value]="item.answersheetImportId"
+          <div class="list-group mt-3 ms-2">
+            <button class="list-group-item d-flex justify-content-between align-items-center"
+              *ngFor="let item of dataSourceAnswerSheetImports" [value]="item.answersheetImportId"
               [ngClass]="(item.answersheetImportId == selectedAnswersheetImportId) ? 'active' : ''"
               [ngStyle]="{ color: item.documentName == selectedAnswersheetImportName ? 'blue' : 'black' }"
-              (click)=" loadAnswersheetImportDetails(item.answersheetImportId, item.documentName, item.isReviewCompleted)"
-            >
+              (click)=" loadAnswersheetImportDetails(item.answersheetImportId, item.documentName, item.isReviewCompleted)">
               <b>{{ item.documentName.split("\\")[2] }}</b> &nbsp;
               {{item.isReviewCompleted ? 'Review completed':'Review pending'}}
               <span class="badge text-bg-primary rounded-pill">{{item.recordCount}}</span>
             </button>
           </div>
+
         </div>
       </div>
     </div>
     <div class="col-md-8">
       <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-2">
+          <button *ngIf="selectedAnswersheetImportIsReviewCompleted !== true"
+            [disabled]="selectedAnswersheetImportName === ''" class="btn btn-primary float-end"
+            (click)="promptBeforeReviewCompletion()">
+            Complete Review
+          </button>
+        </div>
+        <div class="col-md-6">
           <h4>Dummy Numbers in file:&nbsp;{{ selectedAnswersheetImportName.split("\\")[2] }}&nbsp;</h4>
         </div>
         <div class="col-md-2">
           <h4>Count:&nbsp;{{ dataSourceAnswerSheetImportDetails.length }}</h4>
         </div>
-        <div class="col-md-2">
-          <button
-            *ngIf="selectedAnswersheetImportIsReviewCompleted !== true"
-            [disabled]="selectedAnswersheetImportName === ''"
-            class="btn btn-primary float-end"
-            (click)="promptBeforeReviewCompletion()"
-          >
-            Complete Review
-          </button>
+        <div class="col-md-2 float-end">
+          <button title="Delete all dummy numbers" class="btn btn-outline-primary"
+            [disabled]="selectedAnswersheetImportId===0" (click)="promptBeforeDeleteImportedFile()">Delete File</button>
         </div>
       </div>
       <div class="row mt-3">
         <div class="col-lg-12 custom-table-style">
           <div class="table-responsive">
             <!-- Table -->
-            <table
-              mat-table
-              [dataSource]="dataSourceAnswerSheetImportDetails"
-              matSort
-              class="mat-elevation-z8"
-            >
+            <table mat-table [dataSource]="dataSourceAnswerSheetImportDetails" matSort class="mat-elevation-z8">
               <!-- Name Column -->
               <ng-container matColumnDef="dummyNumber">
-                <th
-                  mat-header-cell
-                  *matHeaderCellDef
-                  mat-sort-header
-                >
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
                   Dummy Number
                 </th>
-                <td
-                  mat-cell
-                  *matCellDef="let element"
-                >
+                <td mat-cell *matCellDef="let element">
                   {{ element.dummyNumber }}
                 </td>
               </ng-container>
               <!-- Name Column -->
               <ng-container matColumnDef="isValid">
-                <th
-                  mat-header-cell
-                  *matHeaderCellDef
-                  mat-sort-header
-                >
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
                   Status
                 </th>
-                <td
-                  mat-cell
-                  *matCellDef="let element"
-                >
+                <td mat-cell *matCellDef="let element">
                   <span class="{{ (element.isValid) ? 'text-success' :  'text-danger' }}">
                     {{ element.isValid ? "Valid" : "Invalid" }}</span>
                 </td>
               </ng-container>
               <!-- Name Column -->
               <ng-container matColumnDef="errorMessage">
-                <th
-                  mat-header-cell
-                  *matHeaderCellDef
-                  mat-sort-header
-                >
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
                   Error Message
                 </th>
-                <td
-                  mat-cell
-                  *matCellDef="let element"
-                >
+                <td mat-cell *matCellDef="let element">
                   {{ element.errorMessage }}
                 </td>
               </ng-container>
               <!-- Table Header & Row Definitions -->
-              <tr
-                mat-header-row
-                *matHeaderRowDef="displayedColumns"
-              ></tr>
-              <tr
-                mat-row
-                *matRowDef="let row; columns: displayedColumns"
-              ></tr>
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
             </table>
           </div>
           <!-- Pagination -->
-          <mat-paginator
-            class="mt-3 pagination"
-            [pageSizeOptions]="[15, 30, 50, 100]"
-            showFirstLastButtons
-          ></mat-paginator>
+          <mat-paginator class="mt-3 pagination" [pageSizeOptions]="[15, 30, 50, 100]"
+            showFirstLastButtons></mat-paginator>
         </div>
       </div>
     </div>
   </div>
 </div>
+
 <!-- Confirmation Modal -->
-<ng-template
-  #confirmModule
-  let-modal
->
+<ng-template #confirmModule let-modal>
   <div class="modal-body">
     <div class="row col-md-20">
-      <h6>Please confirm, dummy numbers are reviewed and completed?</h6>
+      <h5>Please confirm, dummy numbers are reviewed and completed?</h5>
     </div>
   </div>
   <div class="modal-footer">
-    <button
-      type="button"
-      class="btn btn-danger px-4"
-      (click)="modal.close('by: no button')"
-    >
-      No
-    </button>
-    <button
-      type="button"
-      class="btn btn-primary px-4"
-      (click)="completeDummyNumberReview()"
-    >
-      Yes
-    </button>
+    <button type="button" class="btn btn-danger px-4" (click)="modal.close('by: no button')"> No </button>
+    <button type="button" class="btn btn-primary px-4" (click)="completeDummyNumberReview()"> Yes </button>
+  </div>
+</ng-template>
+<!-- Answersheet Delete Confirmation Modal -->
+<ng-template #deleteconfirmModule let-modal>
+  <div class="modal-body">
+    <div class="row">
+      <br>
+      <h5>Are you sure to delete this selected file?</h5>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger px-4" (click)="modal.close('by: no button')"> No </button>
+    <button type="button" class="btn btn-primary px-4" (click)="deleteAnswersheetImportedData()"> Yes </button>
   </div>
 </ng-template>

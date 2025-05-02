@@ -87,6 +87,7 @@ export class AnswersheetImportComponent implements OnInit {
   modalRef: NgbModalRef;
 
   @ViewChild('confirmModule') confirmModule: any;
+  @ViewChild('deleteconfirmModule') deleteconfirmModule: any;
 
   constructor(
     private fb: FormBuilder,
@@ -96,7 +97,7 @@ export class AnswersheetImportComponent implements OnInit {
     private answersheetImportService: AnswersheetImportService,
     private toasterService: ToastrService,
     private spinnerService: SpinnerService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadAllInstitues();
@@ -106,7 +107,7 @@ export class AnswersheetImportComponent implements OnInit {
     this.dataSourceExaminations = [];
     this.dataSourceAnswerSheetImports = [];
     this.dataSourceAnswerSheetImportDetails = [];
-    this.selectedAnswersheetImportName  = '';
+    this.selectedAnswersheetImportName = '';
   }
 
   loadAllInstitues(): void {
@@ -179,16 +180,16 @@ export class AnswersheetImportComponent implements OnInit {
     //----------
     this.dataSourceAnswerSheetImports = [];
     this.dataSourceAnswerSheetImportDetails = [];
-    this.selectedAnswersheetImportName = '';    
+    this.selectedAnswersheetImportName = '';
     //----------
     this.answersheetImportService
       .GetAnswersheetImports(this.selectedExaminationId)
       .subscribe({
         next: (data: any) => {
-          this.dataSourceAnswerSheetImports = data; 
+          this.dataSourceAnswerSheetImports = data;
         },
         error: (err: any) => {
-          this.dataSourceAnswerSheetImports = []; 
+          this.dataSourceAnswerSheetImports = [];
         },
       });
   }
@@ -196,7 +197,7 @@ export class AnswersheetImportComponent implements OnInit {
   loadAnswersheetImportDetails(
     answerSheetImportId: number,
     documentName: string,
-    isReviewCompleted:boolean
+    isReviewCompleted: boolean
   ) {
     this.selectedAnswersheetImportId = answerSheetImportId;
     this.selectedAnswersheetImportName = documentName;
@@ -206,10 +207,10 @@ export class AnswersheetImportComponent implements OnInit {
       .GetAnswersheetImportDetails(answerSheetImportId)
       .subscribe({
         next: (data: any) => {
-          this.dataSourceAnswerSheetImportDetails = data;          
+          this.dataSourceAnswerSheetImportDetails = data;
         },
         error: (err: any) => {
-          this.dataSourceAnswerSheetImportDetails = []; 
+          this.dataSourceAnswerSheetImportDetails = [];
         },
       });
   }
@@ -236,7 +237,10 @@ export class AnswersheetImportComponent implements OnInit {
   onExaminationChange(event: Event): void {
     this.selectedExaminationId = parseInt(this.getValue(event));
     this.isDummyNumberImported = false;
-    this.loadAnswersheetImports(); 
+    this.selectedAnswersheetImportId = 0;
+    this.selectedAnswersheetImportIsReviewCompleted = false;
+    this.selectedAnswersheetImportName = "";
+    this.loadAnswersheetImports();
   }
 
   onDummyNumberFileChange(event: any) {
@@ -282,7 +286,7 @@ export class AnswersheetImportComponent implements OnInit {
           this.resetImportFormControls();
           this.loadAnswersheetImports();
         },
-        complete: () => {},
+        complete: () => { },
       });
   }
 
@@ -294,25 +298,49 @@ export class AnswersheetImportComponent implements OnInit {
   }
 
   completeDummyNumberReview() {
-    this.modalRef.close();     
+    this.modalRef.close();
     this.answersheetImportService
       .ReviewCompletedAndApproving(this.selectedAnswersheetImportId)
       .subscribe(
-          (data: any) => {
-              this.toasterService.success('Review completed successfully.');
+        (data: any) => {
+          this.toasterService.success('Review completed successfully.');
           this.loadAnswersheetImports();
           this.selectedAnswersheetImportIsReviewCompleted = true;
           this.loadAnswersheetImportDetails(this.selectedAnswersheetImportId, this.selectedAnswersheetImportName, this.selectedAnswersheetImportIsReviewCompleted);
-          },
+        },
         (error) => {
           if (error.error.message == "UNIQUE-KEY-VIOLATION")
             this.toasterService.error('Some Dummy Numbers are already exists in database..Please check..');
           else
             this.toasterService.error('Failed to complete review.');
-          }
-        );
+        }
+      );
   }
 
+  promptBeforeDeleteImportedFile() {
+    this.modalRef = this.modalService.open(this.deleteconfirmModule, {
+      size: 'md',
+      backdrop: 'static',
+    });
+  }
+
+  deleteAnswersheetImportedData() {
+    this.modalRef.close();
+    this.answersheetImportService.DeleteAnswersheetImportedData(this.selectedAnswersheetImportId)
+      .subscribe({
+        next: (data: any) => {
+          this.toasterService.success('File deleted successfully.');
+          this.loadAnswersheetImports();
+          this.selectedAnswersheetImportId = 0;
+          this.selectedAnswersheetImportIsReviewCompleted = false;
+          this.selectedAnswersheetImportName = "";
+          this.dataSourceAnswerSheetImportDetails = [];
+        },
+        error: (err) => {
+          this.toasterService.error('File delete process failed.');
+        }
+      });
+  }
 
   ////
 } // end of class

@@ -75,6 +75,21 @@ export class AnswersheetImportService {
     return this.http.get(url, httpOptions);
   }
 
+  DeleteAnswersheetImportedData(answersheetImportId: number): Observable<any> {
+    const loggedData = localStorage.getItem('userData');
+    let userData: any;
+    if (loggedData) {
+       userData = JSON.parse(loggedData);
+    }
+    const url: string = `${this.apiUrl}/api/AnswersheetImport/DeleteAnswersheetImport?answersheetImportId=${answersheetImportId}`;
+    const httpOptions = {
+      headers: new HttpHeaders({
+        loggedInUserId: parseInt(userData.userId),
+      }),
+    }; 
+    return this.http.get(url, httpOptions);
+  }
+
   //
   //
   //

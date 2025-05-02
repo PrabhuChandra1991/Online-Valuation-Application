@@ -1,19 +1,8 @@
-﻿using DocumentFormat.OpenXml.InkML;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using SKCE.Examination.Models.DbModels.Common;
 using SKCE.Examination.Services.EntityHelpers;
 using SKCE.Examination.Services.Helpers;
-using SKCE.Examination.Services.ServiceContracts;
 using SKCE.Examination.Services.ViewModels.Common;
-using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.ComponentModel;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SKCE.Examination.Services.Common
 {
@@ -48,7 +37,7 @@ namespace SKCE.Examination.Services.Common
                                     DepartmentName = dept.Name,
                                     StudentCount = (int)exam.StudentCount
                                 }).ToListAsync();
-            return result.OrderByDescending(x => x.CourseCode).ThenBy(x => x.DepartmentCode).ToList();
+            return result.OrderBy(x => x.CourseCode).ThenBy(x => x.DepartmentCode).ToList();
         }
 
 
@@ -64,7 +53,7 @@ namespace SKCE.Examination.Services.Common
         public async Task<List<AnswersheetImportDto>> GetAnswersheetImports(long examinationId)
         {
             return await this._context.AnswersheetImports
-                .Where(x => x.ExaminationId == examinationId)
+                .Where(x => x.ExaminationId == examinationId && x.IsActive)
                 .OrderByDescending(x => x.AnswersheetImportId)
                 .Select(x => new AnswersheetImportDto
                 {
@@ -93,5 +82,20 @@ namespace SKCE.Examination.Services.Common
             return await helper.CreateAnswerSheetsAndApproveImportedData(answersheetImportId, loggedInUserId);
         }
 
-    }
+        public async Task<bool> DeleteAnswersheetImport(long answersheetImportId, long loggedInUserId)
+        {
+            var entity = await this._context.AnswersheetImports.FirstOrDefaultAsync(x => x.AnswersheetImportId == answersheetImportId);
+            if (entity != null)
+            {
+                entity.IsActive = false;
+                entity.ModifiedById = loggedInUserId;
+                entity.ModifiedDate = DateTime.Now;
+                this._context.Entry(entity).State = EntityState.Modified;
+                await this._context.SaveChangesAsync();
+                return true;
+            }
+            return false;
+        }
+
+            }
 }

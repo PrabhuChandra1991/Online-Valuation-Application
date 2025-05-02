@@ -79,13 +79,28 @@ namespace SKCE.Examination.API.Controllers.Common
                 {
                     return BadRequest(new ResultModel() { Message = "UNIQUE-KEY-VIOLATION" });
                 }
-                else{
+                else
+                {
                     return BadRequest(new ResultModel() { Message = "Error on ReviewedAndApproveDummyNumbers" });
                 }
-                
+
             }
         }
 
+        [HttpGet("DeleteAnswersheetImport")]
+        public async Task<IActionResult> DeleteAnswersheetImport(long answersheetImportId)
+        {
+            try
+            {
+                long loggedInUserId = long.Parse(Request.Headers["loggedInUserId"].ToString());
+                var result = await _answersheetImportService.DeleteAnswersheetImport(answersheetImportId, loggedInUserId);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
 
     }
 }

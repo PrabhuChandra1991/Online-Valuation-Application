@@ -188,14 +188,22 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
   }
   openDocUploadModal(content: TemplateRef<any>, qpTemplateId: number) {
     this.qpTemplateId = qpTemplateId;
+   
+  this.qpDocDataForm = new FormGroup({
+    name: new FormControl('', [Validators.required, Validators.minLength(3)]),
+    file: new FormControl('', [Validators.required]),
+    fileSource: new FormControl('', [Validators.required])
+  });
+  this.qpValidationMessage = "";
+    this.isQPDocValidated  = false;
+    this.isQPDocUploaded  = false;
+    this.isInvalidDoc = false;
 
-    this.modalService
-      .open(content, { size: 'lg' })
-      .result.then((result) => {
-        console.log('Modal closed' + result);
-      })
-      .catch((res) => { });
-  }
+      this.modalService.open(content, {size: 'lg'}).result.then((result) => {
+        console.log("Modal closed" + result);
+      }).catch((res) => {});
+
+    }
 
   editAssignment(content: TemplateRef<any>, documentId: any) {
     this.isEditMode = true; // Set edit mode

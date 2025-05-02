@@ -108,11 +108,12 @@ namespace SKCE.Examination.Services.Common
 
                 foreach (var item in resultItems)
                 {
+                    var dummyNo = item.DummyNumber.Trim();
+                    item.UploadedBlobStorageUrl = GetDummyNumberBlobStorageUrl(item.CourseCode, dummyNo);
                     if (allocatedToUserId != null || answersheetId != null)
                     {
-                        item.DummyNumber = GetDummyNumberMasked(item.DummyNumber.Trim());
+                        item.DummyNumber = GetDummyNumberMasked(dummyNo.Trim());
                     }
-                    item.UploadedBlobStorageUrl = GetDummyNumberBlobStorageUrl(item.CourseCode, item.DummyNumber);
                 }
 
                 return resultItems.OrderByDescending(x => x.TotalObtainedMark).OrderBy(x => x.IsEvaluateCompleted).ToList();
@@ -134,7 +135,7 @@ namespace SKCE.Examination.Services.Common
             //Sample url
             //https://skceuatdocuments.blob.core.windows.net/skcedocumentcontainerdev/ANSWERSHEET/23AD201/833825040813032020q52224315223.pdf
 
-            return $"{this._blobBaseUrl}//{this._containerName}//ANSWERSHEET//{courseCode}//{dummyNumber}.pdf";
+            return $"{this._blobBaseUrl}/{this._containerName}/ANSWERSHEET/{courseCode}/{dummyNumber}.pdf";
         }
 
         public async Task<string> ImportDummyNumberByExcel(Stream excelStream, long loggedInUserId)

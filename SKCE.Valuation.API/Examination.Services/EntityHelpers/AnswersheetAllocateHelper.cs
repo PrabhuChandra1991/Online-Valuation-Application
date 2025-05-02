@@ -29,8 +29,8 @@ namespace SKCE.Examination.Services.EntityHelpers
 
             var unallocatedAnswersheets =
                 await this._dbContext.Answersheets
-                            .Where(x => x.IsActive 
-                            && x.ExaminationId == examination.ExaminationId 
+                            .Where(x => x.IsActive
+                            && x.ExaminationId == examination.ExaminationId
                             && x.AllocatedToUserId == null).ToListAsync();
 
             if (unallocatedAnswersheets.Count < inputModel.Noofsheets)
@@ -42,7 +42,7 @@ namespace SKCE.Examination.Services.EntityHelpers
 
             Random random = new Random();
 
-            foreach ( var item in unallocatedAnswersheets)
+            foreach (var item in unallocatedAnswersheets)
             {
                 answersheetWithRandom.Add(
                     new AnswersheetRandomNo
@@ -54,17 +54,23 @@ namespace SKCE.Examination.Services.EntityHelpers
 
             var selectedItems = answersheetWithRandom.OrderBy(x => x.RandomNo).Take(inputModel.Noofsheets);
 
-            foreach ( var item in selectedItems)
+            foreach (var item in selectedItems)
             {
                 item.Answersheet.AllocatedToUserId = inputModel.UserId;
                 item.Answersheet.ModifiedById = loggedInUserId;
                 item.Answersheet.ModifiedDate = DateTime.Now;
-
                 this._dbContext.Update(item.Answersheet).State = EntityState.Modified;
             }
 
+            var user = await this._dbContext.Users.Where(x => x.UserId == inputModel.UserId).FirstOrDefaultAsync();
+            if (user != null)
+            {
+                user.IsActive = true;
+                this._dbContext.Update(user).State = EntityState.Modified;
+            }
+
             await this._dbContext.SaveChangesAsync();
-             
+
             return true;
 
         }

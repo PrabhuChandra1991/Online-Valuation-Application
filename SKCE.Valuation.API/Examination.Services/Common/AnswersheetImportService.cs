@@ -48,7 +48,7 @@ namespace SKCE.Examination.Services.Common
                                     DepartmentName = dept.Name,
                                     StudentCount = (int)exam.StudentCount
                                 }).ToListAsync();
-            return result.OrderBy(x => x.CourseCode).ThenBy(x => x.DepartmentCode).ToList();
+            return result.OrderByDescending(x => x.CourseCode).ThenBy(x => x.DepartmentCode).ToList();
         }
 
 

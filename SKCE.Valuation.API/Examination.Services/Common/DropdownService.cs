@@ -18,8 +18,9 @@ namespace SKCE.Examination.Services.Common
         {
             return await
                 this._context.Examinations
-                            .Where(x => x.IsActive)
-                            .Select(x => x.ExamYear).Distinct().ToListAsync();
+                .Where(x => x.IsActive)
+                .OrderByDescending(x => x.ExamYear)
+                .Select(x => x.ExamYear).Distinct().ToListAsync();
         }
 
         public async Task<List<string>> GetExamMonthsAsync()

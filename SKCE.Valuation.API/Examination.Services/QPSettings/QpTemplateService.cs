@@ -1247,7 +1247,7 @@ namespace SKCE.Examination.Services.QPSettings
             var partBResults = ValidateUGPartB(doc);
             return ($"{htmlTable.ToString()} + {partBResults.Item1}", partBResults.Item2);
         }
-        public static (string,bool) ValidateUGPartB(Document doc)
+        public static (string, bool) ValidateUGPartB(Document doc)
         {
             StringBuilder htmlTable = new StringBuilder();
             htmlTable.Append("<h2>Part B: Question Validation</h2>");
@@ -1268,13 +1268,18 @@ namespace SKCE.Examination.Services.QPSettings
 
             int totalPartBMarks = 0;
             int expectedPartBMarks = 160;
+            // Store question pair details
+            List<(int QNo, List<(string CO, string BT, int Marks)> SubQs)> partBData = new();
 
             for (int qNo = 11; qNo <= 20; qNo++)
             {
+                var subQs = new List<(string CO, string BT, int Marks)>();
+
                 string subQ1Text = ExtractBookmarkText(doc, $"Q{qNo}I");
                 string subQ1CO = ExtractBookmarkText(doc, $"Q{qNo}ICO");
                 string subQ1BT = ExtractBookmarkText(doc, $"Q{qNo}IBT");
                 int subQ1Marks = ExtractMarksFromBookmark(doc, $"Q{qNo}IMARKS");
+                subQs.Add((subQ1CO, subQ1BT, subQ1Marks));
                 var key = (subQ1CO, subQ1BT);
                 if (marksDistribution.ContainsKey(key))
                 {
@@ -1303,6 +1308,7 @@ namespace SKCE.Examination.Services.QPSettings
                 string subQ2CO = ExtractBookmarkText(doc, $"Q{qNo}IICO");
                 string subQ2BT = ExtractBookmarkText(doc, $"Q{qNo}IIBT");
                 int subQ2Marks = ExtractMarksFromBookmark(doc, $"Q{qNo}IIMARKS");
+                subQs.Add((subQ2CO, subQ2BT, subQ2Marks));
                 var key2 = (subQ2CO, subQ2BT);
                 if (marksDistribution.ContainsKey(key2))
                 {
@@ -1353,27 +1359,39 @@ namespace SKCE.Examination.Services.QPSettings
 
                 if (totalMarks != 16) errors.Add($"❌ Q{qNo} Total Marks = {totalMarks} (should be 16).");
 
-                if (qNo == 12 || qNo == 14 || qNo == 16 || qNo == 18 || qNo == 20)
-                {
-                    string subPreQ1CO = ExtractBookmarkText(doc, $"Q{qNo - 1}ICO");
-                    string subPreQ1BT = ExtractBookmarkText(doc, $"Q{qNo - 1}IBT");
-                    string subPreQ2CO = ExtractBookmarkText(doc, $"Q{qNo - 1}IICO");
-                    string subPreQ2BT = ExtractBookmarkText(doc, $"Q{qNo - 1}IIBT");
-
-                    if ((!string.IsNullOrEmpty(subQ2CO) && subQ2CO != "Select" && subQ1CO != subQ2CO) ||
-                        (!string.IsNullOrEmpty(subQ2BT) && subQ2BT != "Select" && subQ1BT != subQ2BT) ||
-                        (!string.IsNullOrEmpty(subPreQ1CO) && subPreQ1CO != "Select" && subQ1CO != subPreQ1CO) ||
-                        (!string.IsNullOrEmpty(subPreQ1BT) && subPreQ1BT != "Select" && subQ1BT != subPreQ1BT) ||
-                        (!string.IsNullOrEmpty(subPreQ2CO) && subPreQ2CO != "Select" && subQ1CO != subPreQ2CO) ||
-                        (!string.IsNullOrEmpty(subPreQ2BT) && subPreQ2BT != "Select" && subQ1BT != subPreQ2BT))
-                    {
-                        errors.Add($"❌ Q{qNo - 1} BT and CO, Q{qNo} BT and CO distributions are mismatch.");
-                    }
-                }
+                partBData.Add((qNo, subQs));
                 // Add to table
                 //htmlTable.Append($"<tr><td>Q{qNo}</td><td>{subQ1Text}</td><td>{subQ1CO}</td><td>{subQ1BT}</td><td>{subQ1Marks}</td><td>{subQ2Text}</td><td>{subQ2CO}</td><td>{subQ2BT}</td><td>{subQ2Marks}</td><td>{totalMarks}</td></tr>");
             }
+            // Validation for either-or pair rules
+            for (int i = 0; i < partBData.Count; i += 2)
+            {
+                var q1 = partBData[i];
+                var q2 = partBData[i + 1];
 
+                bool sameBTCOinQ1 = q1.SubQs.All(sq => sq.CO == q1.SubQs[0].CO && sq.BT == q1.SubQs[0].BT);
+                bool sameBTCOinQ2 = q2.SubQs.All(sq => sq.CO == q2.SubQs[0].CO && sq.BT == q2.SubQs[0].BT);
+
+                int totalQ1 = q1.SubQs.Sum(sq => sq.Marks);
+                int totalQ2 = q2.SubQs.Sum(sq => sq.Marks);
+
+                if (sameBTCOinQ1)
+                {
+                    if (totalQ1 != totalQ2)
+                    {
+                        errors.Add($"❌ Q{q1.QNo} and Q{q2.QNo} should have same total marks ({totalQ1} ≠ {totalQ2}) since BT & CO are same in Q{q1.QNo}.");
+                    }
+                }
+                else
+                {
+                    var q1Details = q1.SubQs.Select(sq => (sq.CO, sq.BT, sq.Marks)).OrderBy(x => x.CO + x.BT + x.Marks);
+                    var q2Details = q2.SubQs.Select(sq => (sq.CO, sq.BT, sq.Marks)).OrderBy(x => x.CO + x.BT + x.Marks);
+                    if (!q1Details.SequenceEqual(q2Details))
+                    {
+                        errors.Add($"❌ Q{q1.QNo} and Q{q2.QNo} must have same BT-CO-Marks combination as they have mixed BT/CO.");
+                    }
+                }
+            }
             //htmlTable.Append("</table>");
             htmlTable.Append("<table border='1' cellpadding='5' cellspacing='0' style='border-collapse: collapse;'>");
 
@@ -1639,13 +1657,17 @@ namespace SKCE.Examination.Services.QPSettings
 
             int totalPartBMarks = 0;
             int expectedPartBMarks = 120;
+            // Store question pair details
+            List<(int QNo, List<(string CO, string BT, int Marks)> SubQs)> partBData = new();
 
             for (int qNo = 11; qNo <= 18; qNo++)
             {
+                var subQs = new List<(string CO, string BT, int Marks)>();
                 string subQ1Text = ExtractBookmarkText(doc, $"Q{qNo}I");
                 string subQ1CO = ExtractBookmarkText(doc, $"Q{qNo}ICO");
                 string subQ1BT = ExtractBookmarkText(doc, $"Q{qNo}IBT");
                 int subQ1Marks = ExtractMarksFromBookmark(doc, $"Q{qNo}IMARKS");
+                subQs.Add((subQ1CO, subQ1BT, subQ1Marks));
                 var key = (subQ1CO, subQ1BT);
                 if (marksDistribution.ContainsKey(key))
                 {
@@ -1674,6 +1696,7 @@ namespace SKCE.Examination.Services.QPSettings
                 string subQ2CO = ExtractBookmarkText(doc, $"Q{qNo}IICO");
                 string subQ2BT = ExtractBookmarkText(doc, $"Q{qNo}IIBT");
                 int subQ2Marks = ExtractMarksFromBookmark(doc, $"Q{qNo}IIMARKS");
+                subQs.Add((subQ2CO, subQ2BT, subQ2Marks));
                 var key2 = (subQ2CO, subQ2BT);
                 if (marksDistribution.ContainsKey(key2))
                 {
@@ -1707,7 +1730,7 @@ namespace SKCE.Examination.Services.QPSettings
                 if (string.IsNullOrEmpty(subQ1Text)) errors.Add($"❌ Q{qNo} SubQ1 text is empty.");
                 if (!validMarks.Contains(subQ1Marks)) errors.Add($"❌ Q{qNo} SubQ1 Marks should be 0, 5, 10, or 15.");
 
-                if(subQ1Marks != 0)
+                if (subQ1Marks != 0)
                 {
                     if (string.IsNullOrEmpty(subQ1CO) || !validCOs.Contains(subQ1CO)) errors.Add($"❌ Q{qNo} SubQ1 CO is invalid.");
                     if (string.IsNullOrEmpty(subQ1BT) || !validBTs.Contains(subQ1BT)) errors.Add($"❌ Q{qNo} SubQ1 BT is invalid.");
@@ -1724,28 +1747,40 @@ namespace SKCE.Examination.Services.QPSettings
                 if (!string.IsNullOrEmpty(qpakAssigned) && string.IsNullOrEmpty(subQ2AnswerKey)) errors.Add($"❌ Q{qNo} Answer key is missing for SubQ2 (QPAK assigned).");
 
                 if (totalMarks != 15) errors.Add($"❌ Q{qNo} Total Marks = {totalMarks} (should be 15).");
-
-                if (qNo == 12 || qNo == 14 || qNo == 16 || qNo == 18 )
-                {
-                    string subPreQ1CO = ExtractBookmarkText(doc, $"Q{qNo - 1}ICO");
-                    string subPreQ1BT = ExtractBookmarkText(doc, $"Q{qNo - 1}IBT");
-                    string subPreQ2CO = ExtractBookmarkText(doc, $"Q{qNo - 1}IICO");
-                    string subPreQ2BT = ExtractBookmarkText(doc, $"Q{qNo - 1}IIBT");
-
-                    if ((!string.IsNullOrEmpty(subQ2CO) && subQ2CO != "Select" && subQ1CO != subQ2CO) ||
-                        (!string.IsNullOrEmpty(subQ2BT) && subQ2BT != "Select" && subQ1BT != subQ2BT) ||
-                        (!string.IsNullOrEmpty(subPreQ1CO) && subPreQ1CO != "Select" && subQ1CO != subPreQ1CO) ||
-                        (!string.IsNullOrEmpty(subPreQ1BT) && subPreQ1BT != "Select" && subQ1BT != subPreQ1BT) ||
-                        (!string.IsNullOrEmpty(subPreQ2CO) && subPreQ2CO != "Select" && subQ1CO != subPreQ2CO) ||
-                        (!string.IsNullOrEmpty(subPreQ2BT) && subPreQ2BT != "Select" && subQ1BT != subPreQ2BT))
-                    {
-                        errors.Add($"❌ Q{qNo - 1} BT and CO, Q{qNo} BT and CO distributions are mismatch.");
-                    }
-                }
+                partBData.Add((qNo, subQs));
                 // Add to table
                 //htmlTable.Append($"<tr><td>Q{qNo}</td><td>{subQ1Text}</td><td>{subQ1CO}</td><td>{subQ1BT}</td><td>{subQ1Marks}</td><td>{subQ2Text}</td><td>{subQ2CO}</td><td>{subQ2BT}</td><td>{subQ2Marks}</td><td>{totalMarks}</td></tr>");
             }
 
+            // Validation for either-or pair rules
+            for (int i = 0; i < partBData.Count; i += 2)
+            {
+                var q1 = partBData[i];
+                var q2 = partBData[i + 1];
+
+                bool sameBTCOinQ1 = q1.SubQs.All(sq => sq.CO == q1.SubQs[0].CO && sq.BT == q1.SubQs[0].BT);
+                bool sameBTCOinQ2 = q2.SubQs.All(sq => sq.CO == q2.SubQs[0].CO && sq.BT == q2.SubQs[0].BT);
+
+                int totalQ1 = q1.SubQs.Sum(sq => sq.Marks);
+                int totalQ2 = q2.SubQs.Sum(sq => sq.Marks);
+
+                if (sameBTCOinQ1)
+                {
+                    if (totalQ1 != totalQ2)
+                    {
+                        errors.Add($"❌ Q{q1.QNo} and Q{q2.QNo} should have same total marks ({totalQ1} ≠ {totalQ2}) since BT & CO are same in Q{q1.QNo}.");
+                    }
+                }
+                else
+                {
+                    var q1Details = q1.SubQs.Select(sq => (sq.CO, sq.BT, sq.Marks)).OrderBy(x => x.CO + x.BT + x.Marks);
+                    var q2Details = q2.SubQs.Select(sq => (sq.CO, sq.BT, sq.Marks)).OrderBy(x => x.CO + x.BT + x.Marks);
+                    if (!q1Details.SequenceEqual(q2Details))
+                    {
+                        errors.Add($"❌ Q{q1.QNo} and Q{q2.QNo} must have same BT-CO-Marks combination as they have mixed BT/CO.");
+                    }
+                }
+            }
             //htmlTable.Append("</table>");
 
             htmlTable.Append("<table border='1' cellpadding='5' cellspacing='0' style='border-collapse: collapse;'>");
@@ -1835,13 +1870,17 @@ namespace SKCE.Examination.Services.QPSettings
             int grandTotal = 0; // Total of all marks
             int totalPartCMarks = 0;
             int expectedPartCMarks = 20;
+            // Store question pair details
+            List<(int QNo, List<(string CO, string BT, int Marks)> SubQs)> partCData = new();
 
             for (int qNo = 19; qNo <= 19; qNo++)
             {
+                var subQs = new List<(string CO, string BT, int Marks)>();
                 string subQ1Text = ExtractBookmarkText(doc, $"Q{qNo}I");
                 string subQ1CO = ExtractBookmarkText(doc, $"Q{qNo}ICO");
                 string subQ1BT = ExtractBookmarkText(doc, $"Q{qNo}IBT");
                 int subQ1Marks = ExtractMarksFromBookmark(doc, $"Q{qNo}IMARKS");
+                subQs.Add((subQ1CO, subQ1BT, subQ1Marks));
                 var key = (subQ1CO, subQ1BT);
                 if (marksDistribution.ContainsKey(key))
                 {
@@ -1869,6 +1908,7 @@ namespace SKCE.Examination.Services.QPSettings
                 string subQ2CO = ExtractBookmarkText(doc, $"Q{qNo}IICO");
                 string subQ2BT = ExtractBookmarkText(doc, $"Q{qNo}IIBT");
                 int subQ2Marks = ExtractMarksFromBookmark(doc, $"Q{qNo}IIMARKS");
+                subQs.Add((subQ2CO, subQ2BT, subQ2Marks));
                 var key2 = (subQ2CO, subQ2BT);
                 if (marksDistribution.ContainsKey(key2))
                 {
@@ -1902,7 +1942,7 @@ namespace SKCE.Examination.Services.QPSettings
                 if (string.IsNullOrEmpty(subQ1Text)) errors.Add($"❌ Q{qNo} SubQ1 text is empty.");
                 if (!validMarks.Contains(subQ1Marks)) errors.Add($"❌ Q{qNo} SubQ1 Marks should be 0, 10, 20.");
 
-                if(subQ1Marks != 0)
+                if (subQ1Marks != 0)
                 {
                     if (string.IsNullOrEmpty(subQ1CO) || !validCOs.Contains(subQ1CO)) errors.Add($"❌ Q{qNo} SubQ1 CO is invalid.");
                     if (string.IsNullOrEmpty(subQ1BT) || !validBTs.Contains(subQ1BT)) errors.Add($"❌ Q{qNo} SubQ1 BT is invalid.");
@@ -1919,11 +1959,40 @@ namespace SKCE.Examination.Services.QPSettings
                 if (!string.IsNullOrEmpty(qpakAssigned) && string.IsNullOrEmpty(subQ2AnswerKey)) errors.Add($"❌ Q{qNo} Answer key is missing for SubQ2 (QPAK assigned).");
 
                 if (totalMarks != 20) errors.Add($"❌ Q{qNo} Total Marks = {totalMarks} (should be 20).");
-
+                partCData.Add((qNo, subQs));
                 // Add to table
                 //htmlTable.Append($"<tr><td>Q{qNo}</td><td>{subQ1Text}</td><td>{subQ1CO}</td><td>{subQ1BT}</td><td>{subQ1Marks}</td><td>{subQ2Text}</td><td>{subQ2CO}</td><td>{subQ2BT}</td><td>{subQ2Marks}</td><td>{totalMarks}</td></tr>");
             }
 
+            // Validation for either-or pair rules
+            for (int i = 0; i < partCData.Count; i += 2)
+            {
+                var q1 = partBData[i];
+                var q2 = partBData[i + 1];
+
+                bool sameBTCOinQ1 = q1.SubQs.All(sq => sq.CO == q1.SubQs[0].CO && sq.BT == q1.SubQs[0].BT);
+                bool sameBTCOinQ2 = q2.SubQs.All(sq => sq.CO == q2.SubQs[0].CO && sq.BT == q2.SubQs[0].BT);
+
+                int totalQ1 = q1.SubQs.Sum(sq => sq.Marks);
+                int totalQ2 = q2.SubQs.Sum(sq => sq.Marks);
+
+                if (sameBTCOinQ1)
+                {
+                    if (totalQ1 != totalQ2)
+                    {
+                        errors.Add($"❌ Q{q1.QNo} and Q{q2.QNo} should have same total marks ({totalQ1} ≠ {totalQ2}) since BT & CO are same in Q{q1.QNo}.");
+                    }
+                }
+                else
+                {
+                    var q1Details = q1.SubQs.Select(sq => (sq.CO, sq.BT, sq.Marks)).OrderBy(x => x.CO + x.BT + x.Marks);
+                    var q2Details = q2.SubQs.Select(sq => (sq.CO, sq.BT, sq.Marks)).OrderBy(x => x.CO + x.BT + x.Marks);
+                    if (!q1Details.SequenceEqual(q2Details))
+                    {
+                        errors.Add($"❌ Q{q1.QNo} and Q{q2.QNo} must have same BT-CO-Marks combination as they have mixed BT/CO.");
+                    }
+                }
+            }
             //htmlTable.Append("</table>");
             htmlTable.Append("<table border='1' cellpadding='5' cellspacing='0' style='border-collapse: collapse;'>");
 

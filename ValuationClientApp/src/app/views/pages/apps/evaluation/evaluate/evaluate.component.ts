@@ -138,6 +138,7 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
               "questionImage": decode(item.questionImage),
               "answerDescription": decode(item.answerDescription),
               "mark": this.getMark(item.questionMark),
+              "disableInput": this.disableInput(item.questionMark),
               "obtainedMark": this.getSavedMarks(item.questionNumber, item.questionNumberSubNum)
             });
           });
@@ -328,6 +329,24 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
     //this.totalMarks = this.totalMarks + mark;
 
     return mark;
+  }
+
+  disableInput(questionMark: string) {
+    let mark = 0;
+    const dom = new DOMParser().parseFromString(decode(questionMark), 'text/html');
+    let spans = dom.querySelectorAll('span');
+
+    spans.forEach((span) => {
+      let innerHTML = span.innerHTML.replace(/&nbsp;/g, '').trim();
+      console.log(innerHTML);
+      if ((innerHTML.length > 0)) {
+        mark = parseInt(innerHTML);
+      }
+    });
+
+    //this.totalMarks = this.totalMarks + mark;
+    
+    return (String(mark) == 'NaN') ? true : false;
   }
 
   loadQuestionDetails(event: any, id: number, qusetionNo: string) {

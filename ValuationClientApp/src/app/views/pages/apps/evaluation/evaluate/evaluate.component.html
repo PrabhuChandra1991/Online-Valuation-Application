@@ -43,6 +43,7 @@
                             <td class="question" *ngFor="let item of qaList; let i = index">
                                 <button *ngIf="item.questionNumberDisplay != ''" class="btn btn-light" type="button"
                                     [attr.id]="'btn' + (i + 1)"
+                                    [disabled]="item.disableInput" 
                                     (click)="loadQuestionDetails($event, (i+1), item.questionNumberDisplay)"
                                     tabindex="-1">{{item.questionNumberDisplay}}</button>
                                 <input *ngIf="item.questionNumberDisplay != ''" type="text" maxlength="5"
@@ -50,9 +51,9 @@
                                     [attr.part]="item.questionPart"
                                     [attr.qno]="item.questionNumber"
                                     [attr.group]="item.questionGroup"
-                                    [attr.savedMark]="item.questionGroup"
                                     [attr.max]="item.mark"
-                                    [attr.id]="'txt' + (i + 1)"                                                                        
+                                    [attr.id]="'txt' + (i + 1)"  
+                                    [disabled]="item.disableInput"                                                                   
                                     [value]="(item.obtainedMark != 0) ? item.obtainedMark : ''"                                     
                                     (focus)="loadQuestionDetails($event, (i + 1), item.questionNumberDisplay)"
                                     (blur)="validateMark($event, item)">

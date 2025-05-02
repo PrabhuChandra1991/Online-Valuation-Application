@@ -137,7 +137,6 @@ void SeedRoles(ExaminationDbContext context)
         var roles = new List<Role>
         {
             new Role { Name = "Super Admin" },
-            new Role { Name = "Admin" },
             new Role { Name = "Expert" }
         };
         foreach (var role in roles)

@@ -150,11 +150,13 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
 
       this.isAdmin = userData.roleId == 1;
 
+      console.log("isAdmin: ", this.isAdmin)
       if (this.isAdmin) {
         // console.log('selected institute',this.selectedInstituteId);
-
         this.loadTemplateaForInstitute(0);
-      } else this.loadAssignedTemplates();
+      } else {
+        this.loadAssignedTemplates();
+      }
     }
   }
 

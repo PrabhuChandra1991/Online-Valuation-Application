@@ -179,7 +179,7 @@ export class AnswersheetImportComponent implements OnInit {
     //----------
     this.dataSourceAnswerSheetImports = [];
     this.dataSourceAnswerSheetImportDetails = [];
-    this.selectedAnswersheetImportName = '';
+    this.selectedAnswersheetImportName = '';    
     //----------
     this.answersheetImportService
       .GetAnswersheetImports(this.selectedExaminationId)
@@ -299,13 +299,10 @@ export class AnswersheetImportComponent implements OnInit {
       .ReviewCompletedAndApproving(this.selectedAnswersheetImportId)
       .subscribe(
           (data: any) => {
-            console.log('respo', data);
-            if (data.message.toLowerCase() == 'success') {
               this.toasterService.success('Review completed successfully.');
-              this.loadAnswersheetImports();
-            } else {
-              this.toasterService.error('Failed on Review Ccompletion.');
-            }
+          this.loadAnswersheetImports();
+          this.selectedAnswersheetImportIsReviewCompleted = true;
+          this.loadAnswersheetImportDetails(this.selectedAnswersheetImportId, this.selectedAnswersheetImportName, this.selectedAnswersheetImportIsReviewCompleted);
           },
         (error) => {
           if (error.error.message == "UNIQUE-KEY-VIOLATION")
@@ -315,6 +312,7 @@ export class AnswersheetImportComponent implements OnInit {
           }
         );
   }
+
 
   ////
 } // end of class

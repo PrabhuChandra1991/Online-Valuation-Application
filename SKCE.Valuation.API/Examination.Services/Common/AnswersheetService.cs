@@ -108,7 +108,7 @@ namespace SKCE.Examination.Services.Common
 
                 foreach (var item in resultItems)
                 {
-                    if (allocatedToUserId != null)
+                    if (allocatedToUserId != null || answersheetId != null)
                     {
                         item.DummyNumber = GetDummyNumberMasked(item.DummyNumber.Trim());
                     }

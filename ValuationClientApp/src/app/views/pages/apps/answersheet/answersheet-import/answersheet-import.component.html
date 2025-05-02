@@ -100,7 +100,7 @@
               [value]="item.answersheetImportId"
               [ngClass]="(item.answersheetImportId == selectedAnswersheetImportId) ? 'active' : ''"
               [ngStyle]="{ color: item.documentName == selectedAnswersheetImportName ? 'blue' : 'black' }"
-              (click)=" loadAnswersheetImportDetails( item.answersheetImportId, item.documentName, item.isReviewCompleted)"
+              (click)=" loadAnswersheetImportDetails(item.answersheetImportId, item.documentName, item.isReviewCompleted)"
             >
               <b>{{ item.documentName.split("\\")[2] }}</b> &nbsp;
               {{item.isReviewCompleted ? 'Review completed':'Review pending'}}

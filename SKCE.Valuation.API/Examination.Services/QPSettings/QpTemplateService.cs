@@ -1966,35 +1966,35 @@ namespace SKCE.Examination.Services.QPSettings
                 //htmlTable.Append($"<tr><td>Q{qNo}</td><td>{subQ1Text}</td><td>{subQ1CO}</td><td>{subQ1BT}</td><td>{subQ1Marks}</td><td>{subQ2Text}</td><td>{subQ2CO}</td><td>{subQ2BT}</td><td>{subQ2Marks}</td><td>{totalMarks}</td></tr>");
             }
 
-            // Validation for either-or pair rules
-            for (int i = 0; i < partCData.Count; i += 2)
-            {
-                var q1 = partCData[i];
-                var q2 = partCData[i + 1];
+            //// Validation for either-or pair rules
+            //for (int i = 0; i < partCData.Count; i += 2)
+            //{
+            //    var q1 = partCData[i];
+            //    var q2 = partCData[i + 1];
 
-                bool sameBTCOinQ1 = q1.SubQs.All(sq => sq.CO == q1.SubQs[0].CO && sq.BT == q1.SubQs[0].BT);
-                bool sameBTCOinQ2 = q2.SubQs.All(sq => sq.CO == q2.SubQs[0].CO && sq.BT == q2.SubQs[0].BT);
+            //    bool sameBTCOinQ1 = q1.SubQs.All(sq => sq.CO == q1.SubQs[0].CO && sq.BT == q1.SubQs[0].BT);
+            //    bool sameBTCOinQ2 = q2.SubQs.All(sq => sq.CO == q2.SubQs[0].CO && sq.BT == q2.SubQs[0].BT);
 
-                int totalQ1 = q1.SubQs.Sum(sq => sq.Marks);
-                int totalQ2 = q2.SubQs.Sum(sq => sq.Marks);
+            //    int totalQ1 = q1.SubQs.Sum(sq => sq.Marks);
+            //    int totalQ2 = q2.SubQs.Sum(sq => sq.Marks);
 
-                if (sameBTCOinQ1)
-                {
-                    if (totalQ1 != totalQ2)
-                    {
-                        errors.Add($"❌ Q{q1.QNo} and Q{q2.QNo} should have same total marks ({totalQ1} ≠ {totalQ2}) since BT & CO are same in Q{q1.QNo}.");
-                    }
-                }
-                else
-                {
-                    var q1Details = q1.SubQs.Select(sq => (sq.CO, sq.BT, sq.Marks)).OrderBy(x => x.CO + x.BT + x.Marks);
-                    var q2Details = q2.SubQs.Select(sq => (sq.CO, sq.BT, sq.Marks)).OrderBy(x => x.CO + x.BT + x.Marks);
-                    if (!q1Details.SequenceEqual(q2Details))
-                    {
-                        errors.Add($"❌ Q{q1.QNo} and Q{q2.QNo} must have same BT-CO-Marks combination as they have mixed BT/CO.");
-                    }
-                }
-            }
+            //    if (sameBTCOinQ1)
+            //    {
+            //        if (totalQ1 != totalQ2)
+            //        {
+            //            errors.Add($"❌ Q{q1.QNo} and Q{q2.QNo} should have same total marks ({totalQ1} ≠ {totalQ2}) since BT & CO are same in Q{q1.QNo}.");
+            //        }
+            //    }
+            //    else
+            //    {
+            //        var q1Details = q1.SubQs.Select(sq => (sq.CO, sq.BT, sq.Marks)).OrderBy(x => x.CO + x.BT + x.Marks);
+            //        var q2Details = q2.SubQs.Select(sq => (sq.CO, sq.BT, sq.Marks)).OrderBy(x => x.CO + x.BT + x.Marks);
+            //        if (!q1Details.SequenceEqual(q2Details))
+            //        {
+            //            errors.Add($"❌ Q{q1.QNo} and Q{q2.QNo} must have same BT-CO-Marks combination as they have mixed BT/CO.");
+            //        }
+            //    }
+            //}
             //htmlTable.Append("</table>");
             htmlTable.Append("<table border='1' cellpadding='5' cellspacing='0' style='border-collapse: collapse;'>");
 

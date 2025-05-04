@@ -1280,7 +1280,8 @@ namespace SKCE.Examination.Services.QPSettings
                 string subQ1CO = ExtractBookmarkText(doc, $"Q{qNo}ICO");
                 string subQ1BT = ExtractBookmarkText(doc, $"Q{qNo}IBT");
                 int subQ1Marks = ExtractMarksFromBookmark(doc, $"Q{qNo}IMARKS");
-                subQs.Add((subQ1CO, subQ1BT, subQ1Marks));
+                if (subQ1CO != "Select" && subQ1BT != "Select")
+                    subQs.Add((subQ1CO, subQ1BT, subQ1Marks));
                 var key = (subQ1CO, subQ1BT);
                 if (marksDistribution.ContainsKey(key))
                 {
@@ -1309,7 +1310,8 @@ namespace SKCE.Examination.Services.QPSettings
                 string subQ2CO = ExtractBookmarkText(doc, $"Q{qNo}IICO");
                 string subQ2BT = ExtractBookmarkText(doc, $"Q{qNo}IIBT");
                 int subQ2Marks = ExtractMarksFromBookmark(doc, $"Q{qNo}IIMARKS");
-                subQs.Add((subQ2CO, subQ2BT, subQ2Marks));
+                if (subQ2CO != "Select" && subQ2BT != "Select")
+                    subQs.Add((subQ2CO, subQ2BT, subQ2Marks));
                 var key2 = (subQ2CO, subQ2BT);
                 if (marksDistribution.ContainsKey(key2))
                 {
@@ -1668,7 +1670,8 @@ namespace SKCE.Examination.Services.QPSettings
                 string subQ1CO = ExtractBookmarkText(doc, $"Q{qNo}ICO");
                 string subQ1BT = ExtractBookmarkText(doc, $"Q{qNo}IBT");
                 int subQ1Marks = ExtractMarksFromBookmark(doc, $"Q{qNo}IMARKS");
-                subQs.Add((subQ1CO, subQ1BT, subQ1Marks));
+                if (subQ1CO != "Select" && subQ1BT != "Select")
+                    subQs.Add((subQ1CO, subQ1BT, subQ1Marks));
                 var key = (subQ1CO, subQ1BT);
                 if (marksDistribution.ContainsKey(key))
                 {
@@ -1697,7 +1700,8 @@ namespace SKCE.Examination.Services.QPSettings
                 string subQ2CO = ExtractBookmarkText(doc, $"Q{qNo}IICO");
                 string subQ2BT = ExtractBookmarkText(doc, $"Q{qNo}IIBT");
                 int subQ2Marks = ExtractMarksFromBookmark(doc, $"Q{qNo}IIMARKS");
-                subQs.Add((subQ2CO, subQ2BT, subQ2Marks));
+                if (subQ2CO != "Select" && subQ2BT != "Select")
+                    subQs.Add((subQ2CO, subQ2BT, subQ2Marks));
                 var key2 = (subQ2CO, subQ2BT);
                 if (marksDistribution.ContainsKey(key2))
                 {

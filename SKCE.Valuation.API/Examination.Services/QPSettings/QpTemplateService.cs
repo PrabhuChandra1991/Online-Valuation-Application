@@ -1279,7 +1279,8 @@ namespace SKCE.Examination.Services.QPSettings
                 string subQ1CO = ExtractBookmarkText(doc, $"Q{qNo}ICO");
                 string subQ1BT = ExtractBookmarkText(doc, $"Q{qNo}IBT");
                 int subQ1Marks = ExtractMarksFromBookmark(doc, $"Q{qNo}IMARKS");
-                subQs.Add((subQ1CO, subQ1BT, subQ1Marks));
+                if (subQ1CO != "Select" && subQ1BT != "Select")
+                    subQs.Add((subQ1CO, subQ1BT, subQ1Marks));
                 var key = (subQ1CO, subQ1BT);
                 if (marksDistribution.ContainsKey(key))
                 {
@@ -1308,7 +1309,9 @@ namespace SKCE.Examination.Services.QPSettings
                 string subQ2CO = ExtractBookmarkText(doc, $"Q{qNo}IICO");
                 string subQ2BT = ExtractBookmarkText(doc, $"Q{qNo}IIBT");
                 int subQ2Marks = ExtractMarksFromBookmark(doc, $"Q{qNo}IIMARKS");
-                subQs.Add((subQ2CO, subQ2BT, subQ2Marks));
+                if(subQ2CO != "Select" && subQ2BT != "Select")
+                    subQs.Add((subQ2CO, subQ2BT, subQ2Marks));
+
                 var key2 = (subQ2CO, subQ2BT);
                 if (marksDistribution.ContainsKey(key2))
                 {
@@ -1358,7 +1361,6 @@ namespace SKCE.Examination.Services.QPSettings
                 if (!string.IsNullOrEmpty(qpakAssigned) && string.IsNullOrEmpty(subQ2AnswerKey)) errors.Add($"❌ Q{qNo} Answer key is missing for SubQ2 (QPAK assigned).");
 
                 if (totalMarks != 16) errors.Add($"❌ Q{qNo} Total Marks = {totalMarks} (should be 16).");
-
                 partBData.Add((qNo, subQs));
                 // Add to table
                 //htmlTable.Append($"<tr><td>Q{qNo}</td><td>{subQ1Text}</td><td>{subQ1CO}</td><td>{subQ1BT}</td><td>{subQ1Marks}</td><td>{subQ2Text}</td><td>{subQ2CO}</td><td>{subQ2BT}</td><td>{subQ2Marks}</td><td>{totalMarks}</td></tr>");
@@ -1667,7 +1669,8 @@ namespace SKCE.Examination.Services.QPSettings
                 string subQ1CO = ExtractBookmarkText(doc, $"Q{qNo}ICO");
                 string subQ1BT = ExtractBookmarkText(doc, $"Q{qNo}IBT");
                 int subQ1Marks = ExtractMarksFromBookmark(doc, $"Q{qNo}IMARKS");
-                subQs.Add((subQ1CO, subQ1BT, subQ1Marks));
+                if (subQ1CO != "Select" && subQ1BT != "Select")
+                    subQs.Add((subQ1CO, subQ1BT, subQ1Marks));
                 var key = (subQ1CO, subQ1BT);
                 if (marksDistribution.ContainsKey(key))
                 {
@@ -1696,7 +1699,8 @@ namespace SKCE.Examination.Services.QPSettings
                 string subQ2CO = ExtractBookmarkText(doc, $"Q{qNo}IICO");
                 string subQ2BT = ExtractBookmarkText(doc, $"Q{qNo}IIBT");
                 int subQ2Marks = ExtractMarksFromBookmark(doc, $"Q{qNo}IIMARKS");
-                subQs.Add((subQ2CO, subQ2BT, subQ2Marks));
+                if (subQ2CO != "Select" && subQ2BT != "Select")
+                    subQs.Add((subQ2CO, subQ2BT, subQ2Marks));
                 var key2 = (subQ2CO, subQ2BT);
                 if (marksDistribution.ContainsKey(key2))
                 {

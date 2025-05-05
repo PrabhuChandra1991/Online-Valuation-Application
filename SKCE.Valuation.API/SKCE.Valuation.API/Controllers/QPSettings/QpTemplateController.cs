@@ -77,8 +77,8 @@ namespace SKCE.Examination.API.Controllers.QPSettings
         {
             return Ok(await _qpTemplateService.GetQPTemplatesByUserIdAsync(userId));
         }
-        
-        
+
+
         [HttpGet("GetExpertsForQPAssignment")]
         public async Task<ActionResult<IEnumerable<QPAssignmentExpertVM>>> GetExpertsForQPAssignment()
         {
@@ -101,9 +101,9 @@ namespace SKCE.Examination.API.Controllers.QPSettings
                 // Load Word document from stream
                 Spire.Doc.Document doc = new Spire.Doc.Document(stream);
                 // Get and validate bookmarks
-               var validationResult = await _qpTemplateService.ValidateGeneratedQPAsync(userQPTemplateId, doc);
+                var validationResult = await _qpTemplateService.ValidateGeneratedQPAsync(userQPTemplateId, doc);
 
-                return Ok(new ResultModel() { Message = validationResult.message, InValid= validationResult.inValidForSubmission });
+                return Ok(new ResultModel() { Message = validationResult.message, InValid = validationResult.inValidForSubmission });
             }
             catch (Exception ex)
             {
@@ -136,14 +136,14 @@ namespace SKCE.Examination.API.Controllers.QPSettings
                     return Ok(new
                     {
                         FileName = filePath.Split("\\")[filePath.Split("\\").Length - 1],
-                        ContentType = "application/pdf",
+                        ContentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                         Base64Content = base64Pdf
                     });
                 }
                 return Ok(new
                 {
                     FileName = string.Empty,
-                    ContentType = "application/pdf",
+                    ContentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                     Base64Content = string.Empty
                 });
             }
@@ -198,21 +198,22 @@ namespace SKCE.Examination.API.Controllers.QPSettings
         public async Task<IActionResult> PrintSelectedQP(long userqpTemplateId, string qpCode, bool isForPrint)
         {
             var filePath = await _qpTemplateService.PrintSelectedQPAsync(userqpTemplateId, qpCode, isForPrint);
-            if (filePath != string.Empty) { 
+            if (filePath != string.Empty)
+            {
                 byte[] fileBytes = System.IO.File.ReadAllBytes(filePath);
                 string base64Pdf = Convert.ToBase64String(fileBytes);
 
                 return Ok(new
                 {
                     FileName = filePath.Split("\\")[filePath.Split("\\").Length - 1],
-                    ContentType = "application/pdf",
+                    ContentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                     Base64Content = base64Pdf
                 });
             }
             return Ok(new
             {
                 FileName = string.Empty,
-                ContentType = "application/pdf",
+                ContentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                 Base64Content = string.Empty
             });
         }

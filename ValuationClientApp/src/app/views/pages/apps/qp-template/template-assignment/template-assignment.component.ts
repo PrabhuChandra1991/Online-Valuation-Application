@@ -681,18 +681,18 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
       this.modalRef.close();
     }
   }
-  openPdfInTab(base64String: string, filename: string) {
+  openPdfInTab(base64String: string, filename: string, contentType:string) {
     const byteCharacters = atob(base64String);
     const byteNumbers = new Array(byteCharacters.length);
-
+  
     for (let i = 0; i < byteCharacters.length; i++) {
       byteNumbers[i] = byteCharacters.charCodeAt(i);
     }
-
+  
     const byteArray = new Uint8Array(byteNumbers);
-    const blob = new Blob([byteArray], { type: 'application/pdf' });
+    const blob = new Blob([byteArray], { type: contentType });
     const blobUrl = URL.createObjectURL(blob);
-
+  
     // Create a temporary anchor to download with filename
     const link = document.createElement('a');
     link.href = blobUrl;
@@ -700,16 +700,16 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-
+  
     // Optionally, open in new tab too
-    window.open(blobUrl, '_blank');
+    //window.open(blobUrl, '_blank');
   }
   printQPDocument(userqpTemplateId: number, isForPrint: boolean) {
     this.spinnerService.toggleSpinnerState(true);
     this.templateService.printQPTemplate(userqpTemplateId, isForPrint).subscribe({
       next: (response) => {
         if (response.base64Content != "") {
-          this.openPdfInTab(response.base64Content, response.fileName);
+          this.openPdfInTab(response.base64Content, response.fileName,response.contentType);
           this.toastr.success('File downloaded successfully!');
           if (isForPrint) {
             this.close()
@@ -849,7 +849,7 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
     this.qpDocumentService.generatedQPPreview(formData, userqpTemplateId).subscribe({
       next: (response) => {
         if (response.base64Content != "") {
-          this.openPdfInTab(response.base64Content, response.fileName);
+          this.openPdfInTab(response.base64Content, response.fileName,response.contentType);
           this.toastr.success('File downloaded successfully!');
         } else {
           this.toastr.error('No file found to print!');

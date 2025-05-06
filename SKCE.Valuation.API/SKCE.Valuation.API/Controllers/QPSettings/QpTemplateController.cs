@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.InkML;
 using DocumentFormat.OpenXml.Office2010.Word;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SKCE.Examination.Models.DbModels.Common;
 using SKCE.Examination.Models.DbModels.QPSettings;
 using SKCE.Examination.Services.Helpers;
@@ -19,11 +21,13 @@ namespace SKCE.Examination.API.Controllers.QPSettings
         private readonly QpTemplateService _qpTemplateService;
         private readonly IMapper _mapper;
         private readonly AzureBlobStorageHelper _azureBlobStorageHelper;
-        public QpTemplateController(QpTemplateService qpTemplateService, IMapper mapper, AzureBlobStorageHelper azureBlobStorageHelper)
+        private readonly ExaminationDbContext _context;
+        public QpTemplateController(QpTemplateService qpTemplateService, IMapper mapper, AzureBlobStorageHelper azureBlobStorageHelper, ExaminationDbContext context)
         {
             _qpTemplateService = qpTemplateService;
             _mapper = mapper;
             _azureBlobStorageHelper = azureBlobStorageHelper;
+            _context = context;
         }
 
         [HttpGet("GetQPTemplateByCourseId/{courseId}")]
@@ -160,12 +164,22 @@ namespace SKCE.Examination.API.Controllers.QPSettings
             using var stream = new MemoryStream();
             await qPSubmissionVM.file.CopyToAsync(stream);
             stream.Position = 0;
-            // Load Word document from stream
-            var documentId = _azureBlobStorageHelper.UploadFileAsync(stream, qPSubmissionVM.file.FileName, qPSubmissionVM.file.ContentType).Result;
+            long documentId = 0;
+            var userQPTemplate = await _context.UserQPTemplates.FirstOrDefaultAsync(qpti => qpti.UserQPTemplateId == userQPTemplateId);
+            if (userQPTemplate == null) return null;
+            if (userQPTemplate.QPTemplateStatusTypeId == 10)
+            {
+                documentId = _azureBlobStorageHelper.UploadFileAsync(stream, "Scrutinized_QP_"+ userQPTemplate.UserId+"_" + qPSubmissionVM.file.FileName, qPSubmissionVM.file.ContentType).Result;
+            }
+            else
+            {
+                // Load Word document from stream
+                 documentId = _azureBlobStorageHelper.UploadFileAsync(stream, "Generated_QP_" + userQPTemplate.UserId + "_" + qPSubmissionVM.file.FileName, qPSubmissionVM.file.ContentType).Result;
+            }
 
-            var userQPTemplate = await _qpTemplateService.SubmitGeneratedQPAsync(userQPTemplateId, documentId, qPSubmissionVM);
-            if (userQPTemplate == null) return NotFound();
-            return Ok(userQPTemplate);
+            var updatedUserQPTemplate = await _qpTemplateService.SubmitGeneratedQPAsync(userQPTemplateId, documentId, qPSubmissionVM);
+            if (updatedUserQPTemplate == null) return NotFound();
+            return Ok(updatedUserQPTemplate);
         }
 
         [HttpGet("AssignQPForScrutinity/{userId}/{userQPTemplateId}")]

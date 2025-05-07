@@ -157,7 +157,7 @@ namespace SKCE.Examination.Services.Helpers
                 var courseSyllabusWordDocument = _context.Documents.FirstOrDefault(d => d.DocumentId == courseSyllabusDocument.WordDocumentId);
 
                 // Save the updated document
-                var updatedSourcePath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}_updatedSourceForPreview.docx", bookmarkUpdates["COURSECODE"], DateTime.Now.ToString("ddMMyyyyhhmmss")));
+                var updatedSourcePath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}_updatedSourceForPreview.docx", bookmarkUpdates["COURSECODE"].Replace("/", "_"), DateTime.Now.ToString("ddMMyyyyhhmmss")));
 
                 MemoryStream sourceStream = await _azureBlobStorageHelper.DownloadWordDocumentFromBlobToOpenXML(inputDocPath);
                 sourceStream.Position = 0;
@@ -253,13 +253,13 @@ namespace SKCE.Examination.Services.Helpers
                 RemoveTextFromDocx(previewdocPath, "Evaluation Warning: The document was created with Spire.Doc for .NET.");
 
                 // Save the modified document as PDF
-                var previewPdfPath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}_{2}.pdf", bookmarkUpdates["COURSECODE"], qPTemplate.QPCode, DateTime.Now.ToString("ddMMyyyyhhmmss")));
+                var previewPdfPath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}_{2}.pdf", bookmarkUpdates["COURSECODE"].Replace("/","_"), qPTemplate.QPCode, DateTime.Now.ToString("ddMMyyyyhhmmss")));
                 //ConvertToPdfBySyncfusion(previewdocPath, previewPdfPath);
 
                 if (!isForPrint) return previewdocPath;
 
                 //var pdfDocumentId =  await _azureBlobStorageHelper.UploadFileToBlob(previewPdfPath, string.Format("{0}_{1}_{2}_{3}_{4}.pdf", qPTemplate.QPTemplateName, qPTemplate.QPCode, qPTemplate.ExamYear, bookmarkUpdates["COURSECODE"], DateTime.UtcNow.ToShortDateString()));
-                var wordDocumentId = await _azureBlobStorageHelper.UploadDocxFileToBlob(previewdocPath, string.Format("{0}_{1}_{2}_{3}_{4}.docx", qPTemplate.QPTemplateName, qPTemplate.QPCode, qPTemplate.ExamYear, bookmarkUpdates["COURSECODE"], DateTime.UtcNow.ToShortDateString()));
+                var wordDocumentId = await _azureBlobStorageHelper.UploadDocxFileToBlob(previewdocPath, string.Format("{0}_{1}_{2}_{3}_{4}.docx", qPTemplate.QPTemplateName, qPTemplate.QPCode, qPTemplate.ExamYear, bookmarkUpdates["COURSECODE"].Replace("/", "_"), DateTime.UtcNow.ToShortDateString()));
 
                 await SaveSelectedQPDetail(qPTemplate, userQPTemplate, printedWordDocumentId, wordDocumentId);
                 return await PrintQP(updatedSourcedoc, bookmarkUpdates, qPTemplate, userQPTemplate, inputDocPath.Replace(".docx", ""));

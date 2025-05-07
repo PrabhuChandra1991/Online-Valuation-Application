@@ -317,7 +317,9 @@ namespace SKCE.Examination.Services.Helpers
             // Save the modified document as PDF
             //var previewPdfPath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}_{2}_QP.pdf", bookmarkUpdates["COURSECODE"], qPTemplate.QPCode, DateTime.Now.ToString("ddMMyyyyhhmmss")));
             //ConvertToPdfBySyncfusion(previewdocPath, previewPdfPath);
-            var wordDocumentId = await _azureBlobStorageHelper.UploadDocxFileToBlob(previewdocPath, string.Format("FinalPrinted_QP_{0}_{1}_{2}_{3}.docx", qPTemplate.QPCode, userQPTemplate.UserId, fileNameToPrint, DateTime.Now.ToString("ddMMyyyyhhmmss")));
+            var assignedUser = await _context.Users.FirstOrDefaultAsync(u => u.UserId == userQPTemplate.UserId);
+            if (assignedUser == null) return null;
+            var wordDocumentId = await _azureBlobStorageHelper.UploadDocxFileToBlob(previewdocPath, string.Format("FinalPrinted_QP_{0}_{1}_{2}_{3}.docx", qPTemplate.QPCode, assignedUser.Name.Replace(" ", "_"), fileNameToPrint, DateTime.Now.ToString("ddMMyyyyhhmmss")));
             var selectedQPDetail = _context.SelectedQPDetails.FirstOrDefault(sqp => sqp.UserQPTemplateId == userQPTemplate.UserQPTemplateId);
             if (selectedQPDetail != null)
             {

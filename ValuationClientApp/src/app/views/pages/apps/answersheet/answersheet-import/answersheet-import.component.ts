@@ -236,7 +236,7 @@ export class AnswersheetImportComponent implements OnInit {
     this.loadExaminationItems();
   }
 
-  onExaminationChange(event: Event): void {
+  onExamCourseChange(event: Event): void {
     this.selectedCourseId = parseInt(this.getValue(event));
     this.isDummyNumberImported = false;
     this.selectedAnswersheetImportId = 0;

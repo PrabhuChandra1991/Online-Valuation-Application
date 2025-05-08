@@ -18,9 +18,16 @@ namespace SKCE.Examination.API.Controllers.Common
         }
 
         [HttpGet("GetAnswersheetImports")]
-        public async Task<List<AnswersheetImportDto>> GetAnswersheetImports(long examinationId)
+        public async Task<List<AnswersheetImportDto>> GetAnswersheetImports()
         {
-            return await this._answersheetImportService.GetAnswersheetImports(examinationId);
+            long institutionId = long.Parse(Request.Headers["institutionId"].ToString());
+            string examYear = Request.Headers["examYear"].ToString();
+            string examMonth = Request.Headers["examMonth"].ToString();
+            long courseId = long.Parse(Request.Headers["courseId"].ToString());
+
+            return await this._answersheetImportService
+                .GetAnswersheetImports(institutionId, examYear, examMonth, courseId);
+
         }
 
         [HttpGet("GetAnswersheetImportDetails")]
@@ -29,13 +36,13 @@ namespace SKCE.Examination.API.Controllers.Common
             return await this._answersheetImportService.GetAnswersheetImportDetails(answersheetImportId);
         }
 
-        [HttpGet("GetExaminationInfo")]
-        public async Task<ActionResult<IEnumerable<AnswersheetImportCourseDptDto>>>
-            GetExaminationInfo([FromQuery] long institutionId,
+        [HttpGet("GetExaminationCourseInfo")]
+        public async Task<ActionResult<IEnumerable<AnswersheetImportCourseDto>>>
+            GetExaminationCourseInfo([FromQuery] long institutionId,
             [FromQuery] string examYear, [FromQuery] string examMonth)
         {
             var result = await this._answersheetImportService
-                .GetExaminationInfoAsync(institutionId, examYear, examMonth);
+                .GetExaminationCourseInfoAsync(institutionId, examYear, examMonth);
             return Ok(result);
         }
 
@@ -45,10 +52,16 @@ namespace SKCE.Examination.API.Controllers.Common
         [HttpPost("ImportDummyNoFromExcelByCourse")]
         public async Task<IActionResult> ImportDummyNoFromExcelByCourse(IFormFile file)
         {
-            string examinationId = Request.Headers["examinationId"].ToString();
+            long institutionId = long.Parse(Request.Headers["institutionId"].ToString());
+            string examYear = Request.Headers["examYear"].ToString();
+            string examMonth = Request.Headers["examMonth"].ToString();
+            long courseId = long.Parse(Request.Headers["courseId"].ToString());
 
-            if (examinationId == "" || examinationId == null)
-                return BadRequest("Examination data not selected.");
+            if (institutionId == 0)
+                return BadRequest("Invalid institutionId");
+
+            if (courseId == 0)
+                return BadRequest("Invalid course Id");
 
 
             if (file == null || file.Length == 0)
@@ -56,7 +69,11 @@ namespace SKCE.Examination.API.Controllers.Common
 
 
             using var stream = file.OpenReadStream();
-            var importedInfo = await _answersheetImportService.ImportDummyNoFromExcelByCourse(stream, long.Parse(examinationId));
+
+            var importedInfo =
+                await _answersheetImportService
+                .ImportDummyNoFromExcelByCourse(stream, institutionId, examYear, examMonth, courseId);
+
 
             return Ok(new { Message = importedInfo });
         }

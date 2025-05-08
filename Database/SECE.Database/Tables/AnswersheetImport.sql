@@ -6,7 +6,7 @@
 	[InstitutionId] BIGINT NOT NULL,
 	[ExamYear] NVARCHAR(5) NOT NULL,
 	[ExamMonth] NVARCHAR(20) NOT NULL,
-	[ExaminationId] BIGINT NOT NULL,	 
+	[CourseId] BIGINT NOT NULL,	 
 	[IsReviewCompleted] BIT DEFAULT 0 NULL,
 	[ReviewCompletedOn] DATETIME NULL,
 	[ReviewCompletedBy] BIGINT NULL,
@@ -16,5 +16,5 @@
 	[ModifiedDate] DATETIME DEFAULT GETDATE(),
 	[ModifiedById] BIGINT NOT NULL,
 	CONSTRAINT [PK_AnswersheetImport] PRIMARY KEY (AnswersheetImportId),
-	CONSTRAINT [FK_AnswersheetImport_Examination] FOREIGN KEY ([ExaminationId]) REFERENCES [dbo].[Examination]([ExaminationId])
+	CONSTRAINT [FK_AnswersheetImport_Course] FOREIGN KEY ([CourseId]) REFERENCES [dbo].[Course]([CourseId])
 )

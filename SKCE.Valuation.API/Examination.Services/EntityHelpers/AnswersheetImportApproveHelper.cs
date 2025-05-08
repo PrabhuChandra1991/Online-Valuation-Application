@@ -38,7 +38,7 @@ namespace SKCE.Examination.Services.EntityHelpers
             {
                 this._dbContext.Answersheets.Add(new Answersheet
                 {
-                    ExaminationId = answersheetImport.ExaminationId,
+                    ExaminationId = item.ExaminationId,
                     DummyNumber = item.DummyNumber,
                     IsActive = true,
                     CreatedById = loggedInUserId,

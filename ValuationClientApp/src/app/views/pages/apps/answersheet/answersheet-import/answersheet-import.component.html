@@ -26,16 +26,14 @@
       </select>
     </div>
     <div class="col-md-4">
-      <select id="courseId" class="form-select" (change)="onExaminationChange($event)">
+      <select id="courseId" class="form-select" (change)="onExamCourseChange($event)">
         <option [value]="0">Examination/Course</option>
-        <option *ngFor="let item of dataSourceExaminations" [value]="item.examinationId">
-          {{ item.courseCode }} ----- {{ item.departmentCode }} ----- ({{
-          item.studentCount
-          }})
+        <option *ngFor="let item of dataSourceExamCourses" [value]="item.courseId">
+          {{ item.courseCode }} - {{ item.courseName }} - ({{item.studentCount}})
         </option>
       </select>
     </div>
-    <div class="col-md-3">
+    <div class=" col-md-3">
       <form [formGroup]="dummyNumberImportForm">
         <input class="form-control" value="gedDummyNumberformControls['file']" type="file" id="masterfile"
           formControlName="file" (change)="onDummyNumberFileChange($event)" />
@@ -74,22 +72,25 @@
     </div>
     <div class="col-md-8">
       <div class="row">
+        <div class="col-md-6">
+          <h5>{{ selectedAnswersheetImportName.split("\\")[2] }}&nbsp;</h5>
+        </div>
+        <div class="col-md-2">
+          <h5>Count:&nbsp;{{ dataSourceAnswerSheetImportDetails.length }}</h5>
+        </div>
         <div class="col-md-2">
           <button *ngIf="selectedAnswersheetImportIsReviewCompleted !== true"
             [disabled]="selectedAnswersheetImportName === ''" class="btn btn-primary float-end"
             (click)="promptBeforeReviewCompletion()">
-            Complete Review
+            Submit
           </button>
-        </div>
-        <div class="col-md-6">
-          <h4>Dummy Numbers in file:&nbsp;{{ selectedAnswersheetImportName.split("\\")[2] }}&nbsp;</h4>
-        </div>
-        <div class="col-md-2">
-          <h4>Count:&nbsp;{{ dataSourceAnswerSheetImportDetails.length }}</h4>
         </div>
         <div class="col-md-2 float-end">
           <button title="Delete all dummy numbers" class="btn btn-outline-primary"
-            [disabled]="selectedAnswersheetImportId===0" (click)="promptBeforeDeleteImportedFile()">Delete File</button>
+            *ngIf="selectedAnswersheetImportIsReviewCompleted !== true" [disabled]="selectedAnswersheetImportId===0"
+            (click)="promptBeforeDeleteImportedFile()">
+            Delete
+          </button>
         </div>
       </div>
       <div class="row mt-3">

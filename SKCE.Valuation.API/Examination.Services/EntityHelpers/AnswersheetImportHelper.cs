@@ -33,37 +33,54 @@ namespace SKCE.Examination.Services.EntityHelpers
 
         }
 
-        public async Task<List<AnswersheetImportDetail>>
-            ImportDummyNoFromExcelByCourse(Stream excelStream, long examinationId, string contentType)
+        public async Task<List<AnswersheetImportDetail>> ImportDummyNoFromExcelByCourse(Stream excelStream,
+            long institutionId, string examYear, string examMonth, long courseId)
         {
             var result = new List<AnswersheetImportDetail>();
 
             try
             {
 
-                var examination =
+                var examinations =
                     await (from exam in this._dbContext.Examinations
                            join course in this._dbContext.Courses on exam.CourseId equals course.CourseId
                            join inst in this._dbContext.Institutions on exam.InstitutionId equals inst.InstitutionId
-                           where exam.ExaminationId == examinationId
+                           join degre in this._dbContext.DegreeTypes on exam.DegreeTypeId equals degre.DegreeTypeId
+                           join dept in this._dbContext.Departments on exam.DepartmentId equals dept.DepartmentId
+
+                           where exam.InstitutionId == institutionId &&
+                           exam.ExamYear == examYear &&
+                           exam.ExamMonth == examMonth &&
+                           exam.CourseId == courseId &&
+                           exam.IsActive
+
                            select new
                            {
                                exam.ExaminationId,
+                               exam.InstitutionId,
+                               exam.RegulationYear,
+                               exam.BatchYear,
+                               exam.DegreeTypeId,
+                               exam.DepartmentId,
+                               exam.Semester,
                                exam.ExamYear,
                                exam.ExamMonth,
-                               CourseCode = course.Code,
-                               exam.InstitutionId,
+                               exam.ExamType,
                                InstitutionCode = inst.Code,
-                           }).FirstOrDefaultAsync();
+                               DegreeTypeCode = degre.Code,
+                               DepartmentCode = dept.ShortName,
+                               CourseCode = course.Code
+                           }).ToListAsync();
 
-                if (examination == null)
+                if (examinations.Count == 0)
                 {
                     return result;
                 }
 
-                var fileNameToUpload = FileNameWithLocation(examination.ExamYear, examination.ExamMonth, examination.CourseCode);
+                var fileNameToUpload = FileNameWithLocation(examYear, examMonth, examinations.First().CourseCode);
 
-                var uploadedURL = await this._blobStorageHelper.UploadFileAsync(excelStream, fileNameToUpload, contentType);
+                var uploadedURL = await this._blobStorageHelper
+                    .UploadFileAsync(excelStream, fileNameToUpload, "xlsx"); ;
 
                 if (uploadedURL == null)
                     return result;
@@ -73,10 +90,10 @@ namespace SKCE.Examination.Services.EntityHelpers
                     {
                         DocumentName = fileNameToUpload,
                         DocumentUrl = uploadedURL,
-                        InstitutionId = examination.InstitutionId,
-                        ExamMonth = examination.ExamMonth,
-                        ExamYear = examination.ExamYear,
-                        ExaminationId = examination.ExaminationId,
+                        InstitutionId = institutionId,
+                        ExamMonth = examMonth,
+                        ExamYear = examYear,
+                        CourseId = courseId,
                         IsActive = true,
                         CreatedById = 1,
                         CreatedDate = DateTime.Now,
@@ -92,7 +109,7 @@ namespace SKCE.Examination.Services.EntityHelpers
 
                 var workbookPart = spreadsheet.WorkbookPart;
 
-                Sheet? sheet = workbookPart.Workbook.Sheets.GetFirstChild<Sheet>();
+                Sheet? sheet = workbookPart?.Workbook?.Sheets?.GetFirstChild<Sheet>();
 
                 var worksheetPart = (WorksheetPart)workbookPart.GetPartById(sheet?.Id);
 
@@ -117,41 +134,59 @@ namespace SKCE.Examination.Services.EntityHelpers
                     string cellDummyNo = GetCellValue(workbookPart, cells[10]);
 
                     bool isValid = true;
-                    List<string> errors = new();  
+                    List<string> errors = new();
 
-                    if (cellCourseCode != examination.CourseCode)
-                    {
-                        errors.Add("Course Code");
-                        isValid = false;
-                    }
-
-                    if (cellExamYear != examination.ExamYear)
-                    {
-
-                        errors.Add("Exam Year");
-                        isValid = false;
-                    }
-
-                    if (cellExamMonth != examination.ExamMonth)
-                    {
-                        errors.Add("Exam Month");
-                        isValid = false;
-                    }
-
-                    if(cellInstCode != examination.InstitutionCode)
+                    if (cellInstCode != examinations.First().InstitutionCode)
                     {
                         errors.Add("College Code");
                         isValid = false;
                     }
 
-                        answersheetImport.AnswersheetImportDetails.Add(
+                    if (cellExamYear != examinations.First().ExamYear)
+                    {
+                        errors.Add("Exam Year");
+                        isValid = false;
+                    }
+
+                    if (cellExamMonth != examinations.First().ExamMonth)
+                    {
+                        errors.Add("Exam Month");
+                        isValid = false;
+                    }
+
+                    if (cellCourseCode != examinations.First().CourseCode)
+                    {
+                        errors.Add("Course Code");
+                        isValid = false;
+                    }
+
+                    var examination = examinations.FirstOrDefault(x =>
+                         x.InstitutionCode == cellInstCode
+                         && x.RegulationYear == cellRegulation
+                         && x.BatchYear == cellBatch
+                         && x.DegreeTypeCode == cellDegreeType
+                         && x.DepartmentCode == cellDepartment
+                         && x.Semester == cellSemester
+                         && x.CourseCode == cellCourseCode
+                         && x.ExamYear == cellExamYear
+                         && x.ExamMonth == cellExamMonth
+                         && x.ExamType == cellExamType);
+
+                    if (examination == null)
+                    {
+                        errors.Add("Examination data not found");
+                        isValid = false;
+                    }
+
+                    answersheetImport.AnswersheetImportDetails.Add(
                         new AnswersheetImportDetail
                         {
+                            ExaminationId = examination?.ExaminationId ?? 0,
                             InstitutionCode = cellInstCode,
                             RegulationYear = cellRegulation,
                             BatchYear = cellBatch,
                             DegreeType = cellDegreeType,
-                            DepartmentShortName= cellDepartment,
+                            DepartmentShortName = cellDepartment,
                             ExamType = cellExamType,
                             Semester = cellSemester,
                             CourseCode = cellCourseCode,
@@ -165,7 +200,7 @@ namespace SKCE.Examination.Services.EntityHelpers
                             CreatedDate = DateTime.Now,
                             ModifiedById = 1,
                             ModifiedDate = DateTime.Now,
-                        }); 
+                        });
                 }
 
                 await _dbContext.SaveChangesAsync();

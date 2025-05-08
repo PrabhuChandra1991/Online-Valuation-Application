@@ -16,40 +16,42 @@ export class AnswersheetImportService {
     }),
   };
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
-  public GetExaminationItems(
+  public GetExaminationCourseItems(
     institutionId: number,
     examYear: string,
     examMonth: string
   ): Observable<any> {
     return this.http.get(
-      `${this.apiUrl}/api/AnswersheetImport/GetExaminationInfo?institutionId=${institutionId}&examYear=${examYear}&examMonth=${examMonth}`
+      `${this.apiUrl}/api/AnswersheetImport/GetExaminationCourseInfo?institutionId=${institutionId}&examYear=${examYear}&examMonth=${examMonth}`
     );
   }
- 
-  importAnswerSheetDummyNumbers(
-    formData: FormData,
-    examinationId: number
-  ): Observable<any> {
-    //-----
-    const url: string = `${this.apiUrl}/api/AnswersheetImport/ImportDummyNoFromExcelByCourse`;
-    //
 
+  importAnswerSheetDummyNumbers(formData: FormData, institutionId: number, examYear: string, examMonth: string, courseId: number): Observable<any> {
+    const url: string = `${this.apiUrl}/api/AnswersheetImport/ImportDummyNoFromExcelByCourse`;
     const httpOptions = {
       headers: new HttpHeaders({
-        examinationId: examinationId,
-      }),
+        institutionId: institutionId,
+        examYear: examYear,
+        examMonth: examMonth,
+        courseId: courseId
+      })
     };
-    //--
-    const response = this.http.post(url, formData, httpOptions);
-
-    return response;
+    return this.http.post(url, formData, httpOptions);
   }
 
-  public GetAnswersheetImports(examinationId: number): Observable<any> {
-    const ulr = `${this.apiUrl}/api/AnswersheetImport/GetAnswersheetImports?examinationId=${examinationId}`;
-    return this.http.get(ulr);
+  public GetAnswersheetImports(institutionId: number, examYear: string, examMonth: string, courseId: number): Observable<any> {
+    const ulr = `${this.apiUrl}/api/AnswersheetImport/GetAnswersheetImports`;
+    const httpOptions = {
+      headers: new HttpHeaders({
+        institutionId: institutionId,
+        examYear: examYear,
+        examMonth: examMonth,
+        courseId: courseId
+      })
+    };
+    return this.http.get(ulr, httpOptions);
   }
 
   public GetAnswersheetImportDetails(
@@ -59,19 +61,19 @@ export class AnswersheetImportService {
     return this.http.get(ulr);
   }
 
-  
+
   ReviewCompletedAndApproving(answersheetImportId: number): Observable<any> {
     const loggedData = localStorage.getItem('userData');
     let userData: any;
     if (loggedData) {
-       userData = JSON.parse(loggedData);
+      userData = JSON.parse(loggedData);
     }
     const url: string = `${this.apiUrl}/api/AnswersheetImport/ReviewedAndApproveDummyNumbers?answersheetImportId=${answersheetImportId}`;
     const httpOptions = {
       headers: new HttpHeaders({
         loggedInUserId: parseInt(userData.userId),
       }),
-    }; 
+    };
     return this.http.get(url, httpOptions);
   }
 
@@ -79,14 +81,14 @@ export class AnswersheetImportService {
     const loggedData = localStorage.getItem('userData');
     let userData: any;
     if (loggedData) {
-       userData = JSON.parse(loggedData);
+      userData = JSON.parse(loggedData);
     }
     const url: string = `${this.apiUrl}/api/AnswersheetImport/DeleteAnswersheetImport?answersheetImportId=${answersheetImportId}`;
     const httpOptions = {
       headers: new HttpHeaders({
         loggedInUserId: parseInt(userData.userId),
       }),
-    }; 
+    };
     return this.http.get(url, httpOptions);
   }
 

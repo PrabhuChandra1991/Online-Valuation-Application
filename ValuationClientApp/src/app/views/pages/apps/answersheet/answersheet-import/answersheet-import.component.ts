@@ -62,14 +62,16 @@ export class AnswersheetImportComponent implements OnInit {
   dataSourceInstitutes: any[] = [];
   dataSourceExamYears: any[] = [];
   dataSourceExamMonths: any[] = [];
-  dataSourceExaminations: any[] = [];
+  dataSourceExamCourses: any[] = [];
+
   dataSourceAnswerSheetImports: any[] = [];
   dataSourceAnswerSheetImportDetails: any[] = [];
 
   selectedInstituteId: number = 0;
   selectedExamMonth: string = '0';
   selectedExamYear: string = '0';
-  selectedExaminationId: number = 0;
+  selectedCourseId: number = 0;
+
   selectedAnswersheetImportId: number = 0;
   selectedAnswersheetImportName: string = '';
   selectedAnswersheetImportIsReviewCompleted: boolean = false;
@@ -104,7 +106,7 @@ export class AnswersheetImportComponent implements OnInit {
     this.loadAllExamYears();
     this.loadAllExamMonths();
 
-    this.dataSourceExaminations = [];
+    this.dataSourceExamCourses = [];
     this.dataSourceAnswerSheetImports = [];
     this.dataSourceAnswerSheetImportDetails = [];
     this.selectedAnswersheetImportName = '';
@@ -147,24 +149,24 @@ export class AnswersheetImportComponent implements OnInit {
   }
 
   loadExaminationItems(): void {
-    this.selectedExaminationId = 0;
+    this.selectedCourseId = 0;
     if (
       this.selectedInstituteId !== 0 &&
       this.selectedExamYear !== '0' &&
       this.selectedExamMonth !== '0'
     ) {
       this.answersheetImportService
-        .GetExaminationItems(
+        .GetExaminationCourseItems(
           this.selectedInstituteId,
           this.selectedExamYear,
           this.selectedExamMonth
         )
         .subscribe({
           next: (data: any) => {
-            this.dataSourceExaminations = data;
+            this.dataSourceExamCourses = data;
             console.log(
               'dataSourceExaminations  loaded:',
-              this.dataSourceExaminations
+              this.dataSourceExamCourses
             );
           },
           error: (err: any) => {
@@ -172,7 +174,7 @@ export class AnswersheetImportComponent implements OnInit {
           },
         });
     } else {
-      this.dataSourceExaminations = [];
+      this.dataSourceExamCourses = [];
     }
   }
 
@@ -183,7 +185,7 @@ export class AnswersheetImportComponent implements OnInit {
     this.selectedAnswersheetImportName = '';
     //----------
     this.answersheetImportService
-      .GetAnswersheetImports(this.selectedExaminationId)
+      .GetAnswersheetImports(this.selectedInstituteId, this.selectedExamYear, this.selectedExamMonth, this.selectedCourseId)
       .subscribe({
         next: (data: any) => {
           this.dataSourceAnswerSheetImports = data;
@@ -235,7 +237,7 @@ export class AnswersheetImportComponent implements OnInit {
   }
 
   onExaminationChange(event: Event): void {
-    this.selectedExaminationId = parseInt(this.getValue(event));
+    this.selectedCourseId = parseInt(this.getValue(event));
     this.isDummyNumberImported = false;
     this.selectedAnswersheetImportId = 0;
     this.selectedAnswersheetImportIsReviewCompleted = false;
@@ -263,16 +265,22 @@ export class AnswersheetImportComponent implements OnInit {
   }
 
   submitDummyNumberImport() {
+
     this.spinnerService.toggleSpinnerState(true);
     const formData = new FormData();
     const fileSource: any = this.dummyNumberImportForm.get('fileSource')?.value;
+
     if (fileSource !== null && fileSource !== undefined) {
       formData.append('file', fileSource);
     }
-    console.log(formData)
-    console.log(this.selectedExaminationId)
+
     this.answersheetImportService
-      .importAnswerSheetDummyNumbers(formData, this.selectedExaminationId)
+      .importAnswerSheetDummyNumbers(
+        formData,
+        this.selectedInstituteId,
+        this.selectedExamYear,
+        this.selectedExamMonth,
+        this.selectedCourseId)
       .subscribe({
         next: (response) => {
           this.spinnerService.toggleSpinnerState(false);

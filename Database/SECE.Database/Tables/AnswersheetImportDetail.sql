@@ -2,6 +2,7 @@
 (
 	[AnswersheetImportDetailId] BIGINT NOT NULL IDENTITY(1,1),
 	[AnswersheetImportId] BIGINT NOT NULL,
+	[ExaminationId] BIGINT NOT NULL,	 
 	[InstitutionCode] NVARCHAR(10) NOT NULL,
 	[RegulationYear] NVARCHAR(5) NOT NULL,
 	[BatchYear] NVARCHAR(5) NOT NULL,
@@ -21,5 +22,5 @@
 	[ModifiedDate] DATETIME DEFAULT GETDATE(),
 	[ModifiedById] BIGINT NOT NULL,
 	CONSTRAINT [PK_AnswersheetImportDetail] PRIMARY KEY (AnswersheetImportDetailId),
-	CONSTRAINT [FK_AnswersheetImportDetail_AnswersheetImport] FOREIGN KEY ([AnswersheetImportId]) REFERENCES [dbo].[AnswersheetImport]([AnswersheetImportId])
+	CONSTRAINT [FK_AnswersheetImportDetail_AnswersheetImport] FOREIGN KEY ([AnswersheetImportId]) REFERENCES [dbo].[AnswersheetImport]([AnswersheetImportId]) 
 )

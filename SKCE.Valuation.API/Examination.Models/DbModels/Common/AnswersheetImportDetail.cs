@@ -10,6 +10,7 @@ namespace SKCE.Examination.Models.DbModels.Common
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long AnswersheetImportDetailId { get; set; }
         public long AnswersheetImportId { get; set; } = 0;
+        public long ExaminationId { get; set; } = 0;
         public required string InstitutionCode { get; set; } = string.Empty;
         public required string RegulationYear { get; set; } = string.Empty;
         public required string BatchYear { get; set; } = string.Empty;

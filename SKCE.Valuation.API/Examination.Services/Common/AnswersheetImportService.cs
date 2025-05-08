@@ -18,42 +18,66 @@ namespace SKCE.Examination.Services.Common
 
         }
 
-        public async Task<List<AnswersheetImportCourseDptDto>> GetExaminationInfoAsync(long institutionId, string examYear, string examMonth)
+        public async Task<List<AnswersheetImportCourseDto>>
+            GetExaminationCourseInfoAsync(long institutionId, string examYear, string examMonth)
         {
+            var resultItems = new List<AnswersheetImportCourseDto>();
 
-            var result = await (from exam in this._context.Examinations
-                                join course in this._context.Courses on exam.CourseId equals course.CourseId
-                                join dept in this._context.Departments on exam.DepartmentId equals dept.DepartmentId
-                                where exam.IsActive
-                                && exam.InstitutionId == institutionId
-                                && exam.ExamYear == examYear
-                                && exam.ExamMonth == examMonth
-                                select new AnswersheetImportCourseDptDto
-                                {
-                                    ExaminationId = exam.ExaminationId,
-                                    CourseCode = course.Code,
-                                    CourseName = course.Name,
-                                    DepartmentCode = dept.ShortName,
-                                    DepartmentName = dept.Name,
-                                    StudentCount = (int)exam.StudentCount
-                                }).ToListAsync();
-            return result.OrderBy(x => x.CourseCode).ThenBy(x => x.DepartmentCode).ToList();
+            var items = await (from exam in this._context.Examinations
+                               join course in this._context.Courses on exam.CourseId equals course.CourseId
+                               where exam.IsActive
+                               && exam.InstitutionId == institutionId
+                               && exam.ExamYear == examYear
+                               && exam.ExamMonth == examMonth
+                               select new
+                               {
+                                   exam.CourseId,
+                                   course.Code,
+                                   course.Name,
+                                   exam.StudentCount
+                               }).ToListAsync();
+
+            var groupItems = items.GroupBy(x => x.CourseId);
+
+            foreach (var item in groupItems)
+            {
+                resultItems.Add(
+                    new AnswersheetImportCourseDto
+                    {
+                        CourseId = item.First().CourseId,
+                        CourseCode = item.First().Code,
+                        CourseName = item.First().Name,
+                        StudentCount = item.Sum(x => (int)x.StudentCount)
+                    });
+            }
+
+
+            return resultItems.OrderBy(x => x.CourseCode).ToList();
         }
 
 
         //POST
-        public async Task<List<AnswersheetImportDetail>> ImportDummyNoFromExcelByCourse(Stream excelStream, long examinationId)
+        public async Task<List<AnswersheetImportDetail>> ImportDummyNoFromExcelByCourse(Stream excelStream,
+            long institutionId, string examYear, string examMonth, long courseId)
         {
             var helper = new AnswersheetImportHelper(this._context, this._blobStorageHelper);
-            var result = await helper.ImportDummyNoFromExcelByCourse(excelStream, examinationId, "xlsx");
+
+            var result = await helper.ImportDummyNoFromExcelByCourse(excelStream,
+                institutionId, examYear, examMonth, courseId);
+
             return result;
         }
 
 
-        public async Task<List<AnswersheetImportDto>> GetAnswersheetImports(long examinationId)
+        public async Task<List<AnswersheetImportDto>> GetAnswersheetImports(
+            long institutionId, string examYear, string examMonth, long courseId)
         {
             return await this._context.AnswersheetImports
-                .Where(x => x.ExaminationId == examinationId && x.IsActive)
+                .Where(x => x.IsActive
+                && x.InstitutionId == institutionId
+                && x.ExamYear == examYear 
+                && x.ExamMonth == examMonth
+                && x.CourseId == courseId)
                 .OrderByDescending(x => x.AnswersheetImportId)
                 .Select(x => new AnswersheetImportDto
                 {
@@ -62,7 +86,8 @@ namespace SKCE.Examination.Services.Common
                     DocumentUrl = x.DocumentUrl,
                     ExamMonth = x.ExamMonth,
                     ExamYear = x.ExamYear,
-                    ExaminationId = x.ExaminationId,
+                    InstitutionId = x.InstitutionId,
+                    CourseId = x.CourseId,
                     RecordCount = x.AnswersheetImportDetails.Count(),
                     IsReviewCompleted = x.IsReviewCompleted,
                     ReviewCompletedOn = x.ReviewCompletedOn,
@@ -72,7 +97,10 @@ namespace SKCE.Examination.Services.Common
 
         public async Task<List<AnswersheetImportDetail>> GetAnswersheetImportDetails(long answersheetImportId)
         {
-            return await this._context.AnswersheetImportDetails.Where(x => x.AnswersheetImportId == answersheetImportId).ToListAsync();
+            return await this._context.AnswersheetImportDetails
+                .Where(x => x.AnswersheetImportId == answersheetImportId)
+                .OrderBy(x => x.IsValid)
+                .ToListAsync();
         }
 
         public async Task<bool> CreateAnswerSheetsAndApproveImportedData(
@@ -97,5 +125,5 @@ namespace SKCE.Examination.Services.Common
             return false;
         }
 
-            }
+    }
 }

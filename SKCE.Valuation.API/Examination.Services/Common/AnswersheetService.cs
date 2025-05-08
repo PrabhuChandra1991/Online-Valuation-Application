@@ -40,6 +40,40 @@ namespace SKCE.Examination.Services.Common
 
         }
 
+        public async Task<IEnumerable<CourseWithAnswersheet>> GetCoursesHavingAnswersheetAsync(string examYear, string examMonth, string examType)
+        {
+            try
+            {
+                var courses = await (
+                from a in _context.Answersheets
+                join e in _context.Examinations on a.ExaminationId equals e.ExaminationId
+                join c in _context.Courses on e.CourseId equals c.CourseId
+                where e.ExamYear == examYear && e.ExamMonth == examMonth && e.ExamType == examType
+                group new { a, c } by new
+                {
+                    c.CourseId,
+                    c.Code,
+                    c.Name,
+                    a.ExaminationId
+                } into g
+                select new CourseWithAnswersheet
+                {
+                    CourseId = g.Key.CourseId,
+                    Code = g.Key.Code,
+                    Name = g.Key.Name,
+                    ExaminationId = g.Key.ExaminationId,
+                    Count = g.Count()
+                }
+                ).OrderBy(x => x.Code).ToListAsync();
+
+                return courses;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public async Task<IEnumerable<Answersheet>> GetAllAnswersheetsAsync()
         {
             return await _context.Answersheets.ToListAsync();

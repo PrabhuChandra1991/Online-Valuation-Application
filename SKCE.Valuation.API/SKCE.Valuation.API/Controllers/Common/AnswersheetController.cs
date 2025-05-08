@@ -19,6 +19,12 @@ namespace SKCE.Examination.API.Controllers.Common
             _answersheetService = answersheetService;
         }
 
+        [HttpGet("GetCoursesHavingAnswersheet")]
+        public async Task<ActionResult<IEnumerable<CourseWithAnswersheet>>> GetCoursesHavingAnswersheet(string examYear, string examMonth, string examType)
+        {
+            return Ok(await _answersheetService.GetCoursesHavingAnswersheetAsync(examYear, examMonth, examType));
+        }
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Answersheet>>> GetAnswersheets()
         {

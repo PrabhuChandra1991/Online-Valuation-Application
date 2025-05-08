@@ -29,6 +29,13 @@ export class AnswersheetService {
     );
   }
 
+  getCoursesWithAnswersheet(
+    examYear: string,
+    examMonth: string,
+    examType: string,): Observable<any> {
+    return this.http.get(`${this.apiUrl}/api/Answersheet/GetCoursesHavingAnswersheet?examYear=${examYear}&examMonth=${examMonth}&examType=${examType}`);
+  }
+
   getCourses(): Observable<any> {
     return this.http.get(`${this.apiUrl}/api/Course`);
   }

@@ -147,9 +147,14 @@ export class EvaluationListComponent implements OnInit {
     this.dataSource.filter = event.value.trim().toLowerCase();
   }
 
-  evaluate(answerSheetId: number) {
-    //let primaryData = this.answerSheetList.filter(x => x.answersheetId == answerSheetId)[0];
-    this.router.navigate(['/apps/evaluate', encode(String(answerSheetId))]);
+  evaluate(answerSheetId: number, blobURL: string) {    
+    if (!blobURL) {
+      this.toastr.error('File not found.');
+    }
+    else {
+      //let primaryData = this.answerSheetList.filter(x => x.answersheetId == answerSheetId)[0];
+      this.router.navigate(['/apps/evaluate', encode(String(answerSheetId))]);
+    }    
   }
 
 }

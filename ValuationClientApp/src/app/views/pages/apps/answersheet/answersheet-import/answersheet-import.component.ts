@@ -65,7 +65,7 @@ export class AnswersheetImportComponent implements OnInit {
   dataSourceExamCourses: any[] = [];
 
   dataSourceAnswerSheetImports: any[] = [];
-  dataSourceAnswerSheetImportDetails: any[] = [];
+  dataSourceAnswerSheetImportDetails = new MatTableDataSource<any>([]);
 
   selectedInstituteId: number = 0;
   selectedExamMonth: string = '0';
@@ -88,6 +88,9 @@ export class AnswersheetImportComponent implements OnInit {
 
   modalRef: NgbModalRef;
 
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
+
   @ViewChild('confirmModule') confirmModule: any;
   @ViewChild('deleteconfirmModule') deleteconfirmModule: any;
 
@@ -108,7 +111,7 @@ export class AnswersheetImportComponent implements OnInit {
 
     this.dataSourceExamCourses = [];
     this.dataSourceAnswerSheetImports = [];
-    this.dataSourceAnswerSheetImportDetails = [];
+    this.dataSourceAnswerSheetImportDetails = new MatTableDataSource<any>([]);
     this.selectedAnswersheetImportName = '';
   }
 
@@ -181,7 +184,7 @@ export class AnswersheetImportComponent implements OnInit {
   loadAnswersheetImports() {
     //----------
     this.dataSourceAnswerSheetImports = [];
-    this.dataSourceAnswerSheetImportDetails = [];
+    this.dataSourceAnswerSheetImportDetails = new MatTableDataSource<any>([]);
     this.selectedAnswersheetImportName = '';
     //----------
     this.answersheetImportService
@@ -204,15 +207,17 @@ export class AnswersheetImportComponent implements OnInit {
     this.selectedAnswersheetImportId = answerSheetImportId;
     this.selectedAnswersheetImportName = documentName;
     this.selectedAnswersheetImportIsReviewCompleted = isReviewCompleted;
-    this.dataSourceAnswerSheetImportDetails = [];
+    this.dataSourceAnswerSheetImportDetails = new MatTableDataSource<any>([]);
     this.answersheetImportService
       .GetAnswersheetImportDetails(answerSheetImportId)
       .subscribe({
         next: (data: any) => {
-          this.dataSourceAnswerSheetImportDetails = data;
+          this.dataSourceAnswerSheetImportDetails.data = data; // Avoid reassigning MatTableDataSource
+          this.dataSourceAnswerSheetImportDetails.paginator = this.paginator;
+          this.dataSourceAnswerSheetImportDetails.sort = this.sort;
         },
         error: (err: any) => {
-          this.dataSourceAnswerSheetImportDetails = [];
+          this.dataSourceAnswerSheetImportDetails = new MatTableDataSource<any>([]);
         },
       });
   }
@@ -342,7 +347,7 @@ export class AnswersheetImportComponent implements OnInit {
           this.selectedAnswersheetImportId = 0;
           this.selectedAnswersheetImportIsReviewCompleted = false;
           this.selectedAnswersheetImportName = "";
-          this.dataSourceAnswerSheetImportDetails = [];
+          this.dataSourceAnswerSheetImportDetails = new MatTableDataSource<any>([]);
         },
         error: (err) => {
           this.toasterService.error('File delete process failed.');

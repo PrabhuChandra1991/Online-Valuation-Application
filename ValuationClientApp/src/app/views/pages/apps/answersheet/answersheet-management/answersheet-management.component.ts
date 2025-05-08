@@ -66,6 +66,9 @@ export class AnswersheetManagementComponent {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
+  ddlYears = new FormControl('');
+  ddlMonths = new FormControl('');
+  ddlTypes = new FormControl('');
   ddlCourses = new FormControl('');
 
   dataSource = new MatTableDataSource<any>([]);
@@ -92,8 +95,11 @@ export class AnswersheetManagementComponent {
     this.loadAllExamYears();
     this.loadAllExamMonths();
     this.loadAllExamTypes();
-    this.loadAllInstitues();
-    this.loadAllCourses();
+    this.ddlYears.setValue('0');
+    this.ddlMonths.setValue('0');
+    this.ddlTypes.setValue('0');
+    this.courses = [];
+    this.ddlCourses.setValue('0');
   }
 
   loadAllExamYears(): void {
@@ -132,8 +138,8 @@ export class AnswersheetManagementComponent {
     });
   }
 
-  loadAllCourses(): void {
-    this.answersheetService.getCourses().subscribe({
+  loadCourses(): void {
+    this.answersheetService.getCoursesWithAnswersheet(this.selectedExamYear, this.selectedExamMonth, this.selectedExamType).subscribe({
       next: (data) => {
         this.courses = data;
         console.log('Course loaded:', this.courses);
@@ -156,17 +162,25 @@ export class AnswersheetManagementComponent {
 
   onExamYearChange(event: Event): void {
     this.selectedExamYear = (event.target as HTMLSelectElement).value;
-    this.ddlCourses.setValue('0');
+    this.ddlMonths.setValue('0');
+    this.ddlTypes.setValue('0');
+    this.courses = [];
+    //this.ddlCourses.setValue('0');
+    this.dataSource.data = [];
   }
 
   onExamMonthChange(event: Event): void {
     this.selectedExamMonth = (event.target as HTMLSelectElement).value;
-    this.ddlCourses.setValue('0');
+    this.courses = [];
+    //this.ddlCourses.setValue('0');
+    this.answersheets = [];
   }
 
   onExamTypeChange(event: Event): void {
     this.selectedExamType = (event.target as HTMLSelectElement).value;
-    this.ddlCourses.setValue('0');
+    this.loadCourses();
+    //this.ddlCourses.setValue('0');
+    this.answersheets = [];
   }
 
   onCourseChange(event: Event): void {

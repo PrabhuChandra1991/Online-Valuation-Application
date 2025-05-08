@@ -2,7 +2,10 @@
 {
     public class AnswersheetAllocateInputModel
     {
-        public required long ExaminationId { get; set; } 
+        public required string ExamYear { get; set; } 
+        public required string ExamMonth { get; set; } 
+        public required string ExamType { get; set; } 
+        public required long CourseId { get; set; } 
         public required long UserId { get; set; } 
         public required int Noofsheets { get; set; }
 

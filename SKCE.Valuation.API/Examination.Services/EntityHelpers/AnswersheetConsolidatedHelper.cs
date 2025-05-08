@@ -16,40 +16,44 @@ namespace SKCE.Examination.Services.EntityHelpers
         public async Task<List<AnswersheetConsolidatedDto>> GetConsolidatedItems(
             string examYear, string examMonth, string examType)
         {
-            var resultItems = await (from exam in _dbContext.Examinations
-                                     join institution in _dbContext.Institutions on exam.InstitutionId equals institution.InstitutionId
-                                     join course in _dbContext.Courses on exam.CourseId equals course.CourseId
-                                     join dept in _dbContext.Departments on exam.DepartmentId equals dept.DepartmentId
-                                     join degType in _dbContext.DegreeTypes on exam.DegreeTypeId equals degType.DegreeTypeId
+            var resultItems = new List<AnswersheetConsolidatedDto>();
 
-                                     where exam.IsActive == true
-                                     && exam.ExamYear == examYear
-                                     && exam.ExamMonth == examMonth
-                                     && exam.ExamType == examType
-                                     //&& (exam.InstitutionId == institutionId || institutionId == null)
+            var qryItems = await (from exam in _dbContext.Examinations
+                                  join course in _dbContext.Courses on exam.CourseId equals course.CourseId
 
-                                     orderby course.Code
+                                  where exam.IsActive == true
+                                  && exam.ExamYear == examYear
+                                  && exam.ExamMonth == examMonth
+                                  && exam.ExamType == examType
 
-                                     select new AnswersheetConsolidatedDto
-                                     {
-                                         ExaminationId = exam.ExaminationId,
-                                         InstitutionCode = institution.Code,
-                                         CourseCode = course.Code,
-                                         CourseName = course.Name,
-                                         DepartmentShortName = dept.ShortName,
-                                         RegulationYear = exam.RegulationYear,
-                                         BatchYear = exam.BatchYear,
-                                         DegreeType = degType.Name,
-                                         ExamType = exam.ExamType,
-                                         Semester = (int)exam.Semester,
-                                         ExamMonth = exam.ExamMonth,
-                                         ExamYear = exam.ExamYear,
-                                         StudentTotalCount = exam.StudentCount,
-                                         AnswerSheetTotalCount = exam.Answersheets.Count(x => x.IsActive),
-                                         AnswerSheetAllocatedCount = exam.Answersheets.Count(x => x.IsActive && x.AllocatedToUserId != null),
-                                         AnswerSheetNotAllocatedCount = exam.Answersheets.Count(x => x.IsActive && x.AllocatedToUserId == null),
-                                     }).ToListAsync();
-            return resultItems;
+                                  select new
+                                  {
+                                      CourseId = course.CourseId,
+                                      CourseCode = course.Code,
+                                      CourseName = course.Name,
+                                      StudentTotalCount = exam.StudentCount,
+                                      AnswerSheetTotalCount = exam.Answersheets.Count(x => x.IsActive),
+                                      AnswerSheetAllocatedCount = exam.Answersheets.Count(x => x.IsActive && x.AllocatedToUserId != null),
+                                      AnswerSheetNotAllocatedCount = exam.Answersheets.Count(x => x.IsActive && x.AllocatedToUserId == null),
+                                  }).ToListAsync();
+
+            var grpItems = qryItems.GroupBy(x => x.CourseId);
+
+            foreach (var item in grpItems)
+            {
+                resultItems.Add(new AnswersheetConsolidatedDto
+                {
+                    CourseId = item.First().CourseId,
+                    CourseCode = item.First().CourseCode,
+                    CourseName = item.First().CourseName,
+                    StudentTotalCount = item.Sum(x => x.StudentTotalCount),
+                    AnswerSheetTotalCount = item.Sum(x => x.AnswerSheetTotalCount),
+                    AnswerSheetAllocatedCount = item.Sum(x => x.AnswerSheetAllocatedCount),
+                    AnswerSheetNotAllocatedCount = item.Sum(x => x.AnswerSheetNotAllocatedCount),
+                });
+            }
+
+            return resultItems.OrderBy(x => x.CourseCode).ToList();
         }
 
 

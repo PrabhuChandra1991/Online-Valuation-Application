@@ -32,12 +32,16 @@ export class EvaluationService {
     return this.http.get(`${this.apiUrl}/api/Answersheet/GetAnswersheetMark?answersheetId=${answersheetId}`);
   }
 
+  getAnswersheetPdfAvailable(answersheetId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/api/Answersheet/GetAnswerSheetAvailable?answersheetId=${answersheetId}`);
+  }
+
   saveAnswersheetMark(answersheetMark: AnswersheetMark): Observable<any> {
     let url = `${this.apiUrl}/api/Answersheet/SaveAnswersheetMark/`;
     return this.http.post(url, JSON.stringify(answersheetMark), this.httpOptions);
   }
 
-  completeEvaluation(answersheetId: number, evaluatedByUserId: number): Observable<any> {    
+  completeEvaluation(answersheetId: number, evaluatedByUserId: number): Observable<any> {
     return this.http.post(`${this.apiUrl}/api/Answersheet/CompleteEvaluation?answersheetId=${answersheetId}&evaluatedByUserId=${evaluatedByUserId}`, {}, this.httpOptions);
   }
 

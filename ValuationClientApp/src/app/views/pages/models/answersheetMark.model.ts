@@ -11,7 +11,10 @@ export interface AnswersheetMark {
 }
 
 export interface AnswersheetAllocateInputModel {
-  examinationId: number;
+  examYear: string;
+  examMonth: string;
+  examType: string;
+  courseId: number;
   userId: number;
   noofsheets: number;
 }

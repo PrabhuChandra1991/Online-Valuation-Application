@@ -21,7 +21,8 @@
             </h5>
         </div>
         <div class="col-md-2 d-grid">
-            <button class="btn btn-primary float-end me-1" (click)="promptBeforeCompletion()">Complete
+            <button class="btn btn-primary float-end me-1" [disabled]="partList.length===0"
+                (click)="promptBeforeCompletion()">Complete
                 Evaluation</button>
         </div>
     </div>
@@ -42,30 +43,26 @@
                         <tr>
                             <td class="question" *ngFor="let item of qaList; let i = index">
                                 <button *ngIf="item.questionNumberDisplay != ''" class="btn btn-light" type="button"
-                                    [attr.id]="'btn' + (i + 1)"
-                                    [disabled]="item.disableInput" 
+                                    [attr.id]="'btn' + (i + 1)" [disabled]="item.disableInput"
                                     (click)="loadQuestionDetails($event, (i+1), item.questionNumberDisplay)"
                                     tabindex="-1">{{item.questionNumberDisplay}}</button>
                                 <input *ngIf="item.questionNumberDisplay != ''" type="text" maxlength="5"
-                                    class="form-control border-0 text-center" 
-                                    [attr.part]="item.questionPart"
-                                    [attr.qno]="item.questionNumber"
-                                    [attr.group]="item.questionGroup"
-                                    [attr.max]="item.mark"
-                                    [attr.id]="'txt' + (i + 1)"  
-                                    [disabled]="item.disableInput"                                                                   
-                                    [value]="(item.obtainedMark != 0) ? item.obtainedMark : ''"                                     
+                                    class="form-control border-0 text-center" [attr.part]="item.questionPart"
+                                    [attr.qno]="item.questionNumber" [attr.group]="item.questionGroup"
+                                    [attr.max]="item.mark" [attr.id]="'txt' + (i + 1)" [disabled]="item.disableInput"
+                                    [value]="(item.obtainedMark != 0) ? item.obtainedMark : ''"
                                     (focus)="loadQuestionDetails($event, (i + 1), item.questionNumberDisplay)"
                                     (blur)="validateMark($event, item)">
                                 <label class="or" *ngIf="item.questionNumberDisplay == ''">OR</label>
                             </td>
                         </tr>
-                    </tbody>  
+                    </tbody>
                     <tfoot>
                         <td *ngFor="let item of groupList" [attr.colspan]="item.count">
-                            <span class="subtotal" [attr.qno]="item.group">{{item.group == 10 ? partAMark : item.mark}}</span>
+                            <span class="subtotal" [attr.qno]="item.group">{{item.group == 10 ? partAMark :
+                                item.mark}}</span>
                         </td>
-                    </tfoot>                  
+                    </tfoot>
                 </table>
             </div>
         </div>
@@ -80,7 +77,7 @@
             <div class="col-md-1">
                 <h5>Part B: {{ partBMark }}</h5>
             </div>
-            <div class="col-md-1" >
+            <div class="col-md-1">
                 <h5 *ngIf="primaryData.degreeTypeName == 'PG'">Part C: {{ partCMark }}</h5>
             </div>
             <div class="col-md-3">

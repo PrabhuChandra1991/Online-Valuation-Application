@@ -82,6 +82,14 @@ namespace SKCE.Examination.API.Controllers.Common
             return Ok(result);
         }
 
+
+        [HttpGet("GetAnswerSheetAvailable")]
+        public async Task<ActionResult<bool>> GetAnswerSheetAvailable(long answersheetId)
+        {
+            var result = await _answersheetService.GetAnswerSheetAvailable(answersheetId);
+            return Ok(result);
+        }
+
         // GET: /api/Answersheet/GetAnswersheetMark
         [HttpGet("GetAnswersheetMark")]
         public async Task<IActionResult> GetAnswersheetMark([FromQuery] long answersheetId)

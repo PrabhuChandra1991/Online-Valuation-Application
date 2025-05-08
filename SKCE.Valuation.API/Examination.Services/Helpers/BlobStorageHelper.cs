@@ -1,10 +1,6 @@
 ﻿using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
-using DocumentFormat.OpenXml.Packaging;
 using Microsoft.Extensions.Configuration;
-using SKCE.Examination.Models.DbModels.Common;
-using Spire.Doc;
-using Document = SKCE.Examination.Models.DbModels.Common.Document;
 
 namespace SKCE.Examination.Services.Helpers
 {
@@ -36,6 +32,17 @@ namespace SKCE.Examination.Services.Helpers
 
             return blobClient.Uri.ToString();
         }
+
+        /// <summary>
+        /// Uploads a file to Azure Blob Storage.
+        /// </summary>
+        public async Task<bool> ExistsAsync(string fileLocation)
+        {
+            var blobContainerClient = _blobServiceClient.GetBlobContainerClient(_containerName);             
+            var blobClient = blobContainerClient.GetBlobClient(fileLocation);
+            return await blobClient.ExistsAsync(); 
+        }
+
 
     }
 }

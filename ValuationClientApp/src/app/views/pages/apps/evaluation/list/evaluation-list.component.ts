@@ -44,7 +44,7 @@ export class EvaluationListComponent implements OnInit {
 
   ) {
     this.dataSource.filterPredicate = (data: any, filter: string) => {
-      if(this.evaluationFilterValue == 'all') {
+      if (this.evaluationFilterValue == 'all') {
         console.log("helso all")
         switch (this.markFilterValue) {
           case "below40": {
@@ -61,47 +61,47 @@ export class EvaluationListComponent implements OnInit {
           }
         }
       }
-      else if(this.evaluationFilterValue == 'true') {
+      else if (this.evaluationFilterValue == 'true') {
         switch (this.markFilterValue) {
           case "below40": {
             return data.isEvaluateCompleted === true
-            && data.totalObtainedMark < 40;
+              && data.totalObtainedMark < 40;
           }
           case "40to44": {
             return data.isEvaluateCompleted === true
-            && data.totalObtainedMark >= 40 && data.totalObtainedMark < 45;
+              && data.totalObtainedMark >= 40 && data.totalObtainedMark < 45;
           }
           case "above44": {
             return data.isEvaluateCompleted === true
-            && data.totalObtainedMark > 44;
+              && data.totalObtainedMark > 44;
           }
           default: {
             return data.isEvaluateCompleted === true
-            && data;
+              && data;
           }
         }
       }
-      else if(this.evaluationFilterValue == 'false') {
+      else if (this.evaluationFilterValue == 'false') {
         switch (this.markFilterValue) {
           case "below40": {
             return data.isEvaluateCompleted === false
-            && data.totalObtainedMark < 40;
+              && data.totalObtainedMark < 40;
           }
           case "40to44": {
             return data.isEvaluateCompleted === false
-            && data.totalObtainedMark >= 40 && data.totalObtainedMark < 45;
+              && data.totalObtainedMark >= 40 && data.totalObtainedMark < 45;
           }
           case "above44": {
             return data.isEvaluateCompleted === false
-            && data.totalObtainedMark > 44;
+              && data.totalObtainedMark > 44;
           }
           default: {
             return data.isEvaluateCompleted === false
-            && data;
+              && data;
           }
         }
       }
-      
+
     };
   }
 
@@ -147,14 +147,15 @@ export class EvaluationListComponent implements OnInit {
     this.dataSource.filter = event.value.trim().toLowerCase();
   }
 
-  evaluate(answerSheetId: number, blobURL: string) {    
-    if (!blobURL) {
-      this.toastr.error('File not found.');
-    }
-    else {
-      //let primaryData = this.answerSheetList.filter(x => x.answersheetId == answerSheetId)[0];
-      this.router.navigate(['/apps/evaluate', encode(String(answerSheetId))]);
-    }    
+  evaluate(answerSheetId: number) {
+    this.evaluationService.getAnswersheetPdfAvailable(answerSheetId).subscribe(
+      (data: boolean) => {
+        if (data) {
+          this.router.navigate(['/apps/evaluate', encode(String(answerSheetId))]);
+        } else {
+          this.toastr.error('File not found.');
+        }
+      });
   }
 
 }

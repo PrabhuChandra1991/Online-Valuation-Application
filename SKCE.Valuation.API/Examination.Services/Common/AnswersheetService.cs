@@ -29,6 +29,8 @@ namespace SKCE.Examination.Services.Common
         //-------------
         public readonly string _blobBaseUrl;
         public readonly string _containerName;
+        //
+        public readonly IConfiguration _configuration;
 
         public AnswersheetService(ExaminationDbContext context, IUserService userService, EmailService emailService, IConfiguration configuration)
         {
@@ -37,7 +39,7 @@ namespace SKCE.Examination.Services.Common
             _emailService = emailService;
             _blobBaseUrl = configuration["AzureBlobStorage:BaseUrl"]; ;
             _containerName = configuration["AzureBlobStorage:ContainerName"];
-
+            _configuration = configuration; 
         }
 
         public async Task<IEnumerable<CourseWithAnswersheet>> GetCoursesHavingAnswersheetAsync(string examYear, string examMonth, string examType)
@@ -212,8 +214,33 @@ namespace SKCE.Examination.Services.Common
             return await helper.CompleteEvaluationSync(answersheetId, evaluatedByUserId);
         }
 
+        public async Task<bool> GetAnswerSheetAvailable(long answersheetId)
+        {
+            var result  =
+              await (from answer in this._context.Answersheets
+               join exam in this._context.Examinations on answer.ExaminationId equals exam.ExaminationId
+               join course in this._context.Courses on exam.CourseId equals course.CourseId
+               where answer.AnswersheetId == answersheetId
+               select new
+               {
+                   course.Code,
+                   answer.DummyNumber
+               }).FirstOrDefaultAsync();
+
+            if (result == null)
+                return false;
+
+            var fileLocation = "ANSWERSHEET/" + result.Code.ToString() + "/" + result.DummyNumber.ToString() + ".pdf";
+
+            var helper = new BlobStorageHelper(this._configuration);
+            return await helper.ExistsAsync(fileLocation);
+        }
+
         public async Task<Boolean> AllocateAnswerSheetsToUser(AnswersheetAllocateInputModel inputData)
         {
+            if (inputData.UserId == 0 || inputData.Noofsheets == 0)
+                return false;
+
             long loggedInUserId = 1;
             var helper = new AnswersheetAllocateHelper(this._context);
             var response = await helper.AllocateAnswersheetsToUserRandomly(inputData, loggedInUserId);
@@ -227,7 +254,8 @@ namespace SKCE.Examination.Services.Common
                         "SKCE Online Examination Platform: Answeersheets allocated", $"Hi {user.Name},\n\nYou have been allocated with {inputData.Noofsheets} answersheets for Evaluation.\n\n Please Evaluate. \n\n");
                 }
             }
-            return response;
+
+            return true;
         }
         public async Task<(MemoryStream, string)> ExportMarksAsync(long institutionId, string examYear, string examMonth, long courseId)
         {

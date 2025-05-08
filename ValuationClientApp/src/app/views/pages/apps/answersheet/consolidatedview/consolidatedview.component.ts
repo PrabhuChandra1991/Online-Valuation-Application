@@ -170,7 +170,7 @@ export class ConsolidatedviewComponent {
           this.gridDataItems = data;
           this.dataSource.data = this.gridDataItems;
           this.dataSource.paginator = this.paginator;
-          this.dataSource.sort = this.sort; 
+          this.dataSource.sort = this.sort;
         },
         error: (errRes: any) => {
           console.error('Error on getConsolidatedExamAnswersheets:', errRes);
@@ -219,12 +219,15 @@ export class ConsolidatedviewComponent {
   }
 
   IsValidNoofScripts() {
-    if (
-      parseInt(this.allocateAnswersheetForm.value.noOfAnswersheetsAllocated) >
-      this.selectedElement.answerSheetNotAllocatedCount
-    ) {
+    if (this.selectedElement.answerSheetNotAllocatedCount === 0)
       return false;
-    }
+
+    if (parseInt(this.allocateAnswersheetForm.value.noOfAnswersheetsAllocated) === 0)
+      return false;
+
+    if (parseInt(this.allocateAnswersheetForm.value.noOfAnswersheetsAllocated) > this.selectedElement.answerSheetNotAllocatedCount)
+      return false;
+
     return true;
   }
 
@@ -237,7 +240,10 @@ export class ConsolidatedviewComponent {
       this.allocateTransactionInprogress = true;
       this.answersheetService
         .AllocateAnswerSheetsToUser(
-          this.selectedElement.examinationId,
+          this.selectedExamYear,
+          this.selectedExamMonth,
+          this.selectedExamType,
+          this.selectedElement.courseId,
           parseInt(this.allocateAnswersheetForm.value.userId),
           parseInt(this.allocateAnswersheetForm.value.noOfAnswersheetsAllocated)
         )

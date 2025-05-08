@@ -22,22 +22,20 @@ namespace SKCE.Examination.Services.EntityHelpers
 
         public async Task<Boolean> AllocateAnswersheetsToUserRandomly(AnswersheetAllocateInputModel inputModel, long loggedInUserId)
         {
-            var examination = this._dbContext.Examinations.FirstOrDefault(x => x.ExaminationId == inputModel.ExaminationId && x.IsActive);
-
-            if (examination == null)
-                return false;
-
             var unallocatedAnswersheets =
-                await this._dbContext.Answersheets
-                            .Where(x => x.IsActive
-                            && x.ExaminationId == examination.ExaminationId
-                            && x.AllocatedToUserId == null).ToListAsync();
+                await (from anshet in this._dbContext.Answersheets
+                       join exam in this._dbContext.Examinations on anshet.ExaminationId equals exam.ExaminationId
+                       where exam.ExamYear == inputModel.ExamYear
+                       && exam.ExamMonth == inputModel.ExamMonth
+                       && exam.ExamType == inputModel.ExamType
+                       && exam.CourseId == inputModel.CourseId
+                       && anshet.AllocatedToUserId == null
+                       && anshet.IsActive && exam.IsActive
+                       select anshet).ToListAsync();
 
-            if (unallocatedAnswersheets.Count < inputModel.Noofsheets)
-            {
+            if (unallocatedAnswersheets.Count == 0)
                 return false;
-            }
-
+              
             var answersheetWithRandom = new List<AnswersheetRandomNo>();
 
             Random random = new Random();

@@ -16,7 +16,7 @@ export class AnswersheetService {
     }),
   };
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getAnswersheetDetails(
     examYear: string,
@@ -61,31 +61,22 @@ export class AnswersheetService {
     );
   }
 
-  AllocateAnswerSheetsToUser(
-    examinationId: number,
-    userId: number,
-    noofsheets: number
-  ): Observable<any> {
+  AllocateAnswerSheetsToUser(examYear: string, examMonth: string, examType: string, courseId: number, userId: number, noofsheets: number): Observable<any> {
     let url = `${this.apiUrl}/api/Answersheet/AllocateAnswerSheetsToUser`;
-
     var headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-
     var inputData: AnswersheetAllocateInputModel = {
-      examinationId: examinationId,
+      examYear: examYear,
+      examMonth: examMonth,
+      examType: examType,
+      courseId: courseId,
       userId: userId,
       noofsheets: noofsheets,
     };
-
     return this.http.post(url, JSON.stringify(inputData), { headers });
   }
-  exportMarks(
-    institutionId: number,
-    courseId: number,
-    examYear: string,
-    examMonth: string
-  ): Observable<any> {
-    return this.http.get(
-      `${this.apiUrl}/api/Answersheet/ExportMarks?institutionId=${institutionId}&courseId=${courseId}&examYear=${examYear}&examMonth=${examMonth}`
-    );
+
+  exportMarks(institutionId: number, courseId: number, examYear: string, examMonth: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/api/Answersheet/ExportMarks?institutionId=${institutionId}&courseId=${courseId}&examYear=${examYear}&examMonth=${examMonth}`);
   }
+
 }

@@ -2,7 +2,7 @@
   <h3>Answersheet Management</h3>
   <div class="row">
     <div class="col-md-1 mt-4">
-      <select id="examYearId" class="form-select" (change)="onExamYearChange($event)">
+      <select id="examYearId" class="form-select" (change)="onExamYearChange($event)" [formControl]="ddlYears">
         <option [value]="0">Year</option>
         <option *ngFor="let item of dataSourceExamYears" [value]="item">
           {{ item }}
@@ -10,7 +10,7 @@
       </select>
     </div>
     <div class="col-md-1 mt-4">
-      <select id="examMonthId" class="form-select" (change)="onExamMonthChange($event)">
+      <select id="examMonthId" class="form-select" (change)="onExamMonthChange($event)" [formControl]="ddlMonths">
         <option [value]="0">Month</option>
         <option *ngFor="let item of dataSourceExamMonths" [value]="item">
           {{ item }}
@@ -18,7 +18,7 @@
       </select>
     </div>
     <div class="col-md-1 mt-4">
-      <select id="examTypeId" class="form-select" (change)="onExamTypeChange($event)">
+      <select id="examTypeId" class="form-select" (change)="onExamTypeChange($event)" [formControl]="ddlTypes">
         <option [value]="0">Type</option>
         <option *ngFor="let item of dataSourceExamTypes" [value]="item">
           {{ item }}
@@ -29,7 +29,7 @@
       <select id="courseId" class="form-select" (change)="onCourseChange($event)" [formControl]="ddlCourses">
         <option [value]="0">Select Course</option>
         <option *ngFor="let course of courses" [value]="course.courseId">
-          {{ course.code }} - {{ course.name }}
+          {{ course.code }} - {{ course.name }} - ({{ course.count }})
         </option>
       </select>
     </div>

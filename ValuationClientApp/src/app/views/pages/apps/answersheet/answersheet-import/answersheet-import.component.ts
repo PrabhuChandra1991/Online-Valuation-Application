@@ -76,6 +76,9 @@ export class AnswersheetImportComponent implements OnInit {
   selectedAnswersheetImportName: string = '';
   selectedAnswersheetImportIsReviewCompleted: boolean = false;
 
+  selectedCourse: any;
+  absentees: number = 0;
+
   isDummyNumberImported = false;
 
   dummyNumberImportForm = new FormGroup({
@@ -215,6 +218,7 @@ export class AnswersheetImportComponent implements OnInit {
           this.dataSourceAnswerSheetImportDetails.data = data; // Avoid reassigning MatTableDataSource
           this.dataSourceAnswerSheetImportDetails.paginator = this.paginator;
           this.dataSourceAnswerSheetImportDetails.sort = this.sort;
+          this.absentees = this.selectedCourse.studentCount - this.dataSourceAnswerSheetImportDetails.data.length;
         },
         error: (err: any) => {
           this.dataSourceAnswerSheetImportDetails = new MatTableDataSource<any>([]);
@@ -248,6 +252,9 @@ export class AnswersheetImportComponent implements OnInit {
     this.selectedAnswersheetImportIsReviewCompleted = false;
     this.selectedAnswersheetImportName = "";
     this.loadAnswersheetImports();
+
+    this.selectedCourse = this.dataSourceExamCourses.filter(x => x.courseId == this.selectedCourseId)[0];
+    this.absentees = 0;
   }
 
   onDummyNumberFileChange(event: any) {

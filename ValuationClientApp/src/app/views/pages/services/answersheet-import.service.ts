@@ -62,13 +62,13 @@ export class AnswersheetImportService {
   }
 
 
-  ReviewCompletedAndApproving(answersheetImportId: number): Observable<any> {
+  ReviewCompletedAndApproving(answersheetImportId: number, absentCount: number): Observable<any> {
     const loggedData = localStorage.getItem('userData');
     let userData: any;
     if (loggedData) {
       userData = JSON.parse(loggedData);
     }
-    const url: string = `${this.apiUrl}/api/AnswersheetImport/ReviewedAndApproveDummyNumbers?answersheetImportId=${answersheetImportId}`;
+    const url: string = `${this.apiUrl}/api/AnswersheetImport/ReviewedAndApproveDummyNumbers?answersheetImportId=${answersheetImportId}&absentCount=${absentCount}`;
     const httpOptions = {
       headers: new HttpHeaders({
         loggedInUserId: parseInt(userData.userId),

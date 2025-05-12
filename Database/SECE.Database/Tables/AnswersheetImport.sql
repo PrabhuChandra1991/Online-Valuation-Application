@@ -10,6 +10,7 @@
 	[IsReviewCompleted] BIT DEFAULT 0 NULL,
 	[ReviewCompletedOn] DATETIME NULL,
 	[ReviewCompletedBy] BIGINT NULL,
+	[AbsenteesCount] INT NULL,
 	[IsActive] BIT DEFAULT 1,
 	[CreatedDate] DATETIME DEFAULT GETDATE(),
 	[CreatedById] BIGINT NOT NULL,

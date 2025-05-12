@@ -13,7 +13,7 @@ namespace SKCE.Examination.Services.EntityHelpers
         }
 
         public async Task<bool> CreateAnswerSheetsAndApproveImportedData(
-            long answersheetImportId, long loggedInUserId)
+            long answersheetImportId,int absentCount, long loggedInUserId)
         {
             var answersheetImport =
                await this._dbContext.AnswersheetImports
@@ -25,6 +25,7 @@ namespace SKCE.Examination.Services.EntityHelpers
             answersheetImport.IsReviewCompleted = true;
             answersheetImport.ReviewCompletedOn = DateTime.Now;
             answersheetImport.ReviewCompletedBy = loggedInUserId;
+            answersheetImport.AbsenteesCount = absentCount;
             answersheetImport.ModifiedById = loggedInUserId;
             answersheetImport.ModifiedDate = DateTime.Now;
             this._dbContext.Entry(answersheetImport).State = EntityState.Modified;

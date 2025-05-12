@@ -79,14 +79,14 @@ namespace SKCE.Examination.API.Controllers.Common
         }
 
         [HttpGet("ReviewedAndApproveDummyNumbers")]
-        public async Task<IActionResult> ReviewedAndApproveDummyNumbers(long answersheetImportId)
+        public async Task<IActionResult> ReviewedAndApproveDummyNumbers(long answersheetImportId, int absentCount)
         {
             try
             {
                 long loggedInUserId = long.Parse(Request.Headers["loggedInUserId"].ToString());
 
                 var result = await _answersheetImportService
-                    .CreateAnswerSheetsAndApproveImportedData(answersheetImportId, loggedInUserId);
+                    .CreateAnswerSheetsAndApproveImportedData(answersheetImportId, absentCount, loggedInUserId);
 
                 return Ok(result);
             }

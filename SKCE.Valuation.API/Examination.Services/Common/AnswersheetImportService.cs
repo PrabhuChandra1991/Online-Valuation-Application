@@ -104,10 +104,11 @@ namespace SKCE.Examination.Services.Common
         }
 
         public async Task<bool> CreateAnswerSheetsAndApproveImportedData(
-            long answersheetImportId, long loggedInUserId)
+            long answersheetImportId,int absentCount, long loggedInUserId)
         {
             var helper = new AnswersheetImportApproveHelper(this._context);
-            return await helper.CreateAnswerSheetsAndApproveImportedData(answersheetImportId, loggedInUserId);
+            return await helper.CreateAnswerSheetsAndApproveImportedData(
+                answersheetImportId, absentCount, loggedInUserId);
         }
 
         public async Task<bool> DeleteAnswersheetImport(long answersheetImportId, long loggedInUserId)

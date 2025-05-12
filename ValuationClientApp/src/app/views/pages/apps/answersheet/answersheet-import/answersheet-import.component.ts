@@ -320,7 +320,7 @@ export class AnswersheetImportComponent implements OnInit {
   completeDummyNumberReview() {
     this.modalRef.close();
     this.answersheetImportService
-      .ReviewCompletedAndApproving(this.selectedAnswersheetImportId)
+      .ReviewCompletedAndApproving(this.selectedAnswersheetImportId, this.absentees)
       .subscribe(
         (data: any) => {
           this.toasterService.success('Review completed successfully.');

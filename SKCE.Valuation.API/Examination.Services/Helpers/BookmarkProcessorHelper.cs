@@ -157,8 +157,8 @@ namespace SKCE.Examination.Services.Helpers
                 var courseSyllabusWordDocument = _context.Documents.FirstOrDefault(d => d.DocumentId == courseSyllabusDocument.WordDocumentId);
 
                 // Save the updated document
-                var updatedSourcePath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}_updatedSourceForPreview.docx", bookmarkUpdates["COURSECODE"], DateTime.Now.ToString("ddMMyyyyhhmmss")));
-                
+                var updatedSourcePath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}_updatedSourceForPreview.docx", bookmarkUpdates["COURSECODE"].Replace("/", "_"), DateTime.Now.ToString("ddMMyyyyhhmmss")));
+
                 MemoryStream sourceStream = await _azureBlobStorageHelper.DownloadWordDocumentFromBlobToOpenXML(inputDocPath);
                 sourceStream.Position = 0;
                 // Load the template document where bookmarks need to be replaced
@@ -221,7 +221,12 @@ namespace SKCE.Examination.Services.Helpers
                 // Iterate through all bookmarks in the updated source document and replace in actual QP template
                 foreach (Spire.Doc.Bookmark bookmark1 in updatedSourcedoc.Bookmarks)
                 {
+
+                    if (bookmark1.Name.Contains("_"))
+                        continue; // Skip system bookmark
+
                     string bookmarkName = bookmark1.Name;
+
                     // Find the same bookmark in the destination document
                     Spire.Doc.Bookmark destinationBookmark = templateDoc.Bookmarks.FindByName(bookmarkName);
                     if (destinationBookmark != null)
@@ -240,24 +245,24 @@ namespace SKCE.Examination.Services.Helpers
                         }
                     }
                 }
-                var previewdocPath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}_{2}.docx", bookmarkUpdates["COURSECODE"], qPTemplate.QPCode, DateTime.Now.ToString("ddMMyyyyhhmmss")));
+                var previewdocPath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}.docx", "Preview_Version_", inputDocPath.Replace(".docx","")));
                 templateDoc.Watermark = null;
                 templateDoc.SaveToFile(previewdocPath, FileFormat.Docx);
-                
+
                 // Remove evaluation watermark from the output document By OpenXML
                 RemoveTextFromDocx(previewdocPath, "Evaluation Warning: The document was created with Spire.Doc for .NET.");
 
                 // Save the modified document as PDF
-                var previewPdfPath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}_{2}.pdf", bookmarkUpdates["COURSECODE"], qPTemplate.QPCode, DateTime.Now.ToString("ddMMyyyyhhmmss")));
+                var previewPdfPath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}_{2}.pdf", bookmarkUpdates["COURSECODE"].Replace("/","_"), qPTemplate.QPCode, DateTime.Now.ToString("ddMMyyyyhhmmss")));
                 //ConvertToPdfBySyncfusion(previewdocPath, previewPdfPath);
 
                 if (!isForPrint) return previewdocPath;
 
                 //var pdfDocumentId =  await _azureBlobStorageHelper.UploadFileToBlob(previewPdfPath, string.Format("{0}_{1}_{2}_{3}_{4}.pdf", qPTemplate.QPTemplateName, qPTemplate.QPCode, qPTemplate.ExamYear, bookmarkUpdates["COURSECODE"], DateTime.UtcNow.ToShortDateString()));
-                var wordDocumentId = await _azureBlobStorageHelper.UploadDocxFileToBlob(previewdocPath, string.Format("{0}_{1}_{2}_{3}_{4}.docx", qPTemplate.QPTemplateName, qPTemplate.QPCode, qPTemplate.ExamYear, bookmarkUpdates["COURSECODE"], DateTime.UtcNow.ToShortDateString()));
+                var wordDocumentId = await _azureBlobStorageHelper.UploadDocxFileToBlob(previewdocPath, string.Format("{0}_{1}_{2}_{3}_{4}.docx", qPTemplate.QPTemplateName, qPTemplate.QPCode, qPTemplate.ExamYear, bookmarkUpdates["COURSECODE"].Replace("/", "_"), DateTime.UtcNow.ToShortDateString()));
 
-               await SaveSelectedQPDetail(qPTemplate, userQPTemplate, printedWordDocumentId, wordDocumentId);
-               return await PrintQP(updatedSourcedoc, bookmarkUpdates,qPTemplate,userQPTemplate);
+                await SaveSelectedQPDetail(qPTemplate, userQPTemplate, printedWordDocumentId, wordDocumentId);
+                return await PrintQP(updatedSourcedoc, bookmarkUpdates, qPTemplate, userQPTemplate, inputDocPath.Replace(".docx", ""));
             }
             catch (Exception ex)
             {
@@ -266,17 +271,21 @@ namespace SKCE.Examination.Services.Helpers
             return string.Empty;
         }
 
-        private async Task<string> PrintQP(Document updatedSourcedoc, Dictionary<string, string> bookmarkUpdates, QPTemplate qPTemplate, UserQPTemplate userQPTemplate) 
+        private async Task<string> PrintQP(Document updatedSourcedoc, Dictionary<string, string> bookmarkUpdates, QPTemplate qPTemplate, UserQPTemplate userQPTemplate,string fileNameToPrint)
         {
             var degreeTypeName = _context.DegreeTypes.FirstOrDefault(dt => dt.DegreeTypeId == qPTemplate.DegreeTypeId)?.Name ?? string.Empty;
             var qpDocument = _context.QPDocuments.FirstOrDefault(d => d.InstitutionId == userQPTemplate.InstitutionId && d.RegulationYear == qPTemplate.RegulationYear && d.DegreeTypeName == degreeTypeName && d.DocumentTypeId == 2 && d.ExamType.ToLower().Contains(qPTemplate.ExamType.ToLower()));
             string documentPathToPrint = _context.Documents.FirstOrDefault(d => d.DocumentId == qpDocument.DocumentId)?.Name;
+            
             // Load the template document where bookmarks need to be replaced
             Document templateDoc = await _azureBlobStorageHelper.DownloadWordDocumentFromBlob(documentPathToPrint);
 
             // Iterate through all bookmarks in the source document
             foreach (Spire.Doc.Bookmark bookmark1 in updatedSourcedoc.Bookmarks)
             {
+                if (bookmark1.Name.Contains("_"))
+                    continue; // Skip system bookmark
+
                 string bookmarkName = bookmark1.Name;
                 // Find the same bookmark in the destination document
                 Spire.Doc.Bookmark destinationBookmark = templateDoc.Bookmarks.FindByName(bookmarkName);
@@ -297,7 +306,7 @@ namespace SKCE.Examination.Services.Helpers
                 }
             }
 
-            var previewdocPath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}_{2}_QP_FinalPrint.docx", bookmarkUpdates["COURSECODE"], qPTemplate.QPCode, DateTime.Now.ToString("ddMMyyyyhhmmss")));
+            var previewdocPath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("FinalPrinted_QP_{0}_{1}_{2}.docx", qPTemplate.QPCode, fileNameToPrint, DateTime.Now.ToString("ddMMyyyyhhmmss")));
             templateDoc.Watermark = null;
             templateDoc.SaveToFile(previewdocPath, FileFormat.Docx);
 
@@ -306,11 +315,13 @@ namespace SKCE.Examination.Services.Helpers
             //Console.WriteLine("Bookmarks replaced successfully!");
 
             // Save the modified document as PDF
-            var previewPdfPath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}_{2}_QP.pdf", bookmarkUpdates["COURSECODE"], qPTemplate.QPCode, DateTime.Now.ToString("ddMMyyyyhhmmss")));
+            //var previewPdfPath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}_{2}_QP.pdf", bookmarkUpdates["COURSECODE"], qPTemplate.QPCode, DateTime.Now.ToString("ddMMyyyyhhmmss")));
             //ConvertToPdfBySyncfusion(previewdocPath, previewPdfPath);
-            var wordDocumentId = await _azureBlobStorageHelper.UploadDocxFileToBlob(previewdocPath, string.Format("{0}_{1}_{2}_{3}_FinalPrinted.docx", qPTemplate.QPTemplateName, qPTemplate.QPCode, qPTemplate.ExamYear, DateTime.UtcNow.ToShortDateString()));
+            var assignedUser = await _context.Users.FirstOrDefaultAsync(u => u.UserId == userQPTemplate.UserId);
+            if (assignedUser == null) return null;
+            var wordDocumentId = await _azureBlobStorageHelper.UploadDocxFileToBlob(previewdocPath, string.Format("FinalPrinted_QP_{0}_{1}_{2}_{3}.docx", qPTemplate.QPCode, assignedUser.Name.Replace(" ", "_"), fileNameToPrint, DateTime.Now.ToString("ddMMyyyyhhmmss")));
             var selectedQPDetail = _context.SelectedQPDetails.FirstOrDefault(sqp => sqp.UserQPTemplateId == userQPTemplate.UserQPTemplateId);
-            if(selectedQPDetail != null)
+            if (selectedQPDetail != null)
             {
                 selectedQPDetail.FinalQPPrintedWordDocumentId = wordDocumentId;
                 _context.SaveChanges();
@@ -327,10 +338,10 @@ namespace SKCE.Examination.Services.Helpers
             qpCode = $"{string.Join("", months.Select(m => m.Trim()[0]))}{qPTemplate.ExamYear}{runningNumber}{randomNumber.ToString()}";
             return qpCode;
         }
-        private async Task SaveSelectedQPDetail(QPTemplate qPTemplate, UserQPTemplate userQPTemplate, long wordDocumentId,long documentId)
+        private async Task SaveSelectedQPDetail(QPTemplate qPTemplate, UserQPTemplate userQPTemplate, long wordDocumentId, long documentId)
         {
             var existingQPTemplate = _context.QPTemplates.FirstOrDefault(q => q.QPTemplateId == qPTemplate.QPTemplateId);
-            if(existingQPTemplate != null)
+            if (existingQPTemplate != null)
             {
                 existingQPTemplate.QPCode = qPTemplate.QPCode;
                 AuditHelper.SetAuditPropertiesForUpdate(existingQPTemplate, 1);
@@ -341,16 +352,16 @@ namespace SKCE.Examination.Services.Helpers
                 existingUserQPTemplate.QPCode = qPTemplate.QPCode;
                 AuditHelper.SetAuditPropertiesForUpdate(existingUserQPTemplate, 1);
             }
-           var selectedExaminations= _context.Examinations.Where(qp =>
-            qp.InstitutionId == userQPTemplate.InstitutionId &&
-            qp.CourseId == qPTemplate.CourseId &&
-            qp.RegulationYear == qPTemplate.RegulationYear &&
-            qp.BatchYear == qPTemplate.BatchYear &&
-            qp.DegreeTypeId == qPTemplate.DegreeTypeId &&
-            qp.ExamType == qPTemplate.ExamType &&
-            qp.Semester == qPTemplate.Semester &&
-            qp.ExamMonth == qPTemplate.ExamMonth &&
-            qp.ExamYear == qPTemplate.ExamYear).ToList();
+            var selectedExaminations = _context.Examinations.Where(qp =>
+             qp.InstitutionId == userQPTemplate.InstitutionId &&
+             qp.CourseId == qPTemplate.CourseId &&
+             qp.RegulationYear == qPTemplate.RegulationYear &&
+             qp.BatchYear == qPTemplate.BatchYear &&
+             qp.DegreeTypeId == qPTemplate.DegreeTypeId &&
+             qp.ExamType == qPTemplate.ExamType &&
+             qp.Semester == qPTemplate.Semester &&
+             qp.ExamMonth == qPTemplate.ExamMonth &&
+             qp.ExamYear == qPTemplate.ExamYear).ToList();
             foreach (var selectedExamination in selectedExaminations)
             {
                 selectedExamination.IsQPPrinted = true;
@@ -377,7 +388,7 @@ namespace SKCE.Examination.Services.Helpers
                 IsQPOnly = userQPTemplate.IsQPOnly,
                 QPCode = qPTemplate.QPCode,
             };
-            AuditHelper.SetAuditPropertiesForInsert(selectedQPDetail,1);
+            AuditHelper.SetAuditPropertiesForInsert(selectedQPDetail, 1);
             _context.SelectedQPDetails.Add(selectedQPDetail);
             _context.SaveChanges();
 

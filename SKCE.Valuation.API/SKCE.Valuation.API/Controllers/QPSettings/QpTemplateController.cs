@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.InkML;
 using DocumentFormat.OpenXml.Office2010.Word;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SKCE.Examination.Models.DbModels.Common;
 using SKCE.Examination.Models.DbModels.QPSettings;
 using SKCE.Examination.Services.Helpers;
@@ -19,11 +21,13 @@ namespace SKCE.Examination.API.Controllers.QPSettings
         private readonly QpTemplateService _qpTemplateService;
         private readonly IMapper _mapper;
         private readonly AzureBlobStorageHelper _azureBlobStorageHelper;
-        public QpTemplateController(QpTemplateService qpTemplateService, IMapper mapper, AzureBlobStorageHelper azureBlobStorageHelper)
+        private readonly ExaminationDbContext _context;
+        public QpTemplateController(QpTemplateService qpTemplateService, IMapper mapper, AzureBlobStorageHelper azureBlobStorageHelper, ExaminationDbContext context)
         {
             _qpTemplateService = qpTemplateService;
             _mapper = mapper;
             _azureBlobStorageHelper = azureBlobStorageHelper;
+            _context = context;
         }
 
         [HttpGet("GetQPTemplateByCourseId/{courseId}")]
@@ -77,8 +81,8 @@ namespace SKCE.Examination.API.Controllers.QPSettings
         {
             return Ok(await _qpTemplateService.GetQPTemplatesByUserIdAsync(userId));
         }
-        
-        
+
+
         [HttpGet("GetExpertsForQPAssignment")]
         public async Task<ActionResult<IEnumerable<QPAssignmentExpertVM>>> GetExpertsForQPAssignment()
         {
@@ -101,9 +105,9 @@ namespace SKCE.Examination.API.Controllers.QPSettings
                 // Load Word document from stream
                 Spire.Doc.Document doc = new Spire.Doc.Document(stream);
                 // Get and validate bookmarks
-               var validationResult = await _qpTemplateService.ValidateGeneratedQPAsync(userQPTemplateId, doc);
+                var validationResult = await _qpTemplateService.ValidateGeneratedQPAsync(userQPTemplateId, doc);
 
-                return Ok(new ResultModel() { Message = validationResult.message, InValid= validationResult.inValidForSubmission });
+                return Ok(new ResultModel() { Message = validationResult.message, InValid = validationResult.inValidForSubmission });
             }
             catch (Exception ex)
             {
@@ -160,12 +164,25 @@ namespace SKCE.Examination.API.Controllers.QPSettings
             using var stream = new MemoryStream();
             await qPSubmissionVM.file.CopyToAsync(stream);
             stream.Position = 0;
-            // Load Word document from stream
-            var documentId = _azureBlobStorageHelper.UploadFileAsync(stream, qPSubmissionVM.file.FileName, qPSubmissionVM.file.ContentType).Result;
+            long documentId = 0;
+            var userQPTemplate = await _context.UserQPTemplates.FirstOrDefaultAsync(qpti => qpti.UserQPTemplateId == userQPTemplateId);
+            
+            if (userQPTemplate == null) return null;
+            var assignedUser = await _context.Users.FirstOrDefaultAsync(u => u.UserId == userQPTemplate.UserId);
+            if(assignedUser == null) return null;
+            if (userQPTemplate.QPTemplateStatusTypeId == 10)
+            {
+                documentId = _azureBlobStorageHelper.UploadFileAsync(stream, "Scrutinized_QP_"+ assignedUser.Name.Replace(" ","_")+"_" + qPSubmissionVM.file.FileName, qPSubmissionVM.file.ContentType).Result;
+            }
+            else
+            {
+                // Load Word document from stream
+                 documentId = _azureBlobStorageHelper.UploadFileAsync(stream, "Generated_QP_" + assignedUser.Name.Replace(" ", "_") + "_" + qPSubmissionVM.file.FileName, qPSubmissionVM.file.ContentType).Result;
+            }
 
-            var userQPTemplate = await _qpTemplateService.SubmitGeneratedQPAsync(userQPTemplateId, documentId, qPSubmissionVM);
-            if (userQPTemplate == null) return NotFound();
-            return Ok(userQPTemplate);
+            var updatedUserQPTemplate = await _qpTemplateService.SubmitGeneratedQPAsync(userQPTemplateId, documentId, qPSubmissionVM);
+            if (updatedUserQPTemplate == null) return NotFound();
+            return Ok(updatedUserQPTemplate);
         }
 
         [HttpGet("AssignQPForScrutinity/{userId}/{userQPTemplateId}")]
@@ -198,7 +215,8 @@ namespace SKCE.Examination.API.Controllers.QPSettings
         public async Task<IActionResult> PrintSelectedQP(long userqpTemplateId, string qpCode, bool isForPrint)
         {
             var filePath = await _qpTemplateService.PrintSelectedQPAsync(userqpTemplateId, qpCode, isForPrint);
-            if (filePath != string.Empty) { 
+            if (filePath != string.Empty)
+            {
                 byte[] fileBytes = System.IO.File.ReadAllBytes(filePath);
                 string base64Pdf = Convert.ToBase64String(fileBytes);
 

@@ -127,7 +127,7 @@ namespace SKCE.Examination.Services.Common
         }
 
         //POST
-        public async Task<Boolean> UploadAnswersheetAsync(string courseCode, string dummyNumber, Stream file)
+        public async Task<string> UploadAnswersheetAsync(string courseCode, string dummyNumber, Stream file)
         {
             var fileName = courseCode + "/" + dummyNumber + ".pdf";
             var uploadedURL = await _blobStorageHelper.UploadFileAsync(file, fileName, "pdf");
@@ -141,11 +141,14 @@ namespace SKCE.Examination.Services.Common
 
                 _context.AnswersheetUploadHistorys.Add(dto);
                 await _context.SaveChangesAsync();
-            }            
 
-            Console.WriteLine($"Blob '{fileName}' uploaded successfully.");
-
-            return true;
+                Console.WriteLine($"Blob '{fileName}' uploaded successfully.");
+                return "Upload success";
+            } 
+            else
+            {
+                return "Upload failed";
+            }
         }
 
     }

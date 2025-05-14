@@ -120,33 +120,14 @@ namespace SKCE.Examination.API.Controllers.Common
         }
 
         /// <summary>
-        /// Upload an Excel file and import QP data.
+        /// Upload pdf file.
         /// </summary>
         [HttpPost("UploadAnswersheet")]
         public async Task<IActionResult> UploadAnswersheet(string courseCode, string dummyNumber, Stream file)
         {
-            long institutionId = long.Parse(Request.Headers["institutionId"].ToString());
-            string examYear = Request.Headers["examYear"].ToString();
-            string examMonth = Request.Headers["examMonth"].ToString();
-            long courseId = long.Parse(Request.Headers["courseId"].ToString());
-
-            if (institutionId == 0)
-                return BadRequest("Invalid institutionId");
-
-            if (courseId == 0)
-                return BadRequest("Invalid course Id");
-
-
-            if (file == null || file.Length == 0)
-                return BadRequest("No file uploaded.");
-
-
-            using var stream = file.OpenReadStream();
-
             var importedInfo =
                 await _answersheetImportService
-                .ImportDummyNoFromExcelByCourse(stream, institutionId, examYear, examMonth, courseId);
-
+                .UploadAnswersheetAsync(courseCode, dummyNumber, file);
 
             return Ok(new { Message = importedInfo });
         }

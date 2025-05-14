@@ -2125,24 +2125,30 @@ namespace SKCE.Examination.Services.QPSettings
                 var qpTemplate = await _context.QPTemplates.FirstOrDefaultAsync(qp => qp.QPTemplateId == qpUserTemplate.QPTemplateId);
 
                 if (qpTemplate == null) return null;
-                qpTemplate.QPTemplateStatusTypeId = 4; //QP Scrutiny Allocated
-                var userQPTemplate = new UserQPTemplate()
-                {
-                    InstitutionId = qpUserTemplate.InstitutionId,
-                    UserId = userId,
-                    QPTemplateStatusTypeId = 10,//Scrutinize QP InProgress
-                    QPDocumentId = qpUserTemplate.QPDocumentId,
-                    IsQPOnly = qpUserTemplate.IsQPOnly,
-                    IsTablesAllowed = qpUserTemplate.IsTablesAllowed,
-                    TableName = qpUserTemplate.TableName,
-                    IsGraphsRequired = qpUserTemplate.IsGraphsRequired,
-                    ParentUserQPTemplateId = qpUserTemplate.UserQPTemplateId,
-                    GraphName = qpUserTemplate.GraphName,
-                    QPTemplateId = qpUserTemplate.QPTemplateId,
-                    SubmittedQPDocumentId = qpUserTemplate.SubmittedQPDocumentId,
-                    UserQPDocumentId = qpUserTemplate.SubmittedQPDocumentId
-                };
-                AuditHelper.SetAuditPropertiesForInsert(userQPTemplate, 1);
+
+            var genereatedDocument = _context.Documents.Where(d => d.DocumentId == qpUserTemplate.SubmittedQPDocumentId).FirstOrDefault();
+            MemoryStream memoryStreamScrutiny = await _azureBlobStorageHelper.DownloadWordDocumentFromBlobToOpenXML(genereatedDocument.Name);
+            memoryStreamScrutiny.Position = 0;
+            long scrutinyVersionDocumentId = _azureBlobStorageHelper.UploadDocxSteamFileToBlob(memoryStreamScrutiny, string.Format("{0}_{1}.docx", "For_Scrutiny", genereatedDocument.Name.Replace(".docx", ""))).Result;
+
+            qpTemplate.QPTemplateStatusTypeId = 4; //QP Scrutiny Allocated
+            var userQPTemplate = new UserQPTemplate()
+            {
+                InstitutionId = qpUserTemplate.InstitutionId,
+                UserId = userId,
+                QPTemplateStatusTypeId = 10,//Scrutinize QP InProgress
+                QPDocumentId = qpUserTemplate.QPDocumentId,
+                IsQPOnly = qpUserTemplate.IsQPOnly,
+                IsTablesAllowed = qpUserTemplate.IsTablesAllowed,
+                TableName = qpUserTemplate.TableName,
+                IsGraphsRequired = qpUserTemplate.IsGraphsRequired,
+                ParentUserQPTemplateId = qpUserTemplate.UserQPTemplateId,
+                GraphName = qpUserTemplate.GraphName,
+                QPTemplateId = qpUserTemplate.QPTemplateId,
+                SubmittedQPDocumentId = scrutinyVersionDocumentId,
+                UserQPDocumentId = scrutinyVersionDocumentId
+            };
+            AuditHelper.SetAuditPropertiesForInsert(userQPTemplate, 1);
                 _context.UserQPTemplates.Add(userQPTemplate);
                 await _context.SaveChangesAsync();
             var courseDetails = _context.Courses.FirstOrDefault(c => c.CourseId == qpTemplate.CourseId);

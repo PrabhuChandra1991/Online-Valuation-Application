@@ -2126,6 +2126,12 @@ namespace SKCE.Examination.Services.QPSettings
             var qpTemplate = await _context.QPTemplates.FirstOrDefaultAsync(qp => qp.QPTemplateId == qpUserTemplate.QPTemplateId);
 
             if (qpTemplate == null) return null;
+
+            var genereatedDocument = _context.Documents.Where(d => d.DocumentId == qpUserTemplate.SubmittedQPDocumentId).FirstOrDefault();
+            MemoryStream memoryStreamScrutiny = await _azureBlobStorageHelper.DownloadWordDocumentFromBlobToOpenXML(genereatedDocument.Name);
+            memoryStreamScrutiny.Position = 0;
+            long scrutinyVersionDocumentId = _azureBlobStorageHelper.UploadDocxSteamFileToBlob(memoryStreamScrutiny, string.Format("{0}_{1}.docx", "For_Scrutiny",genereatedDocument.Name.Replace(".docx", ""))).Result;
+
             qpTemplate.QPTemplateStatusTypeId = 4; //QP Scrutiny Allocated
             var userQPTemplate = new UserQPTemplate()
             {
@@ -2140,8 +2146,8 @@ namespace SKCE.Examination.Services.QPSettings
                 ParentUserQPTemplateId = qpUserTemplate.UserQPTemplateId,
                 GraphName = qpUserTemplate.GraphName,
                 QPTemplateId = qpUserTemplate.QPTemplateId,
-                SubmittedQPDocumentId = qpUserTemplate.SubmittedQPDocumentId,
-                UserQPDocumentId = qpUserTemplate.SubmittedQPDocumentId
+                SubmittedQPDocumentId = scrutinyVersionDocumentId,
+                UserQPDocumentId = scrutinyVersionDocumentId
             };
             AuditHelper.SetAuditPropertiesForInsert(userQPTemplate, 1);
             _context.UserQPTemplates.Add(userQPTemplate);

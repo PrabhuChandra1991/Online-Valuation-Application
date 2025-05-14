@@ -126,5 +126,27 @@ namespace SKCE.Examination.Services.Common
             return false;
         }
 
+        //POST
+        public async Task<Boolean> UploadAnswersheetAsync(string courseCode, string dummyNumber, Stream file)
+        {
+            var fileName = courseCode + "/" + dummyNumber + ".pdf";
+            var uploadedURL = await _blobStorageHelper.UploadFileAsync(file, fileName, "pdf");
+
+            if (uploadedURL != null)
+            {
+                AnswersheetUploadHistory dto = new AnswersheetUploadHistory();
+                dto.CourseCode = courseCode;
+                dto.DummyNumber = dummyNumber;
+                dto.BlobURL = uploadedURL;
+
+                _context.AnswersheetUploadHistorys.Add(dto);
+                await _context.SaveChangesAsync();
+            }            
+
+            Console.WriteLine($"Blob '{fileName}' uploaded successfully.");
+
+            return true;
+        }
+
     }
 }

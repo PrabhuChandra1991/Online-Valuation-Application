@@ -75,7 +75,7 @@ namespace SKCE.Examination.Services.Common
             return await this._context.AnswersheetImports
                 .Where(x => x.IsActive
                 && x.InstitutionId == institutionId
-                && x.ExamYear == examYear 
+                && x.ExamYear == examYear
                 && x.ExamMonth == examMonth
                 && x.CourseId == courseId)
                 .OrderByDescending(x => x.AnswersheetImportId)
@@ -104,7 +104,7 @@ namespace SKCE.Examination.Services.Common
         }
 
         public async Task<bool> CreateAnswerSheetsAndApproveImportedData(
-            long answersheetImportId,int absentCount, long loggedInUserId)
+            long answersheetImportId, int absentCount, long loggedInUserId)
         {
             var helper = new AnswersheetImportApproveHelper(this._context);
             return await helper.CreateAnswerSheetsAndApproveImportedData(
@@ -129,22 +129,29 @@ namespace SKCE.Examination.Services.Common
         //POST
         public async Task<string> UploadAnswersheetAsync(string courseCode, string dummyNumber, Stream file)
         {
-            var fileName = courseCode + "/" + dummyNumber + ".pdf";
-            var uploadedURL = await _blobStorageHelper.UploadFileAsync(file, fileName, "pdf");
+            if (dummyNumber.IndexOf(".pdf") == -1)
+            {
+                dummyNumber = dummyNumber + ".pdf";
+            }
 
+            var fileName = "ANSWERSHEET/" + courseCode + "/" + dummyNumber;
+            var uploadedURL = await _blobStorageHelper.UploadFileAsync(file, fileName, "pdf");
             if (uploadedURL != null)
             {
-                AnswersheetUploadHistory dto = new AnswersheetUploadHistory();
-                dto.CourseCode = courseCode;
-                dto.DummyNumber = dummyNumber;
-                dto.BlobURL = uploadedURL;
-
-                _context.AnswersheetUploadHistorys.Add(dto);
+                _context.AnswersheetUploadHistories.Add(new AnswersheetUploadHistory
+                {
+                    CourseCode = courseCode,
+                    DummyNumber = dummyNumber,
+                    BlobURL = uploadedURL,
+                    IsActive = true,
+                    CreatedById = 1,
+                    CreatedDate = DateTime.Now,
+                    ModifiedById = 1,
+                    ModifiedDate = DateTime.Now
+                });
                 await _context.SaveChangesAsync();
-
-                Console.WriteLine($"Blob '{fileName}' uploaded successfully.");
                 return "Upload success";
-            } 
+            }
             else
             {
                 return "Upload failed";

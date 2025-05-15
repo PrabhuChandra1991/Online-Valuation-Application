@@ -119,18 +119,23 @@ namespace SKCE.Examination.API.Controllers.Common
             }
         }
 
-        /// <summary>
-        /// Upload pdf file.
-        /// </summary>
-        [HttpPost("UploadAnswersheet")]
-        public async Task<IActionResult> UploadAnswersheet(string courseCode, string dummyNumber, Stream file)
+        [HttpPost("UploadAnswerSheetData/{courseCode}/{dummyNumber}")]
+        public async Task<IActionResult> UploadAnswerSheetData(
+            string courseCode, string dummyNumber, IFormFile file)
         {
-            var importedInfo =
-                await _answersheetImportService
-                .UploadAnswersheetAsync(courseCode, dummyNumber, file);
+            try
+            {
 
-            return Ok(new { Message = importedInfo });
+                using var stream = file.OpenReadStream();
+                var result = await _answersheetImportService.UploadAnswersheetAsync(courseCode, dummyNumber, stream);
+                return Ok(new { Message = result });
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
+
 
     }
 }

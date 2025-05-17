@@ -40,8 +40,7 @@ namespace SKCE.Examination.Services.EntityHelpers
 
             var selectedQP = await _dbContext.SelectedQPDetails
                     .FirstOrDefaultAsync(x =>
-                    x.InstitutionId == examination.InstitutionId
-                    && x.CourseId == examination.CourseId
+                    x.CourseId == examination.CourseId
                     && x.RegulationYear == examination.RegulationYear
                     && x.BatchYear == examination.BatchYear
                     && x.DegreeTypeId == examination.DegreeTypeId

@@ -95,12 +95,33 @@ namespace SKCE.Examination.Services.Common
                 }).ToListAsync();
         }
 
-        public async Task<List<AnswersheetImportDetail>> GetAnswersheetImportDetails(long answersheetImportId)
+        public async Task<List<AnswersheetImportDetailDto>> GetAnswersheetImportDetails(long answersheetImportId)
         {
             return await this._context.AnswersheetImportDetails
                 .Where(x => x.AnswersheetImportId == answersheetImportId)
                 .OrderBy(x => x.IsValid)
-                .ToListAsync();
+                .Select(x => new AnswersheetImportDetailDto
+                {
+                    AnswersheetImportDetailId = x.AnswersheetImportDetailId,
+                    AnswersheetImportId = x.AnswersheetImportId,
+                    ExaminationId = x.ExaminationId,
+                    InstitutionCode = x.InstitutionCode,
+                    RegulationYear = x.RegulationYear,
+                    BatchYear = x.BatchYear,
+                    DegreeType = x.DegreeType,
+                    DepartmentShortName = x.DepartmentShortName,
+                    ExamType = x.ExamType,
+                    Semester = x.Semester,
+                    CourseCode = x.CourseCode,
+                    ExamMonth = x.ExamMonth,
+                    ExamYear = x.ExamYear,
+                    DummyNumber = x.DummyNumber,
+                    IsAnswerSheetUploaded =
+                        this._context.AnswersheetUploadHistories
+                        .Any(y => y.DummyNumber == x.DummyNumber),
+                    IsValid = x.IsValid,
+                    ErrorMessage = x.ErrorMessage
+                }).ToListAsync();
         }
 
         public async Task<bool> CreateAnswerSheetsAndApproveImportedData(
@@ -134,6 +155,13 @@ namespace SKCE.Examination.Services.Common
                 dummyNumber = dummyNumber + ".pdf";
             }
 
+            var existEntity = _context.AnswersheetUploadHistories
+                .Where(x => x.CourseCode == courseCode && x.DummyNumber == dummyNumber && x.IsActive);
+            if (existEntity.Any())
+            {
+                return "ALREADY-EXISTS";
+            }
+
             var fileName = "ANSWERSHEET/" + courseCode + "/" + dummyNumber;
             var uploadedURL = await _blobStorageHelper.UploadFileAsync(file, fileName, "pdf");
             if (uploadedURL != null)
@@ -150,11 +178,11 @@ namespace SKCE.Examination.Services.Common
                     ModifiedDate = DateTime.Now
                 });
                 await _context.SaveChangesAsync();
-                return "Upload success";
+                return "UPLOAD-SUCCESS";
             }
             else
             {
-                return "Upload failed";
+                return "UPLOAD-FAILED";
             }
         }
 

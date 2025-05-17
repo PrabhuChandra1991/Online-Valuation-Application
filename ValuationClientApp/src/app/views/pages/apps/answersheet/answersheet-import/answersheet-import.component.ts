@@ -87,7 +87,7 @@ export class AnswersheetImportComponent implements OnInit {
     fileSource: new FormControl([], [Validators.required]),
   });
 
-  displayedColumns: string[] = ['dummyNumber', 'isValid', 'errorMessage'];
+  displayedColumns: string[] = ['dummyNumber', 'isAnswerSheetUploaded', 'isValid', 'errorMessage'];
 
   modalRef: NgbModalRef;
 

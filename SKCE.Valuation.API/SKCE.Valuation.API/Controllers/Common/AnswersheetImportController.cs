@@ -31,7 +31,7 @@ namespace SKCE.Examination.API.Controllers.Common
         }
 
         [HttpGet("GetAnswersheetImportDetails")]
-        public async Task<List<AnswersheetImportDetail>> GetAnswersheetImportDetails(long answersheetImportId)
+        public async Task<List<AnswersheetImportDetailDto>> GetAnswersheetImportDetails(long answersheetImportId)
         {
             return await this._answersheetImportService.GetAnswersheetImportDetails(answersheetImportId);
         }
@@ -128,7 +128,7 @@ namespace SKCE.Examination.API.Controllers.Common
 
                 using var stream = file.OpenReadStream();
                 var result = await _answersheetImportService.UploadAnswersheetAsync(courseCode, dummyNumber, stream);
-                return Ok(new { Message = result });
+                return Ok(result);
             }
             catch (Exception ex)
             {

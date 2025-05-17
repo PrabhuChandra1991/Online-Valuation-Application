@@ -39,7 +39,7 @@ namespace SKCE.Examination.Services.Common
             _emailService = emailService;
             _blobBaseUrl = configuration["AzureBlobStorage:BaseUrl"]; ;
             _containerName = configuration["AzureBlobStorage:ContainerName"];
-            _configuration = configuration; 
+            _configuration = configuration;
         }
 
         public async Task<IEnumerable<CourseWithAnswersheet>> GetCoursesHavingAnswersheetAsync(string examYear, string examMonth, string examType)
@@ -55,15 +55,13 @@ namespace SKCE.Examination.Services.Common
                 {
                     c.CourseId,
                     c.Code,
-                    c.Name,
-                    a.ExaminationId
+                    c.Name
                 } into g
                 select new CourseWithAnswersheet
                 {
                     CourseId = g.Key.CourseId,
                     Code = g.Key.Code,
                     Name = g.Key.Name,
-                    ExaminationId = g.Key.ExaminationId,
                     Count = g.Count()
                 }
                 ).OrderBy(x => x.Code).ToListAsync();
@@ -72,7 +70,7 @@ namespace SKCE.Examination.Services.Common
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw;
             }
         }
 
@@ -216,16 +214,16 @@ namespace SKCE.Examination.Services.Common
 
         public async Task<bool> GetAnswerSheetAvailable(long answersheetId)
         {
-            var result  =
+            var result =
               await (from answer in this._context.Answersheets
-               join exam in this._context.Examinations on answer.ExaminationId equals exam.ExaminationId
-               join course in this._context.Courses on exam.CourseId equals course.CourseId
-               where answer.AnswersheetId == answersheetId
-               select new
-               {
-                   course.Code,
-                   answer.DummyNumber
-               }).FirstOrDefaultAsync();
+                     join exam in this._context.Examinations on answer.ExaminationId equals exam.ExaminationId
+                     join course in this._context.Courses on exam.CourseId equals course.CourseId
+                     where answer.AnswersheetId == answersheetId
+                     select new
+                     {
+                         course.Code,
+                         answer.DummyNumber
+                     }).FirstOrDefaultAsync();
 
             if (result == null)
                 return false;

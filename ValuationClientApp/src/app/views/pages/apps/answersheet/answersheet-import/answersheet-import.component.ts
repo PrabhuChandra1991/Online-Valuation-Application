@@ -330,7 +330,7 @@ export class AnswersheetImportComponent implements OnInit {
         },
         (error) => {
           if (error.error.message == "UNIQUE-KEY-VIOLATION")
-            this.toasterService.error('Some Dummy Numbers are already exists in database..Please check..');
+            this.toasterService.error('Some Answer booklet Number are already exists in database..Please check..');
           else
             this.toasterService.error('Failed to complete review.');
         }

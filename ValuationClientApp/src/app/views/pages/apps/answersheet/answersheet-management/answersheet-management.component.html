@@ -1,5 +1,5 @@
 <div class="container-fluid">
-  <h3>Answersheet Management</h3>
+  <h3>Answersheet Allocate Status</h3>
   <div class="row">
     <div class="col-md-1 mt-4">
       <select id="examYearId" class="form-select" (change)="onExamYearChange($event)" [formControl]="ddlYears">
@@ -47,7 +47,7 @@
 
           <ng-container matColumnDef="dummyNumber">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>
-              Dummy number
+              Answer booklet Number
             </th>
             <td mat-cell *matCellDef="let element">
               {{ element.dummyNumber }}

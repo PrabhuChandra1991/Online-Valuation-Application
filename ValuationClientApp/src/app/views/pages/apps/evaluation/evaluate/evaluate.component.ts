@@ -9,6 +9,7 @@ import { encode, decode } from 'js-base64';
 import { ActivatedRoute } from '@angular/router'
 import { AnswersheetMark } from '../../../models/answersheetMark.model';
 import { Router } from '@angular/router';
+import { SpinnerService } from '../../../services/spinner.service';
 
 @Component({
   selector: 'app-evaluate',
@@ -47,7 +48,8 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
     private toastr: ToastrService,
     private evaluationService: EvaluationService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private spinnerService: SpinnerService
   ) { }
 
   ngOnInit() {
@@ -72,7 +74,6 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
         }
       }
     });
-
   }
 
   // called after dom is loaded to calclate the marks
@@ -338,7 +339,7 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
 
     spans.forEach((span) => {
       let innerHTML = span.innerHTML.replace(/&nbsp;/g, '').trim();
-      console.log(innerHTML);
+      //console.log(innerHTML);
       if ((innerHTML.length > 0)) {
         mark = parseInt(innerHTML);
       }

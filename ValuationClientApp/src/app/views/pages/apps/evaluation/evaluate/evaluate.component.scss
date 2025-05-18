@@ -65,3 +65,31 @@ table .error {
 table .sub-total {
     padding: 0.5rem;
 }
+
+.left-arrow {
+    border: 1px solid #004da3;
+    background: url('../../../../../../images/arrow-left.svg') no-repeat;
+    background-position: center;
+    height: 35px;
+}
+
+.left-arrow:hover {
+    background-color: #004da3 !important;
+    background: url('../../../../../../images/arrow-left-light.svg') no-repeat;
+    background-position: center;
+    height: 35px;
+}
+
+.right-arrow {
+    border: 1px solid #004da3;
+    background: url('../../../../../../images/arrow-right.svg') no-repeat;
+    background-position: center;
+    height: 35px;
+}
+
+.right-arrow:hover {
+    background-color: #004da3 !important;
+    background: url('../../../../../../images/arrow-right-light.svg') no-repeat;
+    background-position: center;
+    height: 35px;
+}

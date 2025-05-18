@@ -3,8 +3,7 @@
     <div class="row">
         <div class="col-md-2 back-btn">
             <a class="link-opacity-50-hover" (click)="backToList()">
-                <img src="https://cdn0.iconfinder.com/data/icons/social-messaging-ui-color-shapes/128/arrow-left-circle-blue-512.png"
-                    height="24px" />&nbsp;&nbsp;Back to List</a>
+                <img src="../../../../../../images/arrow-left-circle.svg" />&nbsp;&nbsp;Back to List</a>
         </div>
         <div class="col-md-8 p-2 text-center">
             <h5 *ngIf="primaryData">
@@ -48,8 +47,9 @@
                                     tabindex="-1">{{item.questionNumberDisplay}}</button>
                                 <input *ngIf="item.questionNumberDisplay != ''" type="text" maxlength="5"
                                     class="form-control border-0 text-center" [attr.part]="item.questionPart"
-                                    [attr.qno]="item.questionNumber" [attr.group]="item.questionGroup"
-                                    [attr.max]="item.mark" [attr.id]="'txt' + (i + 1)" [disabled]="item.disableInput"
+                                    [attr.qno]="item.questionNumber" [attr.qgno]="item.questionNumberDisplay"
+                                    [attr.group]="item.questionGroup" [attr.max]="item.mark" 
+                                    [attr.id]="'txt' + (i + 1)" [disabled]="item.disableInput"
                                     [value]="(item.obtainedMark != 0) ? item.obtainedMark : ''"
                                     (focus)="loadQuestionDetails($event, (i + 1), item.questionNumberDisplay)"
                                     (blur)="validateMark($event, item)">
@@ -101,12 +101,26 @@
             </div>
             <div class="col-md-6">
                 <div class="card p-3">
+                    <div class="row mb-2">
+                        <div class="col-md-4">
+                            <button (click)="prevPage()" class="btn w-25 left-arrow" [disabled]="currentPage <= 1">
+                            </button>
+                        </div>
+                        <div class="col-md-4 pt-2" style="text-align: center;">
+                            <span>Page {{ currentPage }} of {{ totalPages }}</span>
+                        </div>
+                        <div class="col-md-4">
+                            <button (click)="nextPage()" class="btn w-25 right-arrow float-end" [disabled]="currentPage >= totalPages">
+                            </button>
+                        </div>
+                    </div>
                     <div class="pdf-container">
-                        <pdf-viewer [src]="answersheet" [rotation]="0" [original-size]="false" [show-all]="true"
+                        <pdf-viewer [src]="answersheet" [rotation]="0" [original-size]="false" [show-all]="false" [page]="currentPage"
                             [fit-to-page]="true" [zoom]="1" [zoom-scale]="'page-width'" [stick-to-page]="false"
                             [render-text]="true" [external-link-target]="'blank'" [autoresize]="true"
-                            [show-borders]="false" style="width: 100%; height: 100vh;"
-                            (error)="onError($event)"></pdf-viewer>
+                            [show-borders]="false" style="width: 100%; height: 110vh;"
+                            (after-load-complete)="onPdfLoad($event)"
+                            (error)="onError($event)"></pdf-viewer>                            
                     </div>
                 </div>
             </div>
@@ -121,6 +135,8 @@
     <div class="modal-body">
         <div class="row mb-4">
             <div class="col-md-12 mt-4">
+                <h4 *ngIf="noMarksList">You have not entered mark for questions: {{noMarksList}}</h4>
+                <br>
                 <h3>Do you want to complete evaluation?</h3>
             </div>
         </div>

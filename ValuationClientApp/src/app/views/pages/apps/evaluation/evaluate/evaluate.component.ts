@@ -2,7 +2,7 @@ import { NgClass, NgFor } from '@angular/common';
 import { NgbModalRef, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { OnInit, Component, ViewChild, ChangeDetectorRef, AfterViewChecked } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PdfViewerModule } from 'ng2-pdf-viewer';
+import { PdfViewerModule, PDFDocumentProxy } from 'ng2-pdf-viewer';
 import { ToastrService } from 'ngx-toastr';
 import { EvaluationService } from '../../../services/evaluation.service';
 import { encode, decode } from 'js-base64';
@@ -30,7 +30,6 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
   partAMark: number = 0;
   partBMark: number = 0;
   partCMark: number = 0;
-  //totalMarks: number = 0;
   obtainedMarks: number = 0;
   activeQuestion: string = '---------- Please select the question above to load here ----------';
   activeQuestionImg: string = '';
@@ -39,6 +38,10 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
   activeQuestionMark: string = '';
   sasToken: string = "sp=r&st=2025-04-23T08:48:04Z&se=2025-04-23T16:48:04Z&sv=2024-11-04&sr=c&sig=M%2F90Dwk7LJjwQPE%2FTsYmGnIKl1gpgk%2Fvtbp63LNU5qs%3D"
   answersheetMark: AnswersheetMark;
+
+  noMarksList: string = '';
+  currentPage: number = 1;
+  totalPages: number = 0;
 
   @ViewChild('confirmModule') confirmModule: any;
 
@@ -204,26 +207,6 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
 
     console.log("groupList:", (this.groupList));
   }
-
-  // reduceChoiceQuestionMarks() {
-  //   // Remove marks if choice question
-  //   this.groupList.forEach((group) => {
-  //     if (group.count == 2) {
-  //       let item = this.qaList.find(e => e.questionGroup === group.group);
-  //       if (item) {
-  //         //this.totalMarks = this.totalMarks - item.mark;
-  //         return;
-  //       }
-  //     }
-  //     if (group.count == 4) {
-  //       let item = this.qaList.find(e => e.questionGroup === group.group);
-  //       if (item) {
-  //         //this.totalMarks = this.totalMarks - (item.mark * 2);
-  //         return;
-  //       }
-  //     }
-  //   });
-  // }
 
   getSavedMarks(questionNumber: number, questionSubNum: number) {
     let questionRow = this.answersheetMarkData.filter(x => x.questionNumber == questionNumber && x.questionNumberSubNum == questionSubNum)[0];
@@ -445,7 +428,8 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
   }
 
   promptBeforeCompletion() {
-    this.modalRef = this.modalService.open(this.confirmModule, { size: 'md', backdrop: 'static' });
+    this.checkMissingMarks();
+    this.modalRef = this.modalService.open(this.confirmModule, { size: 'lg', backdrop: 'static' });
   }
 
   completeEvaluation() {
@@ -474,14 +458,37 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
     }
   }
 
+  checkMissingMarks() {
+
+    this.noMarksList = '';
+    let qList = document.querySelectorAll("[qgno]") as NodeListOf<HTMLInputElement>;
+    qList.forEach((item: HTMLInputElement) => {
+      if (!item.value && item.getAttribute('max') != 'NaN') {
+        this.noMarksList += item.getAttribute('qgno') + ', '
+      }
+    });
+
+    if (this.noMarksList) {
+      this.noMarksList = this.noMarksList.trim().slice(0, -1);
+    } 
+
+  }
+
+  onPdfLoad(pdf: PDFDocumentProxy) {
+    this.totalPages = pdf.numPages;
+  }
+
+  nextPage() {
+    if (this.currentPage < this.totalPages) this.currentPage++;
+  }
+
+  prevPage() {
+    if (this.currentPage > 1) this.currentPage--;
+  }
+
   backToList() {
     this.router.navigate(['/apps/evaluationlist']);
   }
-
-  // filter(part: string) {
-  //   let list = this.qaList.filter(e => e.part === part);
-  //   return list;
-  // }
 
   onError(error: any) {
     console.error('PDF error: ', error);

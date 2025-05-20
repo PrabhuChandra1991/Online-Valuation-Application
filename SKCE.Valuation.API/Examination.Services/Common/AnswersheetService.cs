@@ -230,7 +230,7 @@ namespace SKCE.Examination.Services.Common
             if (result == null)
                 return false;
 
-            var fileLocation = "ANSWERSHEET/" + result.Code.ToString() + "/" + result.DummyNumber.ToString() + ".pdf";
+            var fileLocation = "ANSWERSHEET/" + result.Code.Replace('/','_') + "/" + result.DummyNumber.ToString() + ".pdf";
 
             var helper = new BlobStorageHelper(this._configuration);
             return await helper.ExistsAsync(fileLocation);

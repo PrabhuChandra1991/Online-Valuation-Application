@@ -166,6 +166,8 @@ namespace SKCE.Examination.Services.Common
 
         private string GetDummyNumberBlobStorageUrl(string courseCode, string dummyNumber)
         {
+            courseCode = courseCode.Replace('/', '_');
+
             //Sample url
             //https://skceuatdocuments.blob.core.windows.net/skcedocumentcontainerdev/ANSWERSHEET/23AD201/833825040813032020q52224315223.pdf
 

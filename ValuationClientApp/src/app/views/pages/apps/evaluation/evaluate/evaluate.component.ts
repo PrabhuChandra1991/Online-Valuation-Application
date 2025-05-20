@@ -40,7 +40,7 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
   answersheetMark: AnswersheetMark;
 
   noMarksList: string = '';
-  currentPage: number = 1;
+  currentPage: number = 3; // Hide Page 1 ,2 , - it has student details
   totalPages: number = 0;
 
   @ViewChild('confirmModule') confirmModule: any;
@@ -233,7 +233,7 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
           this.partAMark += parseFloat(item.value);
         }
       }
-      else if (item.getAttribute('part') == 'B') {              
+      else if (item.getAttribute('part') == 'B') {
         if (item.value) {
           this.getTotalMarkFromGroup(item, partBarray);
         }
@@ -329,7 +329,7 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
     });
 
     //this.totalMarks = this.totalMarks + mark;
-    
+
     return (String(mark) == 'NaN') ? true : false;
   }
 
@@ -470,7 +470,7 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
 
     if (this.noMarksList) {
       this.noMarksList = this.noMarksList.trim().slice(0, -1);
-    } 
+    }
 
   }
 
@@ -483,7 +483,7 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
   }
 
   prevPage() {
-    if (this.currentPage > 1) this.currentPage--;
+    if (this.currentPage > 3) this.currentPage--;
   }
 
   backToList() {

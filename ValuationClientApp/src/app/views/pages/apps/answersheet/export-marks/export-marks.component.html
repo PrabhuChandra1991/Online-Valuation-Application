@@ -9,7 +9,7 @@
         </option>
       </select>
     </div>
-    <div class="col-md-1 mt-4">
+    <div class="col-md-1">
       <select id="examYearId" class="form-select" (change)="onExamYearChange($event)">
         <option [value]="0">Year</option>
         <option *ngFor="let item of dataSourceExamYears" [value]="item">
@@ -17,7 +17,7 @@
         </option>
       </select>
     </div>
-    <div class="col-md-1 mt-4">
+    <div class="col-md-1">
       <select id="examMonthId" class="form-select" (change)="onExamMonthChange($event)">
         <option [value]="0">Month</option>
         <option *ngFor="let item of dataSourceExamMonths" [value]="item">
@@ -25,7 +25,7 @@
         </option>
       </select>
     </div>
-    <div class="col-md-1 mt-4">
+    <div class="col-md-1">
       <select id="examTypeId" class="form-select" (change)="onExamTypeChange($event)">
         <option [value]="0">Type</option>
         <option *ngFor="let item of dataSourceExamTypes" [value]="item">
@@ -33,7 +33,7 @@
         </option>
       </select>
     </div>
-    <div class="col-md-4 mt-4">
+    <div class="col-md-4">
       <select id="courseId" class="form-select" (change)="onCourseChange($event)">
         <option [value]="0">Select Course</option>
         <option *ngFor="let course of dataSourceCourses" [value]="course.courseId">
@@ -45,7 +45,7 @@
     <div class="col-md-2">
       <button type="button" class="btn btn-primary"
         [disabled]="(selectedInstituteId == 0 || selectedCourseId == 0 || selectedExamYear == '' || selectedExamMonth == '')"
-        (click)="exportMarks()">Export</button>
+        (click)="exportMarks()">Export Marks into Excel</button>
     </div>
   </div>
 </div>

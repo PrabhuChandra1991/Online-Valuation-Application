@@ -32,12 +32,17 @@ export class AnswersheetService {
   getCoursesWithAnswersheet(
     examYear: string,
     examMonth: string,
-    examType: string,): Observable<any> {
+    examType: string): Observable<any> {
     return this.http.get(`${this.apiUrl}/api/Answersheet/GetCoursesHavingAnswersheet?examYear=${examYear}&examMonth=${examMonth}&examType=${examType}`);
   }
 
-  getCourses(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/api/Course`);
+
+  getCoursesHavingAnswersheetForExportMark(
+    examYear: string,
+    examMonth: string,
+    examType: string,
+    institutionId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/api/Answersheet/GetCoursesHavingAnswersheetForExportMark?examYear=${examYear}&examMonth=${examMonth}&examType=${examType}&institutionId=${institutionId}`);
   }
 
   getExamMonths(): Observable<any> {
@@ -75,8 +80,8 @@ export class AnswersheetService {
     return this.http.post(url, JSON.stringify(inputData), { headers });
   }
 
-  exportMarks(institutionId: number, courseId: number, examYear: string, examMonth: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/api/Answersheet/ExportMarks?institutionId=${institutionId}&courseId=${courseId}&examYear=${examYear}&examMonth=${examMonth}`);
+  exportMarks(institutionId: number, courseId: number, examYear: string, examMonth: string, examType: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/api/Answersheet/ExportMarks?institutionId=${institutionId}&courseId=${courseId}&examYear=${examYear}&examMonth=${examMonth}&examType=${examType}`);
   }
 
 }

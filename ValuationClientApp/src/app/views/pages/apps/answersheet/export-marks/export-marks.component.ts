@@ -39,74 +39,57 @@ import { SpinnerService } from '../../../services/spinner.service';
 
 @Component({
   selector: 'app-export-marks',
-   imports: [
-      NgbNavModule,
-      NgbDropdownModule,
-      NgScrollbarModule,
-      NgbTooltip,
-      CommonModule,
-      FormsModule,
-      ReactiveFormsModule,
-      MatFormFieldModule,
-      MatInputModule,
-      MatTableModule,
-      MatSortModule,
-      MatPaginatorModule,
-      MatCheckboxModule,
-    ],
+  imports: [
+    NgbNavModule,
+    NgbDropdownModule,
+    NgScrollbarModule,
+    NgbTooltip,
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatTableModule,
+    MatSortModule,
+    MatPaginatorModule,
+    MatCheckboxModule,
+  ],
   templateUrl: './export-marks.component.html',
   styleUrl: './export-marks.component.scss'
 })
 export class ExportMarksComponent {
-institutes: any[] = [];
-  courses: any[] = [];
-  examYears: any[] = [];
-  examMonths: any[] = [];
+
+  dataSourceInstitutes: any[] = [];
+  dataSourceExamYears: any[] = [];
+  dataSourceExamMonths: any[] = [];
+  dataSourceExamTypes: any[] = [];
+  dataSourceCourses: any[] = [];
   selectedExamYear: string = "";
   selectedExamMonth: string = "";
+  selectedExamType: string = "";
   selectedInstituteId: number = 0;
   selectedCourseId: number = 0;
- 
+
   constructor(
     private answersheetService: AnswersheetService,
     private instituteService: InstituteService,
     private toasterService: ToastrService,
     private spinnerService: SpinnerService,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadAllInstitues();
     this.loadAllCourses();
     this.loadExamYears();
     this.loadExamMonths();
+    this.loadAllExamTypes();
   }
-  loadExamYears(): void {
-    this.answersheetService.getExamYears().subscribe({
-      next: (data) => {
-        this.examYears = data;      },
-      error: (err) => {
-        console.error('Error loading ExamYears:', err);
-      },
-    });
-    //this.examYears = ['2025','2026','2027','2028','2029','2030','2031','2032','2033','2034','2035'];
-  }
-  loadExamMonths(): void {
-    this.answersheetService.getExamMonths().subscribe({
-      next: (data: any) => {
-        this.examMonths = data;
-      },
-      error: (err: any) => {
-        console.error('Error loading ExamMonths:', err);
-      },
-    });
-    //this.examMonths = ['APRIL/MAY', 'NOV/DEC'];
-  }
+
 
   loadAllInstitues(): void {
     this.instituteService.getInstitutions().subscribe({
       next: (data) => {
-        this.institutes = data;
-        console.log('Institutes loaded:', this.institutes);
+        this.dataSourceInstitutes = data;
       },
       error: (error) => {
         console.error('Error loading Institutes:', error);
@@ -114,40 +97,98 @@ institutes: any[] = [];
     });
   }
 
-  loadAllCourses(): void {
-    this.answersheetService.getCourses().subscribe({
+  loadExamYears(): void {
+    this.answersheetService.getExamYears().subscribe({
       next: (data) => {
-        this.courses = data;
-        console.log('Course loaded:', this.courses);
+        this.dataSourceExamYears = data;
       },
-      error: (error) => {
-        console.error('Error loading Course:', error);
+      error: (err) => {
+        console.error('Error loading ExamYears:', err);
       },
     });
   }
-  onInstituteChange(event: Event): void {
-    this.selectedInstituteId =parseInt( (event.target as HTMLSelectElement).value);
+
+  loadExamMonths(): void {
+    this.answersheetService.getExamMonths().subscribe({
+      next: (data: any) => {
+        this.dataSourceExamMonths = data;
+      },
+      error: (err: any) => {
+        console.error('Error loading ExamMonths:', err);
+      },
+    });
   }
+
+
+  loadAllExamTypes(): void {
+    this.answersheetService.getExamTypes().subscribe({
+      next: (data: any) => {
+        this.dataSourceExamTypes = data;
+      },
+      error: (err: any) => {
+        console.error('Error loading ExamTypes:', err);
+      },
+    });
+  }
+
+  loadAllCourses(): void {
+    if (this.selectedExamYear != "" && this.selectedExamMonth != "" && this.selectedExamType != "") {
+      this.answersheetService
+        .getCoursesHavingAnswersheetForExportMark
+        (this.selectedExamYear, this.selectedExamMonth, this.selectedExamType, this.selectedInstituteId).subscribe({
+          next: (data) => {
+            this.dataSourceCourses = data;
+          },
+          error: (error) => {
+            console.error('Error loading Course:', error);
+          },
+        });
+    }
+  }
+
+  onInstituteChange(event: Event): void {
+    this.selectedInstituteId = parseInt((event.target as HTMLSelectElement).value);
+    this.loadAllCourses();
+  }
+
   onCourseChange(event: Event): void {
     this.selectedCourseId = parseInt((event.target as HTMLSelectElement).value);
   }
+
   onExamYearChange(event: Event): void {
     this.selectedExamYear = (event.target as HTMLSelectElement).value;
+    this.loadAllCourses();
   }
+
   onExamMonthChange(event: Event): void {
     this.selectedExamMonth = (event.target as HTMLSelectElement).value;
+    this.loadAllCourses();
   }
+
+
+  onExamTypeChange(event: Event): void {
+    this.selectedExamType = (event.target as HTMLSelectElement).value;
+    this.loadAllCourses();
+  }
+
+
+
   exportMarks(): void {
     this.spinnerService.toggleSpinnerState(true);
-      this.answersheetService.exportMarks(this.selectedInstituteId, this.selectedCourseId,this.selectedExamYear,this.selectedExamMonth).subscribe({
-        next: (response:any) => {
+    this.answersheetService.exportMarks(
+      this.selectedInstituteId, this.selectedCourseId,
+      this.selectedExamYear, this.selectedExamMonth, this.selectedExamType).subscribe({
+        next: (response: any) => {
           this.openFileInTab(response.base64Content, response.fileName, response.contentType);
-          
+
           this.toasterService.success('Data submitted successfully!');
           this.spinnerService.toggleSpinnerState(false);
         },
-        error: (error:any) => {
-          this.toasterService.error('Error exporting marks. Please try again.');
+        error: (err: any) => {
+          if (err.error.message === "EVALUATION-NOT-COMPLETED")
+            this.toasterService.error('Evaluation is not completed for all answersheets. Please check.');
+          else
+            this.toasterService.error('Error exporting marks. Please try again.');
           this.spinnerService.toggleSpinnerState(false);
         },
       });

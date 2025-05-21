@@ -19,12 +19,6 @@ namespace SKCE.Examination.API.Controllers.Common
             _answersheetService = answersheetService;
         }
 
-        [HttpGet("GetCoursesHavingAnswersheet")]
-        public async Task<ActionResult<IEnumerable<CourseWithAnswersheet>>> GetCoursesHavingAnswersheet(string examYear, string examMonth, string examType)
-        {
-            return Ok(await _answersheetService.GetCoursesHavingAnswersheetAsync(examYear, examMonth, examType));
-        }
-
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Answersheet>>> GetAnswersheets()
         {
@@ -149,17 +143,48 @@ namespace SKCE.Examination.API.Controllers.Common
             }
         }
 
-        [HttpGet("ExportMarks")]
-        public async Task<IActionResult> ExportMarks([FromQuery] long institutionId, [FromQuery] long courseId, [FromQuery] string examYear, [FromQuery] string examMonth)
-        {
-            var (stream, fileName) = await _answersheetService.ExportMarksAsync(institutionId, examYear, examMonth, courseId);
 
-            return Ok(new
-            {
-                FileName = fileName,
-                ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                Base64Content = Convert.ToBase64String(stream.ToArray())
-            });
+        [HttpGet("GetCoursesHavingAnswersheet")]
+        public async Task<ActionResult<IEnumerable<CourseWithAnswersheet>>> GetCoursesHavingAnswersheet(string examYear, string examMonth, string examType)
+        {
+            return Ok(await _answersheetService.GetCoursesHavingAnswersheetAsync(examYear, examMonth, examType));
         }
+
+        [HttpGet("GetCoursesHavingAnswersheetForExportMark")]
+        public async Task<ActionResult<IEnumerable<CourseWithAnswersheet>>> GetCoursesHavingAnswersheet(
+            long institutionId, string examYear, string examMonth, string examType)
+        {
+            return Ok(await _answersheetService.GetCoursesHavingAnswersheetAsync(examYear, examMonth, examType, institutionId));
+        }
+
+
+        [HttpGet("ExportMarks")]
+        public async Task<IActionResult> ExportMarks(
+            [FromQuery] long institutionId, [FromQuery] long courseId,
+            [FromQuery] string examYear, [FromQuery] string examMonth, [FromQuery] string examType)
+        {
+            try
+            {
+                var (stream, fileName) = await _answersheetService
+                .ExportMarksAsync(institutionId, courseId, examYear, examMonth, examType);
+
+                return Ok(new
+                {
+                    FileName = fileName,
+                    ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    Base64Content = Convert.ToBase64String(stream.ToArray())
+                });
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message.ToString().Contains("EVALUATION-NOT-COMPLETED"))
+                    return BadRequest(new ResultModel() { Message = ex.Message });
+                else
+                    throw ex;
+            }
+
+            
+        }
+
     }
 }

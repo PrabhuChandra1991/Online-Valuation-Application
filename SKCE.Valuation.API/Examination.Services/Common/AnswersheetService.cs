@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -42,7 +43,7 @@ namespace SKCE.Examination.Services.Common
             _configuration = configuration;
         }
 
-        public async Task<IEnumerable<CourseWithAnswersheet>> GetCoursesHavingAnswersheetAsync(string examYear, string examMonth, string examType)
+        public async Task<IEnumerable<CourseWithAnswersheet>> GetCoursesHavingAnswersheetAsync(string examYear, string examMonth, string examType, long institutionId = 0)
         {
             try
             {
@@ -51,6 +52,7 @@ namespace SKCE.Examination.Services.Common
                 join e in _context.Examinations on a.ExaminationId equals e.ExaminationId
                 join c in _context.Courses on e.CourseId equals c.CourseId
                 where e.ExamYear == examYear && e.ExamMonth == examMonth && e.ExamType == examType
+                && (institutionId == 0 || e.InstitutionId == institutionId)
                 group new { a, c } by new
                 {
                     c.CourseId,
@@ -230,7 +232,7 @@ namespace SKCE.Examination.Services.Common
             if (result == null)
                 return false;
 
-            var fileLocation = "ANSWERSHEET/" + result.Code.Replace('/','_') + "/" + result.DummyNumber.ToString() + ".pdf";
+            var fileLocation = "ANSWERSHEET/" + result.Code.Replace('/', '_') + "/" + result.DummyNumber.ToString() + ".pdf";
 
             var helper = new BlobStorageHelper(this._configuration);
             return await helper.ExistsAsync(fileLocation);
@@ -257,17 +259,35 @@ namespace SKCE.Examination.Services.Common
 
             return true;
         }
-        public async Task<(MemoryStream, string)> ExportMarksAsync(long institutionId, string examYear, string examMonth, long courseId)
+        public async Task<(MemoryStream, string)> ExportMarksAsync(
+            long institutionId, long courseId, string examYear, string examMonth, string examType)
         {
-            var degreeTypeId = _context.Examinations
-                .Where(x => x.InstitutionId == institutionId && x.ExamYear == examYear && x.ExamMonth.ToUpper() == examMonth.ToUpper() && x.CourseId == courseId)
-                .Select(x => x.DegreeTypeId)
-                .FirstOrDefault();
+
+            var examinations = await this._context.Examinations
+                .Where(x => x.InstitutionId == institutionId && x.CourseId == courseId
+                && x.ExamYear == examYear && x.ExamMonth == examMonth && x.ExamType == examType).ToListAsync();
+
+            var examinationIds = examinations.Select(x => x.ExaminationId).ToList();
+
+            var answersheets = await this._context.Answersheets
+                .Where(x =>
+                examinationIds.Contains(x.ExaminationId)
+                && x.IsActive
+                ).ToListAsync();
+
+            if (answersheets.Any(x => x.IsEvaluateCompleted == false))
+            {
+                throw new Exception("EVALUATION-NOT-COMPLETED");
+            }
+
+
+            var answersheetIds = answersheets.Select(x => x.AnswersheetId).ToList();
+
+            var answersheetQuestionwiseMarks = await this._context.AnswersheetQuestionwiseMarks
+                .Where(x => answersheetIds.Contains(x.AnswersheetId) && x.IsActive).ToListAsync();
 
             var degreeType = _context.DegreeTypes
-                .Where(x => x.DegreeTypeId == degreeTypeId)
-                .Select(x => x.Name)
-                .FirstOrDefault();
+                .FirstOrDefault(x => x.DegreeTypeId == examinations.First().DegreeTypeId)?.Name;
 
             var institutionCode = _context.Institutions
                 .Where(x => x.InstitutionId == institutionId)
@@ -278,58 +298,9 @@ namespace SKCE.Examination.Services.Common
                 .Where(x => x.CourseId == courseId)
                 .Select(x => x.Code)
                 .FirstOrDefault();
-
-            var query = (from e in _context.Examinations
-                         join a in _context.Answersheets on e.ExaminationId equals a.ExaminationId
-                         join qm in _context.AnswersheetQuestionwiseMarks on a.AnswersheetId equals qm.AnswersheetId
-                         join dg in _context.DegreeTypes on e.DegreeTypeId equals dg.DegreeTypeId
-                         where a.IsActive == true &&
-                               a.IsEvaluateCompleted == true &&
-                               e.InstitutionId == institutionId &&
-                               e.ExamYear == examYear &&
-                               e.ExamMonth == examMonth &&
-                               e.DegreeTypeId == degreeTypeId
-                         select new
-                         {
-                             a.DummyNumber,
-                             qm.QuestionPartName,
-                             qm.QuestionNumber,
-                             qm.QuestionNumberSubNum,
-                             qm.ObtainedMark,
-                             DegreeTypeName = dg.Name
-                         }).ToList();
-
-            var groupedData = query
-                .GroupBy(x => x.DummyNumber)
-                .Select(g => new
-                {
-                    DummyNumber = g.Key,
-
-                    PartA_Total = g.Where(x => x.QuestionPartName == "PART A" && x.QuestionNumber >= 1 && x.QuestionNumber <= 10)
-                                   .Sum(x => x.ObtainedMark),
-
-                    PartB_Total = g.First().DegreeTypeName == "UG"
-                        ? g.Where(x => x.QuestionPartName == "PART B" && x.QuestionNumber >= 11 && x.QuestionNumber <= 20)
-                             .Sum(x => x.ObtainedMark)
-                        : g.Where(x => x.QuestionPartName == "PART B" && x.QuestionNumber >= 11 && x.QuestionNumber <= 18)
-                             .Sum(x => x.ObtainedMark),
-
-                    PartC_Total = g.First().DegreeTypeName == "PG"
-                        ? g.Where(x => x.QuestionPartName == "PART C" && x.QuestionNumber == 19)
-                             .Sum(x => x.ObtainedMark)
-                        : 0,
-
-                    GrandTotal = g.Sum(x => x.ObtainedMark),
-
-                    QuestionMarks = g.ToDictionary(
-                        x => x.QuestionNumberSubNum != null
-                            ? $"{x.QuestionNumber}.{x.QuestionNumberSubNum}"
-                            : x.QuestionNumber.ToString(),
-                        x => x.ObtainedMark
-                    )
-                }).ToList();
-
-            string templatePath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "Export Templates",
+             
+            string templatePath =
+                System.IO.Path.Combine(Directory.GetCurrentDirectory(), "Export Templates",
                 degreeType == "PG" ? "Export_Format_PG.xlsx" : "Export_Format_UG.xlsx");
 
             using var fileStream = new FileStream(templatePath, FileMode.Open, FileAccess.Read);
@@ -344,76 +315,77 @@ namespace SKCE.Examination.Services.Common
                 var sheetData = worksheetPart.Worksheet.GetFirstChild<SheetData>();
 
                 int startRow = 2; // Assuming header is in Row 1
+
                 int partAQuestions = 10;
                 int partBQuestions = (degreeType == "UG") ? 20 : 18;
                 int partCQuestions = (degreeType == "UG") ? 0 : 19;
                 int sno = 1;
-                foreach (var item in groupedData)
+
+                foreach (var answersheet in answersheets)
                 {
+                    var asQnItems = answersheetQuestionwiseMarks
+                            .Where(x => x.AnswersheetId == answersheet.AnswersheetId).ToList();
+
                     int Qno = 0;
                     var row = new Row();
                     row.Append(CreateCell(sno));
                     row.Append(CreateStringCell(institutionCode));
                     row.Append(CreateStringCell(courseCode));
-                    row.Append(CreateStringCell(item.DummyNumber.ToString()));
+                    row.Append(CreateStringCell(answersheet.DummyNumber));
+
+                    // PART A
                     for (int i = 1; i <= partAQuestions; i++)
                     {
-                        Qno = i;
-                        if (item.QuestionMarks is Dictionary<string, decimal> questionMarks)
-                        {
-                            questionMarks.TryGetValue(Qno.ToString() + ".0", out decimal mark);
-                            row.Append(CreateCell(mark));
-                        }
+                        var asQnItem = asQnItems.Where(x => x.QuestionNumber == i).FirstOrDefault();
+                        decimal mark = asQnItem != null ? asQnItem.ObtainedMark : 0;
+                        row.Append(CreateCell(mark));
                     }
-                    row.Append(CreateCell(item.PartA_Total));
+                    decimal partATotal = asQnItems.Where(x => x.QuestionPartName == "A").Sum(x => x.ObtainedMark);
+                    row.Append(CreateCell(partATotal));
 
+                    // PART B
                     for (int i = 11; i <= partBQuestions; i++)
                     {
-                        Qno = i;
-                        decimal totalMarks = 0;
-                        if (item.QuestionMarks is Dictionary<string, decimal> questionSub1Marks)
-                        {
-                            questionSub1Marks.TryGetValue(Qno.ToString() + ".1", out decimal mark);
-                            row.Append(CreateCell(mark));
-                            totalMarks = totalMarks + mark;
-                        }
-                        if (item.QuestionMarks is Dictionary<string, decimal> questionSub2Marks)
-                        {
-                            questionSub2Marks.TryGetValue(Qno.ToString() + ".2", out decimal mark);
-                            row.Append(CreateCell(mark));
-                            totalMarks = totalMarks + mark;
-                        }
-                        row.Append(CreateCell(totalMarks));
-                    }
+                        var asQnItem1 = asQnItems.Where(x => x.QuestionNumber == i && x.QuestionNumberSubNum == 1).FirstOrDefault();
+                        decimal mark1 = asQnItem1 != null ? asQnItem1.ObtainedMark : 0;
+                        row.Append(CreateCell(mark1));
 
-                    row.Append(CreateCell(item.PartB_Total));
+                        var asQnItem2 = asQnItems.Where(x => x.QuestionNumber == i && x.QuestionNumberSubNum == 2).FirstOrDefault();
+                        decimal mark2 = asQnItem2 != null ? asQnItem2.ObtainedMark : 0;
+                        row.Append(CreateCell(mark2));
+
+                        decimal totalMark = mark1 + mark2;
+
+                        row.Append(CreateCell(totalMark));                          
+                    }
+                    decimal partBTotal = asQnItems.Where(x => x.QuestionPartName == "B").Sum(x => x.ObtainedMark);
+                    row.Append(CreateCell(partBTotal));
+
+                    // PART C
                     if (degreeType == "PG")
                     {
-                        decimal totalMarks = 0;
                         for (int i = 19; i <= partCQuestions; i++)
                         {
-                            Qno = i;
+                            var asQnItem1 = asQnItems.Where(x => x.QuestionNumber == i && x.QuestionNumberSubNum == 1).FirstOrDefault();
+                            decimal mark1 = asQnItem1 != null ? asQnItem1.ObtainedMark : 0;
+                            row.Append(CreateCell(mark1));
 
-                            if (item.QuestionMarks is Dictionary<string, decimal> questionPartCSub1Marks)
-                            {
-                                questionPartCSub1Marks.TryGetValue(Qno.ToString() + ".1", out decimal mark);
-                                row.Append(CreateCell(mark));
-                                totalMarks = totalMarks + mark;
-                            }
-                            if (item.QuestionMarks is Dictionary<string, decimal> questionPartCSub2Marks)
-                            {
-                                questionPartCSub2Marks.TryGetValue(Qno.ToString() + ".2", out decimal mark);
-                                row.Append(CreateCell(mark));
-                                totalMarks = totalMarks + mark;
-                            }
+                            var asQnItem2 = asQnItems.Where(x => x.QuestionNumber == i && x.QuestionNumberSubNum == 2).FirstOrDefault();
+                            decimal mark2 = asQnItem2 != null ? asQnItem2.ObtainedMark : 0;
+                            row.Append(CreateCell(mark2));
+
+                            decimal totalMark = mark1 + mark2;
+
+                            row.Append(CreateCell(totalMark));
                         }
-                        if (item.PartC_Total == 0)
-                            row.Append(CreateCell(totalMarks));
-                        else
-                            row.Append(CreateCell(item.PartC_Total));
-
+                        decimal partCTotal = asQnItems.Where(x => x.QuestionPartName == "C").Sum(x => x.ObtainedMark);
+                        row.Append(CreateCell(partCTotal));
                     }
-                    row.Append(CreateCell(item.GrandTotal));
+
+                    //Grand Total
+                    decimal grandTotalMark = asQnItems.Sum(x => x.ObtainedMark);
+                    row.Append(CreateCell(grandTotalMark));
+
                     sheetData.Append(row);
                     sno++;
                 }
@@ -423,8 +395,12 @@ namespace SKCE.Examination.Services.Common
             }
 
             memoryStream.Position = 0;
+
             return await Task.FromResult((memoryStream, $"MarksReport_{institutionCode}_{examYear}_{examMonth}_{courseCode}_{degreeType}.xlsx"));
+
         }
+
+
         private static Cell CreateStringCell(string value)
         {
             return new Cell

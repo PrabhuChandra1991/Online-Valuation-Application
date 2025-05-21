@@ -44,7 +44,7 @@ export const MENU: MenuItem[] = [
     role: [1],
   },
   {
-    label: 'Answersheet Management',
+    label: 'Answersheet Allocate Status',
     icon: 'clipboard',
     link: '/apps/answersheet',
     role: [1],

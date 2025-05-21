@@ -34,6 +34,7 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
   activeQuestion: string = '---------- Please select the question above to load here ----------';
   activeQuestionImg: string = '';
   activeAnswerKey: string = '---------- Answerkey loads here ----------';
+  activeAnswerImg: string = '';  
   answersheet: string = '---------- Answersheet loads here ----------';
   activeQuestionMark: string = '';
   sasToken: string = "sp=r&st=2025-04-23T08:48:04Z&se=2025-04-23T16:48:04Z&sv=2024-11-04&sr=c&sig=M%2F90Dwk7LJjwQPE%2FTsYmGnIKl1gpgk%2Fvtbp63LNU5qs%3D"
@@ -58,6 +59,7 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
   ngOnInit() {
     console.log("ngOnInit.................");
 
+    this.spinnerService.toggleSpinnerState(true);
     const loggedInUser = localStorage.getItem('userData');
     if (loggedInUser) {
       const userData = JSON.parse(loggedInUser);
@@ -73,10 +75,15 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
         if (this.answersheetId) {
           await this.getPrimaryData();
           await this.getAnswersheetMark();
-          await this.getQuestionPaperAnswerKey();
+          await this.getQuestionPaperAnswerKey();         
+          
         }
       }
-    });
+    });    
+
+    setTimeout(()=>{
+      this.spinnerService.toggleSpinnerState(false);
+    }, 2500);
   }
 
   // called after dom is loaded to calclate the marks
@@ -92,8 +99,8 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
         if (data[0]) {
           console.log("primary data: ", data[0])
           this.primaryData = data[0];
-          this.answersheet = `${this.primaryData.uploadedBlobStorageUrl}`; //?${this.sasToken}
-          this.obtainedMarks = this.primaryData.totalObtainedMark;
+          this.answersheet = `${this.primaryData.uploadedBlobStorageUrl}`;
+          this.obtainedMarks = this.primaryData.totalObtainedMark;          
         }
         else {
           console.log('No answersheet data');
@@ -141,6 +148,7 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
               "questionDescription": decode(item.questionDescription),
               "questionImage": decode(item.questionImage),
               "answerDescription": decode(item.answerDescription),
+              "answerImage": decode(item.answerImage),
               "mark": this.getMark(item.questionMark),
               "disableInput": this.disableInput(item.questionMark),
               "obtainedMark": this.getSavedMarks(item.questionNumber, item.questionNumberSubNum)
@@ -162,7 +170,7 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
         console.error('Error fetching question and answer:', error);
         this.toastr.error('Failed to load question and answer.');
       }
-    );
+    );    
   }
 
   getPartList(data: any[]) {
@@ -363,6 +371,7 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
       this.activeQuestion = matchedItem.questionDescription;
       this.activeQuestionImg = matchedItem.questionImage;
       this.activeAnswerKey = matchedItem.answerDescription;
+      this.activeAnswerImg = matchedItem.answerImage;
       this.activeQuestionMark = matchedItem.mark;
     }
 

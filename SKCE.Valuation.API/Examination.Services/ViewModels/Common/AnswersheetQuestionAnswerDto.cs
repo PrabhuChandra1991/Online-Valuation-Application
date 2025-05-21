@@ -19,6 +19,7 @@ namespace SKCE.Examination.Services.ViewModels.Common
         public string? QuestionCO { get; set; } = string.Empty;
         public required string QuestionMark { get; set; } = string.Empty;
         public required string AnswerDescription { get; set; } = string.Empty;
+        public required string AnswerImage { get; set; } = string.Empty;
 
     }
 }

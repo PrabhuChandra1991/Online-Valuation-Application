@@ -111,6 +111,7 @@ namespace SKCE.Examination.Services.EntityHelpers
             string bkQuestionCO = bkQuestionNo + "CO";
             string bkQuestionMARKS = bkQuestionNo + "MARKS";
             string bkQuestionAK = bkQuestionNo + "AK";
+            string bkAnswerIMG = bkQuestionNo + "AKIMG";
 
             var QPBookMark = selectedQPMarks.FirstOrDefault(x => x.BookMarkName == bkQuestionNo);
 
@@ -121,6 +122,7 @@ namespace SKCE.Examination.Services.EntityHelpers
                 var QPBookMarkCO = selectedQPMarks.FirstOrDefault(x => x.BookMarkName == bkQuestionCO);
                 var QPBookMarkMark = selectedQPMarks.FirstOrDefault(x => x.BookMarkName == bkQuestionMARKS);
                 var AnswerBookMark = selectedQPMarks.FirstOrDefault(x => x.BookMarkName == bkQuestionAK);
+                var AnswerImg = selectedQPMarks.FirstOrDefault(x => x.BookMarkName == bkAnswerIMG);
 
                 var questionDisp = GetQuestionNumberDisplay(questionNumber, questionNumberSubNum);
                 var questionPart = GetQuestionPart(questionNumber, degreeType);
@@ -139,6 +141,7 @@ namespace SKCE.Examination.Services.EntityHelpers
                     QuestionCO = QPBookMarkCO?.BookMarkText ?? string.Empty,
                     QuestionMark = QPBookMarkMark?.BookMarkText ?? string.Empty,
                     AnswerDescription = AnswerBookMark?.BookMarkText ?? string.Empty,
+                    AnswerImage = AnswerImg?.BookMarkText ?? string.Empty
                 };
                 return newItem;
             }

@@ -183,7 +183,6 @@ namespace SKCE.Examination.Services.Common
             return result.ToString();
         }
 
-
         public async Task<List<AnswersheetQuestionAnswerDto>> GetQuestionAndAnswersByAnswersheetIdAsync(long answersheetId)
         {
             var helper = new AnswersheetQuestionAnswerHelper(this._context);
@@ -248,12 +247,13 @@ namespace SKCE.Examination.Services.Common
             var response = await helper.AllocateAnswersheetsToUserRandomly(inputData, loggedInUserId);
             if (response)
             {
+                var emailBody = Constants.allocationMail;
                 var user = await _userService.GetUserOnlyByIdAsync(inputData.UserId);
                 if (user != null)
                 {
                     await _emailService.SendEmailAsync(
                         user.Email,
-                        "SKCE Online Examination Platform: Answeersheets allocated", $"Hi {user.Name},\n\nYou have been allocated with {inputData.Noofsheets} answersheets for Evaluation.\n\n Please Evaluate. \n\n");
+                        "SKCE Online Examination Platform: Answeersheets allocated", emailBody);
                 }
             }
 
@@ -400,7 +400,6 @@ namespace SKCE.Examination.Services.Common
 
         }
 
-
         private static Cell CreateStringCell(string value)
         {
             return new Cell
@@ -409,6 +408,7 @@ namespace SKCE.Examination.Services.Common
                 CellValue = new CellValue(value)
             };
         }
+
         private static Cell CreateCell(decimal value)
         {
             return new Cell

@@ -298,7 +298,7 @@ namespace SKCE.Examination.Services.Common
                 .Where(x => x.CourseId == courseId)
                 .Select(x => x.Code)
                 .FirstOrDefault();
-             
+
             string templatePath =
                 System.IO.Path.Combine(Directory.GetCurrentDirectory(), "Export Templates",
                 degreeType == "PG" ? "Export_Format_PG.xlsx" : "Export_Format_UG.xlsx");
@@ -323,10 +323,12 @@ namespace SKCE.Examination.Services.Common
 
                 foreach (var answersheet in answersheets)
                 {
-                    var asQnItems = answersheetQuestionwiseMarks
-                            .Where(x => x.AnswersheetId == answersheet.AnswersheetId).ToList();
+                    var asQnItems = answersheetQuestionwiseMarks.Where(x => x.AnswersheetId == answersheet.AnswersheetId).ToList();
 
-                    int Qno = 0;
+                    decimal partATotal = 0;
+                    decimal partBTotal = 0;
+                    decimal partCTotal = 0;
+                     
                     var row = new Row();
                     row.Append(CreateCell(sno));
                     row.Append(CreateStringCell(institutionCode));
@@ -340,7 +342,8 @@ namespace SKCE.Examination.Services.Common
                         decimal mark = asQnItem != null ? asQnItem.ObtainedMark : 0;
                         row.Append(CreateCell(mark));
                     }
-                    decimal partATotal = asQnItems.Where(x => x.QuestionPartName == "A").Sum(x => x.ObtainedMark);
+
+                    partATotal = asQnItems.Where(x => x.QuestionPartName == "A").Sum(x => x.ObtainedMark);
                     row.Append(CreateCell(partATotal));
 
                     // PART B
@@ -356,9 +359,25 @@ namespace SKCE.Examination.Services.Common
 
                         decimal totalMark = mark1 + mark2;
 
-                        row.Append(CreateCell(totalMark));                          
+                        row.Append(CreateCell(totalMark));
                     }
-                    decimal partBTotal = asQnItems.Where(x => x.QuestionPartName == "B").Sum(x => x.ObtainedMark);
+
+
+                    var partBItems =
+                        asQnItems.Where(x => x.QuestionPartName == "B")
+                        .GroupBy(x => x.QuestionGroupName).ToList();
+
+                    var partBGroups = partBItems.Select(x => new
+                    {
+                        gepName = x.Key,
+                        totalMarks = x.GroupBy(y => y.QuestionNumber).Select(y => new
+                        {
+                            QnNo = y.Key,
+                            totalMarks = y.Sum(x => x.ObtainedMark)
+                        }).Max(x => x.totalMarks)
+                    });
+
+                    partBTotal = partBGroups.Sum(x => x.totalMarks);
                     row.Append(CreateCell(partBTotal));
 
                     // PART C
@@ -378,12 +397,26 @@ namespace SKCE.Examination.Services.Common
 
                             row.Append(CreateCell(totalMark));
                         }
-                        decimal partCTotal = asQnItems.Where(x => x.QuestionPartName == "C").Sum(x => x.ObtainedMark);
+
+                        var partCGroups = asQnItems
+                            .Where(x => x.QuestionPartName == "C")
+                            .GroupBy(x => x.QuestionGroupName)
+                            .Select(x => new
+                            {
+                                grpName = x.Key,
+                                totalMarks = x.GroupBy(y => y.QuestionNumber).Select(y => new
+                                {
+                                    QnNo = y.Key,
+                                    totalMarks = y.Sum(x => x.ObtainedMark)
+                                }).Max(x => x.totalMarks)
+                            });
+
+                        partCTotal = partCGroups.Sum(x => x.totalMarks);
                         row.Append(CreateCell(partCTotal));
                     }
 
                     //Grand Total
-                    decimal grandTotalMark = asQnItems.Sum(x => x.ObtainedMark);
+                    decimal grandTotalMark = partATotal + partBTotal + partCTotal;
                     row.Append(CreateCell(grandTotalMark));
 
                     sheetData.Append(row);

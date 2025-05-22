@@ -118,7 +118,7 @@ namespace SKCE.Examination.Services.Common
                     DummyNumber = x.DummyNumber,
                     IsAnswerSheetUploaded =
                         this._context.AnswersheetUploadHistories
-                        .Any(y => y.DummyNumber == x.DummyNumber),
+                        .Any(y => y.DummyNumber == x.DummyNumber +".pdf"),
                     IsValid = x.IsValid,
                     ErrorMessage = x.ErrorMessage
                 }).ToListAsync();

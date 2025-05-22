@@ -94,8 +94,8 @@
           </div>
           <div class="col-md-2 d-grid">
             <button *ngIf="selectedAnswersheetImportIsReviewCompleted !== true"
-              [disabled]="selectedAnswersheetImportName === ''" class="btn btn-primary float-end"
-              (click)="promptBeforeReviewCompletion()">
+              [disabled]="selectedAnswersheetImportName === '' || hasAnyInvalidItems()"
+              class="btn btn-primary float-end" (click)="promptBeforeReviewCompletion()">
               Submit
             </button>
           </div>
@@ -127,7 +127,9 @@
                     Is Booklet available?
                   </th>
                   <td mat-cell *matCellDef="let element">
-                    {{ element.isAnswerSheetUploaded ? 'Available' : 'Not available' }}
+
+                    <span class="{{ element.isAnswerSheetUploaded ? 'text-success' :  'text-danger' }}">
+                      {{ element.isAnswerSheetUploaded ? 'Available' : 'Not available' }}</span>
                   </td>
                 </ng-container>
                 <!-- Name Column -->
@@ -136,7 +138,7 @@
                     Status
                   </th>
                   <td mat-cell *matCellDef="let element">
-                    <span class="{{ (element.isValid) ? 'text-success' :  'text-danger' }}">
+                    <span class="{{ element.isValid ? 'text-success' :  'text-danger' }}">
                       {{ element.isValid ? "Valid" : "Invalid" }}</span>
                   </td>
                 </ng-container>

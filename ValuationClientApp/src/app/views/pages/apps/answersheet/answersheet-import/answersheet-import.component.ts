@@ -267,6 +267,12 @@ export class AnswersheetImportComponent implements OnInit {
     }
   }
 
+  hasAnyInvalidItems(): boolean {
+    var items = this.dataSourceAnswerSheetImportDetails.data.filter(x => x.isAnswerSheetUploaded === false || x.isValid === false);
+    return items.length > 0;
+  }
+
+
   resetImportFormControls() {
     this.dummyNumberImportForm.controls['file'].setValue([]);
     this.isDummyNumberImported = false;

@@ -244,16 +244,18 @@ namespace SKCE.Examination.Services.Common
 
             long loggedInUserId = 1;
             var helper = new AnswersheetAllocateHelper(this._context);
-            var response = await helper.AllocateAnswersheetsToUserRandomly(inputData, loggedInUserId);
-            if (response)
+
+            var answersheetIds = await helper.AllocateAnswersheetsToUserRandomly(inputData, loggedInUserId);
+
+            if (answersheetIds.Any())
             {
-                var emailBody = Constants.allocationMail;
                 var user = await _userService.GetUserOnlyByIdAsync(inputData.UserId);
                 if (user != null)
                 {
-                    await _emailService.SendEmailAsync(
-                        user.Email,
-                        "SKCE Online Examination Platform: Answeersheets allocated", emailBody);
+                    var emailHelper = new AnswersheetAllocateMailHelper(
+                        this._context, this._emailService, _configuration["LoginUrl"].ToString());
+
+                    await emailHelper.SendAllocatedEmail(answersheetIds, user.Email);
                 }
             }
 
@@ -328,7 +330,7 @@ namespace SKCE.Examination.Services.Common
                     decimal partATotal = 0;
                     decimal partBTotal = 0;
                     decimal partCTotal = 0;
-                     
+
                     var row = new Row();
                     row.Append(CreateCell(sno));
                     row.Append(CreateStringCell(institutionCode));

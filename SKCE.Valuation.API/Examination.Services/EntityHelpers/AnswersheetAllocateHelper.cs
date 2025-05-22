@@ -20,8 +20,10 @@ namespace SKCE.Examination.Services.EntityHelpers
             _dbContext = context;
         }
 
-        public async Task<Boolean> AllocateAnswersheetsToUserRandomly(AnswersheetAllocateInputModel inputModel, long loggedInUserId)
+        public async Task<List<long>> AllocateAnswersheetsToUserRandomly(AnswersheetAllocateInputModel inputModel, long loggedInUserId)
         {
+            var answersheetIds = new List<long>();
+
             var unallocatedAnswersheets =
                 await (from anshet in this._dbContext.Answersheets
                        join exam in this._dbContext.Examinations on anshet.ExaminationId equals exam.ExaminationId
@@ -34,7 +36,7 @@ namespace SKCE.Examination.Services.EntityHelpers
                        select anshet).ToListAsync();
 
             if (unallocatedAnswersheets.Count == 0)
-                return false;
+                return answersheetIds;
               
             var answersheetWithRandom = new List<AnswersheetRandomNo>();
 
@@ -58,6 +60,9 @@ namespace SKCE.Examination.Services.EntityHelpers
                 item.Answersheet.ModifiedById = loggedInUserId;
                 item.Answersheet.ModifiedDate = DateTime.Now;
                 this._dbContext.Update(item.Answersheet).State = EntityState.Modified;
+
+                answersheetIds.Add(item.Answersheet.AnswersheetId);
+
             }
 
             var user = await this._dbContext.Users.Where(x => x.UserId == inputModel.UserId).FirstOrDefaultAsync();
@@ -69,7 +74,7 @@ namespace SKCE.Examination.Services.EntityHelpers
 
             await this._dbContext.SaveChangesAsync();
 
-            return true;
+            return answersheetIds;
 
         }
 

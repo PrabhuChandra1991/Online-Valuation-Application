@@ -70,5 +70,33 @@ public class EmailService
             return false;
         }
     }
+
+    public async Task<bool> SendEmailHtml(string recipientEmail, string subject, string htmlBody)
+    {
+        try
+        {
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress(FromAddress, EmailSender));
+            message.To.Add(new MailboxAddress("", recipientEmail));
+            message.Subject = subject;
+
+            message.Body = new TextPart("html") { Text = htmlBody };
+             
+            using var client = new MailKit.Net.Smtp.SmtpClient();
+            await client.ConnectAsync(SmtpServer, SmtpPort, SecureSocketOptions.StartTls);
+            await client.AuthenticateAsync(EmailSender, EmailPassword);
+            await client.SendAsync(message);
+            await client.DisconnectAsync(true);
+             
+            return true;
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error sending email: {ex.Message}");
+            return false;
+        }
+    }
+
 }
 

@@ -80,11 +80,7 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
           
         }
       }
-    });    
-
-    setTimeout(()=>{
-      this.spinnerService.toggleSpinnerState(false);
-    }, 2500);
+    }); 
   }
 
   // called after dom is loaded to calclate the marks
@@ -486,6 +482,7 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
 
   onPdfLoad(pdf: PDFDocumentProxy) {
     this.totalPages = pdf.numPages;
+    this.spinnerService.toggleSpinnerState(false);
   }
 
   nextPage() {

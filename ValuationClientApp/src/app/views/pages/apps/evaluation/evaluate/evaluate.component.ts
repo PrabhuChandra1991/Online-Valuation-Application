@@ -43,6 +43,7 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
   noMarksList: string = '';
   currentPage: number = 3; // Hide Page 1 ,2 , - it has student details
   totalPages: number = 0;
+  enableSubmit: boolean = false;
 
   @ViewChild('confirmModule') confirmModule: any;
 
@@ -489,6 +490,7 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
 
   nextPage() {
     if (this.currentPage < this.totalPages) this.currentPage++;
+    if (this.currentPage == this.totalPages) this.enableSubmit = true;
   }
 
   prevPage() {

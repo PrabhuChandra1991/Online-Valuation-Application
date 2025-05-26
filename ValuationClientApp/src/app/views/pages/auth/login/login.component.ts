@@ -88,7 +88,8 @@ export class LoginComponent implements OnInit {
         console.log(response);
         localStorage.setItem('isLoggedin', 'true');
         localStorage.setItem('userData',JSON.stringify(response));
-
+        // Set login time in localStorage when user logs in
+        localStorage.setItem('loginTime', new Date().toISOString());
         //this.toastr.success(response['message']);
         this.isOTPRequested = true;
 

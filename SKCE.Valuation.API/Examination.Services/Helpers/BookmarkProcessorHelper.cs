@@ -79,14 +79,14 @@ namespace SKCE.Examination.Services.Helpers
                             DepartmentShortName = cd.d.ShortName,
                         }).ToList();
 
-                        var departmentIds = departmentVMs.Select(q => q.DepartmentId).ToList();
+                        var departmentIds = departmentVMs.Select(q => q.DepartmentId).Distinct().ToList();
 
                         if (departmentIds.Any() && departmentIds.Count > 2)
                         {
-                            bookmarkHtml = String.Join(", ", _context.Departments.Where(d => departmentIds.Contains(d.DepartmentId)).Select(d => d.ShortName).ToList());
+                            bookmarkHtml = String.Join(", ", _context.Departments.Where(d => departmentIds.Contains(d.DepartmentId)).Select(d => d.ShortName).Distinct().ToList());
                         }
                         else
-                            bookmarkHtml = String.Join(", ", _context.Departments.Where(d => departmentIds.Contains(d.DepartmentId)).Select(d => d.Name).ToList());
+                            bookmarkHtml = String.Join(", ", _context.Departments.Where(d => departmentIds.Contains(d.DepartmentId)).Select(d => d.Name).Distinct().ToList());
                     }
                     else if (bookmarkName == "COURSECODE")
                     {

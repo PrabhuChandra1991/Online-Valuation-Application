@@ -5,8 +5,21 @@ export const authGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state: R
   const router = inject(Router);
 
   if (localStorage.getItem('isLoggedin') === 'true') {
-    // If the user is logged in, then return true
-    return true;
+    const loginTimeStr = localStorage.getItem('loginTime');
+    if (loginTimeStr) {
+      const loginTime = new Date(loginTimeStr).getTime();
+      const currentTime = new Date().getTime();
+      const diffInMinutes = (currentTime - loginTime) / (1000 * 60); // milliseconds to minutes
+
+      if (diffInMinutes > 2) {
+        // Session expired
+        localStorage.removeItem('loginTime'); // Optional
+        router.navigateByUrl('/auth/login');
+        return false;
+      }
+
+      return true;
+    }
   }
 
   // If the user is not logged in, redirect to the login page with the return URL

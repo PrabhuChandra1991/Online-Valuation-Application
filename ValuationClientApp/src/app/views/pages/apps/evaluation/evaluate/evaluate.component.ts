@@ -10,6 +10,7 @@ import { ActivatedRoute } from '@angular/router'
 import { AnswersheetMark } from '../../../models/answersheetMark.model';
 import { Router } from '@angular/router';
 import { SpinnerService } from '../../../services/spinner.service';
+import { SharedService } from '../../../services/shared.service';
 
 @Component({
   selector: 'app-evaluate',
@@ -55,7 +56,8 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
     private evaluationService: EvaluationService,
     private router: Router,
     private cdr: ChangeDetectorRef,
-    private spinnerService: SpinnerService
+    private spinnerService: SpinnerService,
+    private sharedService: SharedService
   ) { }
 
   ngOnInit() {
@@ -82,6 +84,12 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
         }
       }
     }); 
+
+    this.sharedService.action$.subscribe(action => {
+      if (action === 'refreshpdf') {
+        this.refreshPDF();
+      }
+    });
   }
 
   // called after dom is loaded to calclate the marks
@@ -494,6 +502,27 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
 
   prevPage() {
     if (this.currentPage > 3) this.currentPage--;
+  }
+
+  refreshPDF() {
+    const pdf = document.querySelector('#answersheet') as HTMLElement;
+    const pdfc = document.querySelector('.ng2-pdf-viewer-container') as HTMLElement;
+
+    if (pdf?.classList.contains('expand')) {
+      pdf.classList.remove('expand');
+      pdfc.style.height = '1030px;'
+    }
+    else {
+      pdf.classList.add('expand');
+      pdfc.style.height = '1200px;'
+    }
+
+    const pdfBackup = this.answersheet;
+    this.answersheet = ''; // Unload it first
+    setTimeout(() => {
+      this.answersheet = pdfBackup; // Reload
+    }, 300);
+
   }
 
   backToList() {

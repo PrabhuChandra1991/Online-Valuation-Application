@@ -104,7 +104,10 @@ table .sub-total {
 .pdf-wrapper {
     #answersheet {
         width: 100%;
-        min-height: 110vh;
+        min-height: 1030px;
         display: block;
     } 
+    .expand {
+        height: 1200px !important;
+    }
 }

@@ -9,6 +9,7 @@ import { MENU } from './menu';
 import { MenuItem } from './menu.model';
 
 import { FeatherIconDirective } from '../../../core/feather-icon/feather-icon.directive';
+import { SharedService } from '../../pages/services/shared.service'
 
 
 @Component({
@@ -26,16 +27,17 @@ import { FeatherIconDirective } from '../../../core/feather-icon/feather-icon.di
 })
 export class SidebarComponent implements OnInit, AfterViewInit {
 
-  @ViewChild('sidebarToggler') sidebarToggler: ElementRef;
+  logoURL: string = 'images/skcet-logo-lg.png';
+
+  toggleIcon: string = 'chevrons-left';
 
   menuItems: MenuItem[] = [];
-
   masterMenu : MenuItem[] = [];
 
+  @ViewChild('sidebarToggler') sidebarToggler: ElementRef;
   @ViewChild('sidebarMenu') sidebarMenu: ElementRef;
 
-
-  constructor(@Inject(DOCUMENT) private document: Document, private renderer: Renderer2, router: Router) {
+  constructor(@Inject(DOCUMENT) private document: Document, private renderer: Renderer2, router: Router, private sharedService: SharedService) {
     router.events.forEach((event) => {
       if (event instanceof NavigationEnd) {
 
@@ -98,6 +100,17 @@ export class SidebarComponent implements OnInit, AfterViewInit {
       e.preventDefault();
       this.document.body.classList.toggle('sidebar-open');
     }
+
+    if (this.logoURL == "images/skcet-logo.png") {
+      this.logoURL = "images/skcet-logo-lg.png";
+      this.toggleIcon = 'chevrons-left';
+    }
+    else {
+      this.logoURL = "images/skcet-logo.png";
+      this.toggleIcon = 'chevrons-right';
+    }
+
+    this.triggerPDFRefresh();
   }
 
 
@@ -254,5 +267,8 @@ export class SidebarComponent implements OnInit, AfterViewInit {
     }
   };
 
+  triggerPDFRefresh() {
+    this.sharedService.callAction('refreshpdf');
+  }
 
 }

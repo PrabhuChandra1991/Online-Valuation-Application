@@ -114,16 +114,15 @@ namespace SKCE.Examination.Services.EntityHelpers
             string bkAnswerIMG = bkQuestionNo + "AKIMG";
 
             var QPBookMark = selectedQPMarks.FirstOrDefault(x => x.BookMarkName == bkQuestionNo);
+            var QPBookMarkImg = selectedQPMarks.FirstOrDefault(x => x.BookMarkName == bkQuestionIMG);
+            var QPBookMarkBT = selectedQPMarks.FirstOrDefault(x => x.BookMarkName == bkQuestionBT);
+            var QPBookMarkCO = selectedQPMarks.FirstOrDefault(x => x.BookMarkName == bkQuestionCO);
+            var QPBookMarkMark = selectedQPMarks.FirstOrDefault(x => x.BookMarkName == bkQuestionMARKS);
+            var AnswerBookMark = selectedQPMarks.FirstOrDefault(x => x.BookMarkName == bkQuestionAK);
+            var AnswerImg = selectedQPMarks.FirstOrDefault(x => x.BookMarkName == bkAnswerIMG);
 
-            if (QPBookMark != null)
+            if (QPBookMark != null || QPBookMarkImg != null || QPBookMarkMark != null)
             {
-                var QPBookMarkImg = selectedQPMarks.FirstOrDefault(x => x.BookMarkName == bkQuestionIMG);
-                var QPBookMarkBT = selectedQPMarks.FirstOrDefault(x => x.BookMarkName == bkQuestionBT);
-                var QPBookMarkCO = selectedQPMarks.FirstOrDefault(x => x.BookMarkName == bkQuestionCO);
-                var QPBookMarkMark = selectedQPMarks.FirstOrDefault(x => x.BookMarkName == bkQuestionMARKS);
-                var AnswerBookMark = selectedQPMarks.FirstOrDefault(x => x.BookMarkName == bkQuestionAK);
-                var AnswerImg = selectedQPMarks.FirstOrDefault(x => x.BookMarkName == bkAnswerIMG);
-
                 var questionDisp = GetQuestionNumberDisplay(questionNumber, questionNumberSubNum);
                 var questionPart = GetQuestionPart(questionNumber, degreeType);
                 var questionGroup = GetQuestionGroupName(questionNumber, questionPart);
@@ -135,7 +134,7 @@ namespace SKCE.Examination.Services.EntityHelpers
                     QuestionNumberDisplay = questionDisp,
                     QuestionPartName = questionPart,
                     QuestionGroupName = questionGroup,
-                    QuestionDescription = QPBookMark.BookMarkText ?? string.Empty,
+                    QuestionDescription = QPBookMark?.BookMarkText ?? string.Empty,
                     QuestionImage = QPBookMarkImg?.BookMarkText ?? string.Empty,
                     QuestionBT = QPBookMarkBT?.BookMarkText ?? string.Empty,
                     QuestionCO = QPBookMarkCO?.BookMarkText ?? string.Empty,

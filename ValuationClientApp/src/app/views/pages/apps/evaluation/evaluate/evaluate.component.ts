@@ -31,14 +31,15 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
   partBMark: number = 0;
   partCMark: number = 0;
   obtainedMarks: number = 0;
+  activeQuestionNo: string = '-';
   activeQuestion: string = '---------- Please select the question above to load here ----------';
   activeQuestionImg: string = '';
   activeAnswerKey: string = '---------- Answerkey loads here ----------';
   activeAnswerImg: string = '';  
-  answersheet: string = '---------- Answersheet loads here ----------';
   activeQuestionMark: string = '';
-  sasToken: string = "sp=r&st=2025-04-23T08:48:04Z&se=2025-04-23T16:48:04Z&sv=2024-11-04&sr=c&sig=M%2F90Dwk7LJjwQPE%2FTsYmGnIKl1gpgk%2Fvtbp63LNU5qs%3D"
+  answersheet: string = '---------- Answersheet loads here ----------';
   answersheetMark: AnswersheetMark;
+  sasToken: string = "sp=r&st=2025-04-23T08:48:04Z&se=2025-04-23T16:48:04Z&sv=2024-11-04&sr=c&sig=M%2F90Dwk7LJjwQPE%2FTsYmGnIKl1gpgk%2Fvtbp63LNU5qs%3D"
 
   noMarksList: string = '';
   currentPage: number = 3; // Hide Page 1 ,2 , - it has student details
@@ -365,6 +366,7 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
     let matchedItem = this.qaList.filter(x => x.questionNumberDisplay == qusetionNo)[0];
 
     if (matchedItem) {
+      this.activeQuestionNo = matchedItem.questionNumberDisplay;
       this.activeQuestion = matchedItem.questionDescription;
       this.activeQuestionImg = matchedItem.questionImage;
       this.activeAnswerKey = matchedItem.answerDescription;

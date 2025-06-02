@@ -66,6 +66,13 @@ table .sub-total {
     padding: 0.5rem;
 }
 
+.float {
+    position: sticky;
+    top: 60px;
+    //overflow: hidden;
+    z-index: 99;
+}
+
 .left-arrow {
     border: 1px solid #004da3;
     background: url('../../../../../../images/arrow-left.svg') no-repeat;
@@ -92,4 +99,12 @@ table .sub-total {
     background: url('../../../../../../images/arrow-right-light.svg') no-repeat;
     background-position: center;
     height: 35px;
+}
+
+.pdf-wrapper {
+    #answersheet {
+        width: 100%;
+        min-height: 110vh;
+        display: block;
+    } 
 }

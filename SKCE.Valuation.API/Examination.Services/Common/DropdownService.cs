@@ -31,10 +31,12 @@ namespace SKCE.Examination.Services.Common
                 .Select(x => x.ExamMonth).Distinct().ToListAsync();
         }
 
-        public Task<List<string>> GetExamTypesAsync()
+        public async Task<List<string>> GetExamTypesAsync()
         {
-            List<string> examTypes = new List<string> { "Regular", "Arrear" };
-            return Task.FromResult(examTypes);
+            return await
+                this._context.Examinations
+                .Where(x => x.IsActive)
+                .Select(x => x.ExamType).Distinct().ToListAsync();
         }
 
         public async Task<List<string>> GetExamYearMonthsAsync()

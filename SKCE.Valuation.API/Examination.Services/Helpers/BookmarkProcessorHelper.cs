@@ -1,31 +1,13 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Wordprocessing;
 using SKCE.Examination.Models.DbModels.QPSettings;
 using Microsoft.Extensions.Configuration;
 using SKCE.Examination.Models.DbModels.Common;
-using System.Diagnostics;
-using System.Text;
-using Syncfusion.Licensing;
 using Spire.Doc;
 using Document = Spire.Doc.Document;
 using Paragraph = Spire.Doc.Documents.Paragraph;
-using Spire.Doc.Documents;
-using Syncfusion.DocIO.DLS;
 using Spire.Doc.Collections;
-using Body = Spire.Doc.Body;
-using Syncfusion.DocIO;
-using SKCE.Examination.Services.ViewModels.QPSettings;
-using DocumentFormat.OpenXml.Vml.Office;
-using DocumentFormat.OpenXml.Math;
-using Spire.Doc.Fields;
-using Amazon.Runtime.Internal.Transform;
 using Microsoft.EntityFrameworkCore;
-using Syncfusion.Pdf.Parsing;
-using Syncfusion.Pdf;
 using HtmlAgilityPack;
-using System.Threading.Tasks;
-using System.IO;
-using DocumentFormat.OpenXml.Bibliography;
 using DocumentFormat.OpenXml;
 
 namespace SKCE.Examination.Services.Helpers
@@ -39,14 +21,10 @@ namespace SKCE.Examination.Services.Helpers
             _context = context;
             _azureBlobStorageHelper = azureBlobStorageHelper;
         }
-        // Processes bookmarks in a source document and prints the modified document
         public async Task<string> ProcessBookmarksAndPrint(QPTemplate qPTemplate, UserQPTemplate userQPTemplate, string inputDocPath, string documentPathToPrint, bool isForPrint, long printedWordDocumentId)
         {
             try
             {
-                //Loading license
-                LoadLicense();
-
                 // Dictionary of bookmarks and their new values
                 Dictionary<string, string> bookmarkUpdates = new Dictionary<string, string>
                 {
@@ -269,7 +247,6 @@ namespace SKCE.Examination.Services.Helpers
             }
             return string.Empty;
         }
-
         private async Task<string> PrintQP(Document updatedSourcedoc, Dictionary<string, string> bookmarkUpdates, QPTemplate qPTemplate, UserQPTemplate userQPTemplate, string fileNameToPrint)
         {
             var degreeTypeName = _context.DegreeTypes.FirstOrDefault(dt => dt.DegreeTypeId == qPTemplate.DegreeTypeId)?.Name ?? string.Empty;
@@ -393,21 +370,6 @@ namespace SKCE.Examination.Services.Helpers
 
             SaveSelectedQPBookmarksByFilePath(selectedQPDetail);
         }
-        static void ConvertToPdfBySyncfusion(string docxPath, string pdfPath)
-        {
-            // Load the Word document
-            Syncfusion.DocIO.DLS.WordDocument document = new Syncfusion.DocIO.DLS.WordDocument(docxPath, FormatType.Docx);
-            //// Convert Word to PDF
-            Syncfusion.Pdf.PdfDocument pdfDocument = new Syncfusion.Pdf.PdfDocument();
-            Syncfusion.DocIORenderer.DocIORenderer renderer = new Syncfusion.DocIORenderer.DocIORenderer();
-            pdfDocument = renderer.ConvertToPDF(document);
-            //ApplyPdfSecurity(pdfDocument);
-            // Save the PDF file
-            pdfDocument.Save(pdfPath);
-            document.Close();
-
-            System.Console.WriteLine("DOCX to PDF conversion By Syncfusion completed.");
-        }
         private void RemoveTextFromDocx(string filePath, string textToRemove)
         {
             using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))
@@ -423,24 +385,6 @@ namespace SKCE.Examination.Services.Helpers
                 }
 
                 doc.MainDocumentPart.Document.Save(); // Save changes
-            }
-        }
-        private void LoadLicense()
-        {
-            // This line attempts to set a license from several locations relative to the executable and Aspose.Words.dll.
-            // You can also use the additional overload to load a license from a stream, this is useful,
-            // for instance, when the license is stored as an embedded resource.
-            try
-            {
-                // Apply Syncfusion License
-                SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NNaF5cXmBCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdmWXtfcXRQQ2lZWEJwW0VWYUA=");
-                Console.WriteLine("License set successfully.");
-            }
-            catch (Exception e)
-            {
-                // We do not ship any license with this example,
-                // visit the Syn fusion site to obtain either a temporary or permanent license. 
-                Console.WriteLine("\nThere was an error setting the license: " + e.Message);
             }
         }
         public string ExtractBookmarkAsHtmlBase64(Document doc, string bookmarkName)

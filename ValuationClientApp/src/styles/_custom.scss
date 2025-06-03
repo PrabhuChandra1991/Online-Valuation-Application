@@ -135,6 +135,7 @@
 .readonly {
     background-color: $disabled-bg !important;
     cursor: default !important;
+    pointer-events: none;
 }
 
 .disabled .mdc-checkbox__background {
@@ -154,4 +155,12 @@ select.disabled,
     pointer-events: none;
     cursor: not-allowed;
     color: $disabled-text;
+}
+
+
+
+.sidebar .sidebar-header .sidebar-toggler {
+    top: 50%;
+    right: -5px;
+    z-index: 99;
 }

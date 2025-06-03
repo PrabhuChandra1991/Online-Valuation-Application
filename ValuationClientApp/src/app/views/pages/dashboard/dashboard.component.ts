@@ -82,7 +82,7 @@ export class DashboardComponent implements OnInit   {
   isMaxReached: boolean = false;
   maxAllowedCount:number = 10;
 
-  isUserEnabled = true;
+  isAdmin = false;
 
   validationErrors: { [key: string]: boolean } = {
     ugName: false,
@@ -387,8 +387,11 @@ export class DashboardComponent implements OnInit   {
           if (loggedData) {
             const loggedInuserData = JSON.parse(loggedData);
 
-            if(loggedInuserData.roleId == 1)
-              this.isUserEnabled = false;
+            if(loggedInuserData.roleId == 1) {
+              this.isAdmin = true;
+              console.log("loggedInuserData.roleId", loggedInuserData.roleId)
+              console.log("this.isAdmin", this.isAdmin)
+            }
           }
         }
        }

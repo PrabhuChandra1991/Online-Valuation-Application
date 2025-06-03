@@ -25,8 +25,7 @@
                 <!-- Name -->
                 <div class="col-sm-5">
                   <label class="form-label">Name <span class="text-danger"> *</span></label>
-                  <input type="text" formControlName="name" class="form-control readonly"
-                    [attr.readonly]='!isUserEnabled' />
+                  <input type="text" formControlName="name" class="form-control" [ngClass]="!isAdmin ? 'readonly' : '' " />
                   <span class="text-danger"
                     *ngIf="(userForm.controls.name.touched) && userForm.controls.name.errors?.required">
                     Name is required
@@ -47,7 +46,7 @@
                 <!-- Mobile -->
                 <div class="col-sm-3">
                   <label class="form-label">Mobile Number <span class="text-danger">*</span></label>
-                  <input type="text" formControlName="mobileNumber" class="form-control readonly" readonly />
+                  <input type="text" formControlName="mobileNumber" class="form-control" [ngClass]="!isAdmin ? 'readonly' : '' " />
                   <span class="text-danger"
                     *ngIf="(userForm.controls.mobileNumber.touched) && userForm.controls.mobileNumber.errors?.required">
                     Mobile Number is required
@@ -58,7 +57,7 @@
                 <!-- Email Address -->
                 <div class="col-sm-4">
                   <label class="form-label">Email Address <span class="text-danger">*</span></label>
-                  <input type="text" formControlName="email" class="form-control readonly" readonly />
+                  <input type="text" formControlName="email" class="form-control" [ngClass]="!isAdmin ? 'readonly' : '' " />
                   <span class="text-danger"
                     *ngIf="(userForm.controls.email.touched) && userForm.controls.email.errors?.required">
                     Email is required

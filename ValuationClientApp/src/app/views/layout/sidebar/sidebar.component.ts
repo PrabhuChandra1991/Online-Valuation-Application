@@ -29,13 +29,15 @@ export class SidebarComponent implements OnInit, AfterViewInit {
 
   logoURL: string = 'images/skcet-logo-lg.png';
 
-  toggleIcon: string = 'chevrons-left';
-
   menuItems: MenuItem[] = [];
   masterMenu : MenuItem[] = [];
 
   @ViewChild('sidebarToggler') sidebarToggler: ElementRef;
   @ViewChild('sidebarMenu') sidebarMenu: ElementRef;
+
+  expanded: boolean = true;
+  @ViewChild('toggleLeftIcon') toggleLeftIcon!: ElementRef;
+  // @ViewChild('toggleRightIcon') toggleRightIcon!: ElementRef;
 
   constructor(@Inject(DOCUMENT) private document: Document, private renderer: Renderer2, router: Router, private sharedService: SharedService) {
     router.events.forEach((event) => {
@@ -58,8 +60,8 @@ export class SidebarComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    
-      this.masterMenu = MENU;
+
+    this.masterMenu = MENU;
 
     const loggedData = localStorage.getItem('userData');
 
@@ -82,6 +84,11 @@ export class SidebarComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
+      
+    console.log("toggleLeftIcon", this.toggleLeftIcon)
+    const ri = this.toggleLeftIcon.nativeElement;
+    ri.style.display = 'none';
+
     // activate menu items
     new MetisMenu(this.sidebarMenu.nativeElement);
 
@@ -101,14 +108,33 @@ export class SidebarComponent implements OnInit, AfterViewInit {
       this.document.body.classList.toggle('sidebar-open');
     }
 
+    // const li = this.toggleLeftIcon.nativeElement;
+    // const ri = this.toggleRightIcon.nativeElement;
+    // // console.log(el.getAttribute("data-feather"))
+    // // if (el.getAttribute("data-feather") == "arrow-left-circle") {
+    // //   el.setAttribute('data-feather', "arrow-right-circle");
+    // // }
+    // // else {
+    // //   el.setAttribute('data-feather', "arrow-left-circle");
+    // // }
+    // // console.log(el.getAttribute("data-feather"))
+    
     if (this.logoURL == "images/skcet-logo.png") {
       this.logoURL = "images/skcet-logo-lg.png";
-      this.toggleIcon = 'chevrons-left';
+      this.expanded = true;
+      //el.setAttribute('data-feather', "arrow-left-circle");
+      // li.style.display = 'none';
+      // ri.style.display = 'none';
     }
     else {
       this.logoURL = "images/skcet-logo.png";
-      this.toggleIcon = 'chevrons-right';
+      this.expanded = false;
+      //el.setAttribute('data-feather', "arrow-right-circle");
+      // li.style.display = 'none';
+      // ri.style.display = 'none';
     }
+
+    // console.log("this.expanded", this.expanded)
 
     this.triggerPDFRefresh();
   }

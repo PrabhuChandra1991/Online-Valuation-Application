@@ -11,12 +11,12 @@ export const authGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state: R
       const currentTime = new Date().getTime();
       const diffInMinutes = (currentTime - loginTime) / (1000 * 60); // milliseconds to minutes
 
-      if (diffInMinutes > 2) {
-        // Session expired
-        localStorage.removeItem('loginTime'); // Optional
-        router.navigateByUrl('/auth/login');
-        return false;
-      }
+      // if (diffInMinutes > 2) {
+      //   // Session expired
+      //   localStorage.removeItem('loginTime'); // Optional
+      //   router.navigateByUrl('/auth/login');
+      //   return false;
+      // }
 
       return true;
     }

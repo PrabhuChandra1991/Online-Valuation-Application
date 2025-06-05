@@ -32,6 +32,7 @@ import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { AnswersheetService } from '../../../services/answersheet.service';
 import { InstituteService } from '../../../services/institute.service';
+import { encode } from 'js-base64';
 
 @Component({
   selector: 'app-answersheet-management',
@@ -60,7 +61,8 @@ export class AnswersheetManagementComponent {
     'dummyNumber',
     'allocatedUserName',
     'isEvaluateCompleted',
-    'totalObtainedMark'
+    'totalObtainedMark',
+    'actions'
   ];
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -88,7 +90,8 @@ export class AnswersheetManagementComponent {
   constructor(
     private fb: FormBuilder,
     private answersheetService: AnswersheetService,
-    private instituteService: InstituteService
+    private instituteService: InstituteService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -219,6 +222,26 @@ export class AnswersheetManagementComponent {
           console.error('Error loading history:', errRes);
         },
       });
+  }
+
+  viewEvaluation(answerSheetId: any) {
+    const url = '/apps/viewevaluation/' + encode(String(answerSheetId));
+    const features = `
+      fullscreen=yes,
+      toolbar=no,
+      location=no,
+      status=no,
+      menubar=no,
+      scrollbars=no,
+      resizable=no,
+      top=0,
+      left=0,
+      width=${screen.width},
+      height=${screen.height}
+    `;
+    const win = window.open(url, '_blank', features);
+    win?.focus();
+    //this.router.navigate(['/apps/view-evaluation', encode(String(answerSheetId))]);
   }
 
   //---------

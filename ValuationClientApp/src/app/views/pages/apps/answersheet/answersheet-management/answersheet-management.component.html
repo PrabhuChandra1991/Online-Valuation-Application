@@ -84,6 +84,13 @@
             </td>
           </ng-container>
 
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let element">
+              <a class="link-opacity-50-hover" (click)="viewEvaluation(element.answersheetId)">View</a>
+            </td>
+          </ng-container>
+
           <!-- Table Header & Row Definitions -->
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
           <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>

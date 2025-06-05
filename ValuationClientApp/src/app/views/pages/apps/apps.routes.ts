@@ -33,6 +33,11 @@ export default [
         canActivate: [authGuard]
     },
     {
+        path: 'viewevaluation/:id',
+        loadComponent: () => import('./evaluation/view/view-evaluation.component').then(c => c.ViewEvaluationComponent),
+        canActivate: [authGuard]
+    },
+    {
         path: 'chat',
         loadComponent: () => import('./chat/chat.component').then(c => c.ChatComponent)
     },

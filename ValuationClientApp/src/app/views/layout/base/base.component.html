@@ -1,16 +1,16 @@
 <div class="main-wrapper">
 
   <!-- partial:sidebar -->
-  <app-sidebar />
+  <app-sidebar *ngIf="!isMinimalRoute()"/>
   <!-- partial -->
 
-  <div class="page-wrapper">
+  <div class="page-wrapper" [ngClass]="(isMinimalRoute()) ? 'fullview' : ''">
 
     <!-- partial:navbar -->
-    <app-navbar></app-navbar>
+    <app-navbar *ngIf="!isMinimalRoute()"></app-navbar>
     <!-- partial -->
 
-    <div class="page-content container-fluid">
+    <div class="page-content container-fluid" [ngClass]="(isMinimalRoute()) ? 'fullview' : ''">
 
       <!-- Spinner for lazyload modules -->
        @if (isLoading) {

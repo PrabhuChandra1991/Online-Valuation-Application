@@ -155,3 +155,16 @@ select.disabled,
     cursor: not-allowed;
     color: $disabled-text;
 }
+
+// This style is to make page full size in view evaluation page
+.main-wrapper {
+    .page-wrapper.fullview {
+        margin-left: 0 !important;
+        width: 100% !important;
+
+        .page-content.fullview {
+        margin-top: 0 !important;
+        }
+    }
+}
+  

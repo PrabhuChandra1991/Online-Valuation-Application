@@ -84,4 +84,8 @@ export class AnswersheetService {
     return this.http.get(`${this.apiUrl}/api/Answersheet/ExportMarks?institutionId=${institutionId}&courseId=${courseId}&examYear=${examYear}&examMonth=${examMonth}&examType=${examType}`);
   }
 
+   revertEvaluation(answersheetId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/api/Answersheet/RevertEvaluation?answersheetId=${answersheetId}`);
+  }
+
 }

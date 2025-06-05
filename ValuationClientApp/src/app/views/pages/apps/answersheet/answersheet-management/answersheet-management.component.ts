@@ -32,6 +32,7 @@ import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { AnswersheetService } from '../../../services/answersheet.service';
 import { InstituteService } from '../../../services/institute.service';
+import { encode } from 'js-base64';
 
 @Component({
   selector: 'app-answersheet-management',
@@ -60,7 +61,9 @@ export class AnswersheetManagementComponent {
     'dummyNumber',
     'allocatedUserName',
     'isEvaluateCompleted',
-    'totalObtainedMark'
+    'totalObtainedMark',
+    'revertEvaluation',
+    'actions'
   ];
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -88,7 +91,8 @@ export class AnswersheetManagementComponent {
   constructor(
     private fb: FormBuilder,
     private answersheetService: AnswersheetService,
-    private instituteService: InstituteService
+    private instituteService: InstituteService,
+    private router:Router
   ) {}
 
   ngOnInit(): void {
@@ -219,6 +223,26 @@ export class AnswersheetManagementComponent {
           console.error('Error loading history:', errRes);
         },
       });
+  }
+
+   revertEvaluation(dummyNumber: any) {
+    if (this.selectedCourseId) {
+      let answersheet = this.answersheets.filter(m => m.dummyNumber == dummyNumber);
+      let answersheetId = answersheet[0].answersheetId;
+      this.answersheetService.revertEvaluation(answersheetId).subscribe({
+         next: (data) => {
+           this.loadData();
+         }
+      });
+    }
+  }
+  
+  edit(dummyNumber: any) {
+    if (this.selectedCourseId) {
+      let answersheet = this.answersheets.filter(m => m.dummyNumber == dummyNumber);
+      let answersheetId = answersheet[0].answersheetId;
+      this.router.navigate(['/apps/evaluate', encode(String(answersheetId))]);
+    }
   }
 
   //---------

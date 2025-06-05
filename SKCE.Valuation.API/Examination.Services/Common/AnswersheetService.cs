@@ -452,5 +452,11 @@ namespace SKCE.Examination.Services.Common
                 CellValue = new CellValue(value)
             };
         }
+
+        public async Task<bool> RevertEvaluation(long answersheetId)
+        {
+            var helper = new AnswersheetMarkTransHelper(this._context);
+            return await helper.RevertEvaluation(answersheetId);
+        }
     }
 }

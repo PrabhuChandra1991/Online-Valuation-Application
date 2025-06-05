@@ -497,7 +497,15 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
   }
 
   backToList() {
-    this.router.navigate(['/apps/evaluationlist']);
+    const loggedInUser = localStorage.getItem('userData');
+    if (loggedInUser) {
+      const userData = JSON.parse(loggedInUser);
+      let isAdmin = userData.roleId == 1;
+      if (isAdmin)
+        this.router.navigate(['/apps/answersheet']);
+      else
+        this.router.navigate(['/apps/evaluationlist']);
+    }
   }
 
   onError(error: any) {

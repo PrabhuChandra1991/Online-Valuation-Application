@@ -98,6 +98,27 @@ namespace SKCE.Examination.Services.EntityHelpers
             return true;
         }
 
+        public async Task<bool> RevertEvaluation(long answersheetId)
+        {
+            var existingEntity = await _context.Answersheets.FirstOrDefaultAsync(e =>
+                e.AnswersheetId == answersheetId &&
+                e.IsActive == true);
+
+            if (existingEntity != null)
+            {
+                existingEntity.IsEvaluateCompleted = false;
+                existingEntity.EvaluatedDateTime = null;
+
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                return false;
+            }
+
+            return true;
+        }
+
 
     } // Class
 }

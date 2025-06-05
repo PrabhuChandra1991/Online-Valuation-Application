@@ -3,7 +3,6 @@ import { RouteConfigLoadEnd, RouteConfigLoadStart, Router, RouterOutlet } from '
 import { NavbarComponent } from '../navbar/navbar.component';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { FooterComponent } from '../footer/footer.component';
-import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'app-base',
@@ -11,8 +10,7 @@ import { CommonModule } from '@angular/common';
         RouterOutlet,
         NavbarComponent,
         SidebarComponent,
-        FooterComponent,
-        CommonModule
+        FooterComponent
     ],
     templateUrl: './base.component.html',
     styleUrl: './base.component.scss'
@@ -21,14 +19,8 @@ export class BaseComponent implements OnInit {
 
   isLoading: boolean = false;
   private router = inject(Router);
-  
-  constructor() {}
 
-  isMinimalRoute(): boolean {
-    //const hiddenRoutes = ['/apps/viewevaluation', '/preview'];    
-    //return hiddenRoutes.includes(this.router.url);
-    return this.router.url.includes('/apps/viewevaluation');
-  }
+  constructor() {}
 
   ngOnInit(): void {
     // Spinner for lazy loading modules/components

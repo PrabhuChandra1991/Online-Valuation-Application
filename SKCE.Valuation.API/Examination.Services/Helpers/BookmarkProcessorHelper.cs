@@ -2,13 +2,17 @@
 using SKCE.Examination.Models.DbModels.QPSettings;
 using Microsoft.Extensions.Configuration;
 using SKCE.Examination.Models.DbModels.Common;
+using Syncfusion.Licensing;
 using Spire.Doc;
 using Document = Spire.Doc.Document;
 using Paragraph = Spire.Doc.Documents.Paragraph;
 using Spire.Doc.Collections;
+using Body = Spire.Doc.Body;
+using Syncfusion.DocIO;
 using Microsoft.EntityFrameworkCore;
 using HtmlAgilityPack;
 using DocumentFormat.OpenXml;
+using Table = Spire.Doc.Table;
 
 namespace SKCE.Examination.Services.Helpers
 {
@@ -21,10 +25,12 @@ namespace SKCE.Examination.Services.Helpers
             _context = context;
             _azureBlobStorageHelper = azureBlobStorageHelper;
         }
+        // Processes bookmarks in a source document and prints the modified document
         public async Task<string> ProcessBookmarksAndPrint(QPTemplate qPTemplate, UserQPTemplate userQPTemplate, string inputDocPath, string documentPathToPrint, bool isForPrint, long printedWordDocumentId)
         {
             try
             {
+
                 // Dictionary of bookmarks and their new values
                 Dictionary<string, string> bookmarkUpdates = new Dictionary<string, string>
                 {
@@ -195,34 +201,46 @@ namespace SKCE.Examination.Services.Helpers
                 Document updatedSourcedoc = new Document();
                 updatedSourcedoc.LoadFromFile(updatedSourcePath);
 
-                // Iterate through all bookmarks in the updated source document and replace in actual QP template
-                foreach (Spire.Doc.Bookmark bookmark1 in updatedSourcedoc.Bookmarks)
+                foreach (Spire.Doc.Bookmark bookmark in updatedSourcedoc.Bookmarks)
                 {
+                    if (bookmark.Name.StartsWith("_")) continue; // Skip system bookmarks
 
-                    if (bookmark1.Name.Contains("_"))
-                        continue; // Skip system bookmark
+                    Spire.Doc.Bookmark destBookmark = templateDoc.Bookmarks.FindByName(bookmark.Name);
+                    if (destBookmark == null) continue;
 
-                    string bookmarkName = bookmark1.Name;
-
-                    // Find the same bookmark in the destination document
-                    Spire.Doc.Bookmark destinationBookmark = templateDoc.Bookmarks.FindByName(bookmarkName);
-                    if (destinationBookmark != null)
+                    try
                     {
-                        // Extract content from the source bookmark (including images)
-                        DocumentObjectCollection sourceContent = bookmark1.BookmarkStart.OwnerParagraph.ChildObjects;
-
-                        // Clear existing content in destination bookmark
-                        Paragraph destParagraph = destinationBookmark.BookmarkStart.OwnerParagraph;
-                        destParagraph.ChildObjects.Clear();
-
-                        // Copy content to the destination bookmark
-                        foreach (DocumentObject obj in sourceContent)
+                        if(bookmark.Name.StartsWith("Q") && !bookmark.Name.StartsWith("QPCODE"))
                         {
-                            destParagraph.ChildObjects.Add(obj.Clone());
+                            // Extract full content between bookmark start and end
+                            List<DocumentObject> content = GetBookmarkContentRecursive(updatedSourcedoc, bookmark.Name);
+                            
+                            // Replace content in destination document
+                            ReplaceBookmarkContent(templateDoc, destBookmark, content);
+                        }
+                        else
+                        {
+                            // Extract content from the source bookmark (including images)
+                            DocumentObjectCollection sourceContent = bookmark.BookmarkStart.OwnerParagraph.ChildObjects;
+
+                            // Clear existing content in destination bookmark
+                            Paragraph destParagraph = destBookmark.BookmarkStart.OwnerParagraph;
+                            destParagraph.ChildObjects.Clear();
+
+                            // Copy content to the destination bookmark
+                            foreach (DocumentObject obj in sourceContent)
+                            {
+                                destParagraph.ChildObjects.Add(obj.Clone());
+                            }
                         }
                     }
+                    catch (Exception)
+                    {
+                        continue;
+                    }
                 }
-                var previewdocPath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}.docx", "Preview_Version_", inputDocPath.Replace(".docx", "")));
+
+                var previewdocPath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}.docx", "Preview_Version_", inputDocPath.Replace(".docx","")));
                 templateDoc.Watermark = null;
                 templateDoc.SaveToFile(previewdocPath, FileFormat.Docx);
 
@@ -230,7 +248,7 @@ namespace SKCE.Examination.Services.Helpers
                 RemoveTextFromDocx(previewdocPath, "Evaluation Warning: The document was created with Spire.Doc for .NET.");
 
                 // Save the modified document as PDF
-                var previewPdfPath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}_{2}.pdf", bookmarkUpdates["COURSECODE"].Replace("/", "_"), qPTemplate.QPCode, DateTime.Now.ToString("ddMMyyyyhhmmss")));
+                var previewPdfPath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}_{2}.pdf", bookmarkUpdates["COURSECODE"].Replace("/","_"), qPTemplate.QPCode, DateTime.Now.ToString("ddMMyyyyhhmmss")));
                 //ConvertToPdfBySyncfusion(previewdocPath, previewPdfPath);
 
                 if (!isForPrint) return previewdocPath;
@@ -247,12 +265,99 @@ namespace SKCE.Examination.Services.Helpers
             }
             return string.Empty;
         }
-        private async Task<string> PrintQP(Document updatedSourcedoc, Dictionary<string, string> bookmarkUpdates, QPTemplate qPTemplate, UserQPTemplate userQPTemplate, string fileNameToPrint)
+        private List<DocumentObject> GetBookmarkContentRecursive(Document doc, string bookmarkName)
+        {
+            List<DocumentObject> result = new();
+            bool insideBookmark = false;
+            bool bookmarkEnded = false;
+
+            foreach (Section section in doc.Sections)
+            {
+                foreach (DocumentObject obj in section.Body.ChildObjects)
+                {
+                    TraverseAndCollect(obj, ref insideBookmark, ref bookmarkEnded, bookmarkName, result);
+                    if (bookmarkEnded)
+                        break;
+                }
+
+                if (bookmarkEnded)
+                    break;
+            }
+
+            return result;
+        }
+        private void TraverseAndCollect(DocumentObject obj, ref bool insideBookmark, ref bool bookmarkEnded, string bookmarkName, List<DocumentObject> result)
+        {
+            if (bookmarkEnded)
+                return;
+
+            if (obj is Paragraph para)
+            {
+                bool paragraphHasBookmarkStart = false;
+                bool paragraphHasBookmarkEnd = false;
+
+                foreach (DocumentObject child in para.ChildObjects)
+                {
+                    if (child is Spire.Doc.BookmarkStart bStart && bStart.Name == bookmarkName)
+                    {
+                        insideBookmark = true;
+                        paragraphHasBookmarkStart = true;
+                    }
+
+                    if (child is Spire.Doc.BookmarkEnd bEnd && bEnd.Name == bookmarkName)
+                    {
+                        bookmarkEnded = true;
+                        paragraphHasBookmarkEnd = true;
+                    }
+                }
+
+                if (insideBookmark)
+                {
+                    // Clone entire paragraph to preserve numbering and formatting
+                    result.Add(para.Clone());
+                }
+
+                if (paragraphHasBookmarkEnd)
+                    return;
+            }
+            else if (obj is Table table)
+            {
+                foreach (Spire.Doc.TableRow row in table.Rows)
+                {
+                    foreach (Spire.Doc.TableCell cell in row.Cells)
+                    {
+                        foreach (DocumentObject cellObj in cell.ChildObjects)
+                        {
+                            TraverseAndCollect(cellObj, ref insideBookmark, ref bookmarkEnded, bookmarkName, result);
+                            if (bookmarkEnded)
+                                return;
+                        }
+                    }
+                }
+            }
+        }
+        private void ReplaceBookmarkContent(Document doc, Bookmark bookmark, List<DocumentObject> content)
+        {
+            Paragraph startPara = bookmark.BookmarkStart.OwnerParagraph;
+            Body body = (Body)startPara.Owner;
+
+            int index = body.ChildObjects.IndexOf(startPara);
+
+            // Remove existing paragraph containing the bookmark
+            body.ChildObjects.RemoveAt(index);
+
+            // Insert new content
+            foreach (var obj in content)
+            {
+                body.ChildObjects.Insert(index++, obj);
+            }
+        }
+        private async Task<string> PrintQP(Document updatedSourcedoc, Dictionary<string, string> bookmarkUpdates, QPTemplate qPTemplate, UserQPTemplate userQPTemplate,string fileNameToPrint)
         {
             var degreeTypeName = _context.DegreeTypes.FirstOrDefault(dt => dt.DegreeTypeId == qPTemplate.DegreeTypeId)?.Name ?? string.Empty;
             var qpDocument = _context.QPDocuments.FirstOrDefault(d => d.InstitutionId == userQPTemplate.InstitutionId && d.RegulationYear == qPTemplate.RegulationYear && d.DegreeTypeName == degreeTypeName && d.DocumentTypeId == 2 && d.ExamType.ToLower().Contains(qPTemplate.ExamType.ToLower()));
             string documentPathToPrint = _context.Documents.FirstOrDefault(d => d.DocumentId == qpDocument.DocumentId)?.Name;
-
+            
             // Load the template document where bookmarks need to be replaced
             Document templateDoc = await _azureBlobStorageHelper.DownloadWordDocumentFromBlob(documentPathToPrint);
 
@@ -369,6 +474,21 @@ namespace SKCE.Examination.Services.Helpers
             _context.SaveChanges();
 
             SaveSelectedQPBookmarksByFilePath(selectedQPDetail);
+        }
+        static void ConvertToPdfBySyncfusion(string docxPath, string pdfPath)
+        {
+            // Load the Word document
+            Syncfusion.DocIO.DLS.WordDocument document = new Syncfusion.DocIO.DLS.WordDocument(docxPath, FormatType.Docx);
+            //// Convert Word to PDF
+            Syncfusion.Pdf.PdfDocument pdfDocument = new Syncfusion.Pdf.PdfDocument();
+            Syncfusion.DocIORenderer.DocIORenderer renderer = new Syncfusion.DocIORenderer.DocIORenderer();
+            pdfDocument = renderer.ConvertToPDF(document);
+            //ApplyPdfSecurity(pdfDocument);
+            // Save the PDF file
+            pdfDocument.Save(pdfPath);
+            document.Close();
+
+            System.Console.WriteLine("DOCX to PDF conversion By Syncfusion completed.");
         }
         private void RemoveTextFromDocx(string filePath, string textToRemove)
         {

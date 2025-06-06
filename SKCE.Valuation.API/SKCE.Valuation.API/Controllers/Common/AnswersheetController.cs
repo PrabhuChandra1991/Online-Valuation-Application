@@ -186,5 +186,19 @@ namespace SKCE.Examination.API.Controllers.Common
             
         }
 
+        // GET: /api/Answersheet/RevertEvaluation
+        [HttpGet("RevertEvaluation")]
+        public async Task<IActionResult> RevertEvaluation([FromQuery] long answersheetId)
+        {
+            try
+            {
+                var response = await _answersheetService.RevertEvaluation(answersheetId);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResultModel() { Message = "Error while saving Mark." });
+            }
+        }
     }
 }

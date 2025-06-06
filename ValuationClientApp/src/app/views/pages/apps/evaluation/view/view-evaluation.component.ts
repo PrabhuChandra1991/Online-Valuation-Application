@@ -497,7 +497,7 @@ export class ViewEvaluationComponent implements OnInit, AfterViewChecked {
   }
 
   backToList() {
-    this.router.navigate(['/apps/evaluationlist']);
+    this.router.navigate(['/apps/answersheet']);
   }
 
   onError(error: any) {

@@ -247,22 +247,22 @@ export class AnswersheetManagementComponent {
   }
 
   viewEvaluation(answerSheetId: any) {
-    const url = '/apps/viewevaluation/' + encode(String(answerSheetId));
-    const features = `
-      fullscreen=yes,
-      toolbar=yes,
-      location=no,
-      status=no,
-      menubar=no,
-      scrollbars=no,
-      resizable=no,
-      top=0,
-      left=0,
-      width=${screen.width},
-      height=${screen.height}
-    `;
-    const win = window.open(url, '_blank', features);
-    win?.focus();
+    this.router.navigate(['/apps/viewevaluation/' + encode(String(answerSheetId))]);
+    // const features = `
+    //   fullscreen=yes,
+    //   toolbar=yes,
+    //   location=no,
+    //   status=no,
+    //   menubar=no,
+    //   scrollbars=no,
+    //   resizable=no,
+    //   top=0,
+    //   left=0,
+    //   width=${screen.width},
+    //   height=${screen.height}
+    // `;
+    // const win = window.open(url, '_blank', features);
+    // win?.focus();
   }
 
   //---------

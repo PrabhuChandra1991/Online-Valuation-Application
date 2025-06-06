@@ -45,4 +45,8 @@ export class EvaluationService {
     return this.http.post(`${this.apiUrl}/api/Answersheet/CompleteEvaluation?answersheetId=${answersheetId}&evaluatedByUserId=${evaluatedByUserId}`, {}, this.httpOptions);
   }
 
+  getAnswersheetDetailsById(answersheetId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/api/Answersheet/GetAnswersheetDetailsById?answersheetId=${answersheetId}`);
+  }
+
 }

@@ -69,7 +69,8 @@
             </th>
             <td mat-cell *matCellDef="let element">
               <span class="{{ (element.isEvaluateCompleted) ? 'text-success' :  'text-primary' }}">
-                {{ (element.isEvaluateCompleted) ? 'Evaluation Completed' : 'Evaluation Pending' }}</span>
+                {{ (element.isEvaluateCompleted) ? 'Evaluation Completed' : 'Evaluation Pending' }}
+              </span>
             </td>
           </ng-container>
 
@@ -79,17 +80,21 @@
             </th>
             <td mat-cell *matCellDef="let element">
               <span
-                class="{{ (element.totalObtainedMark < 40) ? 'text-danger' : (element.totalObtainedMark < 45) ? 'text-warning' : 'text-success' }}">{{
-                element.totalObtainedMark }}</span>
+                class="{{ (element.totalObtainedMark < 40) ? 'text-danger' : (element.totalObtainedMark < 45) ? 'text-warning' : 'text-success' }}">
+                {{
+                element.totalObtainedMark
+                }}
+              </span>
             </td>
           </ng-container>
-
           <ng-container matColumnDef="revertEvaluation">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>
               Revert Evaluation
             </th>
             <td mat-cell *matCellDef="let element">
-              <button *ngIf="element.isEvaluateCompleted" class="btn btn-primary" (click)="revertEvaluation(element.dummyNumber)">Re-Evaluation
+              <button *ngIf="element.isEvaluateCompleted" class="btn btn-primary"
+                (click)="revertEvaluation(element.dummyNumber)">
+                Re-Evaluation
               </button>
           </ng-container>
 
@@ -98,8 +103,11 @@
               Actions
             </th>
             <td mat-cell *matCellDef="let element">
-              <a *ngIf="element.isEvaluateCompleted" class="primary link-opacity-50-hover" (click)="edit(element.dummyNumber)">Edit
-            </a>
+              <a *ngIf="element.isEvaluateCompleted" class="primary link-opacity-50-hover"
+                (click)="edit(element.dummyNumber)"> Edit </a>
+              &nbsp;&nbsp;
+              <a class="link-opacity-50-hover" (click)="viewEvaluation(element.answersheetId)">View</a>
+            </td>
           </ng-container>
 
           <!-- Table Header & Row Definitions -->

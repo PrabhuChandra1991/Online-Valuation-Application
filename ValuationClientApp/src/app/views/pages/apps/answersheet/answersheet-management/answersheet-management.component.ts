@@ -57,7 +57,7 @@ import { encode } from 'js-base64';
 export class AnswersheetManagementComponent {
   answersheets: any[] = [];
 
-  displayedColumns: string[] = [    
+  displayedColumns: string[] = [
     'dummyNumber',
     'allocatedUserName',
     'isEvaluateCompleted',
@@ -92,8 +92,8 @@ export class AnswersheetManagementComponent {
     private fb: FormBuilder,
     private answersheetService: AnswersheetService,
     private instituteService: InstituteService,
-    private router:Router
-  ) {}
+    private router: Router
+  ) { }
 
   ngOnInit(): void {
     this.loadAllExamYears();
@@ -225,24 +225,44 @@ export class AnswersheetManagementComponent {
       });
   }
 
-   revertEvaluation(dummyNumber: any) {
+
+  revertEvaluation(dummyNumber: any) {
     if (this.selectedCourseId) {
       let answersheet = this.answersheets.filter(m => m.dummyNumber == dummyNumber);
       let answersheetId = answersheet[0].answersheetId;
       this.answersheetService.revertEvaluation(answersheetId).subscribe({
-         next: (data) => {
-           this.loadData();
-         }
+        next: (data) => {
+          this.loadData();
+        }
       });
     }
   }
-  
+
   edit(dummyNumber: any) {
     if (this.selectedCourseId) {
       let answersheet = this.answersheets.filter(m => m.dummyNumber == dummyNumber);
       let answersheetId = answersheet[0].answersheetId;
       this.router.navigate(['/apps/evaluate', encode(String(answersheetId))]);
     }
+  }
+
+  viewEvaluation(answerSheetId: any) {
+    const url = '/apps/viewevaluation/' + encode(String(answerSheetId));
+    const features = `
+      fullscreen=yes,
+      toolbar=yes,
+      location=no,
+      status=no,
+      menubar=no,
+      scrollbars=no,
+      resizable=no,
+      top=0,
+      left=0,
+      width=${screen.width},
+      height=${screen.height}
+    `;
+    const win = window.open(url, '_blank', features);
+    win?.focus();
   }
 
   //---------

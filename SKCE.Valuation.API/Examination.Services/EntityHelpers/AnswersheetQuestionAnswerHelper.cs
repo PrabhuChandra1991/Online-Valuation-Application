@@ -92,12 +92,7 @@ namespace SKCE.Examination.Services.EntityHelpers
                 }//While 
             }//If
 
-
             return resultItems;
-
-
-
-
 
         }
 

@@ -1,10 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SKCE.Examination.Models.DbModels.Common;
 using SKCE.Examination.Services.Common;
-using SKCE.Examination.Services.Helpers;
 using SKCE.Examination.Services.ViewModels.Common;
-using SKCE.Examination.Services.ViewModels.QPSettings;
 
 namespace SKCE.Examination.API.Controllers.Common
 {
@@ -36,14 +33,6 @@ namespace SKCE.Examination.API.Controllers.Common
             return Ok(result);
         }
 
-        [HttpGet("GetAnswersheetDetails")]
-        public async Task<ActionResult<IEnumerable<AnswerManagementDto>>> GetAnswersheetDetails(
-            [FromQuery] string? examYear, [FromQuery] string? examMonth, [FromQuery] string? examType, [FromQuery] long? courseId, [FromQuery] long? allocatedToUserId, [FromQuery] long? answersheetId)
-        {
-            var result = await _answersheetService.GetAnswersheetDetailsAsync(examYear, examMonth, examType, courseId, allocatedToUserId, answersheetId);
-            return Ok(result);
-        }
-
 
         /// <summary>
         /// Upload an Excel file and import QP data.
@@ -58,6 +47,26 @@ namespace SKCE.Examination.API.Controllers.Common
             var importedInfo = await _answersheetService.ImportDummyNumberByExcel(stream, 1);
 
             return Ok(new { Message = importedInfo });
+        }
+
+
+        [HttpGet("GetAnswersheetDetails")]
+        public async Task<ActionResult<IEnumerable<AnswerManagementDto>>> GetAnswersheetDetails(
+            [FromQuery] string? examYear, [FromQuery] string? examMonth, [FromQuery] string? examType, [FromQuery] long? courseId, [FromQuery] long? allocatedToUserId, [FromQuery] long? answersheetId)
+        {
+            var result = await _answersheetService.GetAnswersheetDetailsAsync(examYear, examMonth, examType, courseId, allocatedToUserId, answersheetId);
+            return Ok(result);
+        }
+
+        [HttpGet("GetAnswersheetDetailsById")]
+        public async Task<ActionResult<IEnumerable<AnswerManagementDto>>> GetAnswersheetDetailsById([FromQuery] long answersheetId)
+        {
+            if (answersheetId != 0)
+            {
+                var result = await _answersheetService.GetAnswersheetDetailsByIdAsync(answersheetId);
+                return Ok(result);
+            }
+            return Ok();
         }
 
         [HttpGet("GetQuestionAndAnswersByAnswersheetId")]
@@ -183,7 +192,7 @@ namespace SKCE.Examination.API.Controllers.Common
                     throw ex;
             }
 
-            
+
         }
 
         // GET: /api/Answersheet/RevertEvaluation

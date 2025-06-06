@@ -1,0 +1,152 @@
+<div class="container-fluid">
+
+    <div class="row">
+        <div class="col-md-2 back-btn">
+
+        </div>
+        <div class="col-md-8 p-2 text-center">
+            <h5 *ngIf="primaryData">
+                {{primaryData.courseCode}}&nbsp;&nbsp;<span class="text-secondary">|</span>&nbsp;&nbsp;
+                {{primaryData.courseName}}&nbsp;&nbsp;<span class="text-secondary">|</span>&nbsp;&nbsp;
+                {{primaryData.dummyNumber}}
+            </h5>
+        </div>
+        <div class="col-md-2 d-grid">
+
+        </div>
+    </div>
+
+    <div *ngIf="qaList.length > 0">
+
+        <div class="float">
+            <div class="row mt-3 table-responsive">
+                <div class="col-md-12">
+                    <table class="table table-bordered text-center">
+                        <thead>
+                            <tr>
+                                <td *ngFor="let item of partList" [attr.colspan]="item.count">
+                                    Part {{item.part}}
+                                </td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="question" *ngFor="let item of qaList; let i = index">
+                                    <button *ngIf="item.questionNumberDisplay != ''" class="btn btn-light" type="button"
+                                        [attr.id]="'btn' + (i + 1)" [disabled]="item.disableInput"
+                                        (click)="loadQuestionDetails($event, (i+1), item.questionNumberDisplay)"
+                                        tabindex="-1">{{item.questionNumberDisplay}}</button>
+                                    <input *ngIf="item.questionNumberDisplay != ''" type="text" maxlength="5"
+                                        class="form-control border-0 text-center" [attr.part]="item.questionPart"
+                                        [attr.qno]="item.questionNumber" [attr.qgno]="item.questionNumberDisplay"
+                                        [attr.group]="item.questionGroup" [attr.max]="item.mark"
+                                        [attr.id]="'txt' + (i + 1)" [disabled]="item.disableInput"
+                                        [value]="(item.obtainedMark != 0) ? item.obtainedMark : ''"
+                                        (focus)="loadQuestionDetails($event, (i + 1), item.questionNumberDisplay)"
+                                        readonly>
+                                    <label class="or" *ngIf="item.questionNumberDisplay == ''">OR</label>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <td *ngFor="let item of groupList" [attr.colspan]="item.count">
+                                <span class="subtotal" [attr.qno]="item.group">{{item.group == 10 ? partAMark :
+                                    item.mark}}</span>
+                            </td>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4 p-0 mb-2">
+            <div class="col-md-2">
+                <h5>Selected question number:&nbsp;&nbsp;{{activeQuestionNo}}</h5>
+            </div>
+            <div class="col-md-4">
+                <h5>Maximum mark for selected question:&nbsp;&nbsp;{{activeQuestionMark}}</h5>
+            </div>
+            <div class="col-md-1">
+                <h5>Part A: {{ partAMark }}</h5>
+            </div>
+            <div class="col-md-1">
+                <h5>Part B: {{ partBMark }}</h5>
+            </div>
+            <div class="col-md-1">
+                <h5 *ngIf="primaryData.degreeTypeName == 'PG'">Part C: {{ partCMark }}</h5>
+            </div>
+            <div class="col-md-3">
+                <h4 class="float-end"
+                    [ngClass]="(obtainedMarks < 40) ? 'text-danger' : (obtainedMarks < 45) ? 'text-warning' : 'text-success'">
+                    Grand total:&nbsp;&nbsp;{{obtainedMarks}}&nbsp;/&nbsp;100</h4>
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <div class="card p-3">
+                    <h5>Question:</h5>
+                    <div [innerHtml]="activeQuestion"></div>
+                    <div [innerHtml]="activeQuestionImg"></div>
+                </div>
+                <div class="card p-3 my-3">
+                    <h5>Answer:</h5>
+                    <div [innerHtml]="activeAnswerKey"></div>
+                    <div [innerHtml]="activeAnswerImg"></div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card p-3">
+                    <div class="row mb-2">
+                        <div class="col-md-4">
+                            <button (click)="prevPage()" class="btn w-25 left-arrow" [disabled]="currentPage <= 3">
+                            </button>
+                        </div>
+                        <div class="col-md-4 pt-2" style="text-align: center;">
+                            <span>Page {{ currentPage }} of {{ totalPages }}</span>
+                        </div>
+                        <div class="col-md-4">
+                            <button (click)="nextPage()" class="btn w-25 right-arrow float-end"
+                                [disabled]="currentPage >= totalPages">
+                            </button>
+                        </div>
+                    </div>
+                    <div class="pdf-wrapper" #pdfWrapper>
+                        <pdf-viewer id="answersheet" [src]="answersheet" [page]="currentPage" [rotation]="0"
+                            [original-size]="false" [show-all]="false" [fit-to-page]="true" [zoom]="1"
+                            [zoom-scale]="'page-width'" [stick-to-page]="false" [render-text]="true"
+                            [external-link-target]="'blank'" [autoresize]="true" [show-borders]="false"
+                            style="width: 100%; display: block;" (after-load-complete)="onPdfLoad($event)"
+                            (error)="onError($event)"></pdf-viewer>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Confirmation Modal -->
+<ng-template #confirmModule let-modal>
+    <div class="modal-body">
+        <div class="row mb-4">
+            <div class="col-md-12 mt-4">
+                <h4 *ngIf="noMarksList">You have not entered mark for questions: {{noMarksList}}</h4>
+                <br>
+                <h3>Do you want to complete evaluation?</h3>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-danger px-4" (click)="modal.close('by: no button')">No</button>
+        <button type="button" class="btn btn-primary px-4" (click)="completeEvaluation()">Yes</button>
+    </div>
+</ng-template>
+
+<style>
+    .main-wrapper nav.sidebar,
+    .page-wrapper nav.navbar {
+        display: none !important;
+    }
+</style>

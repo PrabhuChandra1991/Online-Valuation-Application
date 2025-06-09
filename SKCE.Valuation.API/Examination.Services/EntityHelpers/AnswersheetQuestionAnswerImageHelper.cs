@@ -49,7 +49,9 @@ namespace SKCE.Examination.Services.EntityHelpers
                 return resultItems;
 
             var selectedQPMarks = await _dbContext.SelectedQPBookMarkDetails
-                .Where(x => x.SelectedQPDetailId == selectedQP.SelectedQPDetailId && x.IsActive).ToListAsync();
+                .Where(x => x.SelectedQPDetailId == selectedQP.SelectedQPDetailId
+                && x.BookMarkName.Contains("Q" + questionNumber.ToString())
+                && x.IsActive).ToListAsync();
 
             var degreeType = await _dbContext.DegreeTypes.FirstAsync(x => x.DegreeTypeId == selectedQP.DegreeTypeId);
 
@@ -80,8 +82,8 @@ namespace SKCE.Examination.Services.EntityHelpers
 
             }//If
 
-            return resultItems;
-
+            return resultItems.Where(x => x.QuestionNumber == questionNumber && x.QuestionNumberSubNum == questionSubNumber).ToList();
+        
         }
 
 

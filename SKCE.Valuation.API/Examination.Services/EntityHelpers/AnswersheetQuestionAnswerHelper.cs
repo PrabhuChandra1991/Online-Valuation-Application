@@ -128,9 +128,9 @@ namespace SKCE.Examination.Services.EntityHelpers
                     QuestionMark = QPBookMarkMark?.BookMarkText ?? string.Empty,
                     QuestionBT = QPBookMarkBT?.BookMarkText ?? string.Empty,
                     QuestionCO = QPBookMarkCO?.BookMarkText ?? string.Empty,
-                    QuestionImage = null,
+                    QuestionImage = string.Empty,
                     AnswerDescription = AnswerBookMark?.BookMarkText ?? string.Empty,
-                    AnswerImage = null
+                    AnswerImage = string.Empty
                 };
                 return newItem;
             }

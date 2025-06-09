@@ -70,9 +70,21 @@ namespace SKCE.Examination.API.Controllers.Common
         }
 
         [HttpGet("GetQuestionAndAnswersByAnswersheetId")]
-        public async Task<ActionResult<List<AnswersheetQuestionAnswerDto>>> GetQuestionAndAnswersByAnswersheetId(long answersheetId)
+        public async Task<ActionResult<List<AnswersheetQuestionAnswerDto>>> 
+            GetQuestionAndAnswersByAnswersheetId(long answersheetId)
         {
-            var result = await _answersheetService.GetQuestionAndAnswersByAnswersheetIdAsync(answersheetId);
+            var result = await _answersheetService
+                .GetQuestionAndAnswersByAnswersheetIdAsync(answersheetId);
+            return Ok(result);
+        }
+
+
+        [HttpGet("GetQuestionAndAnswerImagesByAnswersheetId")]
+        public async Task<ActionResult<List<AnswersheetQuestionAnswerDto>>>
+            GetQuestionAndAnswerImagesByAnswersheetId(long answersheetId, int QuestionNumber, int QuestionNumberSubNum)
+        {
+            var result = await _answersheetService
+                .GetQuestionAndAnswerImagesByAnswersheetIdAsync(answersheetId, QuestionNumber, QuestionNumberSubNum);
             return Ok(result);
         }
 

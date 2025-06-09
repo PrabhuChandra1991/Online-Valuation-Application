@@ -209,5 +209,19 @@ namespace SKCE.Examination.API.Controllers.Common
                 return BadRequest(new ResultModel() { Message = "Error while saving Mark." });
             }
         }
+
+        [HttpGet("EvaluationHistory")]
+        public async Task<IActionResult> EvaluationHistory([FromQuery] long answersheetId)
+        {
+            try
+            {
+                var response = await _answersheetService.EvaluationHistory(answersheetId);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResultModel() { Message = "Error while saving Mark." });
+            }
+        }
     }
 }

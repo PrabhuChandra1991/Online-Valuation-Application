@@ -41,6 +41,7 @@ namespace SKCE.Examination.Models.DbModels.Common
         public DbSet<SelectedQPDetail> SelectedQPDetails { get; set; }
         public DbSet<SelectedQPBookMarkDetail> SelectedQPBookMarkDetails { get; set; }
         public DbSet<AnswersheetUploadHistory> AnswersheetUploadHistories { get; set; }
+        public DbSet<AnswersheetQuestionwiseMarkHistory> AnswersheetQuestionwiseMarkHistories { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

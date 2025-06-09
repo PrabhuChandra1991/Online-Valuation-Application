@@ -119,6 +119,44 @@ namespace SKCE.Examination.Services.EntityHelpers
             return true;
         }
 
+        public async Task<bool> EvaluationHistory(long answersheetId)
+        {
+            var evalHist = _context.AnswersheetQuestionwiseMarks.Where(e =>
+                e.AnswersheetId == answersheetId).ToList();
+
+            if (evalHist != null)
+            {
+                foreach (var eval in evalHist)
+                {
+                    AnswersheetQuestionwiseMarkHistory objAnsHist = new AnswersheetQuestionwiseMarkHistory();
+                    objAnsHist.AnswersheetQuestionwiseMarkId = eval.AnswersheetQuestionwiseMarkId;
+                    objAnsHist.AnswersheetId = eval.AnswersheetId;
+                    objAnsHist.QuestionNumber = eval.QuestionNumber;
+                    objAnsHist.QuestionNumberSubNum = eval.QuestionNumberSubNum;
+                    objAnsHist.QuestionPartName = eval.QuestionPartName;
+                    objAnsHist.QuestionGroupName = eval.QuestionGroupName;
+                    objAnsHist.MaximumMark = eval.MaximumMark;
+                    objAnsHist.ObtainedMark = eval.ObtainedMark;
+                    objAnsHist.MaximumMark = eval.MaximumMark;
+                    objAnsHist.IsActive = eval.IsActive;
+                    objAnsHist.CreatedDate = eval.CreatedDate;
+                    objAnsHist.CreatedById = eval.CreatedById;
+                    objAnsHist.ModifiedDate = eval.ModifiedDate;
+                    objAnsHist.ModifiedById = eval.ModifiedById;
+                    _context.AnswersheetQuestionwiseMarkHistories.Add(objAnsHist);
+                }
+
+
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                return false;
+            }
+
+            return true;
+        }
+
 
     } // Class
 }

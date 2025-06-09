@@ -45,7 +45,7 @@ namespace SKCE.Examination.Services.EntityHelpers
                     && x.BatchYear == examination.BatchYear
                     && x.DegreeTypeId == examination.DegreeTypeId
                     && x.ExamType == examination.ExamType
-                    && x.Semester == examination.Semester
+                    //&& x.Semester == examination.Semester    //removing this filter for loading issue 
                     && x.ExamMonth == examination.ExamMonth
                     && x.ExamYear == examination.ExamYear
                     && x.IsActive);

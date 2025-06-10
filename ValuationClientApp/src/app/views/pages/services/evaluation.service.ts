@@ -28,6 +28,10 @@ export class EvaluationService {
     return this.http.get(`${this.apiUrl}/api/Answersheet/GetQuestionAndAnswersByAnswersheetId?answersheetId=${answersheetId}`);
   }
 
+  getQuestionAndAnswerImages(answersheetId: number, questionNumber: number, questionSubNumber: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/api/Answersheet/GetQuestionAndAnswerImagesByAnswersheetId?answersheetId=${answersheetId}&QuestionNumber=${questionNumber}&QuestionNumberSubNum=${questionSubNumber}`);
+  }
+
   getAnswersheetMark(answersheetId: number): Observable<any> {
     return this.http.get(`${this.apiUrl}/api/Answersheet/GetAnswersheetMark?answersheetId=${answersheetId}`);
   }

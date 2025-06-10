@@ -351,9 +351,7 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
   }
 
   loadQuestionDetails(event: any, id: number, qusetionNo: string) {
-
     this.qaSelectedItem = this.qaList.filter(x => x.questionNumberDisplay == qusetionNo)[0];
-
     if (this.qaSelectedItem) {
       if ((!this.qaSelectedItem.questionImage) && (!this.qaSelectedItem.answerImage)) {
         this.loadQuestionAnswerImages(qusetionNo, this.qaSelectedItem.questionNumber, this.qaSelectedItem.questionNumberSubNum);
@@ -367,7 +365,6 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
       this.activeAnswerKey = this.sanitizer.bypassSecurityTrustHtml(this.qaSelectedItem.answerDescription);
       this.activeQuestionMark = this.qaSelectedItem.mark;
     }
-
   }
 
   loadQuestionAnswerImages(qusetionDisplayNo: string, questionNumber: number, questionNumberSubNum: number) {

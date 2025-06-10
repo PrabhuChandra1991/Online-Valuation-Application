@@ -26,6 +26,7 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
   primaryData: any;
   answersheetMarkData: any[] = [];
   qaList: any[] = [];
+  qaSelectedItem: any = { questionNumberDisplay: '' };
   partList: any[] = [];
   groupList: any[] = [];
   partAMark: number = 0;
@@ -36,7 +37,7 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
   activeQuestion: SafeHtml = '---------- Please select the question above to load here ----------';
   activeQuestionImg: string = '';
   activeAnswerKey: SafeHtml = '---------- Answerkey loads here ----------';
-  activeAnswerImg: string = '';  
+  activeAnswerImg: string = '';
   activeQuestionMark: string = '-';
   answersheet: string = '---------- Answersheet loads here ----------';
   answersheetMark: AnswersheetMark;
@@ -79,11 +80,11 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
         if (this.answersheetId) {
           await this.getPrimaryData();
           await this.getAnswersheetMark();
-          await this.getQuestionPaperAnswerKey();         
-          
+          await this.getQuestionPaperAnswerKey();
+
         }
       }
-    }); 
+    });
   }
 
   // called after dom is loaded to calclate the marks
@@ -91,7 +92,7 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
     //this.cdr.detectChanges();
     setTimeout(() => {
       this.calculateSubTotalMarks();
-    }, 3000);    
+    }, 3000);
   }
 
   async getPrimaryData() {
@@ -102,7 +103,7 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
           console.log("primary data: ", data[0])
           this.primaryData = data[0];
           this.answersheet = `${this.primaryData.uploadedBlobStorageUrl}`;
-          this.obtainedMarks = this.primaryData.totalObtainedMark;          
+          this.obtainedMarks = this.primaryData.totalObtainedMark;
         }
         else {
           console.log('No answersheet data');
@@ -172,7 +173,7 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
         console.error('Error fetching question and answer:', error);
         this.toastr.error('Failed to load question and answer.');
       }
-    );    
+    );
   }
 
   getPartList(data: any[]) {
@@ -350,43 +351,21 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
   }
 
   loadQuestionDetails(event: any, id: number, qusetionNo: string) {
-    console.log("getting question.................");
 
-    let btnList = document.querySelectorAll(".question .btn");
-    let txtList = document.querySelectorAll(".question .form-control");
-    let btnid = `#btn${id}`;
-    let txtid = `#txt${id}`;
-    let btn = document.querySelector(btnid);
-    let txt = document.querySelector(txtid);
+    this.qaSelectedItem = this.qaList.filter(x => x.questionNumberDisplay == qusetionNo)[0];
 
-    btnList.forEach((item) => {
-      if (item.classList.contains('active')) {
-        item.classList.remove('active');
+    if (this.qaSelectedItem) {
+      if ((!this.qaSelectedItem.questionImage) && (!this.qaSelectedItem.answerImage)) {
+        this.loadQuestionAnswerImages(qusetionNo, this.qaSelectedItem.questionNumber, this.qaSelectedItem.questionNumberSubNum);
       }
-    });
-    txtList.forEach((item) => {
-      if (item.classList.contains('active')) {
-        item.classList.remove('active');
+      else {
+        this.activeQuestionImg = decode(this.qaSelectedItem.questionImage);
+        this.activeAnswerImg = decode(this.qaSelectedItem.answerImage);
       }
-    });
-
-    btn?.classList.add('active');
-    txt?.classList.add('active');
-
-    let matchedItem = this.qaList.filter(x => x.questionNumberDisplay == qusetionNo)[0];
-
-    if (matchedItem) {
-      if ((!matchedItem.questionImage) && (!matchedItem.answerImage)) {
-        this.loadQuestionAnswerImages(qusetionNo, matchedItem.questionNumber, matchedItem.questionNumberSubNum);
-      }
-      else {        
-        this.activeQuestionImg = decode(matchedItem.questionImage);
-        this.activeAnswerImg = decode(matchedItem.answerImage);
-      }
-      this.activeQuestionNo = matchedItem.questionNumberDisplay;
-      this.activeQuestion = this.sanitizer.bypassSecurityTrustHtml(matchedItem.questionDescription);
-      this.activeAnswerKey = this.sanitizer.bypassSecurityTrustHtml(matchedItem.answerDescription);
-      this.activeQuestionMark = matchedItem.mark;
+      this.activeQuestionNo = this.qaSelectedItem.questionNumberDisplay;
+      this.activeQuestion = this.sanitizer.bypassSecurityTrustHtml(this.qaSelectedItem.questionDescription);
+      this.activeAnswerKey = this.sanitizer.bypassSecurityTrustHtml(this.qaSelectedItem.answerDescription);
+      this.activeQuestionMark = this.qaSelectedItem.mark;
     }
 
   }

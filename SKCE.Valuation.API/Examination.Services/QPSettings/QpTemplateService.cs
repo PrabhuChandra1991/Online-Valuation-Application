@@ -296,6 +296,7 @@ namespace SKCE.Examination.Services.QPSettings
 
             string updatedFilePath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), "UpdatedSyllabusDocument.docx");
             doc.Watermark = null;
+            doc.ProtectionType = ProtectionType.AllowOnlyReading;
             doc.SaveToFile(updatedFilePath, FileFormat.Docx);
             //// Remove evaluation watermark from the output document By OpenXML
             RemoveTextFromDocx(updatedFilePath, "Evaluation Warning: The document was created with Spire.Doc for .NET.");

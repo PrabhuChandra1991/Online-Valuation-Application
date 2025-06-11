@@ -2,13 +2,13 @@
 using SKCE.Examination.Models.DbModels.QPSettings;
 using Microsoft.Extensions.Configuration;
 using SKCE.Examination.Models.DbModels.Common;
-using Syncfusion.Licensing;
+//using Syncfusion.Licensing;
 using Spire.Doc;
 using Document = Spire.Doc.Document;
 using Paragraph = Spire.Doc.Documents.Paragraph;
 using Spire.Doc.Collections;
 using Body = Spire.Doc.Body;
-using Syncfusion.DocIO;
+//using Syncfusion.DocIO;
 using Microsoft.EntityFrameworkCore;
 using HtmlAgilityPack;
 using DocumentFormat.OpenXml;
@@ -475,21 +475,21 @@ namespace SKCE.Examination.Services.Helpers
 
             SaveSelectedQPBookmarksByFilePath(selectedQPDetail);
         }
-        static void ConvertToPdfBySyncfusion(string docxPath, string pdfPath)
-        {
-            // Load the Word document
-            Syncfusion.DocIO.DLS.WordDocument document = new Syncfusion.DocIO.DLS.WordDocument(docxPath, FormatType.Docx);
-            //// Convert Word to PDF
-            Syncfusion.Pdf.PdfDocument pdfDocument = new Syncfusion.Pdf.PdfDocument();
-            Syncfusion.DocIORenderer.DocIORenderer renderer = new Syncfusion.DocIORenderer.DocIORenderer();
-            pdfDocument = renderer.ConvertToPDF(document);
-            //ApplyPdfSecurity(pdfDocument);
-            // Save the PDF file
-            pdfDocument.Save(pdfPath);
-            document.Close();
+        //static void ConvertToPdfBySyncfusion(string docxPath, string pdfPath)
+        //{
+        //    // Load the Word document
+        //    Syncfusion.DocIO.DLS.WordDocument document = new Syncfusion.DocIO.DLS.WordDocument(docxPath, FormatType.Docx);
+        //    //// Convert Word to PDF
+        //    Syncfusion.Pdf.PdfDocument pdfDocument = new Syncfusion.Pdf.PdfDocument();
+        //    Syncfusion.DocIORenderer.DocIORenderer renderer = new Syncfusion.DocIORenderer.DocIORenderer();
+        //    pdfDocument = renderer.ConvertToPDF(document);
+        //    //ApplyPdfSecurity(pdfDocument);
+        //    // Save the PDF file
+        //    pdfDocument.Save(pdfPath);
+        //    document.Close();
 
-            System.Console.WriteLine("DOCX to PDF conversion By Syncfusion completed.");
-        }
+        //    System.Console.WriteLine("DOCX to PDF conversion By Syncfusion completed.");
+        //}
         private void RemoveTextFromDocx(string filePath, string textToRemove)
         {
             using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, true))

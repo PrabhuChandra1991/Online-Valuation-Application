@@ -9,7 +9,7 @@ using SKCE.Examination.Services.Helpers;
 using SKCE.Examination.Services.ViewModels.QPSettings;
 using Spire.Doc;
 using Spire.Doc.Documents;
-using Syncfusion.DocIO.DLS;
+//using Syncfusion.DocIO.DLS;
 using Document = Spire.Doc.Document;
 
 public class QPDataImportHelper

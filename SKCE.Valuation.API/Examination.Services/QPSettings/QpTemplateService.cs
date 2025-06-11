@@ -11,11 +11,11 @@ using Document = Spire.Doc.Document;
 using Spire.Doc.Documents;
 using Azure.Storage.Blobs;
 using DocumentFormat.OpenXml.Packaging;
-using Syncfusion.DocIO.DLS;
-using Syncfusion.DocIO;
+//using Syncfusion.DocIO.DLS;
+//using Syncfusion.DocIO;
 using Spire.Doc.Collections;
 using Spire.Doc.Fields;
-using Syncfusion.Licensing;
+//using Syncfusion.Licensing;
 using Spire.Xls.Core.Spreadsheet;
 using BookmarksNavigator = Spire.Doc.Documents.BookmarksNavigator;
 using System.Linq;
@@ -302,8 +302,8 @@ namespace SKCE.Examination.Services.QPSettings
 
             // Convert DOCX to PDF for preview By Syncfusion
             string outputPdfPathBySyncfusion = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), "UpdatedSyllabusDocument.pdf");
-            SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NNaF5cXmBCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdmWXtfcXRQQ2lZWEJwW0VWYUA=");
-            ConvertToPdfBySyncfusion(updatedFilePath, outputPdfPathBySyncfusion);
+            //SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NNaF5cXmBCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdmWXtfcXRQQ2lZWEJwW0VWYUA=");
+            //ConvertToPdfBySyncfusion(updatedFilePath, outputPdfPathBySyncfusion);
 
             return (outputPdfPathBySyncfusion, updatedFilePath);
         }
@@ -324,21 +324,21 @@ namespace SKCE.Examination.Services.QPSettings
                 doc.MainDocumentPart.Document.Save(); // Save changes
             }
         }
-        static void ConvertToPdfBySyncfusion(string docxPath, string pdfPath)
-        {
-            // Load the Word document
-            WordDocument document = new WordDocument(docxPath, FormatType.Docx);
-            //// Convert Word to PDF
-            Syncfusion.Pdf.PdfDocument pdfDocument = new Syncfusion.Pdf.PdfDocument();
-            Syncfusion.DocIORenderer.DocIORenderer renderer = new Syncfusion.DocIORenderer.DocIORenderer();
-            pdfDocument = renderer.ConvertToPDF(document);
-            //ApplyPdfSecurity(pdfDocument);
-            // Save the PDF file
-            pdfDocument.Save(pdfPath);
-            document.Close();
-            //OpenPdfInBrowser(pdfPath);
-            //System.Console.WriteLine("DOCX to PDF conversion By Syncfusion completed.");
-        }
+        //static void ConvertToPdfBySyncfusion(string docxPath, string pdfPath)
+        //{
+        //    // Load the Word document
+        //    WordDocument document = new WordDocument(docxPath, FormatType.Docx);
+        //    //// Convert Word to PDF
+        //    Syncfusion.Pdf.PdfDocument pdfDocument = new Syncfusion.Pdf.PdfDocument();
+        //    Syncfusion.DocIORenderer.DocIORenderer renderer = new Syncfusion.DocIORenderer.DocIORenderer();
+        //    pdfDocument = renderer.ConvertToPDF(document);
+        //    //ApplyPdfSecurity(pdfDocument);
+        //    // Save the PDF file
+        //    pdfDocument.Save(pdfPath);
+        //    document.Close();
+        //    //OpenPdfInBrowser(pdfPath);
+        //    //System.Console.WriteLine("DOCX to PDF conversion By Syncfusion completed.");
+        //}
         public async Task<QPTemplate> CreateQpTemplateAsync(QPTemplateVM qPTemplateVM)
         {
             if (qPTemplateVM.QPTemplateId > 0) return await UpdateQpTemplateAsync(qPTemplateVM);

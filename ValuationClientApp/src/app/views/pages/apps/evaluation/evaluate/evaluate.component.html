@@ -52,7 +52,7 @@
                                         [disabled]="item.disableInput"
                                         [value]="(item.obtainedMark != 0) ? item.obtainedMark : ''"
                                         (focus)="loadQuestionDetails($event, (i + 1), item.questionNumberDisplay)"
-                                        (blur)="validateMark($event, item)">
+                                        (blur)="validateMark($event, item)" (change)="onValueFinalized($event, item)">
                                     <label class="or" *ngIf="item.questionNumberDisplay == ''">OR</label>
                                 </td>
                             </tr>

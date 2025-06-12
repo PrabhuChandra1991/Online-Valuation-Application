@@ -10,6 +10,7 @@ import { ActivatedRoute } from '@angular/router'
 import { AnswersheetMark } from '../../../models/answersheetMark.model';
 import { Router } from '@angular/router';
 import { SpinnerService } from '../../../services/spinner.service';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-view-evaluation',
@@ -25,6 +26,7 @@ export class ViewEvaluationComponent implements OnInit, AfterViewChecked {
   primaryData: any;
   answersheetMarkData: any[] = [];
   qaList: any[] = [];
+  qaSelectedItem: any = { questionNumberDisplay: '' };
   partList: any[] = [];
   groupList: any[] = [];
   partAMark: number = 0;
@@ -32,9 +34,9 @@ export class ViewEvaluationComponent implements OnInit, AfterViewChecked {
   partCMark: number = 0;
   obtainedMarks: number = 0;
   activeQuestionNo: string = '-';
-  activeQuestion: string = '---------- Please select the question above to load here ----------';
+  activeQuestion: SafeHtml = '---------- Please select the question above to load here ----------';
   activeQuestionImg: string = '';
-  activeAnswerKey: string = '---------- Answerkey loads here ----------';
+  activeAnswerKey: SafeHtml = '---------- Answerkey loads here ----------';
   activeAnswerImg: string = '';
   activeQuestionMark: string = '-';
   answersheet: string = '---------- Answersheet loads here ----------';
@@ -55,7 +57,8 @@ export class ViewEvaluationComponent implements OnInit, AfterViewChecked {
     private evaluationService: EvaluationService,
     private router: Router,
     private cdr: ChangeDetectorRef,
-    private spinnerService: SpinnerService
+    private spinnerService: SpinnerService,
+    private sanitizer: DomSanitizer
   ) { }
 
   ngOnInit() {
@@ -87,7 +90,9 @@ export class ViewEvaluationComponent implements OnInit, AfterViewChecked {
   // called after dom is loaded to calclate the marks
   ngAfterViewChecked(): void {
     //this.cdr.detectChanges();
-    this.calculateSubTotalMarks();
+    setTimeout(() => {
+      this.calculateSubTotalMarks();
+    }, 3000);
   }
 
   async getPrimaryData() {
@@ -275,6 +280,8 @@ export class ViewEvaluationComponent implements OnInit, AfterViewChecked {
       }, {} as { [key: string]: { qno: string, group: string, totalMark: number } })
     );
 
+    //console.log("summed:", summed);
+
     // 
     let subTotalList = document.querySelectorAll("span.subtotal");
     subTotalList.forEach((item) => {
@@ -284,6 +291,8 @@ export class ViewEvaluationComponent implements OnInit, AfterViewChecked {
         }
       });
     });
+
+    //console.log("subTotalList:", subTotalList);
 
     // Step 2: From each group, pick the one with highest totalMark
     const finalResult = Object.values(
@@ -297,6 +306,8 @@ export class ViewEvaluationComponent implements OnInit, AfterViewChecked {
         return acc;
       }, {} as { [group: string]: { qno: string, group: string, totalMark: number } })
     );
+
+    //console.log("finalResult:", finalResult);
 
     // Step 3: Sum of all totalMarks
     const sumTotalMarks: any = finalResult.reduce((acc, item: any) => acc + item.totalMark, 0);
@@ -340,40 +351,44 @@ export class ViewEvaluationComponent implements OnInit, AfterViewChecked {
   }
 
   loadQuestionDetails(event: any, id: number, qusetionNo: string) {
-    console.log("getting question.................");
-
-    let btnList = document.querySelectorAll(".question .btn");
-    let txtList = document.querySelectorAll(".question .form-control");
-    let btnid = `#btn${id}`;
-    let txtid = `#txt${id}`;
-    let btn = document.querySelector(btnid);
-    let txt = document.querySelector(txtid);
-
-    btnList.forEach((item) => {
-      if (item.classList.contains('active')) {
-        item.classList.remove('active');
+    this.qaSelectedItem = this.qaList.filter(x => x.questionNumberDisplay == qusetionNo)[0];
+    if (this.qaSelectedItem) {
+      if ((!this.qaSelectedItem.questionImage) && (!this.qaSelectedItem.answerImage)) {
+        this.loadQuestionAnswerImages(qusetionNo, this.qaSelectedItem.questionNumber, this.qaSelectedItem.questionNumberSubNum);
       }
-    });
-    txtList.forEach((item) => {
-      if (item.classList.contains('active')) {
-        item.classList.remove('active');
+      else {
+        this.activeQuestionImg = decode(this.qaSelectedItem.questionImage);
+        this.activeAnswerImg = decode(this.qaSelectedItem.answerImage);
       }
-    });
-
-    btn?.classList.add('active');
-    txt?.classList.add('active');
-
-    let matchedItem = this.qaList.filter(x => x.questionNumberDisplay == qusetionNo)[0];
-
-    if (matchedItem) {
-      this.activeQuestionNo = matchedItem.questionNumberDisplay;
-      this.activeQuestion = matchedItem.questionDescription;
-      this.activeQuestionImg = matchedItem.questionImage;
-      this.activeAnswerKey = matchedItem.answerDescription;
-      this.activeAnswerImg = matchedItem.answerImage;
-      this.activeQuestionMark = matchedItem.mark;
+      this.activeQuestionNo = this.qaSelectedItem.questionNumberDisplay;
+      this.activeQuestion = this.sanitizer.bypassSecurityTrustHtml(this.qaSelectedItem.questionDescription);
+      this.activeAnswerKey = this.sanitizer.bypassSecurityTrustHtml(this.qaSelectedItem.answerDescription);
+      this.activeQuestionMark = this.qaSelectedItem.mark;
     }
+  }
 
+  loadQuestionAnswerImages(qusetionDisplayNo: string, questionNumber: number, questionNumberSubNum: number) {
+    this.spinnerService.toggleSpinnerState(true);
+    this.evaluationService.getQuestionAndAnswerImages(this.answersheetId, questionNumber, questionNumberSubNum).subscribe(
+      (data: any[]) => {
+        if (data.length > 0) {
+          this.activeQuestionImg = decode(data[0].questionImage);
+          this.activeAnswerImg = decode(data[0].answerImage);
+
+          this.qaList = this.qaList.map(e =>
+            e.questionNumberDisplay === qusetionDisplayNo ? { ...e, questionImage: data[0].questionImage, answerImage: data[0].answerImage } : e
+          );
+        }
+        else {
+          console.log('No question and answer image data');
+        }
+        this.spinnerService.toggleSpinnerState(false);
+      },
+      (error) => {
+        console.error('Error fetching question and answer image:', error);
+        this.toastr.error('Failed to load question and answer image.');
+      }
+    );
   }
 
   validateMark(event: any, item: any) {

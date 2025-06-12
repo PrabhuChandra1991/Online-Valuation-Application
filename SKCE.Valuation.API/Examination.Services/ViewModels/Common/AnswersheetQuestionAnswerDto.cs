@@ -17,9 +17,17 @@ namespace SKCE.Examination.Services.ViewModels.Common
         public string? QuestionImage { get; set; } = null;
         public string? QuestionBT { get; set; } = string.Empty;
         public string? QuestionCO { get; set; } = string.Empty;
-        public required string QuestionMark { get; set; } = string.Empty;
-        public required string AnswerDescription { get; set; } = string.Empty;
-        public required string AnswerImage { get; set; } = string.Empty;
-
+        public string? QuestionMark { get; set; } = string.Empty;
+        public string? AnswerDescription { get; set; } = string.Empty;
+        public string? AnswerImage { get; set; } = string.Empty;
     }
+
+    public class AnswersheetQuestionAnswerImageDto
+    {
+        public required int QuestionNumber { get; set; } = 0;
+        public required int QuestionNumberSubNum { get; set; } = 0;
+        public string? QuestionImage { get; set; } = null;
+        public string? AnswerImage { get; set; } = string.Empty;
+    }
+
 }

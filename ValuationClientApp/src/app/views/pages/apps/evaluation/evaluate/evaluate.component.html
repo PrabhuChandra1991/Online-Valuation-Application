@@ -21,7 +21,7 @@
         </div>
         <div class="col-md-2 d-grid">
             <button class="btn btn-primary float-end me-1" [disabled]="!enableSubmit"
-            (click)="promptBeforeCompletion()">Complete Evaluation</button>
+                (click)="promptBeforeCompletion()">Complete Evaluation</button>
         </div>
     </div>
 
@@ -42,13 +42,16 @@
                             <tr>
                                 <td class="question" *ngFor="let item of qaList; let i = index">
                                     <button *ngIf="item.questionNumberDisplay != ''" class="btn btn-light" type="button"
+                                        [ngClass]="{'active':qaSelectedItem.questionNumberDisplay === item.questionNumberDisplay }"
                                         [attr.id]="'btn' + (i + 1)" [disabled]="item.disableInput"
                                         (click)="loadQuestionDetails($event, (i+1), item.questionNumberDisplay)"
                                         tabindex="-1">{{item.questionNumberDisplay}}</button>
                                     <input *ngIf="item.questionNumberDisplay != ''" type="text" maxlength="5"
-                                        class="form-control border-0 text-center" [attr.part]="item.questionPart"
-                                        [attr.qno]="item.questionNumber" [attr.qgno]="item.questionNumberDisplay"
-                                        [attr.group]="item.questionGroup" [attr.max]="item.mark" [attr.id]="'txt' + (i + 1)"
+                                        class="form-control border-0 text-center"
+                                        [ngClass]="{'active':qaSelectedItem.questionNumberDisplay === item.questionNumberDisplay }"
+                                        [attr.part]="item.questionPart" [attr.qno]="item.questionNumber"
+                                        [attr.qgno]="item.questionNumberDisplay" [attr.group]="item.questionGroup"
+                                        [attr.max]="item.mark" [attr.id]="'txt' + (i + 1)"
                                         [disabled]="item.disableInput"
                                         [value]="(item.obtainedMark != 0) ? item.obtainedMark : ''"
                                         (focus)="loadQuestionDetails($event, (i + 1), item.questionNumberDisplay)"
@@ -121,12 +124,12 @@
                         </div>
                     </div>
                     <div class="pdf-wrapper" #pdfWrapper>
-                        <pdf-viewer id="answersheet" [src]="answersheet" [page]="currentPage" [rotation]="0" 
-                            [original-size]="false" [show-all]="false" [fit-to-page]="true" [zoom]="1" 
-                            [zoom-scale]="'page-width'" [stick-to-page]="false" [render-text]="true" 
+                        <pdf-viewer id="answersheet" [src]="answersheet" [page]="currentPage" [rotation]="0"
+                            [original-size]="false" [show-all]="false" [fit-to-page]="true" [zoom]="1"
+                            [zoom-scale]="'page-width'" [stick-to-page]="false" [render-text]="true"
                             [external-link-target]="'blank'" [autoresize]="true" [show-borders]="false"
-                            style="width: 100%; display: block;"
-                            (after-load-complete)="onPdfLoad($event)" (error)="onError($event)"></pdf-viewer>
+                            style="width: 100%; display: block;" (after-load-complete)="onPdfLoad($event)"
+                            (error)="onError($event)"></pdf-viewer>
                     </div>
                 </div>
             </div>

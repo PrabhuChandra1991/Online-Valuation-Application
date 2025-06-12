@@ -112,6 +112,15 @@ namespace SKCE.Examination.Services.Common
             return result.ToList();
         }
 
+
+        public async Task<List<AnswersheetQuestionAnswerImageDto>>
+            GetQuestionAndAnswerImagesByAnswersheetIdAsync(long answersheetId, int questionNumber, int questionSubNumber)
+        {
+            var helper = new AnswersheetQuestionAnswerImageHelper(this._context);
+            var result = await helper.GetQuestionAndAnswerImagesByAnswersheetId(answersheetId, questionNumber, questionSubNumber);
+            return result.ToList();
+        }
+
         public async Task<List<AnswersheetConsolidatedDto>> GetExamConsolidatedAnswersheetsAsync(
             string examYear, string examMonth, string examType)
         {

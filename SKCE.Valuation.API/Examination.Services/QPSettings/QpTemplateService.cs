@@ -810,9 +810,9 @@ namespace SKCE.Examination.Services.QPSettings
                     var syllabusDocument = _context.CourseSyllabusDocuments.FirstOrDefault(d => d.CourseId == qPTemplate.CourseId);
                     if (syllabusDocument != null)
                     {
-                        qPTemplate.CourseSyllabusDocumentId = syllabusDocument.DocumentId;
-                        qPTemplate.CourseSyllabusDocumentName = documents.FirstOrDefault(di => di.DocumentId == syllabusDocument.DocumentId)?.Name ?? string.Empty;
-                        qPTemplate.CourseSyllabusDocumentUrl = documents.FirstOrDefault(di => di.DocumentId == syllabusDocument.DocumentId)?.Url ?? string.Empty;
+                        qPTemplate.CourseSyllabusDocumentId = syllabusDocument.WordDocumentId;
+                        qPTemplate.CourseSyllabusDocumentName = documents.FirstOrDefault(di => di.DocumentId == syllabusDocument.WordDocumentId)?.Name ?? string.Empty;
+                        qPTemplate.CourseSyllabusDocumentUrl = documents.FirstOrDefault(di => di.DocumentId == syllabusDocument.WordDocumentId)?.Url ?? string.Empty;
                     }
                     else
                     {

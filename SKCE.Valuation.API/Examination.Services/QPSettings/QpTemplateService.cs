@@ -617,7 +617,7 @@ namespace SKCE.Examination.Services.QPSettings
             await _context.SaveChangesAsync();
             return qpTemplate;
         }
-        public async Task<List<QPTemplateVM>> GetQPTemplatesAsync(long institutionId)
+        public async Task<List<QPTemplateVM>> GetQPTemplatesAsync(long institutionId, string? examYear, string? examMonth, string? examType)
         {
             var degreeTypes = _context.DegreeTypes.ToList();
             var institutions = _context.Institutions.ToList();
@@ -642,7 +642,7 @@ namespace SKCE.Examination.Services.QPSettings
                 ExamType = qpt.ExamType,
                 Semester = qpt.Semester,
                 StudentCount = qpt.StudentCount,
-            }).ToListAsync();
+            }).Where(x => x.ExamYear== (( examYear != null) ? examYear : x.ExamYear) && x.ExamMonth == ((examMonth != null) ? examMonth : x.ExamMonth) && x.ExamType == ((examType != null) ? examType :x.ExamType) ).ToListAsync();
 
             foreach (var qPTemplate in qPTemplates)
             {

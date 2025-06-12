@@ -57,9 +57,9 @@ namespace SKCE.Examination.API.Controllers.QPSettings
             return Ok(updatedTemplate);
         }
         [HttpGet("GetQPTemplates/{institutionId}")]
-        public async Task<ActionResult<IEnumerable<QPTemplateVM>>> GetQPTemplates(long institutionId)
+        public async Task<ActionResult<IEnumerable<QPTemplateVM>>> GetQPTemplates(long institutionId, string? examYear, string? examMonth, string? examType)
         {
-            return Ok(await _qpTemplateService.GetQPTemplatesAsync(institutionId));
+            return Ok(await _qpTemplateService.GetQPTemplatesAsync(institutionId, examYear, examMonth, examType));
         }
 
         [HttpGet("{qpTemplateId}")]

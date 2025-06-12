@@ -41,6 +41,7 @@
     "bootstrap": "^5.3.3",
     "chart.js": "^4.4.4",
     "feather-icons": "^4.29.2",
+    "file-saver": "^2.0.5",
     "js-base64": "^3.7.7",
     "metismenujs": "^1.4.0",
     "ng-apexcharts": "^1.11.0",
@@ -65,6 +66,7 @@
     "sortablejs": "^1.15.3",
     "sweetalert2": "^11.14.0",
     "tslib": "^2.3.0",
+    "xlsx": "^0.18.5",
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
@@ -73,6 +75,7 @@
     "@angular/compiler-cli": "^19.2.0",
     "@angular/localize": "^19.2.0",
     "@types/feather-icons": "^4.29.4",
+    "@types/file-saver": "^2.0.7",
     "@types/jasmine": "~5.1.0",
     "@types/sortablejs": "^1.15.8",
     "jasmine-core": "~5.2.0",

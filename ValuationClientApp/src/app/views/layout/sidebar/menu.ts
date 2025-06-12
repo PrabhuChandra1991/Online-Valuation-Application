@@ -67,6 +67,12 @@ export const MENU: MenuItem[] = [
     link: '/exportmarks',
     role: [1],
   },
+   {
+    label: 'Report Management',
+    icon: 'clipboard',
+    link: '/apps/reports',
+    role: [1],
+  },
   // {
   //   label: 'Valuation',
   //   icon: 'list',

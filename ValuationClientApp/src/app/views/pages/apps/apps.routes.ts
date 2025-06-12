@@ -115,4 +115,13 @@ export default [
         canActivate: [authGuard],
     },
 
+    {
+        path: 'reports',
+        loadComponent: () => 
+            import(
+                './reports/reports.component'
+            ).then(c => c.ReportsComponent),
+        canActivate: [authGuard]
+    },
+
 ] as Routes;

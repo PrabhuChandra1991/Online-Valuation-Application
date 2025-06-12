@@ -9,13 +9,31 @@
         public required string CourseName { get; set; }
         public required long StudentTotalRegisteredCount { get; set; }
         public required long StudentTotalAppearedCount { get; set; }
-        public required long StudentTotalAbsentCount { get; set; }
+        public long StudentTotalAbsentCount
+        {
+            get
+            {
+                return this.StudentTotalRegisteredCount - StudentTotalAppearedCount;
+            }   
+        }
         public required long StudentTotal_45_50_Count { get; set; }
         public required long StudentTotal_51_60_Count { get; set; }
         public required long StudentTotal_61_70_Count { get; set; }
         public required long StudentTotal_71_80_Count { get; set; }
         public required long StudentTotal_81_90_Count { get; set; }
         public required long StudentTotal_91_100_Count { get; set; }
-        public required long StudentTotalPassCount { get; set; } 
+        public long StudentTotalPassCount
+        {
+            get
+            {
+                return
+                this.StudentTotal_45_50_Count +
+                this.StudentTotal_51_60_Count +
+                this.StudentTotal_61_70_Count +
+                this.StudentTotal_71_80_Count +
+                this.StudentTotal_81_90_Count +
+                this.StudentTotal_91_100_Count;
+            }
+        }
     }
 }

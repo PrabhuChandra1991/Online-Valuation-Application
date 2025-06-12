@@ -19,21 +19,21 @@ namespace SKCE.Examination.API.Controllers.Report
         [HttpGet("GetConsolidatedMarkReport")]
         public async Task<ActionResult<IEnumerable<ConsolidatedMarkReportDto>>> GetConsolidatedMarkReportData()
         {
-            var resultItems = _reportService.GetConsolidatedMarkReportData();
+            var resultItems = await _reportService.GetConsolidatedMarkReportData();
             return Ok(resultItems);
-        }         
+        }
 
         [HttpGet("GetPassAnalysisReport")]
         public async Task<ActionResult<IEnumerable<PassAnalysisReportDto>>> GetPassAnalysisReportData()
         {
-            var resultItems = _reportService.GetPassAnalysisReportData();
+            var resultItems = await _reportService.GetPassAnalysisReportData();
             return Ok(resultItems);
         }
 
         [HttpGet("GetFailAnalysisReport")]
         public async Task<ActionResult<IEnumerable<FailAnalysisReportDto>>> GetFailAnalysisReportData()
         {
-            var resultItems = _reportService.GetFailAnalysisReportData();
+            var resultItems = await _reportService.GetFailAnalysisReportData();
             return Ok(resultItems);
         }
 

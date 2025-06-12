@@ -1,4 +1,5 @@
 ﻿using SKCE.Examination.Models.DbModels.Common;
+using SKCE.Examination.Services.EntityReportHelpers;
 using SKCE.Examination.Services.ViewModels.Report;
 
 namespace SKCE.Examination.Services.Common
@@ -7,26 +8,27 @@ namespace SKCE.Examination.Services.Common
     {
         private readonly ExaminationDbContext _context;
 
-        public ReportService(ExaminationDbContext context )
+        public ReportService(ExaminationDbContext context)
         {
-            _context = context; 
+            _context = context;
         }
 
         public async Task<IEnumerable<ConsolidatedMarkReportDto>> GetConsolidatedMarkReportData()
         {
-            return new List<ConsolidatedMarkReportDto>();
-
+            var helper = new ConsolidatedMarkReportHelper(this._context);
+            return await helper.GetConsolidatedMarkReportData();
         }
 
         public async Task<IEnumerable<PassAnalysisReportDto>> GetPassAnalysisReportData()
         {
-            return new List<PassAnalysisReportDto>();
-
+            var helper = new PassAnalysisReportHelper(this._context);
+            return await helper.GetPassAnalysisReportData();
         }
-         
+
         public async Task<IEnumerable<FailAnalysisReportDto>> GetFailAnalysisReportData()
         {
-            return new List<FailAnalysisReportDto>();
+            var helper = new FailAnalysisReportHelper(this._context);
+            return await helper.GetFailAnalysisReportData();
         }
 
     }

@@ -4,16 +4,16 @@ using SKCE.Examination.Services.ViewModels.Report;
 
 namespace SKCE.Examination.Services.EntityReportHelpers
 {
-    public class ConsolidatedMarkReportHelper
+    public class PassAnalysisReportHelper
     {
         private readonly ExaminationDbContext _context;
 
-        public ConsolidatedMarkReportHelper(ExaminationDbContext context)
+        public PassAnalysisReportHelper(ExaminationDbContext context)
         {
             _context = context;
         }
 
-        public async Task<List<ConsolidatedMarkReportDto>> GetConsolidatedMarkReportData()
+        public async Task<List<PassAnalysisReportDto>> GetPassAnalysisReportData()
         {
             var examimationItems =
                 await (from examination in this._context.Examinations
@@ -43,7 +43,7 @@ namespace SKCE.Examination.Services.EntityReportHelpers
             var resultItems =
               (from item in examimationItems
                group item by new { item.InstitutionId, item.CourseId } into grpItems
-               select new ConsolidatedMarkReportDto
+               select new PassAnalysisReportDto
                {
                    InstitutionId = grpItems.Key.InstitutionId,
                    InstitutionCode = grpItems.First().InstitutionCode,
@@ -56,17 +56,39 @@ namespace SKCE.Examination.Services.EntityReportHelpers
                    StudentTotalAppearedCount = asnswersheets
                    .Count(x => grpItems.Select(y => y.ExaminationId).Contains(x.ExaminationId)),
 
-                   //StudentTotalAbsentCount = 0,
+                   //StudentTotalAbsentCount  --- Refer model Get property
 
-                   StudentTotalPassCount = asnswersheets
-                   .Where(x => x.TotalObtainedMark >= 45)
+                   StudentTotal_45_50_Count = asnswersheets
+                   .Where(x => x.TotalObtainedMark >= 45 && x.TotalObtainedMark <= 50)
                    .Where(x => grpItems.Select(y => y.ExaminationId).Contains(x.ExaminationId))
                    .Count(),
 
-                   StudentTotalFailCount = asnswersheets
-                   .Where(x => x.TotalObtainedMark < 45)
+                   StudentTotal_51_60_Count = asnswersheets
+                   .Where(x => x.TotalObtainedMark >= 51 && x.TotalObtainedMark <= 60)
                    .Where(x => grpItems.Select(y => y.ExaminationId).Contains(x.ExaminationId))
-                   .Count()
+                   .Count(),
+
+                   StudentTotal_61_70_Count = asnswersheets
+                   .Where(x => x.TotalObtainedMark >= 61 && x.TotalObtainedMark <= 70)
+                   .Where(x => grpItems.Select(y => y.ExaminationId).Contains(x.ExaminationId))
+                   .Count(),
+
+                   StudentTotal_71_80_Count = asnswersheets
+                   .Where(x => x.TotalObtainedMark >= 71 && x.TotalObtainedMark <= 80)
+                   .Where(x => grpItems.Select(y => y.ExaminationId).Contains(x.ExaminationId))
+                   .Count(),
+
+                   StudentTotal_81_90_Count = asnswersheets
+                   .Where(x => x.TotalObtainedMark >= 81 && x.TotalObtainedMark <= 90)
+                   .Where(x => grpItems.Select(y => y.ExaminationId).Contains(x.ExaminationId))
+                   .Count(),
+
+                   StudentTotal_91_100_Count = asnswersheets
+                   .Where(x => x.TotalObtainedMark >= 91 && x.TotalObtainedMark <= 100)
+                   .Where(x => grpItems.Select(y => y.ExaminationId).Contains(x.ExaminationId))
+                   .Count(),
+
+                   //StudentTotalPassCount --- Refer model Get property
 
                }).ToList();
 

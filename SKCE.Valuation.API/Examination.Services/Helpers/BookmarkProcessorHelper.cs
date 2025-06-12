@@ -214,7 +214,7 @@ namespace SKCE.Examination.Services.Helpers
                         {
                             // Extract full content between bookmark start and end
                             List<DocumentObject> content = GetBookmarkContentRecursive(updatedSourcedoc, bookmark.Name);
-                            
+
                             // Replace content in destination document
                             ReplaceBookmarkContent(templateDoc, destBookmark, content);
                         }
@@ -240,7 +240,7 @@ namespace SKCE.Examination.Services.Helpers
                     }
                 }
 
-                var previewdocPath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}.docx", "Preview_Version_", inputDocPath.Replace(".docx","")));
+                var previewdocPath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}.docx", "Preview_Version_", inputDocPath.Replace(".docx", "")));
                 templateDoc.Watermark = null;
                 templateDoc.SaveToFile(previewdocPath, FileFormat.Docx);
 
@@ -248,7 +248,7 @@ namespace SKCE.Examination.Services.Helpers
                 RemoveTextFromDocx(previewdocPath, "Evaluation Warning: The document was created with Spire.Doc for .NET.");
 
                 // Save the modified document as PDF
-                var previewPdfPath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}_{2}.pdf", bookmarkUpdates["COURSECODE"].Replace("/","_"), qPTemplate.QPCode, DateTime.Now.ToString("ddMMyyyyhhmmss")));
+                var previewPdfPath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}_{2}.pdf", bookmarkUpdates["COURSECODE"].Replace("/", "_"), qPTemplate.QPCode, DateTime.Now.ToString("ddMMyyyyhhmmss")));
                 //ConvertToPdfBySyncfusion(previewdocPath, previewPdfPath);
 
                 if (!isForPrint) return previewdocPath;
@@ -336,7 +336,7 @@ namespace SKCE.Examination.Services.Helpers
                 }
             }
         }
-        private void ReplaceBookmarkContent(Document doc, Bookmark bookmark, List<DocumentObject> content)
+        private void ReplaceBookmarkContent(Document doc, Spire.Doc.Bookmark bookmark, List<DocumentObject> content)
         {
             Paragraph startPara = bookmark.BookmarkStart.OwnerParagraph;
             Body body = (Body)startPara.Owner;
@@ -352,12 +352,12 @@ namespace SKCE.Examination.Services.Helpers
                 body.ChildObjects.Insert(index++, obj);
             }
         }
-        private async Task<string> PrintQP(Document updatedSourcedoc, Dictionary<string, string> bookmarkUpdates, QPTemplate qPTemplate, UserQPTemplate userQPTemplate,string fileNameToPrint)
+        private async Task<string> PrintQP(Document updatedSourcedoc, Dictionary<string, string> bookmarkUpdates, QPTemplate qPTemplate, UserQPTemplate userQPTemplate, string fileNameToPrint)
         {
             var degreeTypeName = _context.DegreeTypes.FirstOrDefault(dt => dt.DegreeTypeId == qPTemplate.DegreeTypeId)?.Name ?? string.Empty;
             var qpDocument = _context.QPDocuments.FirstOrDefault(d => d.InstitutionId == userQPTemplate.InstitutionId && d.RegulationYear == qPTemplate.RegulationYear && d.DegreeTypeName == degreeTypeName && d.DocumentTypeId == 2 && d.ExamType.ToLower().Contains(qPTemplate.ExamType.ToLower()));
             string documentPathToPrint = _context.Documents.FirstOrDefault(d => d.DocumentId == qpDocument.DocumentId)?.Name;
-            
+
             // Load the template document where bookmarks need to be replaced
             Document templateDoc = await _azureBlobStorageHelper.DownloadWordDocumentFromBlob(documentPathToPrint);
 
@@ -370,20 +370,36 @@ namespace SKCE.Examination.Services.Helpers
                 string bookmarkName = bookmark1.Name;
                 // Find the same bookmark in the destination document
                 Spire.Doc.Bookmark destinationBookmark = templateDoc.Bookmarks.FindByName(bookmarkName);
-                if (destinationBookmark != null)
-                {
-                    // Extract content from the source bookmark (including images)
-                    DocumentObjectCollection sourceContent = bookmark1.BookmarkStart.OwnerParagraph.ChildObjects;
-
-                    // Clear existing content in destination bookmark
-                    Paragraph destParagraph = destinationBookmark.BookmarkStart.OwnerParagraph;
-                    destParagraph.ChildObjects.Clear();
-
-                    // Copy content to the destination bookmark
-                    foreach (DocumentObject obj in sourceContent)
+                if (destinationBookmark == null) continue;
+                try 
+                { 
+                    if (bookmark1.Name.StartsWith("Q") && !bookmark1.Name.StartsWith("QPCODE"))
                     {
-                        destParagraph.ChildObjects.Add(obj.Clone());
+                        // Extract full content between bookmark start and end
+                        List<DocumentObject> content = GetBookmarkContentRecursive(updatedSourcedoc, bookmark1.Name);
+
+                        // Replace content in destination document
+                        ReplaceBookmarkContent(templateDoc, destinationBookmark, content);
                     }
+                    else
+                    {
+                        // Extract content from the source bookmark (including images)
+                        DocumentObjectCollection sourceContent = bookmark1.BookmarkStart.OwnerParagraph.ChildObjects;
+
+                        // Clear existing content in destination bookmark
+                        Paragraph destParagraph = destinationBookmark.BookmarkStart.OwnerParagraph;
+                        destParagraph.ChildObjects.Clear();
+
+                        // Copy content to the destination bookmark
+                        foreach (DocumentObject obj in sourceContent)
+                        {
+                            destParagraph.ChildObjects.Add(obj.Clone());
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    continue;
                 }
             }
 

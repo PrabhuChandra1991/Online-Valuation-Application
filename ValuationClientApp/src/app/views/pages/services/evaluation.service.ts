@@ -49,4 +49,7 @@ export class EvaluationService {
     return this.http.get(`${this.apiUrl}/api/Answersheet/GetAnswersheetDetailsById?answersheetId=${answersheetId}`);
   }
 
+   EvaluationHistory(answersheetId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/api/Answersheet/EvaluationHistory?answersheetId=${answersheetId}`);
+  }
 }

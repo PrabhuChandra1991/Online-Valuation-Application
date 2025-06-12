@@ -376,7 +376,15 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
 
   }
 
-  validateMark(event: any, item: any) {
+  validateMark(event: any, item: any, index:number) {
+    if(index == 0)
+    {
+      console.log('test data' + item)
+       this.evaluationService.EvaluationHistory(item.answersheetId).subscribe(
+      (data: any) => {
+        console.log('history save done' + data);
+      });
+    }
     if (event.target.value) {
       if (event.target.value.match(/[^0-9.]/g)) {
         this.toastr.error('Please add only numbers.');

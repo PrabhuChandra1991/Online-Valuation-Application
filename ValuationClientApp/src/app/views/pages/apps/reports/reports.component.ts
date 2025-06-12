@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { ReportService } from '../../services/report.service';
 
 @Component({
   selector: 'app-reports',
@@ -12,10 +13,10 @@ import { Component } from '@angular/core';
 export class ReportsComponent {
 dataSourceExamTypes: string[] = [];
 selectedExamType:string;
+  toasterService: any;
+  spinnerService: any;
 
- constructor(
-    
-  ) { }
+ constructor(private reportService:ReportService) { }
 
 ngOnInit(): void {
     this.loadAllExamTypes();
@@ -28,11 +29,27 @@ ngOnInit(): void {
   onExamTypeChange(event: Event){
     this.selectedExamType = (event.target as HTMLSelectElement).value;
   }
-
+  fileName:string;
+  contentType:string = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
   export(){
      if(this.selectedExamType == 'Consolidated Report')
      {
-       this.answersheetService.exportMarks(
+      this.fileName = 'ConsolidateReport';
+       this.reportService.GetConsolidatedMarkReport().subscribe({
+        next: (response: any) => {
+          this.openFileInTab(response.base64Content, this.fileName , this.contentType);
+
+          this.toasterService.success('Data submitted successfully!');
+          this.spinnerService.toggleSpinnerState(false);
+        },
+        error: (err: any) => {
+          if (err.error.message === "EVALUATION-NOT-COMPLETED")
+            this.toasterService.error('Evaluation is not completed for all answersheets. Please check.');
+          else
+            this.toasterService.error('Error exporting marks. Please try again.');
+          this.spinnerService.toggleSpinnerState(false);
+        },
+      });
      }
      else if(this.selectedExamType == 'Pass Analysis Report')
      {

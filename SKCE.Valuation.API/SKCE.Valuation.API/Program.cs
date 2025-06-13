@@ -1,16 +1,13 @@
 
 using Microsoft.EntityFrameworkCore;
-using SKCE.Examination.Services.Common;
-using SKCE.Examination.Services.ServiceContracts;
-using SKCE.Examination.Models.DbModels.Common;
-using SKCE.Examination.Services.Helpers;
-using SKCE.Examination.Models.DbModels.QPSettings;
-using SKCE.Examination.Services.AutoMapperProfiles;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Azure;
+using SKCE.Examination.Models.DbModels.Common;
+using SKCE.Examination.Models.DbModels.QPSettings;
+using SKCE.Examination.Services.Common;
+using SKCE.Examination.Services.Helpers;
 using SKCE.Examination.Services.MappingProfiles;
 using SKCE.Examination.Services.QPSettings;
-using System.Text.Json.Serialization;
+using SKCE.Examination.Services.ServiceContracts;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,10 +32,11 @@ builder.Services.AddScoped<InstitutionService>();
 builder.Services.AddScoped<AnswersheetService>();
 builder.Services.AddScoped<AnswersheetImportService>();
 builder.Services.AddScoped<DropdownService>();
+builder.Services.AddScoped<ReportService>();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers()
-    .AddNewtonsoftJson(x=>x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+    .AddNewtonsoftJson(x => x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
 //builder.Services.AddControllers().AddJsonOptions(x =>
 //   x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
@@ -76,7 +74,7 @@ using (var scope = app.Services.CreateScope())
         Console.WriteLine($"An error occurred while seeding the database: {ex.Message}");
     }
 }
-    app.UseExceptionHandler("/Error");
+app.UseExceptionHandler("/Error");
 app.UseSwagger();
 app.UseSwaggerUI();
 
@@ -105,14 +103,14 @@ void SeedDefaultUser(ExaminationDbContext context)
     {
         var defaultUser = new User
         {
-            Salutation="Mr.",
-            Gender="Male",
+            Salutation = "Mr.",
+            Gender = "Male",
             Name = "Super Admin",
             Email = builder.Configuration["SuperAdminEmail"].ToString(),
             MobileNumber = "8300034477",
             RoleId = 1,
             CollegeName = "SRI KRISHNA COLLEGE OF ENGINEERING TECHNOLOGY",
-            DepartmentName ="",
+            DepartmentName = "",
             TotalExperience = 1,
             BankAccountName = "",
             BankAccountNumber = "",
@@ -178,7 +176,7 @@ void SeedExamMonths(ExaminationDbContext context)
 /// </summary>
 void SeedQPTags(ExaminationDbContext context)
 {
-    if (!context.QPTags.Any()) 
+    if (!context.QPTags.Any())
     {
         //TagDataTypeId -1 for Rich text box, 2 for TextBox, 3 for Numeric Text box
         var qptags = new List<QPTag>

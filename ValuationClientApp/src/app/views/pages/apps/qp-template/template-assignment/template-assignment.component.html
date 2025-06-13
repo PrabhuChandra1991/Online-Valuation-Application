@@ -1,7 +1,32 @@
 <div class="container-fluid">
   <h3>Assigned Templates</h3>
   <div class="row mt-4">
-    <div class="col-lg-3 col-md-5">
+    <div class="col-md-1 mt-4">
+      <select id="examYearId" class="form-select" (change)="onExamYearChange($event)">
+        <option [value]="0">Year</option>
+        <option *ngFor="let item of dataSourceExamYears" [value]="item">
+          {{ item }}
+        </option>
+      </select>
+    </div>
+    <div class="col-md-1 mt-4">
+      <select id="examMonthId" class="form-select" (change)="onExamMonthChange($event)">
+        <option [value]="0">Month</option>
+        <option *ngFor="let item of dataSourceExamMonths" [value]="item">
+          {{ item }}
+        </option>
+      </select>
+    </div>
+    <div class="col-md-1 mt-4">
+      <select id="examTypeId" class="form-select" (change)="onExamTypeChange($event)" [formControl]="ddlType">
+        <option [value]="0">Type</option>
+        <option *ngFor="let item of dataSourceExamTypes" [value]="item">
+          {{ item }}
+        </option>
+      </select>
+    </div>
+
+    <div class="col-md-5 mt-4">
       <input class="form-control" (keyup)="applyFilter($event)" placeholder="Search">
     </div>
     <div class="col-lg-7 col-md-2">

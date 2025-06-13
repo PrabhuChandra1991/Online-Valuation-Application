@@ -57,12 +57,18 @@ namespace SKCE.Examination.API.Controllers.QPSettings
             return Ok(updatedTemplate);
         }
         [HttpGet("GetQPTemplates/{institutionId}")]
-        public async Task<ActionResult<IEnumerable<QPTemplateVM>>> GetQPTemplates(long institutionId, string? examYear, string? examMonth, string? examType)
+        public async Task<ActionResult<IEnumerable<QPTemplateVM>>> GetQPTemplates(long institutionId)
         {
-            return Ok(await _qpTemplateService.GetQPTemplatesAsync(institutionId, examYear, examMonth, examType));
+            return Ok(await _qpTemplateService.GetQPTemplatesAsync(institutionId));
         }
 
-        [HttpGet("{qpTemplateId}")]
+        [HttpGet("GetQPTemplatesData/{institutionId}")]
+        public async Task<ActionResult<IEnumerable<QPTemplateVM>>> GetQPTemplatesData(long institutionId, string? examYear, string? examMonth, string? examType)
+        {
+            return Ok(await _qpTemplateService.GetQPTemplatesDataAsync(institutionId, examYear, examMonth, examType));
+        }
+
+            [HttpGet("{qpTemplateId}")]
         public async Task<ActionResult<QPTemplateVM>> GetQPTemplate(long qpTemplateId)
         {
             var qPTemplate = await _qpTemplateService.GetQPTemplateAsync(qpTemplateId);
@@ -81,7 +87,11 @@ namespace SKCE.Examination.API.Controllers.QPSettings
         {
             return Ok(await _qpTemplateService.GetQPTemplatesByUserIdAsync(userId));
         }
-
+        [HttpGet("GetUserQPTemplatesData/{userId}")]
+        public async Task<ActionResult<IEnumerable<UserQPTemplateVM>>> GetUserQPTemplatesDataAsync(long userId, string? examYear, string? examMonth, string? examType)
+        {
+            return Ok(await _qpTemplateService.GetQPTemplatesByUserIdDataAsync(userId, examYear, examMonth, examType));
+        }
 
         [HttpGet("GetExpertsForQPAssignment")]
         public async Task<ActionResult<IEnumerable<QPAssignmentExpertVM>>> GetExpertsForQPAssignment()

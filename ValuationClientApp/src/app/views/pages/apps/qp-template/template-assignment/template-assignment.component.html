@@ -73,7 +73,7 @@
             @else{
             <td mat-cell *matCellDef="let element">
               <a class="primary link-opacity-50-hover" *ngIf="element.qpTemplateStatusTypeId === 8 || element.qpTemplateStatusTypeId === 10"
-                (click)="openDocUploadModal(lgDocModal,element.userQPTemplateId)"
+                (click)="openDocUploadModal(lgDocModal,element.userQPTemplateId, element.courseCode)"
                 [ngClass]="(element.qpTemplateStatusTypeId === 9 || element.qpTemplateStatusTypeId === 11) ? 'disabled' : ''">
                 Upload generated QP
               </a>

@@ -186,9 +186,10 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
       console.log("Modal closed" + result);
     }).catch((res) => { });
   }
-  openDocUploadModal(content: TemplateRef<any>, qpTemplateId: number) {
+  courseCode:any;
+  openDocUploadModal(content: TemplateRef<any>, qpTemplateId: number, courseCode:any) {
     this.qpTemplateId = qpTemplateId;
-   
+   this.courseCode = courseCode;
   this.qpDocDataForm = new FormGroup({
     name: new FormControl('', [Validators.required, Validators.minLength(3)]),
     file: new FormControl('', [Validators.required]),
@@ -802,7 +803,7 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
       formData.append('file', fileSourceValue);
     }
 
-    this.qpDocumentService.validateQPFile(formData, qpDocumentId).subscribe({
+    this.qpDocumentService.validateQPFile(formData, qpDocumentId, this.courseCode).subscribe({
       next: (response) => {
         if (response.inValid) {
           this.qpValidationMessage = response.message;

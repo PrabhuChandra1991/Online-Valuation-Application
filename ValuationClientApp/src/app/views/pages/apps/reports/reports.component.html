@@ -1,0 +1,19 @@
+ <div class="container-fluid">
+  <h3>Report Management</h3>
+  <div class="row mt-6">
+  <div class="col-md-6">
+      <select id="examTypeId" class="form-select" (change)="onExamTypeChange($event)">
+        <option [value]="0">Type</option>
+        <option *ngFor="let item of dataSourceExamTypes" [value]="item">
+          {{ item }}
+        </option>
+      </select>
+    </div>
+
+     <div class="col-md-2">
+      <button type="button" class="btn btn-primary"
+        (click)="export()">Export into Excel</button>
+    </div>
+  </div>
+ </div>
+ 

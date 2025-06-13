@@ -390,8 +390,26 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
       }
     );
   }
+  onValueFinalized(event: any, item: any)
+  {
+    const newValue = Number(event.target.value);
+    const oldValue = item.obtainedMark;
+
+    if (newValue !== oldValue) {
+      console.log('test data', item.questionNumber)
+      this.evaluationService.EvaluationHistory(this.primaryData.answersheetId, item.questionNumber).subscribe(
+        (data: any) => {
+          console.log('history save done', data);
+        });
+    }
+  }
 
   validateMark(event: any, item: any) {
+   
+    this.evaluationService.EvaluationHistory(this.primaryData.answersheetId, item.questionNumber).subscribe(
+    (data: any) => {
+    console.log('history save done', data);
+  
     if (event.target.value) {
       if (event.target.value.match(/[^0-9.]/g)) {
         this.toastr.error('Please add only numbers.');
@@ -418,6 +436,9 @@ export class EvaluateComponent implements OnInit, AfterViewChecked {
       //   }
       // });
     }
+
+    });
+
   }
 
   saveMark(item: any, obtainedMark: number) {

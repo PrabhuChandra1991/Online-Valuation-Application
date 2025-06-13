@@ -103,9 +103,9 @@
               Actions
             </th>
             <td mat-cell *matCellDef="let element">
-              <!-- <a *ngIf="element.isEvaluateCompleted" class="primary link-opacity-50-hover"
+              <a *ngIf="element.isEvaluateCompleted" class="primary link-opacity-50-hover"
                 (click)="edit(element.dummyNumber)"> Edit </a>
-              &nbsp;&nbsp; -->
+              &nbsp;&nbsp;
               <a class="link-opacity-50-hover" (click)="viewEvaluation(element.answersheetId)">View</a>
             </td>
           </ng-container>

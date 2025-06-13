@@ -705,6 +705,7 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
     // Optionally, open in new tab too
     //window.open(blobUrl, '_blank');
   }
+  previewDone:any = false;
   printQPDocument(userqpTemplateId: number, isForPrint: boolean) {
     this.spinnerService.toggleSpinnerState(true);
     this.templateService.printQPTemplate(userqpTemplateId, isForPrint).subscribe({
@@ -839,6 +840,7 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
   }
 
   previewGeneratedDcument(userqpTemplateId: number) {
+    this.previewDone = true;
     this.spinnerService.toggleSpinnerState(true);
     const formData = new FormData();
     const fileSourceValue = this.qpDocDataForm.get('fileSource')?.value;
@@ -869,6 +871,12 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
   }
 
   submit(qpDocumentId: number) {
+    if(!this.previewDone)
+    {
+        this.validationMessage = 'Please preview and verify details before submit.';
+        this.previewDone = false;
+        return;
+    }
     this.spinnerService.toggleSpinnerState(true);
     const formData = new FormData();
     const fileSourceValue = this.qpDocDataForm.get('fileSource')?.value;

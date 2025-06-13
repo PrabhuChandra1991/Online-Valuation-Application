@@ -395,6 +395,14 @@
             <input matInput name="tableName" placeholder="Table Name" required #tableName>
           </mat-form-field>
         </div>
+
+        <div class="row">
+        <div class="col-sm-12" *ng="!previewDone">
+          <div class="mb-3">
+            <div [innerHTML]="validationMessage"></div>
+          </div>
+        </div><!-- Col -->
+      </div><!-- Row -->
       </div><!-- Row -->
     </form>
   </div>

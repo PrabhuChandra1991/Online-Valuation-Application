@@ -1036,8 +1036,22 @@ namespace SKCE.Examination.Services.QPSettings
             _context.SaveChanges();
             return true;
         }
-        public async Task<(string message, bool inValidForSubmission)> ValidateGeneratedQPAsync(long userQPTemplateId, Document doc)
+        public async Task<(string message, bool inValidForSubmission)> ValidateGeneratedQPAsync(string courseCode, long userQPTemplateId, Document doc)
         {
+            string text = doc.GetText();
+            string keyword = "COURSE CODE";
+            int index = text.IndexOf(keyword, StringComparison.OrdinalIgnoreCase);
+            if (index != -1)
+            {
+                string after = text.Substring(index + keyword.Length).Trim();
+                string[] parts = after.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length > 0)
+                {
+                    if (parts[3] != courseCode)
+                        return ("Course Code mismatched with document", true);
+                }
+            }
+
             var userQPTemplate = await _context.UserQPTemplates.FirstOrDefaultAsync(uqp => uqp.UserQPTemplateId == userQPTemplateId);
             if (userQPTemplate == null)
             {

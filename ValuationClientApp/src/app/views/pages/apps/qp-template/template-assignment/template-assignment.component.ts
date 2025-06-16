@@ -186,9 +186,10 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
       console.log("Modal closed" + result);
     }).catch((res) => { });
   }
-  openDocUploadModal(content: TemplateRef<any>, qpTemplateId: number) {
+  courseCode:any;
+  openDocUploadModal(content: TemplateRef<any>, qpTemplateId: number, courseCode:any) {
     this.qpTemplateId = qpTemplateId;
-   
+   this.courseCode = courseCode;
   this.qpDocDataForm = new FormGroup({
     name: new FormControl('', [Validators.required, Validators.minLength(3)]),
     file: new FormControl('', [Validators.required]),
@@ -704,6 +705,7 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
     // Optionally, open in new tab too
     //window.open(blobUrl, '_blank');
   }
+  previewDone:any = false;
   printQPDocument(userqpTemplateId: number, isForPrint: boolean) {
     this.spinnerService.toggleSpinnerState(true);
     this.templateService.printQPTemplate(userqpTemplateId, isForPrint).subscribe({
@@ -802,7 +804,7 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
       formData.append('file', fileSourceValue);
     }
 
-    this.qpDocumentService.validateQPFile(formData, qpDocumentId).subscribe({
+    this.qpDocumentService.validateQPFile(formData, qpDocumentId, this.courseCode).subscribe({
       next: (response) => {
         if (response.inValid) {
           this.qpValidationMessage = response.message;
@@ -838,6 +840,7 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
   }
 
   previewGeneratedDcument(userqpTemplateId: number) {
+    this.previewDone = true;
     this.spinnerService.toggleSpinnerState(true);
     const formData = new FormData();
     const fileSourceValue = this.qpDocDataForm.get('fileSource')?.value;
@@ -868,6 +871,12 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
   }
 
   submit(qpDocumentId: number) {
+    if(!this.previewDone)
+    {
+        this.validationMessage = 'Please preview and verify details before submit.';
+        this.previewDone = false;
+        return;
+    }
     this.spinnerService.toggleSpinnerState(true);
     const formData = new FormData();
     const fileSourceValue = this.qpDocDataForm.get('fileSource')?.value;

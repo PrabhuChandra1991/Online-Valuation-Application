@@ -40,18 +40,20 @@ export class ReportsComponent {
       this.fileName = 'ConsolidateReport';
       this.reportService.GetConsolidatedMarkReport().subscribe({
         next: (response: any) => {
-          const headers = ['COLLEGE_CODE', 'COURSE_CODE', 'COURSE_NAME', 'REGISTERED_STUDENT_COUNT',
-            'APPEARED_ANSWER_SHEET_COUNT', 'ABSENT_COUNT', 'PASS_COUNT', 'FAIL_COUNT'];
+          const headers = ['COLLEGE_CODE', 'COURSE_CODE', 'COURSE_NAME', 'EXAM_TYPE', 'REGISTERED_STUDENT_COUNT',
+            'APPEARED_ANSWER_SHEET_COUNT', 'ABSENT_COUNT', 'PASS_COUNT', 'FAIL_COUNT', 'EVALUATION_NOT_COMPLETED_COUNT'];
 
           const dataRows = response.map((item: any) => [
             item.institutionCode,
             item.courseCode,
             item.courseName,
+            item.examType,
             item.studentTotalRegisteredCount,
             item.studentTotalAppearedCount,
             item.studentTotalAbsentCount,
             item.studentTotalPassCount,
-            item.studentTotalFailCount
+            item.studentTotalFailCount,
+            item.pendingEvaluationCount
           ]);
           const finalData = [headers, ...dataRows];
           this.openFileInTab(finalData, this.fileName, this.contentType);
@@ -62,17 +64,19 @@ export class ReportsComponent {
       this.fileName = 'PassAnalysisReport';
       this.reportService.GetPassAnalysisReport().subscribe({
         next: (response: any) => {
-          const headers = ['COLLEGE_CODE', 'COURSE_CODE', 'COURSE_NAME', 'REGISTERED_STUDENT_COUNT', 'APPEARED_ANSWER_SHEET_COUNT',
-            'ABSENT_COUNT', 'TOTAL_PASS_COUNT', '91-100', '81-90', '71-80', '61-70', '51-60', '45-50'];
+          const headers = ['COLLEGE_CODE', 'COURSE_CODE', 'COURSE_NAME', 'EXAM_TYPE', 'REGISTERED_STUDENT_COUNT', 'APPEARED_ANSWER_SHEET_COUNT',
+            'ABSENT_COUNT', 'TOTAL_PASS_COUNT', 'EVALUATION_NOT_COMPLETED_COUNT', '91-100', '81-90', '71-80', '61-70', '51-60', '45-50'];
 
           const dataRows = response.map((item: any) => [
             item.institutionCode,
             item.courseCode,
             item.courseName,
+            item.examType,
             item.studentTotalRegisteredCount,
             item.studentTotalAppearedCount,
             item.studentTotalAbsentCount,
             item.studentTotalPassCount,
+            item.pendingEvaluationCount,
             item.studentTotal_91_100_Count,
             item.studentTotal_81_90_Count,
             item.studentTotal_71_80_Count,
@@ -89,17 +93,19 @@ export class ReportsComponent {
       this.fileName = 'FailAnalysisReport';
       this.reportService.GetFailAnalysisReport().subscribe({
         next: (response: any) => {
-          const headers = ['COLLEGE_CODE', 'COURSE_CODE', 'COURSE_NAME', 'REGISTERED_STUDENT_COUNT', 'APPEARED_ANSWER_SHEET_COUNT',
-            'ABSENT_COUNT', 'TOTAL_FAIL_COUNT', '40-44', '35-39', '30-34', '25-29', '0-24'];
+          const headers = ['COLLEGE_CODE', 'COURSE_CODE', 'COURSE_NAME', 'EXAM_TYPE', 'REGISTERED_STUDENT_COUNT', 'APPEARED_ANSWER_SHEET_COUNT',
+            'ABSENT_COUNT', 'TOTAL_FAIL_COUNT', 'EVALUATION_NOT_COMPLETED_COUNT', '40-44', '35-39', '30-34', '25-29', '0-24'];
 
           const dataRows = response.map((item: any) => [
             item.institutionCode,
             item.courseCode,
             item.courseName,
+            item.examType,
             item.studentTotalRegisteredCount,
             item.studentTotalAppearedCount,
             item.studentTotalAbsentCount,
             item.studentTotalFailCount,
+            item.pendingEvaluationCount,
             item.studentTotal_40_44_Count,
             item.studentTotal_35_39_Count,
             item.studentTotal_30_34_Count,

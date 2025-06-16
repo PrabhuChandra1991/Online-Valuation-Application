@@ -29,16 +29,23 @@ namespace SKCE.Examination.Services.EntityReportHelpers
                            CourseCode = course.Code,
                            CourseName = course.Name,
                            StudentCount = examination.StudentCount,
+                           ExamType = examination.ExamType,
                        }).ToListAsync();
 
             var asnswersheets =
-                await (from asnswersheet in this._context.Answersheets
-                       where asnswersheet.IsActive == true
-                       select new
-                       {
-                           ExaminationId = asnswersheet.ExaminationId,
-                           TotalObtainedMark = asnswersheet.TotalObtainedMark
-                       }).ToListAsync();
+                 await (from asnswersheet in this._context.Answersheets
+                        join examination in this._context.Examinations
+                        on asnswersheet.ExaminationId equals examination.ExaminationId
+                        join course in this._context.Courses
+                        on examination.CourseId equals course.CourseId
+                        where asnswersheet.IsActive == true
+                        select new
+                        {
+                            IsEvalutionCompleted = asnswersheet.IsEvaluateCompleted,
+                            ExaminationId = asnswersheet.ExaminationId,
+                            TotalObtainedMark = asnswersheet.TotalObtainedMark,
+                            CourseCode = course.Code
+                        }).ToListAsync();
 
             var resultItems =
               (from item in examimationItems
@@ -50,14 +57,15 @@ namespace SKCE.Examination.Services.EntityReportHelpers
                    CourseId = grpItems.Key.CourseId,
                    CourseCode = grpItems.First().CourseCode,
                    CourseName = grpItems.First().CourseName,
-
+                   ExamType = grpItems.First().ExamType,
                    StudentTotalRegisteredCount = grpItems.Sum(x => x.StudentCount),
 
                    StudentTotalAppearedCount = asnswersheets
                    .Count(x => grpItems.Select(y => y.ExaminationId).Contains(x.ExaminationId)),
 
                    //StudentTotalAbsentCount = 0,
-
+                   PendingEvaluationCount = asnswersheets.Count(x => x.CourseCode == grpItems.First().CourseCode
+                                                                    && x.IsEvalutionCompleted == false),
                    StudentTotalPassCount = asnswersheets
                    .Where(x => x.TotalObtainedMark >= 45)
                    .Where(x => grpItems.Select(y => y.ExaminationId).Contains(x.ExaminationId))

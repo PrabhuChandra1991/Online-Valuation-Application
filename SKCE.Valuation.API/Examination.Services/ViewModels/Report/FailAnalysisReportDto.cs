@@ -7,6 +7,7 @@
         public required long CourseId { get; set; }
         public required string CourseCode { get; set; }
         public required string CourseName { get; set; }
+        public required string ExamType { get; set; }
         public required long StudentTotalRegisteredCount { get; set; }
         public required long StudentTotalAppearedCount { get; set; }
         public long StudentTotalAbsentCount
@@ -21,6 +22,7 @@
         public required long StudentTotal_30_34_Count { get; set; }
         public required long StudentTotal_35_39_Count { get; set; }
         public required long StudentTotal_40_44_Count { get; set; }
+        public required long PendingEvaluationCount { get; set; } = 0;
         public long StudentTotalFailCount
         {
             get

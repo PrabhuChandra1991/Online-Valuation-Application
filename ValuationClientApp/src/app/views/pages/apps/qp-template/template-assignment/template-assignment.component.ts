@@ -39,6 +39,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { InstituteService } from '../../../services/institute.service';
 import { MatButtonModule } from '@angular/material/button';
 import { QPDocumentService } from '../../../services/qpdocument.service';
+import { AnswersheetService } from '../../../services/answersheet.service';
 
 @Component({
   selector: 'app-template-assignment',
@@ -64,6 +65,18 @@ import { QPDocumentService } from '../../../services/qpdocument.service';
 })
 export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
   [x: string]: any;
+
+  dataSourceExamYears: any[] = [];
+  dataSourceExamMonths: any[] = [];
+  dataSourceExamTypes: any[] = [];
+
+  selectedExamYear: string = '0';
+  selectedExamMonth: string = '0';
+  selectedExamType: string = '0';
+
+  ddlType = new FormControl('0');
+
+
 
   isAdmin: Boolean;
   isEditMode: Boolean;
@@ -129,10 +142,15 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
     private instituteService: InstituteService,
     private toastr: ToastrService,
     private route: ActivatedRoute,
-    private qpDocumentService: QPDocumentService
+    private qpDocumentService: QPDocumentService,
+    private answersheetService: AnswersheetService 
   ) { }
 
   ngOnInit(): void {
+    this.loadAllExamYears();
+    this.loadAllExamMonths();
+    this.loadAllExamTypes();
+    
     this.resetForm();
 
     this.loadCourses();
@@ -160,6 +178,72 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
     }
   }
 
+  loadAllExamYears(): void {
+    this.answersheetService.getExamYears().subscribe({
+      next: (data: any) => {
+        this.dataSourceExamYears = data;
+        console.log('ExamYears loaded:', this.dataSourceExamYears);
+      },
+      error: (err: any) => {
+        console.error('Error loading ExamYears:', err);
+      },
+    });
+  }
+
+  loadAllExamMonths(): void {
+    this.answersheetService.getExamMonths().subscribe({
+      next: (data: any) => {
+        this.dataSourceExamMonths = data;
+        console.log('ExamMonths loaded:', this.dataSourceExamMonths);
+      },
+      error: (err: any) => {
+        console.error('Error loading ExamMonths:', err);
+      },
+    });
+  }
+
+  loadAllExamTypes(): void {
+    this.answersheetService.getExamTypes().subscribe({
+      next: (data: any) => {
+        this.dataSourceExamTypes = data;
+        console.log('ExamTypes loaded:', this.dataSourceExamMonths);
+      },
+      error: (err: any) => {
+        console.error('Error loading ExamTypes:', err);
+      },
+    });
+    this.ddlType.setValue('0');
+  }
+
+   onExamYearChange(event: Event): void {
+    this.selectedExamYear = (event.target as HTMLSelectElement).value;
+    this.ddlType.setValue('0');
+  }
+
+  onExamMonthChange(event: Event): void {
+    this.selectedExamMonth = (event.target as HTMLSelectElement).value;
+    this.ddlType.setValue('0');
+  }
+
+  onExamTypeChange(event: Event): void {
+    this.selectedExamType = (event.target as HTMLSelectElement).value;
+    //this.loadGridData();
+    const loggedInUser = localStorage.getItem('userData');
+
+    if (loggedInUser) {
+      const userData = JSON.parse(loggedInUser);
+
+      this.isAdmin = userData.roleId == 1;
+
+      console.log("isAdmin: ", this.isAdmin)
+      if (this.isAdmin) {
+        // console.log('selected institute',this.selectedInstituteId);
+        this.loadTemplateaForInstitute(0);
+      } else {
+        this.loadAssignedTemplates();
+      }
+    }
+  }
   ngAfterViewInit(): void {
     // Show the chat-coloadAssignedTemplatesntent when a chat-item is clicked on tablet and mobile devices
     // document.querySelectorAll('.chat-list .chat-item').forEach(item => {
@@ -264,7 +348,11 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
   loadTemplateaForInstitute(institutionId: number): void {
     //let institutionId = 2;
     this.spinnerService.toggleSpinnerState(true);
-    this.templateService.getTemplates(institutionId).subscribe({
+    this.templateService.getTemplatesData(institutionId,
+        this.selectedExamYear,
+        this.selectedExamMonth,
+        this.selectedExamType
+    ).subscribe({
       next: (data: any[]) => {
         this.dataSource.data = data;
         this.dataSource.paginator = this.paginator;
@@ -298,7 +386,11 @@ export class TemplateAssignmentComponent implements OnInit, AfterViewInit {
       const userData = JSON.parse(loggedData);
 
       this.templateService
-        .getAssignedQpTemplateByUser(userData.userId)
+        .getAssignedQpTemplateByUserData(userData.userId,
+          this.selectedExamYear,
+         this.selectedExamMonth,
+         this.selectedExamType
+        )
         .subscribe({
           next: (data: any[]) => {
             this.templates = data;

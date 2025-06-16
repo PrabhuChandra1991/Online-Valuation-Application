@@ -34,12 +34,23 @@
       </select>
     </div>
     <div class="col-md-4">
-      <select id="courseId" class="form-select" (change)="onCourseChange($event)">
+      <!-- <select id="courseId" class="form-select" (change)="onCourseChange($event)">
         <option [value]="0">Select Course</option>
         <option *ngFor="let course of dataSourceCourses" [value]="course.courseId">
           {{ course.code }} - {{ course.name }} - ({{ course.count }})
         </option>
-      </select>
+      </select> -->
+      <input class="form-control"
+        type="text"
+        placeholder="Search course here..."
+        [formControl]="courseControl"
+        (focus)="showList()" 
+        (blur)="hideList()">
+      <ul class="autocompletelist" *ngIf="filteredOptions.length">
+        <li *ngFor="let option of filteredOptions" (click)="onCourseChange(option)">
+          {{ option }}
+        </li>
+      </ul>
     </div>
 
     <div class="col-md-2">

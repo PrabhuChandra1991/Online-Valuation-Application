@@ -70,6 +70,10 @@ export class ExportMarksComponent {
   selectedInstituteId: number = 0;
   selectedCourseId: number = 0;
 
+  courseControl = new FormControl('');
+  courseList: string[] = [];
+  filteredOptions: string[] = [];
+
   constructor(
     private answersheetService: AnswersheetService,
     private instituteService: InstituteService,
@@ -119,7 +123,6 @@ export class ExportMarksComponent {
     });
   }
 
-
   loadAllExamTypes(): void {
     this.answersheetService.getExamTypes().subscribe({
       next: (data: any) => {
@@ -138,6 +141,22 @@ export class ExportMarksComponent {
         (this.selectedExamYear, this.selectedExamMonth, this.selectedExamType, this.selectedInstituteId).subscribe({
           next: (data) => {
             this.dataSourceCourses = data;
+
+            console.log('Course:', data);
+
+            for (const course of data) {
+              this.courseList.push(course.code + " - " + course.name + " - (" + course.count + ")");
+            }
+    
+            console.log('Course loaded:', this.courseList);
+    
+            this.courseControl.valueChanges.subscribe(value => {
+              const filterValue = value?.toLowerCase() || '';
+              this.filteredOptions = this.courseList.filter(option =>
+                option.toLowerCase().includes(filterValue)
+              );
+            });
+
           },
           error: (error) => {
             console.error('Error loading Course:', error);
@@ -151,10 +170,6 @@ export class ExportMarksComponent {
     this.loadAllCourses();
   }
 
-  onCourseChange(event: Event): void {
-    this.selectedCourseId = parseInt((event.target as HTMLSelectElement).value);
-  }
-
   onExamYearChange(event: Event): void {
     this.selectedExamYear = (event.target as HTMLSelectElement).value;
     this.loadAllCourses();
@@ -165,13 +180,34 @@ export class ExportMarksComponent {
     this.loadAllCourses();
   }
 
-
   onExamTypeChange(event: Event): void {
     this.selectedExamType = (event.target as HTMLSelectElement).value;
     this.loadAllCourses();
   }
 
+  showList() {
+    this.filteredOptions = this.courseList;
+    document.querySelector('.course')?.classList.remove('hide');
+  }
 
+  hideList() {
+    setTimeout(() => {
+      this.filteredOptions = [];
+      document.querySelector('.course')?.classList.add('hide');
+    }, 200);
+  }
+
+  onCourseChange(option: string) {    
+    this.courseControl.setValue(option);
+    this.filteredOptions = []; // hide dropdown after selection
+
+    let index = option.indexOf('-');
+    let code = option.substring(0, index).trim();
+    let result = this.dataSourceCourses.filter(course => course.code === code);
+    this.selectedCourseId = result[0].courseId;
+
+    console.log("Course selected: ", result)
+  }
 
   exportMarks(): void {
     this.spinnerService.toggleSpinnerState(true);
@@ -193,6 +229,7 @@ export class ExportMarksComponent {
         },
       });
   }
+
   openFileInTab(base64String: string, filename: string, contentType: string) {
     const byteCharacters = atob(base64String);
     const byteNumbers = new Array(byteCharacters.length);

@@ -26,12 +26,23 @@
       </select>
     </div>
     <div class="col-md-4">
-      <select id="courseId" class="form-select" (change)="onExamCourseChange($event)">
+      <!-- <select id="courseId" class="form-select" (change)="onExamCourseChange($event)">
         <option [value]="0">Examination/Course</option>
         <option *ngFor="let item of dataSourceExamCourses" [value]="item.courseId">
           {{ item.courseCode }} - {{ item.courseName }} - ({{item.studentCount}})
         </option>
-      </select>
+      </select> -->
+      <input class="form-control"
+        type="text"
+        placeholder="Search course here..."
+        [formControl]="courseControl"
+        (focus)="showList()" 
+        (blur)="hideList()">
+      <ul class="autocompletelist" *ngIf="filteredOptions.length">
+        <li *ngFor="let option of filteredOptions" (click)="onCourseChange(option)">
+          {{ option }}
+        </li>
+      </ul>
     </div>
     <div class=" col-md-3">
       <form [formGroup]="dummyNumberImportForm">

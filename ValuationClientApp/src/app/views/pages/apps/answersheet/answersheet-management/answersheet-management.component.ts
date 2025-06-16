@@ -72,7 +72,7 @@ export class AnswersheetManagementComponent {
   ddlYears = new FormControl('');
   ddlMonths = new FormControl('');
   ddlTypes = new FormControl('');
-  ddlCourses = new FormControl('');
+  //ddlCourses = new FormControl('');
 
   dataSource = new MatTableDataSource<any>([]);
 
@@ -87,6 +87,10 @@ export class AnswersheetManagementComponent {
   selectedExamMonth: string = '';
   selectedExamType: string = '';
   selectedCourseId: number = 0;
+
+  courseControl = new FormControl('');
+  courseList: string[] = [];
+  filteredOptions: string[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -103,7 +107,7 @@ export class AnswersheetManagementComponent {
     this.ddlMonths.setValue('0');
     this.ddlTypes.setValue('0');
     this.courses = [];
-    this.ddlCourses.setValue('0');
+    //this.ddlCourses.setValue('0');
   }
 
   loadAllExamYears(): void {
@@ -146,13 +150,53 @@ export class AnswersheetManagementComponent {
     this.answersheetService.getCoursesWithAnswersheet(this.selectedExamYear, this.selectedExamMonth, this.selectedExamType).subscribe({
       next: (data) => {
         this.courses = data;
-        console.log('Course loaded:', this.courses);
+        console.log('Course:', data);
+
+        for (const course of data) {
+          this.courseList.push(course.code + " - " + course.name + " - (" + course.count + ")");
+        }
+
+        console.log('Course loaded:', this.courseList);
+
+        this.courseControl.valueChanges.subscribe(value => {
+          const filterValue = value?.toLowerCase() || '';
+          this.filteredOptions = this.courseList.filter(option =>
+            option.toLowerCase().includes(filterValue)
+          );
+        });
+
       },
       error: (error) => {
         console.error('Error loading Course:', error);
       },
     });
-    this.ddlCourses.setValue('0');
+    //this.ddlCourses.setValue('0');
+  }
+
+  showList() {
+    this.filteredOptions = this.courseList;
+    document.querySelector('.course')?.classList.remove('hide');
+  }
+
+  hideList() {
+    setTimeout(() => {
+      this.filteredOptions = [];
+      document.querySelector('.course')?.classList.add('hide');
+    }, 200);
+  }
+
+  onCourseChange(option: string) {    
+    this.courseControl.setValue(option);
+    this.filteredOptions = []; // hide dropdown after selection
+
+    let index = option.indexOf('-');
+    let code = option.substring(0, index).trim();
+    let result = this.courses.filter(course => course.code === code);
+    this.selectedCourseId = result[0].courseId;
+
+    console.log("Course selected: ", result)
+
+    this.loadData();
   }
 
   applyFilter(event: Event) {
@@ -187,10 +231,10 @@ export class AnswersheetManagementComponent {
     this.answersheets = [];
   }
 
-  onCourseChange(event: Event): void {
-    this.selectedCourseId = parseInt((event.target as HTMLSelectElement).value);
-    this.loadData();
-  }
+  // onCourseChange(event: Event): void {
+  //   this.selectedCourseId = parseInt((event.target as HTMLSelectElement).value);
+  //   this.loadData();
+  // }
 
   loadAllInstitues(): void {
     this.instituteService.getInstitutions().subscribe({

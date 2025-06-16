@@ -79,6 +79,10 @@ export class AnswersheetImportComponent implements OnInit {
   selectedCourse: any;
   absentees: number = 0;
 
+  courseControl = new FormControl('');
+  courseList: string[] = [];
+  filteredOptions: string[] = [];
+
   isDummyNumberImported = false;
 
   dummyNumberImportForm = new FormGroup({
@@ -174,6 +178,20 @@ export class AnswersheetImportComponent implements OnInit {
               'dataSourceExaminations  loaded:',
               this.dataSourceExamCourses
             );
+
+            for (const course of data) {
+              this.courseList.push(course.courseCode + " - " + course.courseName + " - (" + course.studentCount + ")");
+            }
+    
+            console.log('Course loaded:', this.courseList);
+    
+            this.courseControl.valueChanges.subscribe(value => {
+              const filterValue = value?.toLowerCase() || '';
+              this.filteredOptions = this.courseList.filter(option =>
+                option.toLowerCase().includes(filterValue)
+              );
+            });
+
           },
           error: (err: any) => {
             console.error('Error loading dataSourceExaminations:', err);
@@ -224,6 +242,32 @@ export class AnswersheetImportComponent implements OnInit {
           this.dataSourceAnswerSheetImportDetails = new MatTableDataSource<any>([]);
         },
       });
+  }
+
+  showList() {
+    this.filteredOptions = this.courseList;
+    document.querySelector('.course')?.classList.remove('hide');
+  }
+
+  hideList() {
+    setTimeout(() => {
+      this.filteredOptions = [];
+      document.querySelector('.course')?.classList.add('hide');
+    }, 200);
+  }
+
+  onCourseChange(option: string) {    
+    this.courseControl.setValue(option);
+    this.filteredOptions = []; // hide dropdown after selection
+
+    let index = option.indexOf('-');
+    let code = option.substring(0, index).trim();
+    let result = this.dataSourceExamCourses.filter(course => course.code === code);
+    this.selectedCourseId = result[0].courseId;
+
+    console.log("Course selected: ", result)
+
+    //this.loadData();
   }
 
   private getValue(event: Event) {

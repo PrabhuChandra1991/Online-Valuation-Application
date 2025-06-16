@@ -223,11 +223,11 @@ namespace SKCE.Examination.API.Controllers.Common
         }
 
         [HttpGet("EvaluationHistory")]
-        public async Task<IActionResult> EvaluationHistory([FromQuery] long answersheetId, [FromQuery] long questionNumber)
+        public async Task<IActionResult> EvaluationHistory([FromQuery] long answersheetId, [FromQuery] long questionNumber, [FromQuery] long questionNumberSubNum)
         {
             try
             {
-                var response = await _answersheetService.EvaluationHistory(answersheetId,questionNumber);
+                var response = await _answersheetService.EvaluationHistory(answersheetId,questionNumber,questionNumberSubNum);
                 return Ok(response);
             }
             catch (Exception ex)

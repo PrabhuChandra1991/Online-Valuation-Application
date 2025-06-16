@@ -119,10 +119,10 @@ namespace SKCE.Examination.Services.EntityHelpers
             return true;
         }
 
-        public async Task<bool> EvaluationHistory(long answersheetId,long questionNumber)
+        public async Task<bool> EvaluationHistory(long answersheetId,long questionNumber, long questionNumberSubNum)
         {
             var evalHist = _context.AnswersheetQuestionwiseMarks.Where(e =>
-                e.AnswersheetId == answersheetId && e.QuestionNumber == questionNumber).FirstOrDefault();
+                e.AnswersheetId == answersheetId && e.QuestionNumber == questionNumber && e.QuestionNumberSubNum == questionNumberSubNum).FirstOrDefault();
 
             if (evalHist != null)
             {

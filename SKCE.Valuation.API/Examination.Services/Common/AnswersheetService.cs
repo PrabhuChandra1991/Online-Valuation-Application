@@ -217,10 +217,10 @@ namespace SKCE.Examination.Services.Common
             return await helper.RevertEvaluation(answersheetId);
         }
 
-        public async Task<bool> EvaluationHistory(long answersheetId, long questionNumber)
+        public async Task<bool> EvaluationHistory(long answersheetId, long questionNumber, long questionNumberSubNum)
         {
             var helper = new AnswersheetMarkTransHelper(this._context);
-            return await helper.EvaluationHistory(answersheetId,questionNumber);
+            return await helper.EvaluationHistory(answersheetId,questionNumber,questionNumberSubNum);
         }
     }
 }

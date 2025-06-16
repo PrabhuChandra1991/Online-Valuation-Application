@@ -53,7 +53,7 @@ export class EvaluationService {
     return this.http.get(`${this.apiUrl}/api/Answersheet/GetAnswersheetDetailsById?answersheetId=${answersheetId}`);
   }
 
-   EvaluationHistory(answersheetId: number, questionNumber:number): Observable<any> {
-    return this.http.get(`${this.apiUrl}/api/Answersheet/EvaluationHistory?answersheetId=${answersheetId}&questionNumber=${questionNumber}`);
+   EvaluationHistory(answersheetId: number, questionNumber:number, questionNumberSubNum:number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/api/Answersheet/EvaluationHistory?answersheetId=${answersheetId}&questionNumber=${questionNumber}&questionNumberSubNum=${questionNumberSubNum}`);
   }
 }

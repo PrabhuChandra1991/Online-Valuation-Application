@@ -210,7 +210,7 @@ namespace SKCE.Examination.Services.Helpers
 
                     try
                     {
-                        if(bookmark.Name.StartsWith("Q") && !bookmark.Name.StartsWith("QPCODE"))
+                        if (bookmark.Name.StartsWith("Q") && !bookmark.Name.StartsWith("QPCODE"))
                         {
                             // Extract full content between bookmark start and end
                             List<DocumentObject> content = GetBookmarkContentRecursive(updatedSourcedoc, bookmark.Name);
@@ -240,6 +240,45 @@ namespace SKCE.Examination.Services.Helpers
                     }
                 }
 
+                foreach (Section section in templateDoc.Sections)
+                {
+                    foreach (Table table in section.Tables)
+                    {
+                        var rowIndicesToRemove = new HashSet<int>();
+
+                        for (int i = 0; i < table.Rows.Count; i++)
+                        {
+                            var row = table.Rows[i];
+
+                            foreach (TableCell cell in row.Cells)
+                            {
+                                foreach (Paragraph para in cell.Paragraphs)
+                                {
+                                    string text = para.Text.Trim();
+                                    if (text.ToLower() == "select" || (table.Rows.Count == 7 && text == ""))
+                                    {
+                                        rowIndicesToRemove.Add(i);
+                                        if (i + 1 < table.Rows.Count && !userQPTemplate.IsQPOnly) // Add next row index
+                                            rowIndicesToRemove.Add(i + 1);
+                                        break;
+                                    }
+                                }
+
+                                if (rowIndicesToRemove.Contains(i))
+                                    break;
+                            }
+                        }
+
+                        // Remove rows in reverse order to keep indices valid
+                        var indices = new List<int>(rowIndicesToRemove);
+                        indices.Sort((a, b) => b.CompareTo(a)); // descending order
+
+                        foreach (int index in indices)
+                        {
+                            table.Rows.RemoveAt(index);
+                        }
+                    }
+                }
                 var previewdocPath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("{0}_{1}.docx", "Preview_Version_", inputDocPath.Replace(".docx", "")));
                 templateDoc.Watermark = null;
                 templateDoc.SaveToFile(previewdocPath, FileFormat.Docx);
@@ -371,8 +410,8 @@ namespace SKCE.Examination.Services.Helpers
                 // Find the same bookmark in the destination document
                 Spire.Doc.Bookmark destinationBookmark = templateDoc.Bookmarks.FindByName(bookmarkName);
                 if (destinationBookmark == null) continue;
-                try 
-                { 
+                try
+                {
                     if (bookmark1.Name.StartsWith("Q") && !bookmark1.Name.StartsWith("QPCODE"))
                     {
                         // Extract full content between bookmark start and end
@@ -403,6 +442,40 @@ namespace SKCE.Examination.Services.Helpers
                 }
             }
 
+            foreach (Section section in templateDoc.Sections)
+            {
+                // Loop through each table in the section
+                foreach (Table table in section.Tables)
+                {
+                    // Collect rows to remove to avoid modifying collection while iterating
+                    var rowsToRemove = new List<TableRow>();
+
+                    foreach (TableRow row in table.Rows)
+                    {
+                        foreach (TableCell cell in row.Cells)
+                        {
+                            foreach (Paragraph para in cell.Paragraphs)
+                            {
+                                string text = para.Text.Trim();
+                                if (text.ToLower() == "select" || (table.Rows.Count == 7 && text == ""))
+                                {
+                                    rowsToRemove.Add(row);
+                                    break;
+                                }
+                            }
+
+                            if (rowsToRemove.Contains(row))
+                                break;
+                        }
+                    }
+
+                    // Remove the marked rows
+                    foreach (TableRow row in rowsToRemove)
+                    {
+                        table.Rows.Remove(row);
+                    }
+                }
+            }
             var previewdocPath = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), string.Format("FinalPrinted_QP_{0}_{1}_{2}.docx", qPTemplate.QPCode, fileNameToPrint, DateTime.Now.ToString("ddMMyyyyhhmmss")));
             templateDoc.Watermark = null;
             templateDoc.SaveToFile(previewdocPath, FileFormat.Docx);

@@ -22,8 +22,9 @@ export class QPDocumentService {
       downloadQPFile(documentId: number): Observable<any> {
           return this.http.get(`${this.apiUrl}/api/BlobStorage/download/${documentId}`);
         }
-      validateQPFile(formData: any, documentId: number): Observable<any> {
-        let resp = this.http.post(`${this.apiUrl}/api/QpTemplate/ValidateGeneratedQP/${documentId}`, formData);
+      validateQPFile(formData: any, documentId: number, courseCode:any): Observable<any> {
+        let encodedCourseCode = encodeURIComponent(courseCode);
+        let resp = this.http.post(`${this.apiUrl}/api/QpTemplate/ValidateGeneratedQP/${documentId}?courseCode=${encodedCourseCode}`, formData);
         return resp;
         }
 

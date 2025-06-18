@@ -90,7 +90,7 @@ namespace SKCE.Examination.API.Controllers.QPSettings
         }
 
         [HttpPost("ValidateGeneratedQP/{userQPTemplateId}")]
-        public async Task<IActionResult> ValidateGeneratedQP(long userQPTemplateId, IFormFile file)
+        public async Task<IActionResult> ValidateGeneratedQP(long userQPTemplateId, [FromQuery]string courseCode, IFormFile file)
         {
             if (file == null || file.Length == 0)
                 return BadRequest("Invalid file. Please upload a valid Word document.");
@@ -105,7 +105,7 @@ namespace SKCE.Examination.API.Controllers.QPSettings
                 // Load Word document from stream
                 Spire.Doc.Document doc = new Spire.Doc.Document(stream);
                 // Get and validate bookmarks
-                var validationResult = await _qpTemplateService.ValidateGeneratedQPAsync(userQPTemplateId, doc);
+                var validationResult = await _qpTemplateService.ValidateGeneratedQPAsync(courseCode, userQPTemplateId, doc);
 
                 return Ok(new ResultModel() { Message = validationResult.message, InValid = validationResult.inValidForSubmission });
             }

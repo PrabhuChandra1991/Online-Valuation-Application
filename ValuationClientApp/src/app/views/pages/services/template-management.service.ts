@@ -47,6 +47,14 @@ export class TemplateManagementService {
    getTemplates(institutionId:number): Observable<any> {
     return this.http.get(`${this.apiUrl}/api/QpTemplate/GetQPTemplates/${institutionId}`);
   }
+
+   getTemplatesData(institutionId:number,
+    examYear: string,
+    examMonth: string,
+    examType: string
+   ): Observable<any> {
+    return this.http.get(`${this.apiUrl}/api/QpTemplate/GetQPTemplatesData/${institutionId}?examYear=${examYear}&examMonth=${examMonth}&examType=${examType}`);
+  }
   // Fetch templated from API
   getTemplatesByStatusId(statusId:number): Observable<any> {
     return this.http.get(`${this.apiUrl}/api/QpTemplate/GetQPTemplatesByStatusId/${statusId}`);
@@ -62,6 +70,13 @@ export class TemplateManagementService {
 
   getAssignedQpTemplateByUser(userId: any): Observable<any> {
     return this.http.get(`${this.apiUrl}/api/QpTemplate/GetUserQPTemplates/${userId}`);
+  }
+  getAssignedQpTemplateByUserData(userId: any,
+    examYear: string,
+    examMonth: string,
+    examType: string
+   ): Observable<any> {
+    return this.http.get(`${this.apiUrl}/api/QpTemplate/GetUserQPTemplatesData/${userId}?examYear=${examYear}&examMonth=${examMonth}&examType=${examType}`);
   }
 
   CreateQpTemplate(formData: FormData): Observable<any> {
